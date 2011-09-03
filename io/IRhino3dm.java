@@ -1137,6 +1137,8 @@ public class IRhino3dm{
 		layer = context.layers[attributes.layerIndex].ilayer;
 		layer.add(e);
 		IOut.debug(10,"layer name : "+layer.name); //
+		
+		if(!layer.isVisible()) e.hide();
 	    }
 	    
 	    if(attributes.colorSource==colorSourceFromObject &&
@@ -1152,6 +1154,10 @@ public class IRhino3dm{
 	    else if(layer!=null){ // if(attributes.colorSource==ObjectAttributes.colorSourceFromLayer){ // all other
 		e.setColor(layer.getColor());
 		IOut.debug(10,"set layer color : "+layer.getColor()); //
+	    }
+	    
+	    if(!attributes.visible){
+		e.hide();
 	    }
 	    
 	    IOut.debug(10,"object color : "+e.getColor()); //
@@ -1562,7 +1568,7 @@ public class IRhino3dm{
 	    displayMaterialId=null;
 	    plotColor = new Color(255,255,255,0); // with 0xFFFFFF00 plot color, plot color follows layer color, which is currently desirable behavior.
 	    plotWeightMm=0.;
-	    visible=true;
+	    visible=ilayer.visible(); //true;
 	    locked=false;
 	    expanded=true;
 	    renderingAttributes = new RenderingAttributes();
@@ -1719,6 +1725,8 @@ public class IRhino3dm{
 	    if(color!=null) ilayer.setColor(color);
 	    ilayer.setVisible(visible);
 	    
+	    //IOut.err("LAYER: "+name+": visible="+visible); //
+	    
 	    return ilayer;
 	}
 	
@@ -1863,6 +1871,10 @@ public class IRhino3dm{
 	    else{
 		layerIndex = 0;
 	    }
+	    
+	    //IOut.err("LAYER = "+e.layer); //
+	    //IOut.err("LAYER INDEX = "+layerIndex); //
+	    
 	    linetypeIndex = -1;
 	    materialIndex = -1;
 	    renderingAttributes = new RenderingAttributes();
@@ -1874,7 +1886,7 @@ public class IRhino3dm{
 	    wireDensity = 1;
 	    viewportId = null;
 	    activeSpace = activeSpaceModelSpace;
-	    visible = true;
+	    visible = e.visible(); //true;
 	    mode = objectModeNormalObject;
 	    
 	    //colorSource = colorSourceFromLayer; // ?
@@ -2350,7 +2362,8 @@ public class IRhino3dm{
 	abstract public Interval domain();
 	abstract public boolean isValid();
 	
-	public ICurve createIObject(Rhino3dmFile context, IServerI s){ return null; }
+	// for IPolycurve which is not child of ICurve (yet)
+	public /*ICurve*/IObject createIObject(Rhino3dmFile context, IServerI s){ return null; }
 	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){ return null; }
 	public ITrimCurve createTrimCurve(Rhino3dmFile context, IServerI s, ISurfaceI srf){ return null; }
 	
@@ -6052,20 +6065,26 @@ public class IRhino3dm{
 	}
 	
 	
-	public ICurve createIObject(Rhino3dmFile context, IServerI s){
+	public IObject/*ICurve*/ createIObject(Rhino3dmFile context, IServerI s){
 	    
 	    //for(int i=0; i<t.size(); i++){ IOut.p("t (domain) "+i+": "+t.get(i)); }
 	    //for(int i=0; i<segment.size(); i++){ Interval d = segment.get(i).domain();IOut.p("segment["+i+"].domain = "+d.v1+" - "+d.v2); }
-
-	    // temporary implementation: this should be replaced by instantiation IPolyCurve
 	    
+	    // temporary implementation: this should be replaced by instantiation IPolycurve
+	    
+	    ArrayList<ICurve> icrvs = new ArrayList<ICurve>();
 	    for(int i=0; i<segment.size(); i++){
-		segment.get(i).createIObject(context,s);
+		IObject obj = segment.get(i).createIObject(context,s);
+		if(obj instanceof ICurve) icrvs.add((ICurve)obj);
 	    }
-	    return null;
+	    
+	    return new IPolycurve(icrvs);
+	    //return null;
 	}
+	
+	// this needs to be implemented
 	public ITrimCurve createTrimCurve(Rhino3dmFile context, IServerI s, ISurfaceI srf){
-	    return null;
+	    return null; // !!! 
 	}
 	
     }

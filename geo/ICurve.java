@@ -39,50 +39,47 @@ public class ICurve extends IObject implements ICurveI{
     public ICurveGeo curve;
     //public ICurveI curve; // public?
     
-    public ICurve(){ curve = new ICurveGeo(); }
+
+    public ICurve(){ this((IServerI)null); }
     public ICurve(IVecI[] cpts, int degree, double[] knots, double ustart, double uend){
-	curve = new ICurveGeo(cpts,degree,knots,ustart,uend); initCurve(null); 
+	this((IServerI)null, cpts, degree, knots, ustart, uend);
     }
     public ICurve(IVecI[] cpts, int degree, double[] knots){
-	curve = new ICurveGeo(cpts,degree,knots); initCurve(null); 
+	this((IServerI)null, cpts, degree, knots);
     }
-    public ICurve(IVecI[] cpts, int degree){
-        curve = new ICurveGeo(cpts,degree); initCurve(null); 
-    }
-    public ICurve(IVecI[] cpts){
-        curve = new ICurveGeo(cpts); initCurve(null); 
-    }
+    public ICurve(IVecI[] cpts, int degree){ this((IServerI)null, cpts, degree); }
+    public ICurve(IVecI[] cpts){ this((IServerI)null, cpts); }
     public ICurve(IVecI[] cpts, int degree, boolean close){
-        curve = new ICurveGeo(cpts,degree,close); initCurve(null); 
+	this((IServerI)null, cpts, degree,close);
     }
-    public ICurve(IVecI[] cpts, boolean close){
-        curve = new ICurveGeo(cpts,close); initCurve(null); 
-    }
-    public ICurve(IVecI pt1, IVecI pt2){
-	curve = new ICurveGeo(pt1,pt2);initCurve(null); 
-    }
+    public ICurve(IVecI[] cpts, boolean close){ this((IServerI)null, cpts, close); }
+    public ICurve(IVecI pt1, IVecI pt2){ this((IServerI)null, pt1, pt2); }
     public ICurve(double x1, double y1, double z1, double x2, double y2, double z2){
-	curve = new ICurveGeo(new IVec(x1,y1,z1),new IVec(x2,y2,z2));initCurve(null); 
+	this((IServerI)null, x1,y1,z1,x2,y2,z2);
     }
-    
-    public ICurve(double[][] xyzValues){
-	curve = new ICurveGeo(xyzValues); initCurve(null); 
-    }
+    public ICurve(double[][] xyzValues){ this((IServerI)null, xyzValues); }
     public ICurve(double[][] xyzValues, int degree){
-	curve = new ICurveGeo(xyzValues,degree); initCurve(null); 
+	this((IServerI)null, xyzValues, degree);
     }
     public ICurve(double[][] xyzValues, boolean close){
-	curve = new ICurveGeo(xyzValues,close); initCurve(null); 
+	this((IServerI)null, xyzValues, close);
     }
     public ICurve(double[][] xyzValues, int degree, boolean close){
-	curve = new ICurveGeo(xyzValues,degree,close); initCurve(null); 
+	this((IServerI)null, xyzValues, degree, close);
     }
-    
-    
+        
     
     //public ICurve(ICurveGeo crv){ curve = new ICurveGeo(crv); initCurve(null); }
-    public ICurve(ICurveGeo crv){ curve = crv; initCurve(null); }
-    public ICurve(ICurveI crv){ curve = crv.get(); initCurve(null); }
+    public ICurve(ICurveGeo crv){ this((IServerI)null, crv); }
+    public ICurve(ICurveI crv){ this((IServerI)null, crv); }
+    public ICurve(ICurve crv){
+	super(crv);
+        //curve = new ICurveGeo(crv.get());
+	curve = crv.curve.dup();
+	initCurve(crv.server); //?
+	setColor(crv.getColor());
+    }
+    
     
     public ICurve(IServerI s){ super(s); curve = new ICurveGeo(); initCurve(s); }
     public ICurve(IServerI s, IVecI[] cpts, int degree, double[] knots, double ustart, double uend){
@@ -129,18 +126,63 @@ public class ICurve extends IObject implements ICurveI{
     public ICurve(IServerI s, ICurveGeo crv){ super(s); curve = crv; initCurve(s); }
     public ICurve(IServerI s, ICurveI crv){ super(s); curve = crv.get(); initCurve(s); }
     
+    public ICurve(IServerI s, ICurve crv){
+	super(s,crv);
+        //curve = new ICurveGeo(crv.get());
+	curve = crv.curve.dup();
+	initCurve(s); //?
+	setColor(crv.getColor());
+    }
+    
+    /*
+    public ICurve(){ curve = new ICurveGeo(); }
+    public ICurve(IVecI[] cpts, int degree, double[] knots, double ustart, double uend){
+	curve = new ICurveGeo(cpts,degree,knots,ustart,uend); initCurve(null); 
+    }
+    public ICurve(IVecI[] cpts, int degree, double[] knots){
+	curve = new ICurveGeo(cpts,degree,knots); initCurve(null); 
+    }
+    public ICurve(IVecI[] cpts, int degree){
+        curve = new ICurveGeo(cpts,degree); initCurve(null); 
+    }
+    public ICurve(IVecI[] cpts){
+        curve = new ICurveGeo(cpts); initCurve(null); 
+    }
+    public ICurve(IVecI[] cpts, int degree, boolean close){
+        curve = new ICurveGeo(cpts,degree,close); initCurve(null); 
+    }
+    public ICurve(IVecI[] cpts, boolean close){
+        curve = new ICurveGeo(cpts,close); initCurve(null); 
+    }
+    public ICurve(IVecI pt1, IVecI pt2){
+	curve = new ICurveGeo(pt1,pt2);initCurve(null); 
+    }
+    public ICurve(double x1, double y1, double z1, double x2, double y2, double z2){
+	curve = new ICurveGeo(new IVec(x1,y1,z1),new IVec(x2,y2,z2));initCurve(null); 
+    }
+    public ICurve(double[][] xyzValues){
+	curve = new ICurveGeo(xyzValues); initCurve(null); 
+    }
+    public ICurve(double[][] xyzValues, int degree){
+	curve = new ICurveGeo(xyzValues,degree); initCurve(null); 
+    }
+    public ICurve(double[][] xyzValues, boolean close){
+	curve = new ICurveGeo(xyzValues,close); initCurve(null); 
+    }
+    public ICurve(double[][] xyzValues, int degree, boolean close){
+	curve = new ICurveGeo(xyzValues,degree,close); initCurve(null); 
+    }
+    //public ICurve(ICurveGeo crv){ curve = new ICurveGeo(crv); initCurve(null); }
+    public ICurve(ICurveGeo crv){ curve = crv; initCurve(null); }
+    public ICurve(ICurveI crv){ curve = crv.get(); initCurve(null); }
     public ICurve(ICurve crv){
 	super(crv);
         curve = new ICurveGeo(crv.get());
 	initCurve(crv.server); //?
 	setColor(crv.getColor());
     }
-    public ICurve(IServerI s, ICurve crv){
-	super(s,crv);
-        curve = new ICurveGeo(crv.get());
-	initCurve(s); //?
-	setColor(crv.getColor());
-    }
+    */
+    
     
     public void initCurve(IServerI s){
 	if(curve instanceof ICurveGeo){ parameter = (ICurveGeo)curve; }

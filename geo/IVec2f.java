@@ -73,12 +73,18 @@ public class IVec2f extends IParameterObject implements IVec2I{
     public IVec2f set(IVec2I v){ return set(v.get()); }
     public IVec2f set(IDoubleI x, IDoubleI y){ this.x=(float)x.x(); this.y=(float)y.x(); return this; }
     
+    public IVec2f add(float x, float y){ this.x+=x; this.y+=y; return this; }
+    public IVec2f add(double x, double y){ this.x+=x; this.y+=y; return this; }
+    public IVec2f add(IDoubleI x, IDoubleI y){ this.x+=x.x(); this.y+=y.x(); return this; }
     public IVec2f add(IVec2f v){ x+=v.x; y+=v.y; return this; }
-    public IVec2f add(IVec2 v){ x+=(float)v.x; y+=(float)v.y; return this; }
+    public IVec2f add(IVec2 v){ x+=v.x; y+=v.y; return this; }
     public IVec2f add(IVec2I v){ return add(v.get()); }
     
+    public IVec2f sub(float x, float y){ this.x-=x; this.y-=y; return this; }
+    public IVec2f sub(double x, double y){ this.x-=x; this.y-=y; return this; }
+    public IVec2f sub(IDoubleI x, IDoubleI y){ this.x-=x.x(); this.y-=y.x(); return this; }
     public IVec2f sub(IVec2f v){ x-=v.x; y-=v.y; return this; }
-    public IVec2f sub(IVec2 v){ x-=(float)v.x; y-=(float)v.y; return this; }
+    public IVec2f sub(IVec2 v){ x-=v.x; y-=v.y; return this; }
     public IVec2f sub(IVec2I v){ return sub(v.get()); }
     
     public IVec2f mul(float x){ this.x*=x; this.y*=x; return this; }

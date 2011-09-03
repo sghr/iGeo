@@ -54,7 +54,8 @@ public class ILayer extends IObject{
     public ILayer add(IObject e){
 	if(!objects.contains(e)){
 	    objects.add(e);
-	    e.layer = this;
+	    if(e.layer()!=this) e.layer(this);
+	    //e.layer = this;
 	    // if e is ILayer, e.layer means parent layer
 	}
 	//if(e instanceof ILayer){ ((ILayer)e).parentLayer = this; }
@@ -62,15 +63,29 @@ public class ILayer extends IObject{
     }
     public ILayer remove(int i){ objects.remove(i); return this; }
     public ILayer remove(IObject e){ objects.remove(e); return this; }
-    
-    public ILayer setVisible(boolean v){ visible=v; return this; }
-    
+
+    public boolean contains(IObject e){ return objects.contains(e); }
     
     public ILayer name(String layerName){ name = layerName; return this; }
+
+    @Override public boolean visible(){ return visible; }
     
-    
-    public ILayer hide(){ super.hide(); return this; }
-    public ILayer show(){ super.show(); return this; }
+    public ILayer setVisible(boolean v){ return visible(v); }
+    public ILayer visible(boolean v){
+	visible=v;
+	if(visible) show(); else hide();
+	return this;
+    }
+    public ILayer hide(){
+	super.hide();
+	for(IObject o: objects) o.hide();
+	return this;
+    }
+    public ILayer show(){
+	super.show();
+	for(IObject o: objects) o.show();
+	return this;
+    }
     
     
     

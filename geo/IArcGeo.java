@@ -154,9 +154,6 @@ public class IArcGeo extends ICurveGeo{
 	this.angle = angle;
 	IVec4[] cpts = arcCP(center.get(),normal.get(),startPt.get(),angle.x());
 	
-	IOut.p("cpts="+cpts);
-	IOut.p("cpts.length="+cpts.length);
-	
 	super.init(cpts,arcDeg(),arcKnots(angle.x()));
     }
     

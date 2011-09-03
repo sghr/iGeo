@@ -38,7 +38,21 @@ import java.awt.Color;
 public class IBrep extends IObject{
     public ArrayList<ISurface> surfaces;
     
-    public IBrep(){ surfaces = new ArrayList<ISurface>(); }
+    public IBrep(){ this((IServerI)null); }
+    public IBrep(IServerI s){ super(s); surfaces = new ArrayList<ISurface>(); }
+    
+    public IBrep(IBrep brep){
+	super(brep);
+	surfaces = new ArrayList<ISurface>(brep.surfaces.size());
+	for(int i=0; i<brep.surfaces.size(); i++)
+	    surfaces.add(brep.surfaces.get(i).dup()); // deep copy
+    }
+    public IBrep(IServerI s, IBrep brep){
+	super(s,brep);
+	surfaces = new ArrayList<ISurface>(brep.surfaces.size());
+	for(int i=0; i<brep.surfaces.size(); i++)
+	    surfaces.add(brep.surfaces.get(i).dup()); // deep copy
+    }
     
     public IBrep add(ISurface s){ surfaces.add(s); return this; }
     
@@ -46,6 +60,12 @@ public class IBrep extends IObject{
     
     public int surfaceNum(){ return surfaces.size(); }
     
+    @Override public IBrep dup(){ return new IBrep(this); }
+    
+    @Override public void del(){
+	super.del();
+        for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).del();
+    }
     
     public IBrep name(String nm){
 	super.name(nm);
@@ -58,6 +78,12 @@ public class IBrep extends IObject{
 	return this;
     }
     
+    public boolean visible(){
+	for(int i=0;surfaces!=null&&i<surfaces.size();i++)
+	    if(surfaces.get(i).visible()) return true;
+	return false; // false if everything is false
+    }
+    
     public IBrep hide(){
 	super.hide();
 	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).hide();
@@ -65,7 +91,7 @@ public class IBrep extends IObject{
     }
     public IBrep show(){
 	super.show();
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).hide();
+	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).show();
 	return this;
     }
     

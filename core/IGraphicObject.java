@@ -59,9 +59,18 @@ abstract public class IGraphicObject extends ISubobject implements IGraphicI{
     abstract public boolean isDrawable(IGraphicMode mode);
     
     
-    public boolean isVisible(){ return visible; }
-    public void hide(){ visible=false; }
-    public void show(){ visible=true; }
+    public boolean isVisible(){ return visible; }    
+    public boolean visible(){ return visible; }
+    public void hide(){
+	visible=false;
+	// mainly to update focus bounding box
+	if(parent!=null&&parent.server!=null) parent.server.update();
+    }
+    public void show(){
+	visible=true;
+	// mainly to update focus bounding box
+	if(parent!=null&&parent.server!=null) parent.server.update();
+    }
     
     
     public void setColor(Color c){ color=c; }

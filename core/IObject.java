@@ -124,16 +124,6 @@ public class IObject{
 	else if(IG.current()!=null) IG.current().server().remove(this);
     }
     
-    public IObject hide(){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.hide();
-	return this;
-    }
-    
-    public IObject show(){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.show();
-	return this;
-    }
-    
     
     public void setParameter(IParameterObject param){
 	if(parameter!=null) IOut.err("parameter is already set. overwrote."); 
@@ -218,10 +208,35 @@ public class IObject{
     
     
     public ILayer layer(){ return layer; }
-    public IObject layer(ILayer l){ l.add(this); return this; }
+    public IObject layer(ILayer l){
+	if(l==null) layer=null;
+	else if(layer!=l){
+	    if(!l.contains(this)) l.add(this);
+	    layer=l;
+	}
+	return this;
+    }
     
     
-    // shouldn't this be in other graphic class?
+    // shouldn't these methods be in other graphic class?
+    
+    
+    public boolean visible(){
+	if(graphics==null) return false;
+	for(IGraphicObject gr:graphics) if(gr.visible()) return true;
+	return false; // false if everything is false
+    }
+    public boolean isVisible(){ return visible(); }
+    
+    public IObject hide(){
+	if(graphics!=null) for(IGraphicObject gr:graphics) gr.hide();
+	return this;
+    }
+    
+    public IObject show(){
+	if(graphics!=null) for(IGraphicObject gr:graphics) gr.show();
+	return this;
+    }
     
     /** @return returns whatever Color of any graphics member. (first found)
      */

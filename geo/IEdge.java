@@ -45,6 +45,13 @@ public class IEdge{
 	v1.addEdge(this);
 	v2.addEdge(this);
     }
+
+    public IEdge(IEdge e){
+	vertices = new IVertex[e.vertices.length];
+	for(int i=0; i<vertices.length; i++) vertices[i] = e.vertices[i];
+	faces = new ArrayList<IFace>();
+	for(int i=0; i<e.faces.size(); i++) faces.add(e.faces.get(i));
+    }
     
     public IVertex getVertex(int i){ return vertex(i); }
     public IVertex vertex(int i){ return vertices[i]; }
@@ -53,6 +60,8 @@ public class IEdge{
     public void addFace(IFace f){ faces.add(f); }
     public IFace getFace(int i){ return face(i); }
     public IFace face(int i){ return faces.get(i); }
+
+    public IEdge dup(){ return new IEdge(this); }
     
     public void del(){
 	for(int i=0; i<faces.size(); i++) faces.get(i).del(); 

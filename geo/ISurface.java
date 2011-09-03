@@ -209,14 +209,16 @@ public class ISurface extends IObject implements ISurfaceI{
     
     public ISurface(ISurface srf){
 	super(srf);
-	surface = new ISurfaceGeo(srf.surface.get());
+	//surface = new ISurfaceGeo(srf.surface.get());
+	surface = srf.surface.dup();
 	initSurface(srf.server);
 	setColor(srf.getColor());
     }
     
     public ISurface(IServerI s, ISurface srf){
 	super(s,srf);
-	surface = new ISurfaceGeo(srf.surface.get());
+	//surface = new ISurfaceGeo(srf.surface.get());
+	surface = srf.surface.dup();
 	initSurface(s);
 	setColor(srf.getColor());
     }

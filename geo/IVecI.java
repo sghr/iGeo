@@ -54,7 +54,11 @@ public interface IVecI extends IVecOp{
     public IVecI set(double x, double y, double z);
     public IVecI set(IDoubleI x, IDoubleI y, IDoubleI z);
     
+    public IVecI add(double x, double y, double z);
+    public IVecI add(IDoubleI x, IDoubleI y, IDoubleI z);
     public IVecI add(IVecI v);
+    public IVecI sub(double x, double y, double z);
+    public IVecI sub(IDoubleI x, IDoubleI y, IDoubleI z);
     public IVecI sub(IVecI v);
     public IVecI mul(IDoubleI v);
     public IVecI mul(double v);

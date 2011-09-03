@@ -45,6 +45,9 @@ public class IMesh extends IObject implements IMeshI{
     public IMesh(IMeshGeo m){ super(); mesh=m; initMesh(null); }
     public IMesh(IServerI s, IMeshGeo m){ super(s); mesh=m; initMesh(s); }
     
+    public IMesh(IMesh m){ super(m); mesh=m.mesh.dup(); initMesh(m.server); }
+    public IMesh(IServerI s, IMesh m){ super(s,m); mesh=m.mesh.dup(); initMesh(s); }
+    
     public IMesh(IServerI s, ArrayList<ICurveI> lines){
 	super(s); mesh = new IMeshGeo(lines); initMesh(s);
     }
@@ -148,7 +151,11 @@ public class IMesh extends IObject implements IMeshI{
     
     public IMesh(IServerI s, IFace[] fcs){ super(s); mesh = new IMeshGeo(fcs); initMesh(s); }
     public IMesh(IFace[] fcs){ this((IServerI)null,fcs); }
-        
+    
+    public IMeshGeo get(){ return mesh; }
+    
+    public IMesh dup(){ return new IMesh(this); }
+    
     
     public void initMesh(IServerI s){
 	parameter = mesh;

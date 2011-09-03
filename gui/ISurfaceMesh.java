@@ -89,11 +89,11 @@ public class ISurfaceMesh {
 	double[] vpos = new double[surfPts[0].length];
 	for(int i=0; i<surfPts.length; i++){
 	    upos[i] = surfPts[i][0].x;
-	    IOut.p("upos["+i+"]="+upos[i]); //
+	    IOut.debug(20, "upos["+i+"]="+upos[i]); //
 	}
 	for(int i=0; i<surfPts[0].length; i++){
 	    vpos[i] = surfPts[0][i].y;
-	    IOut.p("vpos["+i+"]="+vpos[i]); //
+	    IOut.debug(20, "vpos["+i+"]="+vpos[i]); //
 	}
 	
 	ISubsurfaceMesh.SubsurfaceMatrix matrix =
@@ -346,7 +346,7 @@ public class ISurfaceMesh {
 	*/
 	public void setPolyline(IVec2[] polyline, boolean closed){
 	    for(int i=0; i<polyline.length; i++){
-		IOut.p("polyline["+i+"]="+polyline[i]);//
+		IOut.debug(30,"polyline["+i+"]="+polyline[i]);//
 	    }
 	    
 	    
@@ -356,23 +356,23 @@ public class ISurfaceMesh {
 	    for(int i=1; i<=polyline.length; i++){
 		SubsurfaceIndex index = getIndexOnPoint(polyline[i%polyline.length]);
 		
-		IOut.p("i="+i+", prevIndex=<"+prevIndex.uindex+","+prevIndex.vindex+">, index=<"+index.uindex+","+index.vindex+">"); //
+		IOut.debug(30, "i="+i+", prevIndex=<"+prevIndex.uindex+","+prevIndex.vindex+">, index=<"+index.uindex+","+index.vindex+">"); //
 		
 		if(!index.equals(prevIndex)){
 		    
 		    if(i<polyline.length || closed ){
 			//IOut.p("polyline["+i+"]="+polyline[i] +" to polyline["+((i+1)%polyline.length) + "]="+polyline[(i+1)%polyline.length]);
-			IOut.p("polyline["+(i-1)+"] to polyline["+(i%polyline.length) + "]"); //
+			IOut.debug(30,"polyline["+(i-1)+"] to polyline["+(i%polyline.length) + "]"); //
 			SubsurfaceIndex[] array =
 			    getIndexOnLine(polyline[i-1],polyline[i%polyline.length]);
 			
 			if(array==null){
-			    IOut.p("array == null"); //
+			    IOut.debug(30,"array == null"); //
 			}
 			else{
-			    IOut.p("array.length = "+array.length); //
+			    IOut.debug(30,"array.length = "+array.length); //
 			    for(int j=0; j<array.length; j++){
-				IOut.p("array["+j+"]=<"+array[j].uindex+","+array[j].vindex+">"); //
+				IOut.debug(30,"array["+j+"]=<"+array[j].uindex+","+array[j].vindex+">"); //
 			    }
 			}
 			if(array!=null){
@@ -397,7 +397,7 @@ public class ISurfaceMesh {
 			    indices.add(index);
 			//IOut.p("end checking contains"); //
 			*/
-			IOut.p("index=<"+index.uindex+","+index.vindex+">"); //
+			IOut.debug(30,"index=<"+index.uindex+","+index.vindex+">"); //
 			
 		    }
 		    prevIndex=index;

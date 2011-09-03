@@ -39,9 +39,9 @@ public class IVertex implements IVecI{
     public ArrayList<IFace> faces;
     public ArrayList<IVertex> linkedVertices;
     
-    public IVecI pos=null;
-    public IVecI normal=null;
-    public IVec2I texture=null; // texture coordinates
+    public IVecI pos;
+    public IVecI normal;
+    public IVec2I texture; // texture coordinates
     
     //public int index; // index number in parent mesh
     
@@ -50,6 +50,22 @@ public class IVertex implements IVecI{
     public IVertex(IVec p){ pos=p; init(); }
     public IVertex(IVec4 p){ pos=p; init(); }
     public IVertex(IVecI p){ pos=p; init(); }
+    
+    public IVertex(IVertex v){
+	edges = new ArrayList<IEdge>();
+	for(int i=0; i<v.edges.size(); i++) edges.add(v.edges.get(i));
+	
+	faces = new ArrayList<IFace>();
+	for(int i=0; i<v.faces.size(); i++) faces.add(v.faces.get(i));
+	
+	linkedVertices=new ArrayList<IVertex>();
+	for(int i=0; i<v.linkedVertices.size(); i++)
+	    linkedVertices.add(v.linkedVertices.get(i));
+	
+	pos = v.pos.dup();
+	if(v.normal!=null) normal=v.normal.dup();
+	if(v.texture!=null) texture = v.texture.dup();
+    }
     
     public void init(){
 	edges = new ArrayList<IEdge>();
@@ -71,12 +87,16 @@ public class IVertex implements IVecI{
     public double z(){ return pos.z(); }
     public IVec get(){ return pos.get(); }
     
+    public IVertex dup(){ return new IVertex(this); }
+    
+    /*
     public IVertex dup(){ // just point, not link nor edges, faces
 	IVertex v = new IVertex(pos.dup());
-	v.normal = this.normal;
-	v.texture = this.texture;
+	v.normal = this.normal.dup();
+	v.texture = this.texture.dup();
 	return v;
     }
+    */
     
     public IVec2I to2d(){ return pos.to2d(); }
     public IVec4I to4d(){ return pos.to4d(); }
@@ -92,7 +112,11 @@ public class IVertex implements IVecI{
     public IVertex set(double x, double y, double z){ pos.set(x,y,z); return this; }
     public IVertex set(IDoubleI x, IDoubleI y, IDoubleI z){ pos.set(x,y,z); return this; }
     
+    public IVertex add(double x, double y, double z){ pos.add(x,y,z); return this; }
+    public IVertex add(IDoubleI x, IDoubleI y, IDoubleI z){ pos.add(x,y,z); return this; }    
     public IVertex add(IVecI v){ pos.add(v); return this; }
+    public IVertex sub(double x, double y, double z){ pos.sub(x,y,z); return this; }
+    public IVertex sub(IDoubleI x, IDoubleI y, IDoubleI z){ pos.sub(x,y,z); return this; }
     public IVertex sub(IVecI v){ pos.sub(v); return this; }
     public IVertex mul(IDoubleI v){ pos.mul(v); return this; }
     public IVertex mul(double v){ pos.mul(v); return this; }

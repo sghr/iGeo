@@ -40,7 +40,7 @@ import igeo.core.*;
 public class ISurfaceGraphicFillGL extends IGraphicObject{
     
     public static final boolean insertPointOnDegree1TwistedSurface=true;
-        
+    
     public int isoparmRatioU=IConfig.surfaceIsoparmResolution;
     public int isoparmRatioV=IConfig.surfaceIsoparmResolution;
     
@@ -175,7 +175,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	for(int i=0; i<uval.length; i++){
 	    for(int j=0; j<vval.length; j++){
 		pts[i][j] = surface.pt(uval[i], vval[j]).get();
-		nrm[i][j] = surface.normal(uval[i], vval[j]).get();
+		nrm[i][j] = surface.normal(uval[i], vval[j]).get().unit();
 	    }
 	}
 	
@@ -235,9 +235,12 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	else{
 	    vval = new double[vnum];
 	    for(int k=0; k<surface.vepNum(); k++)
-		for(int l=0; l<isoparmRatioV&&k<surface.uepNum()-1||l==0; l++)
+		for(int l=0; l<isoparmRatioV&&k<surface.vepNum()-1||l==0; l++){
 		    vval[k*isoparmRatioV+l] =
 			surface.v(k,(double)l/isoparmRatioV);
+		    
+		    //IOut.debug(20, "vval["+k+"*"+isoparmRatioV+"+"+l+"] = "+vval[k*isoparmRatioV+l]); //
+		}
 	}
 	
 	// insert points for deg 1 twisted surface
@@ -296,7 +299,8 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    }
 	    
 	}
-		
+	
+	
 	IVec2[][] surfPts = new IVec2[unum][vnum];
 	
 	for(int i=0; i<unum; i++){
@@ -336,7 +340,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	for(int i=0; i<triangles2D.length; i++){
 	    for(int j=0; j<triangles2D[i].length; j++){
 		triangles3D[i][j] = surface.pt(triangles2D[i][j]).get();
-		trianglesNormal[i][j] = surface.normal(triangles2D[i][j]).get();
+		trianglesNormal[i][j] = surface.normal(triangles2D[i][j]).get().unit();
 	    }
 	}
 	
@@ -373,7 +377,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		float[] colorf = new float[]{ red, green, blue, alpha };
 		gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
 		gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
-		gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
+		//gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
 		gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
 			       ISurfaceGraphicGL.defaultShininess);
 		gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color

@@ -87,9 +87,21 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	this.x=x.x(); this.y=y.x(); this.z=z.x(); return this;
     }
     
+    public IVec add(double x, double y, double z){
+	this.x+=x; this.y+=y; this.z+=z; return this;
+    }
+    public IVec add(IDoubleI x, IDoubleI y, IDoubleI z){
+	this.x+=x.x(); this.y+=y.x(); this.z+=z.x(); return this;
+    }
     public IVec add(IVec v){ x+=v.x; y+=v.y; z+=v.z; return this; }
     public IVec add(IVecI v){ return add(v.get()); }
     
+    public IVec sub(double x, double y, double z){
+	this.x-=x; this.y-=y; this.z-=z; return this;
+    }
+    public IVec sub(IDoubleI x, IDoubleI y, IDoubleI z){
+	this.x-=x.x(); this.y-=y.x(); this.z-=z.x(); return this;
+    }
     public IVec sub(IVec v){ x-=v.x; y-=v.y; z-=v.z; return this; }
     public IVec sub(IVecI v){ return sub(v.get()); }
     

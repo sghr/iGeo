@@ -195,7 +195,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
     public ICurveGeo get(){ return this; }
     
-    public ICurveI dup(){ return new ICurveGeo(this); }
+    public ICurveGeo dup(){ return new ICurveGeo(this); }
     
     
     public IVec pt(IDoubleI u){ return pt(u.x()); }

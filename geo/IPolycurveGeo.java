@@ -34,23 +34,23 @@ import igeo.core.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-abstract public class IPolyCurveGeo implements ICurveI{
+abstract public class IPolycurveGeo implements ICurveI{
     
     public ArrayList<ICurveI> curves; // public?
     public ArrayList<IDoubleI> knots;
     
-    public IPolyCurveGeo(){ }
+    public IPolycurveGeo(){ }
     
-    public IPolyCurveGeo(ICurveI[] crvs){
+    public IPolycurveGeo(ICurveI[] crvs){
 	curves = new ArrayList<ICurveI>();
 	for(int i=0; i<crvs.length; i++){ curves.add(crvs[i]); }
     }
     
-    public IPolyCurveGeo(ArrayList<ICurveI> crvs){
+    public IPolycurveGeo(ArrayList<ICurveI> crvs){
 	curves = crvs;
     }
     
-    public IPolyCurveGeo(IPolyCurveGeo crv){
+    public IPolycurveGeo(IPolycurveGeo crv){
 	curves = new ArrayList<ICurveI>(crv.curves.size());
 	for(int i=0; i<crv.curves.size(); i++){ curves.add(crv.curves.get(i)); }
     }

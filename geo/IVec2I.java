@@ -47,8 +47,12 @@ public interface IVec2I extends IVec2Op{
     public IVec2I set(IVec2I v);
     public IVec2I set(double x, double y);
     public IVec2I set(IDoubleI x, IDoubleI y);
-    
+
+    public IVec2I add(double x, double y);
+    public IVec2I add(IDoubleI x, IDoubleI y);
     public IVec2I add(IVec2I v);
+    public IVec2I sub(double x, double y);
+    public IVec2I sub(IDoubleI x, IDoubleI y);
     public IVec2I sub(IVec2I v);
     public IVec2I mul(IDoubleI v);
     public IVec2I mul(double v);
@@ -56,7 +60,7 @@ public interface IVec2I extends IVec2Op{
     public IVec2I div(double v);
     public IVec2I neg();
     public IVec2I rev();
-
+    
     public IVec2I add(IVec2I v, double f);
     public IVec2I add(IVec2I v, IDoubleI f);
     

@@ -29,6 +29,10 @@ package igeo.geo;
    @version 0.7.0.0;
 */
 public interface IMeshI{
+
+    public IMeshGeo get();
+
+    public IMeshI dup();
     
     public int vertexNum();
     public int edgeNum();

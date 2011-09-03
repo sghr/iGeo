@@ -57,7 +57,7 @@ public class IPoint extends IObject implements IVecI{
     }
     
     public IPoint(IServerI s, IPoint p){
-	super(s);
+	super(s,p);
 	pos = p.pos.dup();
 	initPoint(s);
 	setColor(p.getColor());
@@ -99,8 +99,13 @@ public class IPoint extends IObject implements IVecI{
     public IPoint set(IVecI v){ pos.set(v); return this; }
     public IPoint set(double x, double y, double z){ pos.set(x,y,z); return this;}
     public IPoint set(IDoubleI x, IDoubleI y, IDoubleI z){ pos.set(x,y,z); return this; }
-    
+
+    public IPoint add(double x, double y, double z){ pos.add(x,y,z); return this; }
+    public IPoint add(IDoubleI x, IDoubleI y, IDoubleI z){ pos.add(x,y,z); return this; }    
     public IPoint add(IVecI v){ pos.add(v); return this; }
+    
+    public IPoint sub(double x, double y, double z){ pos.sub(x,y,z); return this; }
+    public IPoint sub(IDoubleI x, IDoubleI y, IDoubleI z){ pos.sub(x,y,z); return this; }
     public IPoint sub(IVecI v){ pos.sub(v); return this; }
     public IPoint mul(IDoubleI v){ pos.mul(v); return this; }
     public IPoint mul(double v){ pos.mul(v); return this; }

@@ -42,6 +42,10 @@ public class IMeshR extends IObject implements IMeshI{
     public IMeshR(IMeshI m){ super(); mesh=m; initMesh(null); }
     public IMeshR(IServerI s, IMeshI m){ super(s); mesh=m; initMesh(s); }
     
+    public IMeshR(IMeshR m){ super(m); mesh=m.dup(); initMesh(m.server); }
+    public IMeshR(IServerI s, IMeshR m){ super(s,m); mesh=m.dup(); initMesh(s); }
+    
+    
     public void initMesh(IServerI s){
 	if(mesh instanceof IMeshGeo) parameter = (IMeshGeo)mesh;
 	if(graphics==null) initGraphic(s);
@@ -52,6 +56,10 @@ public class IMeshR extends IObject implements IMeshI{
         return null;
     }
     
+    public IMeshGeo get(){ return mesh.get(); }
+    
+    public IMeshR dup(){ return new IMeshR(this); }
+        
     public int vertexNum(){ return mesh.vertexNum(); }
     public int edgeNum(){ return mesh.edgeNum(); }
     public int faceNum(){ return mesh.faceNum(); }

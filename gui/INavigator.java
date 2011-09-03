@@ -43,6 +43,7 @@ import igeo.geo.*;
 public class INavigator{
     
     public final static IMouseButton defaultRotateButton=new IMouseButton(MouseEvent.BUTTON1);
+    public final static IMouseButton defaultRotateButton2=new IMouseButton(MouseEvent.BUTTON1,false,false,true);
     public final static IMouseButton defaultPanButton=new IMouseButton(MouseEvent.BUTTON2);
     public final static IMouseButton defaultPanButton2=new IMouseButton(MouseEvent.BUTTON1,
 									true, false, false);
@@ -99,6 +100,7 @@ public class INavigator{
 	zoomButtons=new ArrayList<IMouseButton>();
 	
 	rotateButtons.add(defaultRotateButton);
+	rotateButtons.add(defaultRotateButton2);
 	panButtons.add(defaultPanButton);
 	panButtons.add(defaultPanButton2);
 	zoomButtons.add(defaultZoomButton);

@@ -270,24 +270,44 @@ public class IRootPanel extends IComponent implements IServerI, MouseListener, M
 	boolean shift = e.isShiftDown();
 	boolean control = e.isControlDown();
 	
-	if(key==KeyEvent.VK_F && !shift &&!control){
+	if(key==KeyEvent.VK_F && /*!shift &&*/!control){
 	    currentMousePane.focus();
 	}
-	if(key==KeyEvent.VK_F && shift &&!control){
+	/*
+	else if(key==KeyEvent.VK_F && shift &&!control){
 	    setBoundingBox();
 	    currentMousePane.focus();
 	}
+	*/
 	else if(key==KeyEvent.VK_S&& !shift &&!control){
+	    // fill & wireframe
+	    currentMousePane.getView().mode().setDrawMode(true,true,false);
+	}
+	else if(key==KeyEvent.VK_S&& shift &&!control){
 	    // toggle fill shading
-	    currentMousePane.getView().mode().toggleFill();
+	    //currentMousePane.getView().mode().toggleFill();
+	    // fill 
+	    currentMousePane.getView().mode().setDrawMode(false,true,false);
 	}
 	else if(key==KeyEvent.VK_W&& !shift &&!control){
+	    // wireframe
+	    currentMousePane.getView().mode().setDrawMode(true,false,false);
+	}
+	/*
+	else if(key==KeyEvent.VK_W&& shift &&!control){
 	    // toggle wireframe
 	    currentMousePane.getView().mode().toggleWireframe();
 	}
+	*/
 	else if(key==KeyEvent.VK_T&& !shift &&!control){
+	    // transparent fill & wireframe
+	    currentMousePane.getView().mode().setDrawMode(true,true,true);
+	}
+	else if(key==KeyEvent.VK_T&& shift &&!control){
 	    // toggle transparency
-	    currentMousePane.getView().mode().toggleTransparent();
+	    //currentMousePane.getView().mode().toggleTransparent();
+	    // transparent fill
+	    currentMousePane.getView().mode().setDrawMode(false,true,true);
 	}
 	else if(key==KeyEvent.VK_Q && control&& !shift){
 	    System.exit(1); // temporary.

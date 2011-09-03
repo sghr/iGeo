@@ -129,9 +129,12 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
 	this.x=x.x(); this.y=y.x(); this.z=z.x(); return this;
     }
     
-    
+    public IVec4 add(double x, double y, double z){ super.add(x,y,z); return this; }
+    public IVec4 add(IDoubleI x, IDoubleI y, IDoubleI z){ super.add(x,y,z); return this; }
     public IVec4 add(IVec v){ super.add(v); return this; }
     public IVec4 add(IVecI v){ super.add(v); return this; }
+    public IVec4 sub(double x, double y, double z){ super.sub(x,y,z); return this; }
+    public IVec4 sub(IDoubleI x, IDoubleI y, IDoubleI z){ super.sub(x,y,z); return this; }
     public IVec4 sub(IVec v){ super.sub(v); return this; }
     public IVec4 sub(IVecI v){ super.sub(v); return this; }
     public IVec4 mul(IDoubleI v){ super.mul(v); return this; }

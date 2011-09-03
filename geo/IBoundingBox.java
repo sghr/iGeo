@@ -64,61 +64,74 @@ public class IBoundingBox{
 	
 	boolean first = true;
 	for(IObject e:objects){
-	    if(e instanceof IPoint){
-		IPoint p = (IPoint)e;
-		if(first){ init(p.get()); first=false; }
-		else compare(p.get());
-	    }
-	    else if(e instanceof IPointR){
-		IPointR p = (IPointR)e;
-		if(first){ init(p.get()); first=false; }
-		else compare(p.get());
-	    }
-	    else if(e instanceof ICurve){
-		ICurve c = (ICurve)e;
-		for(int i=0; i<c.num(); i++)
-		    if(first){ init(c.cp(i).get()); first=false; }
-		    else compare(c.cp(i).get());
-	    }
-	    else if(e instanceof ICurveR){
-		ICurveR c = (ICurveR)e;
-		for(int i=0; i<c.num(); i++)
-		    if(first){ init(c.cp(i).get()); first=false; }
-		    else compare(c.cp(i).get());
-	    }
-	    else if(e instanceof ISurface){
-		ISurface s = (ISurface)e;
-		for(int i=0; i<s.unum(); i++){
-		    for(int j=0; j<s.vnum(); j++){
-			if(first){ init(s.cp(i,j).get()); first=false; }
-			else compare(s.cp(i,j).get());
+	    if(e.visible()){
+		if(e instanceof IPoint){
+		    IPoint p = (IPoint)e;
+		    if(first){ init(p.get()); first=false; }
+		    else compare(p.get());
+		}
+		else if(e instanceof IPointR){
+		    IPointR p = (IPointR)e;
+		    if(first){ init(p.get()); first=false; }
+		    else compare(p.get());
+		}
+		else if(e instanceof ICurve){
+		    ICurve c = (ICurve)e;
+		    for(int i=0; i<c.num(); i++)
+			if(first){ init(c.cp(i).get()); first=false; }
+			else compare(c.cp(i).get());
+		}
+		else if(e instanceof ICurveR){
+		    ICurveR c = (ICurveR)e;
+		    for(int i=0; i<c.num(); i++)
+			if(first){ init(c.cp(i).get()); first=false; }
+			else compare(c.cp(i).get());
+		}
+		else if(e instanceof ISurface){
+		    ISurface s = (ISurface)e;
+		    for(int i=0; i<s.unum(); i++){
+			for(int j=0; j<s.vnum(); j++){
+			    if(first){ init(s.cp(i,j).get()); first=false; }
+			    else compare(s.cp(i,j).get());
+			}
 		    }
 		}
-	    }
-	    else if(e instanceof ISurfaceR){
-		ISurfaceR s = (ISurfaceR)e;
-		for(int i=0; i<s.unum(); i++){
-		    for(int j=0; j<s.vnum(); j++){
-			if(first){ init(s.cp(i,j).get()); first=false; }
-			else compare(s.cp(i,j).get());
+		else if(e instanceof ISurfaceR){
+		    ISurfaceR s = (ISurfaceR)e;
+		    for(int i=0; i<s.unum(); i++){
+			for(int j=0; j<s.vnum(); j++){
+			    if(first){ init(s.cp(i,j).get()); first=false; }
+			    else compare(s.cp(i,j).get());
+			}
 		    }
 		}
-	    }
-	    else if(e instanceof IMesh){
-		IMesh m = (IMesh)e;
-		for(int i=0; i<m.vertexNum(); i++){
-		    if(first){ init(m.vertex(i).get()); first=false; }
-		    else compare(m.vertex(i).get()); 
+		else if(e instanceof IMesh){
+		    IMesh m = (IMesh)e;
+		    for(int i=0; i<m.vertexNum(); i++){
+			if(first){ init(m.vertex(i).get()); first=false; }
+			else compare(m.vertex(i).get()); 
+		    }
 		}
-	    }
-	    else if(e instanceof IMeshR){
-		IMeshR m = (IMeshR)e;
-		for(int i=0; i<m.vertexNum(); i++){
-		    if(first){ init(m.vertex(i).get()); first=false; }
-		    else compare(m.vertex(i).get()); 
+		else if(e instanceof IMeshR){
+		    IMeshR m = (IMeshR)e;
+		    for(int i=0; i<m.vertexNum(); i++){
+			if(first){ init(m.vertex(i).get()); first=false; }
+			else compare(m.vertex(i).get()); 
+		    }
 		}
 	    }
 	}
+	
+	if(min.eq(max, IConfig.minimumBoundingBox)){
+	    IOut.err("bounding box is too small. minimum size is set");
+	    IVec sz = new IVec(IConfig.minimumBoundingBox,
+			       IConfig.minimumBoundingBox,
+			       IConfig.minimumBoundingBox);
+	    sz.div(2);
+	    max.set(min).add(sz);
+	    min.sub(sz);
+	}
+	
 	
 	if(objects.size()>1000) IOut.debug(10, "calculation of bounding box completed");
 	

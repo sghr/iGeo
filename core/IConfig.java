@@ -158,7 +158,9 @@ public interface IConfig{
     */
     public static double keyZoomSpeed = 5;
     
-    
-    
+    /**
+       Minimum size to create bounding box and to zoom into.
+    */
+    public static double minimumBoundingBox = 0.002;
 }
     

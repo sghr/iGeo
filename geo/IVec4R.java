@@ -112,7 +112,20 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     
     
     
+    public IVec4R add(double x, double y, double z){
+	op=new Add(op,new IVec(x,y,z)); return this;
+    }
+    public IVec4R add(IDoubleI x, IDoubleI y, IDoubleI z){
+	op=new Add(op,new IVecR(x,y,z)); return this;
+    }
     public IVec4R add(IVecI u){ op=new Add(op,u); return this; }
+    
+    public IVec4R sub(double x, double y, double z){
+	op=new Sub(op,new IVec(x,y,z)); return this;
+    }
+    public IVec4R sub(IDoubleI x, IDoubleI y, IDoubleI z){
+	op=new Sub(op,new IVecR(x,y,z)); return this;
+    }
     public IVec4R sub(IVecI u){ op=new Sub(op,u); return this; }
     
     public IVec4R mul(IDoubleI u){ op=new Mul(op,u); return this; }

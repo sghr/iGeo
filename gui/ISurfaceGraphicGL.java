@@ -42,7 +42,7 @@ public class ISurfaceGraphicGL extends IGraphicObject{
     public static float defaultColorBlue = .5f; //1f;
     public static float defaultColorAlpha = 1f;
 
-    public static float defaultShininess=0.5f; //1f; //5f; //1f; //0.1f; //0.5f; //1f;
+    public static float defaultShininess=0.3f; //0.5f; //1f; //5f; //1f; //0.1f; //0.5f; //1f;
     
     
     public ISurfaceGraphicFillGL fill;

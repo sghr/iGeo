@@ -70,10 +70,14 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public IVec2 set(IVec2 v){ x=v.x; y=v.y; return this; }
     public IVec2 set(IVec2I v){ return set(v.get()); }
     public IVec2 set(IDoubleI x, IDoubleI y){ this.x=x.x(); this.y=y.x(); return this; }
-    
+
+    public IVec2 add(double x, double y){ this.x+=x; this.y+=y; return this; }
+    public IVec2 add(IDoubleI x, IDoubleI y){ this.x+=x.x(); this.y+=y.x(); return this; }
     public IVec2 add(IVec2 v){ x+=v.x; y+=v.y; return this; }
     public IVec2 add(IVec2I v){ return add(v.get()); }
     
+    public IVec2 sub(double x, double y){ this.x-=x; this.y-=y; return this; }
+    public IVec2 sub(IDoubleI x, IDoubleI y){ this.x-=x.x(); this.y-=y.x(); return this; }
     public IVec2 sub(IVec2 v){ x-=v.x; y-=v.y; return this; }
     public IVec2 sub(IVec2I v){ return sub(v.get()); }
     
@@ -425,7 +429,6 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
        remove points which are on straight line of adjacents
     */
     public static IVec2I[] removeStraightPoints(IVec2I[] pts, boolean closed){
-	IOut.p();
 	// remove redundant point on straight
 	int num = pts.length;
 	if(num<=2) return pts;

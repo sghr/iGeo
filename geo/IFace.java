@@ -36,7 +36,6 @@ public class IFace{
     public IEdge[] edges;
     public IVec normal;
     
-    
     public IFace(IEdge[] e){ init(e); }
     public IFace(IEdge e1, IEdge e2, IEdge e3){ this(new IEdge[]{e1, e2, e3}); }
     public IFace(IEdge e1, IEdge e2, IEdge e3, IEdge e4){ this(new IEdge[]{e1, e2, e3, e4}); }
@@ -54,6 +53,17 @@ public class IFace{
     
     public IFace(IVertex v1, IVertex v2, IVertex v3){ this(new IVertex[]{v1,v2,v3}); }
     public IFace(IVertex v1, IVertex v2, IVertex v3, IVertex v4){ this(new IVertex[]{v1,v2,v3,v4}); }
+
+    /**
+       Copis a face but shareing same vertices and edges with the original
+    */
+    public IFace(IFace f){
+	vertices = new IVertex[f.vertices.length];
+	for(int i=0; i<vertices.length; i++) vertices[i]=f.vertices[i];
+	edges = new IEdge[f.edges.length];
+	for(int i=0; i<edges.length; i++) edges[i]=f.edges[i];
+	if(f.normal!=null) normal = f.normal.dup();
+    }
     
     public void init(IEdge[] e){
 	int num = e.length;
@@ -66,8 +76,7 @@ public class IFace{
 	if(edges[1].contains(edges[0].vertices[0])) vertices[0]=edges[0].vertices[1];
 	else if(edges[1].contains(edges[0].vertices[1])) vertices[0]=edges[0].vertices[0];
 	else IOut.err("first&second edges don't match");
-	
-	
+		
 	for(int i=1; i<num; i++){
 	    if(edges[i-1].contains(vertices[i-1]))
 		vertices[i]=edges[i-1].getOtherVertex(vertices[i-1]);
@@ -81,9 +90,13 @@ public class IFace{
 	    vertices[i].addFace(this);
 	    edges[i].addFace(this);
 	}
-	
     }
     
+    
+    public IFace dup(){ return new IFace(this); }
+    
+    
+    /*
     public IFace dup(){ // duplicate vertices, edges  
 	int num = vertices.length;
 	IVertex v[] = new IVertex[num];
@@ -96,6 +109,7 @@ public class IFace{
 	f.normal = normal;
 	return f;
     }
+    */
     
     
     public IVertex getVertex(int i){ return vertex(i); }

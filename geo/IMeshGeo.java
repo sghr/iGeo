@@ -154,6 +154,24 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	}
     }
     
+    public IMeshGeo(IMeshGeo m){
+	// deep copy
+	vertices = new ArrayList<IVertex>();
+        edges = new ArrayList<IEdge>();
+        faces = new ArrayList<IFace>();
+	
+	for(int i=0; i<m.vertices.size(); i++) vertices.add(m.vertices.get(i).dup());
+	for(int i=0; i<m.edges.size(); i++) edges.add(m.edges.get(i).dup());
+	for(int i=0; i<m.faces.size(); i++) faces.add(m.faces.get(i).dup());
+	
+	// re-connect everything
+	for(int i=0; i<m.faces.size(); i++) replaceFace(m.faces.get(i), faces.get(i));
+	for(int i=0; i<m.edges.size(); i++) replaceEdge(m.edges.get(i), edges.get(i));
+	for(int i=0; i<m.vertices.size(); i++) replaceVertex(m.vertices.get(i), vertices.get(i));
+	
+    }
+    
+    
     public void init(ArrayList<ICurveI> lines, IMeshCreator creator){
 	
         //boolean fixAllPoints=true; //false;
@@ -233,6 +251,51 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
                 }
             }
         }
+    }
+    
+    public IMeshGeo get(){ return this; }
+    
+    public IMeshGeo dup(){ return new IMeshGeo(this); }
+    
+    /** For use in copy constructor */
+    protected void replaceVertex(IVertex origVertex, IVertex newVertex){
+	// vertices
+	for(IVertex v:vertices)
+	    for(int i=0; i<v.linkedVertices.size(); i++)
+		if(v.linkedVertices.get(i) == origVertex)
+		    v.linkedVertices.set(i,newVertex);
+	// edges
+	for(IEdge e:edges)
+	    for(int i=0; i<e.vertices.length; i++)
+		if(e.vertices[i] == origVertex) e.vertices[i] = newVertex;
+	// faces
+	for(IFace f:faces)
+	    for(int i=0; i<f.vertices.length; i++)
+		if(f.vertices[i] == origVertex) f.vertices[i] = newVertex;
+    }
+    
+    /** For use in copy constructor */
+    protected void replaceEdge(IEdge origEdge, IEdge newEdge){
+	// vertices
+	for(IVertex v:vertices)
+	    for(int i=0; i<v.edges.size(); i++)
+		if(v.edges.get(i) == origEdge) v.edges.set(i,newEdge);
+	// faces
+	for(IFace f:faces)
+	    for(int i=0; i<f.edges.length; i++)
+		if(f.edges[i] == origEdge) f.edges[i] = newEdge;
+    }
+    
+    /** For use in copy constructor */
+    protected void replaceFace(IFace origFace, IFace newFace){
+	// vertices
+	for(IVertex v:vertices)
+	    for(int i=0; i<v.faces.size(); i++)
+		if(v.faces.get(i) == origFace) v.faces.set(i,newFace);
+	// edges
+	for(IEdge e:edges)
+	    for(int i=0; i<e.faces.size(); i++)
+		if(e.faces.get(i) == origFace) e.faces.set(i,newFace);
     }
     
     
@@ -355,6 +418,9 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	    }
 	}
     }
+    
+    
+    
     
     public int vertexNum(){ return vertices.size(); }
     public int edgeNum(){ return edges.size(); }

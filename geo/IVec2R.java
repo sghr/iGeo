@@ -64,7 +64,11 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
     public IVec2R set(double x, double y){ op=new IVec2(x,y); return this; }
     public IVec2R set(IDoubleI x, IDoubleI y){ op = new FromXY(x,y); return this; }
     
+    public IVec2R add(double x, double y){ op = new Add(op,new IVec2(x,y)); return this; }
+    public IVec2R add(IDoubleI x, IDoubleI y){ op = new Add(op,new IVec2R(x,y)); return this; }
     public IVec2R add(IVec2I u){ op = new Add(op,u); return this; }
+    public IVec2R sub(double x, double y){ op = new Sub(op,new IVec2(x,y)); return this; }
+    public IVec2R sub(IDoubleI x, IDoubleI y){ op = new Sub(op,new IVec2R(x,y)); return this; }
     public IVec2R sub(IVec2I u){ op = new Sub(op,u); return this; }
     public IVec2R mul(IDoubleI u){ op = new Mul(op,u); return this; }
     public IVec2R mul(double u){ op = new Mul(op, new IDouble(u)); return this; }

@@ -23,37 +23,256 @@
 package igeo.geo;
 
 import java.util.ArrayList;
+import java.awt.Color;
 
 import igeo.core.*;
 
 /**
    Class of a curve which consists of multiple curves.
-   Because implementation is not completed yet, it's abstract class. 
+   Implementation is very temporary.
    To be completed later.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-abstract public class IPolycurve implements ICurveI{
+
+public class IPolycurve extends IObject /*implements ICurveI*/{
     
-    public ArrayList<ICurveI> curves; // public?
-    public ArrayList<IDoubleI> knots;
+    // currently just implemented as a group of ICurve
     
-    public IPolycurve(){ }
+    public ArrayList<ICurve> curves; // public?
+    //public ArrayList<IDouble> knots;
     
-    public IPolycurve(ICurveI[] crvs){
-	curves = new ArrayList<ICurveI>();
+    public IPolycurve(){ this((IServerI)null); }
+    public IPolycurve(IServerI s){ super(s); }
+    
+    public IPolycurve(ICurve[] crvs){ this(null,crvs); }
+    public IPolycurve(IServerI s, ICurve[] crvs){
+	super(s);
+	curves = new ArrayList<ICurve>();
 	for(int i=0; i<crvs.length; i++){ curves.add(crvs[i]); }
     }
-    
-    public IPolycurve(ArrayList<ICurveI> crvs){
+
+    public IPolycurve(ArrayList<ICurve> crvs){ this(null,crvs); }
+    public IPolycurve(IServerI s, ArrayList<ICurve> crvs){
+	super(s);
 	curves = crvs;
     }
-    
     public IPolycurve(IPolycurve crv){
-	curves = new ArrayList<ICurveI>(crv.curves.size());
+	super(crv);
+	curves = new ArrayList<ICurve>(crv.curves.size());
 	for(int i=0; i<crv.curves.size(); i++){ curves.add(crv.curves.get(i)); }
     }
+    public IPolycurve(IServerI s, IPolycurve crv){
+	super(s,crv);
+	curves = new ArrayList<ICurve>(crv.curves.size());
+	for(int i=0; i<crv.curves.size(); i++){ curves.add(crv.curves.get(i)); }
+    }
+    
+    
+    @Override public IPolycurve dup(){ return new IPolycurve(this); }
+    
+    @Override public void del(){
+	super.del();
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).del();
+    }
+    
+        
+    public IPolycurve name(String nm){
+        super.name(nm);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).name(nm+"_s"+i);
+        return this;
+    }
+    public IPolycurve layer(ILayer l){
+        super.layer(l);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).layer(l);
+        return this;
+    }
+    
+    public boolean visible(){
+	for(int i=0;curves!=null&&i<curves.size();i++) 
+	    if(curves.get(i).visible()) return true;
+	return false; // false if everything is false
+    }
+    
+    public IPolycurve hide(){
+        super.hide();
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).hide();
+        return this;
+    }
+    public IPolycurve show(){
+        super.show();
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).show();
+        return this;
+    }
+    public IPolycurve clr(Color c){
+        super.clr(c);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(c);
+        return this;
+    }
+    public IPolycurve clr(int gray){
+        super.clr(gray);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(gray);
+        return this;
+    }
+    public IPolycurve clr(float fgray){
+        super.clr(fgray);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(fgray);
+        return this;
+    }
+    public IPolycurve clr(double dgray){
+        super.clr(dgray);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(dgray);
+        return this;
+    }
+    public IPolycurve clr(int gray, int alpha){
+        super.clr(gray,alpha);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(gray,alpha);
+        return this;
+    }
+    public IPolycurve clr(float fgray, float falpha){
+        super.clr(fgray,falpha);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(fgray,falpha);
+        return this;
+    }
+    public IPolycurve clr(double dgray, double dalpha){
+        super.clr(dgray,dalpha);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(dgray,dalpha);
+        return this;
+    }
+    public IPolycurve clr(int r, int g, int b){
+        super.clr(r,g,b);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(r,g,b);
+        return this;
+    }
+    public IPolycurve clr(float fr, float fg, float fb){
+        super.clr(fr,fg,fb);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(fr,fg,fb);
+        return this;
+    }
+    public IPolycurve clr(double dr, double dg, double db){
+        super.clr(dr,dg,db);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(dr,dg,db);
+        return this;
+    }
+    public IPolycurve clr(int r, int g, int b, int a){
+        super.clr(r,g,b,a);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(r,g,b,a);
+        return this;
+    }
+    public IPolycurve clr(float fr, float fg, float fb, float fa){
+        super.clr(fr,fg,fb,fa);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(fr,fg,fb,fa);
+        return this;
+    }
+    public IPolycurve clr(double dr, double dg, double db, double da){
+        super.clr(dr,dg,db,da);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(dr,dg,db,da);
+        return this;
+    }
+    public IPolycurve hsb(float h, float s, float b, float a){
+        super.hsb(h,s,b,a);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).hsb(h,s,b,a);
+        return this;
+    }
+    public IPolycurve hsb(double h, double s, double b, double a){
+        super.hsb(h,s,b,a);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).hsb(h,s,b,a);
+        return this;
+    }
+    public IPolycurve hsb(double h, double s, double b){
+        super.hsb(h,s,b);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).hsb(h,s,b);
+        return this;
+    }
+    
+    
+    public IPolycurve setColor(Color c){
+        super.setColor(c);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(c);
+        return this;
+    }
+    public IPolycurve setColor(int gray){
+        super.setColor(gray);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(gray);
+        return this;
+    }
+    public IPolycurve setColor(float fgray){
+        super.setColor(fgray);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(fgray);
+        return this;
+    }
+    public IPolycurve setColor(double dgray){
+        super.setColor(dgray);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(dgray);
+        return this;
+    }
+    public IPolycurve setColor(int gray, int alpha){
+        super.setColor(gray,alpha);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(gray,alpha);
+        return this;
+    }
+    public IPolycurve setColor(float fgray, int falpha){
+        super.setColor(fgray,falpha);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(fgray,falpha);
+        return this;
+    }
+    public IPolycurve setColor(double dgray, double dalpha){
+        super.setColor(dgray,dalpha);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(dgray,dalpha);
+        return this;
+    }
+    public IPolycurve setColor(int r, int g, int b){
+        super.setColor(r,g,b);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(r,g,b);
+        return this;
+    }
+    public IPolycurve setColor(float fr, float fg, float fb){
+        super.setColor(fr,fg,fb);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(fr,fg,fb);
+        return this;
+    }
+    public IPolycurve setColor(double dr, double dg, double db){
+        super.setColor(dr,dg,db);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(dr,dg,db);
+        return this;
+    }
+    public IPolycurve setColor(int r, int g, int b, int a){
+        super.setColor(r,g,b,a);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(r,g,b,a);
+        return this;
+    }
+    public IPolycurve setColor(float fr, float fg, float fb, float fa){
+        super.setColor(fr,fg,fb,fa);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(fr,fg,fb,fa);
+        return this;
+    }
+    public IPolycurve setColor(double dr, double dg, double db, double da){
+        super.setColor(dr,dg,db,da);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(dr,dg,db,da);
+        return this;
+    }
+    public IPolycurve setHSBColor(float h, float s, float b, float a){
+        super.setHSBColor(h,s,b,a);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setHSBColor(h,s,b,a);
+        return this;
+    }
+    public IPolycurve setHSBColor(double h, double s, double b, double a){
+        super.setHSBColor(h,s,b,a);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setHSBColor(h,s,b,a);
+        return this;
+    }
+    public IPolycurve setHSBColor(float h, float s, float b){
+        super.setHSBColor(h,s,b);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setHSBColor(h,s,b);
+        return this;
+    }
+    public IPolycurve setHSBColor(double h, double s, double b){
+        super.setHSBColor(h,s,b);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setHSBColor(h,s,b);
+        return this;
+    }    
+    
     
     // to be implemented...
     /*

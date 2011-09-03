@@ -68,7 +68,20 @@ public class IVecR extends IParameterObject implements IVecI, IReferenceParamete
 	op = new FromXYZ(x,y,z); return this;
     }
     
+    public IVecR add(double x, double y, double z){
+	op=new Add(op,new IVec(x,y,z)); return this;
+    }
+    public IVecR add(IDoubleI x, IDoubleI y, IDoubleI z){
+	op=new Add(op,new IVecR(x,y,z)); return this;
+    }
     public IVecR add(IVecI u){ op=new Add(op,u); return this; }
+    
+    public IVecR sub(double x, double y, double z){
+	op=new Sub(op,new IVec(x,y,z)); return this;
+    }
+    public IVecR sub(IDoubleI x, IDoubleI y, IDoubleI z){
+	op=new Sub(op,new IVecR(x,y,z)); return this;
+    }
     public IVecR sub(IVecI u){ op=new Sub(op,u); return this; }
     public IVecR mul(IDoubleI u){ op=new Mul(op,u); return this; }
     public IVecR mul(double u){ op=new Mul(op,new IDouble(u)); return this; }

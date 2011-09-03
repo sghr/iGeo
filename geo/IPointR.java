@@ -37,12 +37,10 @@ public class IPointR extends IObject implements IVecI{
     public IVecI pos;
     
     public IPointR(){ pos = new IVec(); initPoint(null); }
-    public IPointR(IVec v){ pos = v; initPoint(null); }
     public IPointR(IVecI v){ pos = v; initPoint(null); }
     public IPointR(double x, double y, double z){ pos = new IVec(x,y,z); initPoint(null); }
     
     public IPointR(IServerI s){ super(s); pos = new IVec(0,0,0); initPoint(s); }
-    public IPointR(IServerI s, IVec v){ super(s); pos = v; initPoint(s); }
     public IPointR(IServerI s, IVecI v){ super(s); pos = v; initPoint(s); }
     public IPointR(IServerI s, double x, double y, double z){
 	super(s); pos = new IVec(x,y,z); initPoint(s); 
@@ -56,7 +54,7 @@ public class IPointR extends IObject implements IVecI{
     }
     
     public IPointR(IServerI s, IPointR p){
-	super(s);
+	super(s,p);
 	pos = p.pos.dup();
 	initPoint(s);
 	setColor(p.getColor());
@@ -97,7 +95,11 @@ public class IPointR extends IObject implements IVecI{
     public IPointR set(double x, double y, double z){ pos.set(x,y,z); return this;}
     public IPointR set(IDoubleI x, IDoubleI y, IDoubleI z){ pos.set(x,y,z); return this; }
     
+    public IPointR add(double x, double y, double z){ pos.add(x,y,z); return this; }
+    public IPointR add(IDoubleI x, IDoubleI y, IDoubleI z){ pos.add(x,y,z); return this; }    
     public IPointR add(IVecI v){ pos.add(v); return this; }
+    public IPointR sub(double x, double y, double z){ pos.sub(x,y,z); return this; }
+    public IPointR sub(IDoubleI x, IDoubleI y, IDoubleI z){ pos.sub(x,y,z); return this; }
     public IPointR sub(IVecI v){ pos.sub(v); return this; }
     public IPointR mul(IDoubleI v){ pos.mul(v); return this; }
     public IPointR mul(double v){ pos.mul(v); return this; }

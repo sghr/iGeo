@@ -52,6 +52,9 @@ public class IOut {
     public static void disablePrint(){ enabled=false; }
     public static void enableErr(){ errEnabled=true; }
     public static void disableErr(){ errEnabled=false; }
+
+    public static void debugLevel(int level){ debugLevel=level; }
+    public static int debugLevel(){ return debugLevel; }
     
     protected static void printCurrentStack(){
 	printCurrentStack(ps);

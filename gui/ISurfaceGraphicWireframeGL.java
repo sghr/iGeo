@@ -321,7 +321,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	    float[] colorf = new float[]{ red, green, blue, alpha };
 	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
 	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
-	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
+	    //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
 	    gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
 			   ISurfaceGraphicGL.defaultShininess);
 	    gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
