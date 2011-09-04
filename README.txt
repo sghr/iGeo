@@ -10,10 +10,6 @@ polygon meshes and 3D model file I/O. It also has an interface
 called piGeon specialized for processing. 
 
 
-LICENSE
-
-Copyright (c) 2002-2011 Satoru Sugihara
-
 iGeo is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as
 published by the Free Software Foundation, version 3.
