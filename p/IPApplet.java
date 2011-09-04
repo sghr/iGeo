@@ -45,7 +45,7 @@ public class IPApplet extends PApplet{
     public void setup(){
 	//size(600,600, IG.IG3D);
 	size(600,600, IG.GL);
-	
+
 	/*
 	final double range=200;
 	for(int i=0; i<10000; i++){
