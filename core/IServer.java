@@ -45,7 +45,7 @@ public class IServer implements IServerI{
     
     public IGraphicServer graphicServer; // non null in graphic mode
     public IG ig; // parent
-    //IRootPanel panel; // non null in graphic mode
+    //IPanel panel; // non null in graphic mode
     
     // for updating logic of other object referring IServer
     public int statusCount=0; // incremented when any change happens in the state
@@ -62,7 +62,7 @@ public class IServer implements IServerI{
     }
     
     // graphic mode
-    public IServer(IG ig, IRootPanel panel){
+    public IServer(IG ig, IPanel panel){
 	this.ig =ig;
 	objects = new ArrayList<IObject>();
 	//graphics = new ArrayList<IGraphicObject>();
@@ -97,7 +97,7 @@ public class IServer implements IServerI{
 	}
     }
     
-    //public IRootPanel getRootPanel(){ return panel; }
+    //public IPanel getPanel(){ return panel; }
     
     public boolean isGraphicMode(){ return graphicServer!=null; }
     

@@ -34,7 +34,7 @@ import igeo.core.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IScreenTogglePanel extends IRootPanel{
+public class IScreenTogglePanel extends IPanel{
     
     public IPane fullScreenPane=null;
     public int fullPaneOrigX, fullPaneOrigY, fullPaneOrigWidth, fullPaneOrigHeight;

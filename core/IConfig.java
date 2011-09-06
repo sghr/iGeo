@@ -28,7 +28,7 @@ package igeo.core;
    @author Satoru Sugihara
    @version 0.7.0.0
 */
-public interface IConfig{
+public /*interface*/ class IConfig{
     
     /**
        if IObject should keep multiple IGraphicObject when it swithes to

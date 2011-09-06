@@ -34,7 +34,7 @@ import igeo.core.*;
    An instance of IView is associated with an instance of IPane.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
+   @version 0.7.1.0;
 */
 public class IView{
     
@@ -57,7 +57,11 @@ public class IView{
     public static float[] defaultGLDiffuseLight = {.7f,.7f,.7f,1f};
     public static float[] defaultGLSpecularLight = {.0f,.0f,.0f,1f};
     
-    public static boolean defaultGLTwoSidedLighting = false; //true; // when this is true, it seems to cause weird behavior looking like some of normals are flipped or messed up    
+    public static boolean defaultGLTwoSidedLighting = false; //true; // when this is true, it seems to cause weird behavior looking like some of normals are flipped or messed up
+
+    public static double[][][] defaultGLBGColor =
+	new double[][][]{ { {1.0,1.0,1.0},{0.3,0.5,0.7} },
+			  { {0.9,0.9,0.9},{0.3,0.5,0.7} } };
     
     // eye location
     public IVec pos;
@@ -111,9 +115,7 @@ public class IView{
     
     public IGraphicMode mode=new IGraphicMode(defaultMode);
     
-    public double[][][] glBGColor = new double[][][]
-	{ { {1.0,1.0,1.0},{0.3,0.5,0.7} },
-	  { {0.9,0.9,0.9},{0.3,0.5,0.7} } };
+    public double[][][] glBGColor = null; //defaultGLBGColor;
     
     public Color javaBGColor1, javaBGColor2; 
     
@@ -503,6 +505,40 @@ public class IView{
     }
     
     
+    //public void drawBG(IGraphics g){}
+    
+    public void drawBG(GL gl){
+	if(glBGColor!=null){
+	    gl.glMatrixMode(GL.GL_MODELVIEW);
+	    gl.glPushMatrix();
+	    gl.glLoadIdentity();
+	    gl.glMatrixMode(GL.GL_PROJECTION);
+	    gl.glPushMatrix();
+	    gl.glLoadIdentity();
+	    gl.glDisable(GL.GL_DEPTH_TEST);
+	    //if(mode.isLight()) gl.glDisable(GL.GL_LIGHTING);
+	    gl.glBegin(GL.GL_QUADS);
+	    //gl.glColor3d(0.3,0.5,0.7);
+	    gl.glColor3dv(glBGColor[0][1],0);
+	    gl.glVertex3d(-1.,-1.,0);
+	    gl.glColor3dv(glBGColor[1][1],0);
+	    gl.glVertex3d(1.,-1.,0);
+	    //gl.glColor3d(1.,1.,1.);
+	    gl.glColor3dv(glBGColor[1][0],0);
+	    gl.glVertex3d(1.,1.,0);
+	    //gl.glColor3d(0.9,0.9,0.9);
+	    gl.glColor3dv(glBGColor[0][0],0);
+	    gl.glVertex3d(-1.,1.,0);
+	    gl.glEnd();
+	    gl.glEnable(GL.GL_DEPTH_TEST);
+	    gl.glMatrixMode(GL.GL_MODELVIEW);
+	    gl.glPopMatrix();
+	    gl.glMatrixMode(GL.GL_PROJECTION);
+	    gl.glPopMatrix();
+	}
+    }
+    
+    
     //public void beginGLView(GL gl, IGraphics g){
     public void draw(GL gl){
 	
@@ -513,29 +549,9 @@ public class IView{
 	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT); //
 	
 	// background
-	/*
-	g.getGL().glMatrixMode(GL.GL_MODELVIEW);
-	g.getGL().glPushMatrix();
-	g.getGL().glLoadIdentity();
-	g.getGL().glMatrixMode(GL.GL_PROJECTION);
-	g.getGL().glPushMatrix();
-	g.getGL().glLoadIdentity();
-	g.getGL().glDisable(GL.GL_DEPTH_TEST);
-	g.getGL().glBegin(GL.GL_QUADS);
-	g.getGL().glColor3d(0.3,0.5,0.7);
-	g.getGL().glVertex3d(-1.,-1.,1.);
-	g.getGL().glVertex3d(1.,-1.,1.);
-	g.getGL().glColor3d(1.,1.,1.);
-	g.getGL().glVertex3d(1.,1.,1.);
-	g.getGL().glVertex3d(-1.,1.,1.);
-	g.getGL().glEnd();
-	g.getGL().glEnable(GL.GL_DEPTH_TEST);
-	g.getGL().glMatrixMode(GL.GL_MODELVIEW);
-	g.getGL().glPopMatrix();
-	g.getGL().glMatrixMode(GL.GL_PROJECTION);
-	g.getGL().glPopMatrix();
-	*/
 	
+	drawBG(gl);
+	/*
 	gl.glMatrixMode(GL.GL_MODELVIEW);
 	gl.glPushMatrix();
 	gl.glLoadIdentity();
@@ -544,7 +560,6 @@ public class IView{
 	gl.glLoadIdentity();
 	gl.glDisable(GL.GL_DEPTH_TEST);
 	//if(mode.isLight()) gl.glDisable(GL.GL_LIGHTING);
-	
 	gl.glBegin(GL.GL_QUADS);
 	//gl.glColor3d(0.3,0.5,0.7);
 	gl.glColor3dv(glBGColor[0][1],0);
@@ -558,11 +573,30 @@ public class IView{
 	gl.glColor3dv(glBGColor[0][0],0);
 	gl.glVertex3d(-1.,1.,0);
 	gl.glEnd();
+	gl.glEnable(GL.GL_DEPTH_TEST);
+	gl.glMatrixMode(GL.GL_MODELVIEW);
+	gl.glPopMatrix();
+	gl.glMatrixMode(GL.GL_PROJECTION);
+	gl.glPopMatrix();
+	*/
 	
-	//if(mode.isLight()) gl.glEnable(GL.GL_LIGHTING);
+	
+	//gl.glClearColor(1f,1f,1f,1f);
+	//if(IGRandom.percent(1)) gl.glClearColor(IGRandom.getf(),IGRandom.getf(),IGRandom.getf(),1f); //
+	
+	//gl.glDisable(GL.GL_DEPTH_TEST); // !! for transparency
+	//gl.glEnable(GL.GL_DEPTH_TEST);
+	
+	
 	
 	// default light
 	if(mode.isLight()){
+	    //
+	    gl.glMatrixMode(GL.GL_MODELVIEW);
+	    gl.glPushMatrix();
+	    gl.glLoadIdentity();
+	    
+	    
 	    //gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, new float[]{0f,0f,1f,0f}, 0);
 	    //gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, new float[]{.1f,.1f,.1f,1.0f}, 0);
 	    ////gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, new float[]{.3f,.3f,.3f}, 0);
@@ -585,31 +619,16 @@ public class IView{
 	    
 	    gl.glEnable(GL.GL_LIGHT1);
 	    gl.glEnable(GL.GL_LIGHTING);
+	    
+	    	    
+	    gl.glPopMatrix();
+	    
 	}
 	
-	//gl.glDisable(GL.GL_CULL_FACE); // !!! test
-	
-	gl.glEnable(GL.GL_DEPTH_TEST);
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-	
-	gl.glPopMatrix();
 	
 	gl.glMatrixMode(GL.GL_PROJECTION);
-	gl.glPopMatrix();
-	
-	
-	
-	//gl.glClearColor(1f,1f,1f,1f);
-	//if(IGRandom.percent(1)) gl.glClearColor(IGRandom.getf(),IGRandom.getf(),IGRandom.getf(),1f); //
-	
-	//gl.glDisable(GL.GL_DEPTH_TEST); // !! for transparency
-	//gl.glEnable(GL.GL_DEPTH_TEST);
-	
-	gl.glMatrixMode(GL.GL_PROJECTION);
-	
-	gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-	
 	gl.glLoadIdentity();
+	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
 	
 	
 	if(axonometric)
@@ -620,31 +639,7 @@ public class IView{
 	//gl.glLoadIdentity();
 	//gl.glTranslated(-x,-y,-z);
 	
-	
 	gl.glLoadMatrixd(glTransformArray,0);
-	
-	
-	/*
-	if(mode.isLight()){
-	    //IVec v =  frontDirection();
-	    //v.neg();
-	    
-	    //gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, new float[]{(float)v.x,(float)v.y,(float)v.z,0}, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, new float[]{(float)pos.x,(float)pos.y,(float)pos.z,10f}, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, new float[]{.0f,.0f,.0f}, 0);
-	    //gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, new float[]{1f,1f,1f}, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, new float[]{1f,1f,1f}, 0);
-	    
-	    //gl.glLightModeli(GL.GL_LIGHT_MODEL_LOCAL_VIEWER, 1); //
-	    //gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1); //
-	    
-	    //gl.glEnable(GL.GL_NORMALIZE); //
-	    //gl.glEnable(GL.GL_AUTO_NORMAL); //
-	    
-	    gl.glEnable(GL.GL_LIGHT1);
-	    gl.glEnable(GL.GL_LIGHTING);
-	}
-	*/
 	
 	
     }

@@ -66,14 +66,14 @@ public class IGraphicServer{
     
     public IServer server;
     
-    public IRootPanel panel;
+    public IPanel panel;
     
     public IGraphicMode[] modes=null;
     
     public boolean useGL;
     
     
-    public IGraphicServer(IServer s, IRootPanel p){
+    public IGraphicServer(IServer s, IPanel p){
 	server=s;
 	panel = p;
 	views=new ArrayList<IView>();
@@ -81,6 +81,11 @@ public class IGraphicServer{
     }
     
     public void addView(IView v){ views.add(v); }
+
+    public IView view(int i){ return views.get(i); }
+    
+    public int viewNum(){ return views.size(); }
+    
     
     public void setMode(IGraphicMode m){
 	if(views!=null) for(IView v:views) v.setMode(new IGraphicMode(m));

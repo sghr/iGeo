@@ -36,16 +36,17 @@ import igeo.gui.*;
 
 /**
    A child class of Processing's PApplet.
+   Currently only used for debugging.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IPApplet extends PApplet{
+public class PIApplet extends PApplet{
     
     public void setup(){
 	//size(600,600, IG.IG3D);
 	size(600,600, IG.GL);
-
+	
 	/*
 	final double range=200;
 	for(int i=0; i<10000; i++){

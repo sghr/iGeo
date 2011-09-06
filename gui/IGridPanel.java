@@ -31,7 +31,7 @@ import igeo.core.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IGridPanel extends IScreenTogglePanel{ //IGRootPanel{
+public class IGridPanel extends IScreenTogglePanel{ //IPanel{
     
     public IPane[][] gridPanes;
     public int xnum, ynum;

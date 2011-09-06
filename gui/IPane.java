@@ -32,19 +32,19 @@ import igeo.geo.*;
 
 /**
    A pane object to provide one rectangular area to draw objects.
-   One pane is associated with one IView and INavigator and retained by IRootPanel.
+   One pane is associated with one IView and INavigator and retained by IPanel.
    
    @see IView
    @see INavigator
-   @see IRootPanel
+   @see IPanel
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
+   @version 0.7.1.0;
 */
 public class IPane extends IComponent{
     
     //IG ig;
-    public IRootPanel parent;
+    public IPanel parent;
     public IView view;
     
     public INavigator navigator;
@@ -53,7 +53,7 @@ public class IPane extends IComponent{
     public Color borderColor = Color.gray; //Color.gray;
     public BasicStroke borderStroke = new BasicStroke(borderWidth);
     
-    public IPane(int x, int y, int width, int height, IView view, IRootPanel p){
+    public IPane(int x, int y, int width, int height, IView view, IPanel p){
 	super(x,y,width,height);
 	this.view = view;
 	parent = p;
@@ -62,8 +62,8 @@ public class IPane extends IComponent{
 	navigator = new INavigator(view, this);
     }
     
-    public void setParent(IRootPanel p){ parent=p; }
-    public IRootPanel getPanel(){ return parent; }
+    public void setParent(IPanel p){ parent=p; }
+    public IPanel getPanel(){ return parent; }
     //public void setIG(IG ig){ this.ig=ig; }
     
     public void setBorderWidth(float b){
@@ -73,7 +73,6 @@ public class IPane extends IComponent{
     public float getBorderWidth(){ return borderWidth; }
     public void setBorderColor(Color c){ borderColor = c;}
     public Color getBorderColor(){ return borderColor; }
-    
     
     public void setBounds(int x, int y, int w, int h){
 	//IOut.debug(10,"x="+x+", y="+y+", width="+w+", height="+h); //
@@ -85,18 +84,6 @@ public class IPane extends IComponent{
     public void setView(IView view){ this.view = view; }
     
     public IView getView(){ return view; }
-    
-    /*
-    public void draw(GL gl){
-	//view
-	view.draw(gl);
-	//parent.ig.draw(gl);
-	
-	// ig
-	// parent.ig.
-    }
-    public void draw(Graphics2D g){}
-    */
     
     public void draw(IGraphics g){
 	
@@ -122,8 +109,6 @@ public class IPane extends IComponent{
 		    for(int i=objects.size()-1; i>=0; i--)
 			if(objects.get(i).isVisible()) objects.get(i).draw(g);
 		
-		//g.drawGeometry(g.getGL());//debug
-		
 		if(view.mode().isLight()){
 		    g.getGL().glDisable(GL.GL_LIGHTING);
 		    g.getGL().glDisable(GL.GL_LIGHT1);
@@ -134,16 +119,11 @@ public class IPane extends IComponent{
 		    
 		    // border
 		    if(borderWidth>0&&(parent.width!=width ||parent.height!=height)){
-			
 			g2.setColor(borderColor);
 			g2.setStroke(borderStroke);
 			//g2.drawRect(x,y,width-1,height-1);
 			g2.drawRect(x,y,width,height);
-			
-			//g2.setColor(Color.gray); //
-			//g2.drawRect(x,y,width-1,height-1);
 		    }
-		    
 		}
 		
 	    }
@@ -161,7 +141,7 @@ public class IPane extends IComponent{
     }
     
     
-    // focus view on objects
+    /** Focus view on objects */
     public void focus(){
 	//if(parent.getBoundingBox()==null) parent.setBoundingBox();
 	
@@ -170,7 +150,7 @@ public class IPane extends IComponent{
 	view.focus(parent.getBoundingBox());
     }
     
-    
+    /** Focus view on objects */
     public void focus(ArrayList<IObject> e){
 	IBoundingBox bb = new IBoundingBox();
 	bb.setObjects(e);

@@ -25,17 +25,19 @@ package igeo.gui;
 import java.util.ArrayList;
 import java.awt.event.*;
 
+import javax.media.opengl.*;
+
 import igeo.core.*;
 import igeo.geo.IBoundingBox;
 
 /**
    A root GUI object of iGeo managing all IPane instance.
-   An instance IG is keyed by IRootPanel object when it's in Graphic mode.
+   An instance IG is keyed by IPanel object when it's in Graphic mode.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
+   @version 0.7.1.0;
 */
-public class IRootPanel extends IComponent implements IServerI, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener{
+public class IPanel extends IComponent implements IServerI, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener{
     
     public ArrayList<IPane> panes;
     
@@ -49,7 +51,7 @@ public class IRootPanel extends IComponent implements IServerI, MouseListener, M
     public IBoundingBox boundingBox;
     public int serverStatusCount;
     
-    public IRootPanel(int x, int y, int width, int height){
+    public IPanel(int x, int y, int width, int height){
 	super(x,y,width,height);
 	panes = new ArrayList<IPane>();
 	this.ig = ig;
@@ -71,36 +73,6 @@ public class IRootPanel extends IComponent implements IServerI, MouseListener, M
     public IPane getPane(int i){ return panes.get(i); }
     
     public int paneNum(){ return panes.size(); }
-    
-    /*
-    // full screen of a pane inside root panel, not full screen on the display;
-    public void enableFullScreen(int paneIdx){
-	IPane p = panes.get(paneIdx);
-	fullPaneOrigX = p.x;
-	fullPaneOrigY = p.y;
-	fullPaneOrigWidth = p.width;
-	fullPaneOrigHeight = p.height;
-	fullScreenPane = p;
-	
-	for(int i=0; i<panes.size(); i++){ if(i!=paneIdx) panes.get(i).hide(); }
-	
-	IOut.p("x="+x+", y="+y+", width="+width+", height"+height); //
-	fullScreenPane.setBounds(this.x,this.y,this.width,this.height);
-    }
-    public void enableFullScreen(IPane p){
-	int idx = panes.indexOf(p);
-	if(idx>=0) enableFullScreen(idx);
-    }
-    public void disableFullScreen(){
-	if(fullScreenPane!=null){
-	    fullScreenPane.setBounds(fullPaneOrigX,fullPaneOrigY,
-				     fullPaneOrigWidth,fullPaneOrigHeight);
-	    
-	    for(int i=0; i<panes.size(); i++){ if(panes.get(i)!=fullScreenPane) panes.get(i).show(); }
-	    fullScreenPane = null;
-	}
-    }
-    */
     
     public void removePane(int i){ panes.remove(i); }
     public void clearPane(){ panes.clear(); }
@@ -124,53 +96,17 @@ public class IRootPanel extends IComponent implements IServerI, MouseListener, M
 	    int nh = (int)(panes.get(i).getHeight()*h/origH);
 	    panes.get(i).setBounds(nx,ny,nw,nh);
 	}
-	/*
-	if(fullScreenPane!=null){
-	    fullPaneOrigX = (int)(fullPaneOrigX*w/origW);
-	    fullPaneOrigY = (int)(fullPaneOrigY*h/origH);
-	    fullPaneOrigWidth = (int)(fullPaneOrigWidth*w/origW);
-	    fullPaneOrigHeight = (int)(fullPaneOrigHeight*h/origH);
-	}
-	*/
 	width=w;
 	height=h;
     }
     
     
-    
-    /*
-    public void draw(GL gl){
-	for(int i=0; i<panes.size(); i++)
-	    if(panes.get(i).isVisible()) panes.get(i).draw(gl);
-    }
-    public void draw(Graphics2D g){
-	for(int i=0; i<panes.size(); i++)
-	    if(panes.get(i).isVisible()) panes.get(i).draw(g);
-    }
-    */
-    
     public void draw(IGraphics g){
 	for(int i=0; i<panes.size(); i++){
 	    synchronized(IG.lock){
-		//IOut.p("panes("+i+")"); //
 		if(panes.get(i).isVisible()){ panes.get(i).draw(g); }
 	    }
 	}
-	/*
-	if(fullScreenPane!=null){
-	    synchronized(IG.lock){
-		fullScreenPane.draw(g);
-	    }
-	}
-	else{
-	    for(int i=0; i<panes.size(); i++){
-		synchronized(IG.lock){
-		    //IOut.p("panes("+i+")"); //
-		    if(panes.get(i).isVisible()){ panes.get(i).draw(g); }
-		}
-	    }
-	}
-	*/
     }
     
     public IPane getPaneAt(MouseEvent e){

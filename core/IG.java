@@ -36,15 +36,15 @@ import igeo.io.*;
    A single IG instance can be accessed through static methods although
    multiple IG instance also can be contained in the static variable iglist in case
    multiple object servers are needed or simultaneous execution of multiple applets. 
-   One IG instance contains one IServer as object database and one IRootPanel as
-   display window. The member variable of IRootPanel can be null when no display
+   One IG instance contains one IServer as object database and one IPanel as
+   display window. The member variable of IPanel can be null when no display
    window is needed. 
    
    @see IServer
-   @see IRootPanel
+   @see IPanel
    
    @author Satoru Sugihara
-   @version 0.7.0.0
+   @version 0.7.1.0
 */
 public class IG implements IServerI{
     
@@ -58,24 +58,27 @@ public class IG implements IServerI{
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
     }
     
-    
+    /************************************
+     * static variables
+     ************************************/
     public static final Object lock = new Object();
     
-    //public static final String IG3D = "igeo.p.IGPGraphics"; // for processing graphics
-    public static final String GL = "igeo.p.IPGraphicsGL"; // for processing graphics
-    //public static final String JAVA = "igeo.p.IGPGraphicsJava"; // for processing graphics
+    public static final String GL = "igeo.p.PIGraphicsGL"; // for processing graphics
+    //public static final String JAVA = "igeo.p.PIGraphicsJava"; // for processing graphics
     
     protected static ArrayList<IG> iglist=null;
     protected static int currentId = -1;
     
-    protected IServer server;
-    //protected IGPane pane = null;
-    protected IRootPanel panel = null;
+    /************************************
+     * object variables
+     ************************************/
+    /*protected*/ public IServer server;
+    /*protected*/ public IPanel panel = null;
     
-    protected String inputFile;
-    protected String outputFile;
+    /*protected*/ public String inputFile;
+    /*protected*/ public String outputFile;
     
-    /**
+    /* *
        initialize whole IG system with IServer and graphical components
        instance of IG should be held by IGPane
        
@@ -121,9 +124,10 @@ public class IG implements IServerI{
 	return null;
     }
     */
-
-    /** no graphic mode
-     */
+    
+    /**
+       Initialize whole IG system in non-graphic mode.
+    */
     public static IG init(){
 	if(iglist==null) iglist = new ArrayList<IG>();
 	IG ig = new IG();
@@ -132,9 +136,11 @@ public class IG implements IServerI{
 	return ig;
     }
     
-    /** graphic mode
-     */
-    public static IG init(IRootPanel owner){
+    /**
+       Initialize whole IG system in graphic mode.
+       Please instantiate IPanel beforehand.
+    */
+    public static IG init(IPanel owner){
 	if(iglist==null) iglist = new ArrayList<IG>();
 	IG ig = new IG(owner);
 	iglist.add(ig);
@@ -143,12 +149,40 @@ public class IG implements IServerI{
     }
     
     
+    /**
+       Find the IG instance which is likely to be the current.
+    */
+    
     public static IG current(){
 	if(iglist==null || currentId<0 || currentId>=iglist.size()) return null;
 	return iglist.get(currentId);
     }
-
-    public static IG getIG(IRootPanel owner){
+    
+    public static void setCurrent(IG ig){
+	int idx = iglist.indexOf(ig);
+	if(idx>=0 && idx<iglist.size()) currentId = idx;
+	else{ // not in the list
+	    // add? really?
+	    iglist.add(ig);
+	    currentId = iglist.size()-1;
+	}
+    }
+    
+    public static void setCurrent(IPanel owner){
+	for(int i=0; i<iglist.size(); i++){
+	    if(iglist.get(i).panel == owner){
+		currentId = i;
+		return;
+	    }
+	}
+	IOut.err("no IG instance found for "+owner);
+    }
+    
+    
+    /**
+       Find IG instance linked with the specified IPanel instance.
+    */
+    public static IG getIG(IPanel owner){
 	for(IG ig : iglist) if(ig.panel == owner) return ig;
 	return null;
     }
@@ -270,32 +304,22 @@ public class IG implements IServerI{
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,true,true));
     }
-    
-    
+        
     //public static void setBG(Color c){}
     //public static void setBG(Color c1, Color c2){}
     //public static void setBG(Color c1, Color c2, Color c3, Color c4){}
     //public static void setBG(Image img){}
     
-    
+    // anybody would want this in public?
     protected IG(){
 	server = new IServer(this);
     }
     
-    protected IG(IRootPanel p){
+    protected IG(IPanel p){
 	server = new IServer(this, p);
 	panel = p; // 
 	p.setIG(this);
     }
-    
-    /*
-    protected IG(IGPane p){
-	server = new IServer();
-	pane = p;
-	if(pane!=null) pane.setIG(this);
-    }
-    */
-    
     
     public boolean openFile(String file){
 	boolean retval = IIO.open(file,this);
@@ -343,7 +367,7 @@ public class IG implements IServerI{
     //public void draw(IGraphics g){ server.draw(g); }
     
     //public IGPane pane(){ return pane; }
-    //public IRootPanel panel(){ return panel; }
+    //public IPanel panel(){ return panel; }
     
     //public void delete(){
     public void clear(){ server.clear(); }
