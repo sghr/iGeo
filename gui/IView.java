@@ -115,7 +115,7 @@ public class IView{
     
     public IGraphicMode mode=new IGraphicMode(defaultMode);
     
-    public double[][][] glBGColor = null; //defaultGLBGColor;
+    public double[][][] glBGColor = defaultGLBGColor; // null
     
     public Color javaBGColor1, javaBGColor2; 
     
