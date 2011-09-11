@@ -92,7 +92,9 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
 	IG ig = IG.init(panel);
 	
 	ig.server().graphicServer().enableGL(); //
-		
+	//ig.setBasePath(parent.sketchPath("")); // not sketchPath
+	ig.setBasePath(parent.dataPath("")); // for default path to read/write files
+	
 	parent.addMouseListener(panel);
 	parent.addMouseMotionListener(panel);
 	parent.addMouseWheelListener(panel);

@@ -203,11 +203,16 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 scale(IVecI center, IDoubleI f){ super.scale(center,f); return this; }
     public IVec4 scale(IVecI center, double f){ super.scale(center,f); return this; }
     public IVec4 scale(IVec center, double f){ super.scale(center,f); return this; }
-
-    public IVec4 mirror(IVec planeDir){ super.mirror(planeDir); return this; }
-    public IVec4 mirror(IVecI planeDir){ super.mirror(planeDir); return this; }
-    public IVec4 mirror(IVec center, IVec planeDir){ super.mirror(center,planeDir); return this; }
-    public IVec4 mirror(IVecI center, IVecI planeDir){ super.mirror(center,planeDir); return this; }
+    
+    public IVec4 ref(IVec planeDir){ super.ref(planeDir); return this; }
+    public IVec4 ref(IVecI planeDir){ super.ref(planeDir); return this; }
+    public IVec4 ref(IVec center, IVec planeDir){ super.ref(center,planeDir); return this; }
+    public IVec4 ref(IVecI center, IVecI planeDir){ super.ref(center,planeDir); return this; }
+    
+    public IVec4 mirror(IVec planeDir){ super.ref(planeDir); return this; }
+    public IVec4 mirror(IVecI planeDir){ super.ref(planeDir); return this; }
+    public IVec4 mirror(IVec center, IVec planeDir){ super.ref(center,planeDir); return this; }
+    public IVec4 mirror(IVecI center, IVecI planeDir){ super.ref(center,planeDir); return this; }
     
     public IVec4 transform(IMatrix3I mat){ super.transform(mat); return this; }
     public IVec4 transform(IMatrix4I mat){ super.transform(mat); return this; }

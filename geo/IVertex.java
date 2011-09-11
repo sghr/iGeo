@@ -165,26 +165,26 @@ public class IVertex implements IVecI{
     public boolean eq(ISwitchE e, IVecI v, double resolution){ return pos.eq(e,v,resolution); }
     public IBoolI eq(ISwitchR r, IVecI v, IDoubleI resolution){ return pos.eq(r,v,resolution); }
     
-    public boolean eqX(IVecI v){ return eqX(v); }
-    public boolean eqY(IVecI v){ return eqY(v); }
-    public boolean eqZ(IVecI v){ return eqZ(v); }
-    public boolean eqX(ISwitchE e, IVecI v){ return eqX(e,v); }
-    public boolean eqY(ISwitchE e, IVecI v){ return eqY(e,v); }
-    public boolean eqZ(ISwitchE e, IVecI v){ return eqZ(e,v); }
-    public IBoolI eqX(ISwitchR r, IVecI v){ return eqX(r,v); }
-    public IBoolI eqY(ISwitchR r, IVecI v){ return eqY(r,v); }
-    public IBoolI eqZ(ISwitchR r, IVecI v){ return eqZ(r,v); }
+    public boolean eqX(IVecI v){ return pos.eqX(v); }
+    public boolean eqY(IVecI v){ return pos.eqY(v); }
+    public boolean eqZ(IVecI v){ return pos.eqZ(v); }
+    public boolean eqX(ISwitchE e, IVecI v){ return pos.eqX(e,v); }
+    public boolean eqY(ISwitchE e, IVecI v){ return pos.eqY(e,v); }
+    public boolean eqZ(ISwitchE e, IVecI v){ return pos.eqZ(e,v); }
+    public IBoolI eqX(ISwitchR r, IVecI v){ return pos.eqX(r,v); }
+    public IBoolI eqY(ISwitchR r, IVecI v){ return pos.eqY(r,v); }
+    public IBoolI eqZ(ISwitchR r, IVecI v){ return pos.eqZ(r,v); }
     
     
-    public boolean eqX(IVecI v, double resolution){ return eqX(v,resolution); }
-    public boolean eqY(IVecI v, double resolution){ return eqY(v,resolution); }
-    public boolean eqZ(IVecI v, double resolution){ return eqZ(v,resolution); }
-    public boolean eqX(ISwitchE e, IVecI v, double resolution){ return eqX(e,v,resolution); }
-    public boolean eqY(ISwitchE e, IVecI v, double resolution){ return eqY(e,v,resolution); }
-    public boolean eqZ(ISwitchE e, IVecI v, double resolution){ return eqZ(e,v,resolution); }
-    public IBoolI eqX(ISwitchR r, IVecI v, IDoubleI resolution){ return eqX(r,v,resolution); }
-    public IBoolI eqY(ISwitchR r, IVecI v, IDoubleI resolution){ return eqY(r,v,resolution); }
-    public IBoolI eqZ(ISwitchR r, IVecI v, IDoubleI resolution){ return eqZ(r,v,resolution); }
+    public boolean eqX(IVecI v, double resolution){ return pos.eqX(v,resolution); }
+    public boolean eqY(IVecI v, double resolution){ return pos.eqY(v,resolution); }
+    public boolean eqZ(IVecI v, double resolution){ return pos.eqZ(v,resolution); }
+    public boolean eqX(ISwitchE e, IVecI v, double resolution){ return pos.eqX(e,v,resolution); }
+    public boolean eqY(ISwitchE e, IVecI v, double resolution){ return pos.eqY(e,v,resolution); }
+    public boolean eqZ(ISwitchE e, IVecI v, double resolution){ return pos.eqZ(e,v,resolution); }
+    public IBoolI eqX(ISwitchR r, IVecI v, IDoubleI resolution){ return pos.eqX(r,v,resolution); }
+    public IBoolI eqY(ISwitchR r, IVecI v, IDoubleI resolution){ return pos.eqY(r,v,resolution); }
+    public IBoolI eqZ(ISwitchR r, IVecI v, IDoubleI resolution){ return pos.eqZ(r,v,resolution); }
     
     
     public double angle(IVecI v){ return pos.angle(v); }
@@ -204,19 +204,21 @@ public class IVertex implements IVecI{
     public IVecI rot(IVecI center, IVecI axis, IVecI destPt){ pos.rot(center,axis,destPt); return this; }
     
     
-    public IVertex scale(IDoubleI f){ scale(f); return this; }
-    public IVertex scale(double f){ scale(f); return this; }
+    public IVertex scale(IDoubleI f){ pos.scale(f); return this; }
+    public IVertex scale(double f){ pos.scale(f); return this; }
     
-    public IVertex scale(IVecI center, IDoubleI f){ scale(center,f); return this; }
-    public IVertex scale(IVecI center, double f){ scale(center,f); return this; }
+    public IVertex scale(IVecI center, IDoubleI f){ pos.scale(center,f); return this; }
+    public IVertex scale(IVecI center, double f){ pos.scale(center,f); return this; }
     
-    public IVertex mirror(IVecI planeDir){ mirror(planeDir); return this; }
-    public IVertex mirror(IVecI center, IVecI planeDir){ mirror(center,planeDir); return this; }
+    public IVertex ref(IVecI planeDir){ pos.ref(planeDir); return this; }
+    public IVertex ref(IVecI center, IVecI planeDir){ pos.ref(center,planeDir); return this; }
+    public IVertex mirror(IVecI planeDir){ pos.ref(planeDir); return this; }
+    public IVertex mirror(IVecI center, IVecI planeDir){ pos.ref(center,planeDir); return this; }
     
-    public IVertex transform(IMatrix3I mat){ transform(mat); return this; }
-    public IVertex transform(IMatrix4I mat){ transform(mat); return this; }
-    public IVertex transform(IVecI xvec, IVecI yvec, IVecI zvec){ transform(xvec,yvec,zvec); return this; }
-    public IVertex transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){ transform(xvec,yvec,zvec,translate); return this; }
+    public IVertex transform(IMatrix3I mat){ pos.transform(mat); return this; }
+    public IVertex transform(IMatrix4I mat){ pos.transform(mat); return this; }
+    public IVertex transform(IVecI xvec, IVecI yvec, IVecI zvec){ pos.transform(xvec,yvec,zvec); return this; }
+    public IVertex transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){ pos.transform(xvec,yvec,zvec,translate); return this; }
     
     public IVertex diff(IVecI v){ return dup().sub(v); }
     public IVertex mid(IVecI v){ return dup().add(v).div(2); }
@@ -234,7 +236,7 @@ public class IVertex implements IVecI{
     
     public IVertex sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return dup().mul(w1).add(v2,w2); }
     public IVertex sum(IVecI v2, IDoubleI w2){ return dup().mul((new IDouble(1.0)).sub(w2)).add(v2,w2); }
-
+    
     public IVec getAverageNormal(){
 	if(faces==null || faces.size()==0) return new IVec(0,0,1); // default
 	IVec n=new IVec(0,0,0);

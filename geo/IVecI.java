@@ -213,8 +213,11 @@ public interface IVecI extends IVecOp{
     public IVecI scale(IVecI center, double f);
     
     /**
-       mirror/reflect/flip 3 dimensionally to the other side of the plane
+       reflect(mirror) 3 dimensionally to the other side of the plane
     */
+    public IVecI ref(IVecI planeDir);
+    public IVecI ref(IVecI center, IVecI planeDir);
+    
     public IVecI mirror(IVecI planeDir);
     public IVecI mirror(IVecI center, IVecI planeDir);
     

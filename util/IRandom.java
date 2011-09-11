@@ -36,7 +36,7 @@ import igeo.geo.*;
    @version 0.7.0.0;
 */
 public class IRandom{
-    static final long defaultSeed=1;
+    static public final long defaultSeed=1;
     
     static protected Random random=null;
     

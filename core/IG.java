@@ -78,6 +78,8 @@ public class IG implements IServerI{
     /*protected*/ public String inputFile;
     /*protected*/ public String outputFile;
     
+    public String basePath = ".";
+    
     /* *
        initialize whole IG system with IServer and graphical components
        instance of IG should be held by IGPane
@@ -124,6 +126,11 @@ public class IG implements IServerI{
 	return null;
     }
     */
+    
+    
+    /***********************************************************************
+     * static methods
+     ***********************************************************************/
     
     /**
        Initialize whole IG system in non-graphic mode.
@@ -221,7 +228,6 @@ public class IG implements IServerI{
 	return ig.getInputFile();
     }
     
-    
     public static IPoint[] points(){
 	IG ig = current(); if(ig==null) return null; return ig.getPoints();
     }
@@ -310,6 +316,21 @@ public class IG implements IServerI{
     //public static void setBG(Color c1, Color c2, Color c3, Color c4){}
     //public static void setBG(Image img){}
     
+    /** Print method.
+	This is a wrapper of IOut.p(), which is 
+	also a wrapper of System.out.println() in most part.
+    */
+    public static void p(Object obj){ IOut.p(obj); }
+    public static void p(){ IOut.p(); }
+    public static void enabePrintPrefix(){ IOut.enablePrefix(); }
+    public static void disablePrintPrefix(){ IOut.disablePrefix(); }
+    
+    
+    
+    /*************************************************************************
+     * object methods
+     *************************************************************************/
+    
     // anybody would want this in public?
     protected IG(){
 	server = new IServer(this);
@@ -322,6 +343,9 @@ public class IG implements IServerI{
     }
     
     public boolean openFile(String file){
+	File f = new File(file);
+	if(!f.isAbsolute() && basePath!=null)
+	    file = basePath + File.separator + file;
 	boolean retval = IIO.open(file,this);
 	inputFile = file;
 	focusView();
@@ -329,6 +353,17 @@ public class IG implements IServerI{
     }
     
     public boolean saveFile(String file){
+	File f = new File(file);
+	if(!f.isAbsolute() && basePath!=null){
+	    file = basePath + File.separator + file;
+	    File baseDir = new File(basePath);
+	    if(!baseDir.isDirectory()){
+		IOut.debug(20, "creating directory"+baseDir.toString());
+		if(!baseDir.mkdir()){
+		    IOut.err("failed to create directory: "+baseDir.toString());
+		}
+	    }
+	}
 	return IIO.save(file,this);
     }
     
@@ -344,8 +379,10 @@ public class IG implements IServerI{
     public void setOutputFile(String filename){ outputFile=filename; }
     public String getInputFile(){ return inputFile; }
     public String getOutputFile(){ return outputFile; }
-
-
+    
+    public String getBasePath(){ return basePath; }
+    public String setBasePath(String path){ return basePath=path; }
+    
     public ILayer getLayer(String layerName){ return server.getLayer(layerName); }
     public ILayer[] getAllLayers(){ return server.getAllLayers(); }
     public void removeLayer(String layerName){ server.removeLayer(layerName); }

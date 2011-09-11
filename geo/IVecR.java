@@ -232,16 +232,19 @@ public class IVecR extends IParameterObject implements IVecI, IReferenceParamete
     }
     
     /**
-       mirror/reflect/flip 3 dimensionally to the other side of the plane
+       reflect (mirror) 3 dimensionally to the other side of the plane
     */
-    public IVecR mirror(IVecI planeDir){
-	op=new Mirror(op,planeDir); return this; 
-    }
-    public IVecR mirror(IVecI center, IVecI planeDir){
+    public IVecR ref(IVecI planeDir){ op=new Ref(op,planeDir); return this; }
+    public IVecR ref(IVecI center, IVecI planeDir){
 	if(center==this) return this;
-	return sub(center).mirror(planeDir).add(center);
+	return sub(center).ref(planeDir).add(center);
     }
+    public IVecR mirror(IVecI planeDir){ return ref(planeDir); }
+    public IVecR mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
     
+    /**
+       transform with matrix
+    */
     public IVecR transform(IMatrix3I mat){ op = new Transform3(op,mat); return this; }
     public IVecR transform(IMatrix4I mat){ op = new Transform4(op,mat); return this; }
     public IVecR transform(IVecI xvec, IVecI yvec, IVecI zvec){
@@ -496,10 +499,10 @@ public class IVecR extends IParameterObject implements IVecI, IReferenceParamete
 	}
     }
     
-    static public class Mirror extends IParameterObject implements IVecOp{
+    static public class Ref extends IParameterObject implements IVecOp{
 	public IVecOp v, plane;
-	public Mirror(IVecOp v, IVecOp plane){ this.v=v; this.plane=plane; }
-	public IVec get(){ return v.get().mirror(plane.get()); }
+	public Ref(IVecOp v, IVecOp plane){ this.v=v; this.plane=plane; }
+	public IVec get(){ return v.get().ref(plane.get()); }
     }
     
     static public class Transform3 extends IParameterObject implements IVecOp{

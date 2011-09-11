@@ -258,21 +258,48 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public IVec2 scale(IVec2I center, double f){ return scale(center.get(),f); }
     public IVec2 scale(IVec2I center, IDoubleI f){ return scale(center.get(),f.x()); }
     
-    /**
-       mirror/reflect/flip 3 dimensionally to the other side of the plane
-       @param planeDir direction perpendicular to mirroring line
+    /** reflect (mirror) 2 dimensionally to the other side of the line
+	@param lineDir direction of reflection line
     */
-    public IVec2 mirror(IVec2 planeDir){
-	//planeDir = planeDir.dup().unit();
-	//return add(planeDir.mul(dot(planeDir)*-2));
-	return add(planeDir.dup().mul(dot(planeDir)/planeDir.len2()*-2));
+    public IVec2 ref(IVec2 lineDir){
+	return rev().add(lineDir.dup().mul(dot(lineDir)/lineDir.len2()*-2));
     }
-    public IVec2 mirror(IVec2I planeDir){ return mirror(planeDir.get()); }
-    public IVec2 mirror(IVec2 center, IVec2 planeDir){
-	if(center==this) return this;
-	return sub(center).mirror(planeDir).add(center);
+    /** reflect (mirror) 2 dimensionally to the other side of the line
+	@param lineDir direction of reflection line
+    */
+    public IVec2 ref(IVec2I lineDir){ return ref(lineDir.get()); }
+    /** reflect (mirror) 2 dimensionally to the other side of the line
+	@param linePt start point of reflection line
+	@param lineDir direction of reflection line
+    */
+    public IVec2 ref(IVec2 linePt, IVec2 lineDir){
+	if(linePt==this) return this;
+	return sub(linePt).ref(lineDir).add(linePt);
     }
-    public IVec2 mirror(IVec2I center, IVec2I planeDir){ return mirror(center.get(),planeDir.get()); }
+    /** reflect (mirror) 2 dimensionally to the other side of the line
+	@param linePt start point of reflection line
+	@param lineDir direction of reflection line
+    */
+    public IVec2 ref(IVec2I linePt, IVec2I lineDir){ return ref(linePt.get(),lineDir.get()); }
+    
+    /** reflect (mirror) 2 dimensionally to the other side of the line
+	@param lineDir direction of reflection line
+    */
+    public IVec2 mirror(IVec2 lineDir){ return ref(lineDir); }
+    /** reflect (mirror) 2 dimensionally to the other side of the line
+	@param lineDir direction of reflection line
+    */
+    public IVec2 mirror(IVec2I lineDir){ return ref(lineDir.get()); }
+    /** reflect (mirror) 2 dimensionally to the other side of the line
+	@param linePt start point of reflection line
+	@param lineDir direction of reflection line
+    */
+    public IVec2 mirror(IVec2 linePt, IVec2 lineDir){ return ref(linePt,lineDir); }
+    /** reflect (mirror) 2 dimensionally to the other side of the line
+	@param linePt start point of reflection line
+	@param lineDir direction of reflection line
+    */
+    public IVec2 mirror(IVec2I linePt, IVec2I lineDir){ return ref(linePt,lineDir); }
     
     
     //public IVec2I transform(IMatrix2I mat);

@@ -361,23 +361,27 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
     
     /**
-       mirror/reflect/flip 3 dimensionally to the other side of the plane
+       reflect (mirror) 3 dimensionally to the other side of the plane
     */
-    public IVec mirror(IVec planeDir){
+    public IVec ref(IVec planeDir){
 	//planeDir = planeDir.dup().unit();
 	//return add(planeDir.mul(dot(planeDir)*-2));
 	return add(planeDir.dup().mul(dot(planeDir)/planeDir.len2()*-2));
     }
-    public IVec mirror(IVecI planeDir){
-	return mirror(planeDir.get());
-    }
-    public IVec mirror(IVec center, IVec planeDir){
+    public IVec ref(IVecI planeDir){ return ref(planeDir.get()); }
+    public IVec ref(IVec center, IVec planeDir){
 	if(center==this) return this;
-	return sub(center).mirror(planeDir).add(center);
+	return sub(center).ref(planeDir).add(center);
     }
-    public IVec mirror(IVecI center, IVecI planeDir){
-	return mirror(center.get(),planeDir.get());
+    public IVec ref(IVecI center, IVecI planeDir){
+	return ref(center.get(),planeDir.get());
     }
+    
+    public IVec mirror(IVec planeDir){ return ref(planeDir); }
+    public IVec mirror(IVecI planeDir){ return ref(planeDir); }
+    public IVec mirror(IVec center, IVec planeDir){ return ref(center,planeDir); }
+    public IVec mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
     
     public IVec transform(IMatrix3I mat){ return set(mat.mul(this)); }
     public IVec transform(IMatrix4I mat){ return set(mat.mul(this)); }

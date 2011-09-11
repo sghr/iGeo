@@ -266,13 +266,13 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	return sub(center).mul(f).add(center);
     }
     
-    public IVec4R mirror(IVecI planeDir){
-        op=new Mirror(op,planeDir); return this; 
-    }
-    public IVec4R mirror(IVecI center, IVecI planeDir){
+    public IVec4R ref(IVecI planeDir){ op=new Ref(op,planeDir); return this; }
+    public IVec4R ref(IVecI center, IVecI planeDir){
         if(center==this) return this;
-        return sub(center).mirror(planeDir).add(center);
+        return sub(center).ref(planeDir).add(center);
     }
+    public IVec4R mirror(IVecI planeDir){ return ref(planeDir); }
+    public IVec4R mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
     
     public IVec4R transform(IMatrix3I mat){ op = new Transform3(op,mat); return this; }
     public IVec4R transform(IMatrix4I mat){ op = new Transform4(op,mat); return this; }
@@ -574,11 +574,11 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     }
     
     
-    static public class Mirror extends IParameterObject implements IVec4Op{
+    static public class Ref extends IParameterObject implements IVec4Op{
 	public IVec4Op v;
 	public IVecOp plane;
-	public Mirror(IVec4Op v, IVecOp plane){ this.v=v; this.plane=plane; };
-	public IVec4 get(){ return (IVec4)v.get().mirror(plane.get()); }
+	public Ref(IVec4Op v, IVecOp plane){ this.v=v; this.plane=plane; };
+	public IVec4 get(){ return (IVec4)v.get().ref(plane.get()); }
     }
     
     static public class Transform3 extends IParameterObject implements IVec4Op{

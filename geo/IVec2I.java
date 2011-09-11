@@ -156,10 +156,12 @@ public interface IVec2I extends IVec2Op{
     public IVec2I scale(IVec2I center, double f);
     
     /**
-       mirror/reflect/flip 3 dimensionally to the other side of the plane
+       reflect (mirror) 2 dimensionally to the other side of the line
     */
-    public IVec2I mirror(IVec2I planeDir);
-    public IVec2I mirror(IVec2I center, IVec2I planeDir);
+    public IVec2I ref(IVec2I lineDir);
+    public IVec2I ref(IVec2I center, IVec2I lineDir);
+    public IVec2I mirror(IVec2I lineDir);
+    public IVec2I mirror(IVec2I center, IVec2I lineDir);
     
     
     //public IVec2I transform(IMatrix2I mat);

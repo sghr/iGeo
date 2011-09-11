@@ -245,8 +245,10 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    // transparent fill
 	    currentMousePane.getView().mode().setDrawMode(false,true,true);
 	}
-	else if(key==KeyEvent.VK_Q && control&& !shift){
-	    System.exit(1); // temporary.
+	//else if(key==KeyEvent.VK_Q && control&& !shift){
+	else if( (key==KeyEvent.VK_W || key==KeyEvent.VK_Q)
+		 && control&& !shift){ // to match with Processing closing behavior
+	    System.exit(0); // temporary.
 	}
 	else if(key==KeyEvent.VK_S && control&& !shift){
 	    ig.save();

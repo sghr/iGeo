@@ -35,85 +35,118 @@ public class IOut {
     public static PrintStream ps = System.out;
     public static PrintStream err = System.err;
     public static PrintStream debug = System.out; //System.err;
-    public static boolean printStack=true; //false;
+    public static boolean printPrefix=true; //false;
     public static boolean enabled=true; //false; //true; 
     public static boolean errEnabled=true;
     public static boolean debugEnabled=true;
     public static int debugLevel=0;
+    public static boolean printErrorPrefix=true; //false;
+    public static boolean printDebugPrefix=true; //false;
     public static String errPrefix = "ERROR: ";
     public static String debugPrefix = "DEBUG: ";
     
     public static void setStream(PrintStream pstr){ ps=pstr; }
     public static void setErrStream(PrintStream pstr){ err=pstr; }
     
-    public static void enablePrintStack(){ printStack=true; }
-    public static void disablePrintStack(){ printStack=false; }
     public static void enablePrint(){ enabled=true; }
     public static void disablePrint(){ enabled=false; }
     public static void enableErr(){ errEnabled=true; }
     public static void disableErr(){ errEnabled=false; }
-
+    public static void enableDebug(){ debugEnabled=true; }
+    public static void disableDebug(){ debugEnabled=false; }
+    
+    public static void enablePrefix(){ printPrefix=true; }
+    public static void disablePrefix(){ printPrefix=false; }
+    public static void enableErrorPrefix(){ printErrorPrefix=true; }
+    public static void disableErrorPrefix(){ printErrorPrefix=false; }
+    public static void enableDebugPrefix(){ printDebugPrefix=true; }
+    public static void disableDebugPrefix(){ printDebugPrefix=false; }
+    
     public static void debugLevel(int level){ debugLevel=level; }
     public static int debugLevel(){ return debugLevel; }
     
-    protected static void printCurrentStack(){
-	printCurrentStack(ps);
-    }
+    //protected static void printCurrentStack(){ printCurrentStack(ps); }
+    
     protected static void printCurrentStack(PrintStream p){
-	final int stackNum=3; //4
-	final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
-	if(stk!=null && stk.length>stackNum) printStack(p,stk[stackNum]);
+	//final int stackNum=3; //4
+	//final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
+	//if(stk!=null && stk.length>stackNum) printStack(p,stk[stackNum]);
+	final String separator=": ";
+	String stk = currentStack();
+	p.print(stk+separator);
     }
     protected static void printStack(PrintStream p, StackTraceElement stk){
+	//String className = stk.getClassName();
+	//int idx = className.lastIndexOf('.');
+	//if(idx>=0) className = className.substring(idx+1);
+	//p.print(className+"."+stk.getMethodName()+": "); //
+	final String separator=": ";
+	p.print(stack(stk)+separator);
+    }
+    
+    public static String currentStack(){
+	final int stackNum=3; //4
+	final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
+	if(stk!=null && stk.length>stackNum) return stack(stk[stackNum]);
+	return ""; // null // null or ""?
+    }
+    public static String stack(StackTraceElement stk){
 	String className = stk.getClassName();
 	int idx = className.lastIndexOf('.');
 	if(idx>=0) className = className.substring(idx+1);
-	p.print(className+"."+stk.getMethodName()+": "); //
+	return className+"."+stk.getMethodName();
     }
-    
     
     public static void p(Object str){
 	if(enabled){
-	    if(printStack) printCurrentStack(ps);
+	    if(printPrefix) printCurrentStack(ps);
 	    ps.println(str);
 	}
     }
     
     public static void p(){
 	if(enabled){
-	    if(printStack) printCurrentStack(ps); // added
+	    if(printPrefix) printCurrentStack(ps); // added
 	    ps.println();
 	}
     }
     
     public static void err(Object str){
 	if(errEnabled){
-	    if(printStack) printCurrentStack(err);
-	    err.print(errPrefix);
+	    if(printErrorPrefix){
+		printCurrentStack(err);
+		err.print(errPrefix);
+	    }
 	    err.println(str);
 	}
     }
     
     public static void err(){
 	if(errEnabled){
-	    if(printStack) printCurrentStack(err); // added
-	    err.print(errPrefix);
+	    if(printErrorPrefix){
+		printCurrentStack(err); // added
+		err.print(errPrefix);
+	    }
 	    err.println();
 	}
     }
     
     public static void debug(int level, Object str){
 	if(debugEnabled && (debugLevel<0 || level<=debugLevel)){
-	    if(printStack) printCurrentStack(debug);
-	    debug.print(debugPrefix);
+	    if(printDebugPrefix){
+		printCurrentStack(debug);
+		debug.print(debugPrefix);
+	    }
 	    debug.println(str);
 	}
     }
     
     public static void debug(int level){
 	if(debugEnabled && (debugLevel<0 || level<=debugLevel)){
-	    if(printStack) printCurrentStack(debug);
-	    debug.print(debugPrefix);
+	    if(printDebugPrefix){
+		printCurrentStack(debug);
+		debug.print(debugPrefix);
+	    }
 	    debug.println();
 	}
     }

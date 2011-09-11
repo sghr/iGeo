@@ -22,15 +22,21 @@
 
 package igeo.util;
 
+import igeo.geo.*;
+
 /**
-   An interface to define comparator to be used in sorting with ISort.
+   A class to define order of IVec in Z to be used in sorting with ISort.
    
    @see ISort
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public interface IComparator<T>{
-    public int compare(T o1, T o2); // return >0, <0, ==0
+public class IZComparator implements IComparator<IVec>{
+    public int compare(IVec v1, IVec v2){ // return >0, <0, ==0
+	if(v1.z < v2.z) return -1;
+	if(v1.z > v2.z) return 1;
+	return 0;
+    }
 }
 

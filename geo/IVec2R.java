@@ -185,15 +185,15 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
     }
     
     /**
-       mirror/reflect/flip 3 dimensionally to the other side of the plane
+       reflect (mirror) 2 dimensionally to the other side of the line
     */
-    public IVec2R mirror(IVec2I planeDir){
-	op = new Mirror(op, planeDir); return this;
+    public IVec2R ref(IVec2I lineDir){ op = new Ref(op, lineDir); return this; }
+    public IVec2R ref(IVec2I linePt, IVec2I lineDir){
+	if(linePt==this) return this;
+	return sub(linePt).ref(lineDir).add(linePt);
     }
-    public IVec2R mirror(IVec2I center, IVec2I planeDir){
-	if(center==this) return this;
-	return sub(center).mirror(planeDir).add(center);
-    }
+    public IVec2R mirror(IVec2I lineDir){ return ref(lineDir); }
+    public IVec2R mirror(IVec2I linePt, IVec2I lineDir){ return ref(linePt,lineDir); }
     
     
     //public IVec2R transform(IMatrix2I mat);
@@ -410,10 +410,10 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
 	}
     }
     
-    static public class Mirror extends IParameterObject implements IVec2Op{
-	public IVec2Op v, planeDir;
-	public Mirror(IVec2Op v,  IVec2Op planeDir){ this.v=v; this.planeDir=planeDir; }
-	public IVec2 get(){ return v.get().mirror(planeDir.get()); }
+    static public class Ref extends IParameterObject implements IVec2Op{
+	public IVec2Op v, lineDir;
+	public Ref(IVec2Op v,  IVec2Op lineDir){ this.v=v; this.lineDir=lineDir; }
+	public IVec2 get(){ return v.get().ref(lineDir.get()); }
     }
     
     static public class TransformVec2 extends IParameterObject implements IVec2Op{
