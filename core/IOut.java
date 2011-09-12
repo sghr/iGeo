@@ -72,7 +72,17 @@ public class IOut {
 	//final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
 	//if(stk!=null && stk.length>stackNum) printStack(p,stk[stackNum]);
 	final String separator=": ";
-	String stk = currentStack();
+	final int stackOffset=4; //3;
+	String stk = currentStack(stackOffset);
+	p.print(stk+separator);
+    }
+    protected static void printCurrentStack(PrintStream p, int stackOffset){
+	//final int stackNum=3; //4
+	//final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
+	//if(stk!=null && stk.length>stackNum) printStack(p,stk[stackNum]);
+	final String separator=": ";
+	final int defaultOffset=4; //3;
+	String stk = currentStack(defaultOffset+stackOffset);
 	p.print(stk+separator);
     }
     protected static void printStack(PrintStream p, StackTraceElement stk){
@@ -84,10 +94,10 @@ public class IOut {
 	p.print(stack(stk)+separator);
     }
     
-    public static String currentStack(){
-	final int stackNum=3; //4
+    public static String currentStack(int stackOffset){
+	//final int stackNum=5; //4; //3; //4
 	final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
-	if(stk!=null && stk.length>stackNum) return stack(stk[stackNum]);
+	if(stk!=null && stk.length>stackOffset) return stack(stk[stackOffset]);
 	return ""; // null // null or ""?
     }
     public static String stack(StackTraceElement stk){
@@ -107,6 +117,26 @@ public class IOut {
     public static void p(){
 	if(enabled){
 	    if(printPrefix) printCurrentStack(ps); // added
+	    ps.println();
+	}
+    }
+    
+    /**
+       @param stackOffset offset of the depth of stack of calling subroutines, to controll what subroutine name to be printed
+    */
+    public static void printlnWithOffset(Object str, int stackOffset){
+	if(enabled){
+	    if(printPrefix) printCurrentStack(ps, stackOffset);
+	    ps.println(str);
+	}
+    }
+    
+    /**
+       @param stackOffset offset of the depth of stack of calling subroutines, to controll what subroutine name to be printed
+    */
+    public static void printlnWithOffset(int stackOffset){
+	if(enabled){
+	    if(printPrefix) printCurrentStack(ps, stackOffset); // added
 	    ps.println();
 	}
     }

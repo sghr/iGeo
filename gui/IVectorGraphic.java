@@ -26,71 +26,45 @@ import javax.media.opengl.*;
 
 import igeo.geo.*;
 import igeo.core.*;
-//import igeo.gl.*;
 
 /**
-   Graphic subobject class to draw a curve object by OpenGL
+   Graphic subobject class to draw a vector with an arrowhead
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ICurveGraphicGL extends IGraphicObject{
-    public /*static*/ float weight = 1f;
+public class IVectorGraphic extends IGraphicObject{
+    public static double defaultSize = 2; //1; //5; //1.0;
+    public static float defaultWeight = 1f;
+
+    public static IVec arrowHeadNormal = new IVec(0,0,1);
+    public static IVec arrowHeadNormal2 = new IVec(0,1,0);
     
-    public ICurveI curve; // parent
+    public IVectorObject vec=null;
     
-    public IGLLineStrip polyline;
+    public double size=defaultSize;
+    public float weight=defaultWeight;
     
-    public ICurveGraphicGL(ICurve crv){
-	super(crv);
-	//curve = crv.curve;
-	//init();
+    public IVectorGraphic(IVectorObject v){
+	super(v);
+	vec = v;
     }
     
-    public ICurveGraphicGL(ICurveR crv){
-	super(crv);
-	//curve = crv.curve;
-	//init();
-    }
-    
-    public void initCurve(){
-	if(parent instanceof ICurve){ curve = ((ICurve)parent).curve; }
-	else if(parent instanceof ICurveR){ curve = ((ICurveR)parent).curve; }
-	
-	IVec[] pts=null;
-	if(curve.deg()==1){
-	    int num = curve.num();
-	    pts = new IVec[num];
-	    for(int i=0; i<num; i++) pts[i] = curve.cp(i).get();
-	}
-	else{
-	    int reso = IConfig.curveGraphicResolution;
-	    int epnum = curve.epNum() ;
-	    int num = (epnum-1)*reso+1;
-	    pts = new IVec[num];
-	    for(int i=0; i<epnum; i++){
-		for(int j=0; j<reso; j++){
-		    if(i<epnum-1 || j==0){
-			pts[i*reso + j] = curve.pt(curve.u(i,(double)j/reso)).get();
-		    }
-		}
-	    }
-	}
-	polyline = new IGLLineStrip(pts);
-    }
-    
-    public boolean isDrawable(IGraphicMode m){ return m.isGL(); }
+    public void size(double sz){ size=sz; }
+    public double size(){ return size; }
     
     public void draw(IGraphics g){
 	
-	if(curve==null) initCurve(); // not initizlized at the constructor // shouldn't it?
+	if(vec==null) return;
 	
-	GL gl = g.getGL();
-	if(gl!=null){
-	    gl.glLineWidth(weight);
-	    //gl.glLineStipple(0,(short)0xFFFF);
+	if(g.view().mode().isGL()){
 	    
-            float red = ISurfaceGraphicGL.defaultColorRed;
+	    GL gl = g.getGL();
+	    
+	    gl.glLineWidth(weight); //
+	    gl.glPointSize((float)size); //
+	    
+	    float red = ISurfaceGraphicGL.defaultColorRed;
             float green = ISurfaceGraphicGL.defaultColorGreen;
             float blue = ISurfaceGraphicGL.defaultColorBlue;
             float alpha = ISurfaceGraphicGL.defaultColorAlpha;
@@ -102,7 +76,7 @@ public class ICurveGraphicGL extends IGraphicObject{
             }
 	    
 	    if(g.view().mode().isTransparent()&&g.view().mode().isTransparentWireframe())
-		 alpha = (float)transparentModeAlpha;
+		alpha = (float)transparentModeAlpha;
 	    
             if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
                 float[] colorf = new float[]{ red, green, blue, alpha };
@@ -118,20 +92,58 @@ public class ICurveGraphicGL extends IGraphicObject{
 	    if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
 		gl.glDisable(GL.GL_LIGHTING);
 	    
-	    gl.glColor4f(red, green, blue, alpha);
-	    polyline.draw(gl);
-	    //gl.glBegin(GL.GL_LINE_STRIP);
-	    //for(int i=0; i<pts.length; i++){
-		//gl.glVertex3d(pts[i].x, pts[i].y, pts[i].z);
-		//gl.glVertex3f((float)pts[i].x, (float)pts[i].y, (float)pts[i].z);
-	    //}
-	    //gl.glEnd();
+	    IVec rt = vec.root.get();
+	    IVec v = vec.vec.get();
+	    IVec t = null;
+	    
+	    if(v.angle(arrowHeadNormal)<IConfig.angleResolution)
+		t = v.cross(arrowHeadNormal2);
+	    else t = v.cross(arrowHeadNormal);
+	    t.len(size/2);
+	    IVec v2 = vec.vec.get().dup().rev().len(size);
+	    
+	    if(g.view().mode().isFill()){
+		gl.glBegin(GL.GL_LINES);
+		gl.glVertex3d(rt.x, rt.y, rt.z);
+		gl.glVertex3d(v.x+v2.x+rt.x, v.y+v2.y+rt.y, v.z+v2.z+rt.z);
+		gl.glEnd();
+		if(g.view().mode().isTransparent()){
+		    alpha = (float)transparentModeAlpha;
+		    gl.glColor4f(red, green, blue, alpha);
+		}
+		// arrow head
+		gl.glBegin(GL.GL_TRIANGLES);
+		gl.glVertex3d(v.x+v2.x-t.x+rt.x, v.y+v2.y-t.y+rt.y, v.z+v2.z-t.z+rt.z);
+		gl.glVertex3d(v.x+rt.x, v.y+rt.y, v.z+rt.z);
+		gl.glVertex3d(v.x+v2.x+t.x+rt.x, v.y+v2.y+t.y+rt.y, v.z+v2.z+t.z+rt.z);
+		gl.glEnd();
+	    }
+	    else{
+		gl.glColor4f(red, green, blue, alpha);
+		gl.glBegin(GL.GL_LINES);
+		gl.glVertex3d(rt.x, rt.y, rt.z);
+		gl.glVertex3d(v.x+rt.x, v.y+rt.y, v.z+rt.z);
+		gl.glEnd();
+		gl.glBegin(GL.GL_LINE_STRIP);
+		gl.glVertex3d(v.x+v2.x-t.x+rt.x, v.y+v2.y-t.y+rt.y, v.z+v2.z-t.z+rt.z);
+		gl.glVertex3d(v.x+rt.x, v.y+rt.y, v.z+rt.z);
+		gl.glVertex3d(v.x+v2.x+t.x+rt.x, v.y+v2.y+t.y+rt.y, v.z+v2.z+t.z+rt.z);
+		gl.glEnd();
+	    }
 	    
 	    if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
 		gl.glEnable(GL.GL_LIGHTING);
 	}
+	else if(g.view().mode().isJava()){
+	    
+	    // ...to be implemented
+	    
+	}
 	
-	
+    }
+    
+    public boolean isDrawable(IGraphicMode m){
+	return m.isGL(); // currently GL only
     }
     
 }

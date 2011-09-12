@@ -320,8 +320,8 @@ public class IG implements IServerI{
 	This is a wrapper of IOut.p(), which is 
 	also a wrapper of System.out.println() in most part.
     */
-    public static void p(Object obj){ IOut.p(obj); }
-    public static void p(){ IOut.p(); }
+    public static void p(Object obj){ IOut.printlnWithOffset(obj,1); }
+    public static void p(){ IOut.printlnWithOffset(1); }
     public static void enabePrintPrefix(){ IOut.enablePrefix(); }
     public static void disablePrintPrefix(){ IOut.disablePrefix(); }
     

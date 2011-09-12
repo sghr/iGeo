@@ -62,8 +62,8 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public double x(){ return x; }
     public double y(){ return y; }
     public double z(){ return z; }
-    //public IVec get(){ return this; }
-    public IVec get(){ return new IVec(x,y,z); }
+    public IVec get(){ return this; }
+    //public IVec get(){ return new IVec(x,y,z); }
     
     public IVec dup(){ return new IVec(x,y,z); }
     
@@ -132,7 +132,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     //public IDouble dotR(IVecI v){ return new IDouble(dot(v.get())); }
     public double dot(ISwitchE e, IVecI v){ return dot(v); }
     public IDouble dot(ISwitchR r, IVecI v){ return new IDouble(dot(v)); }
-
+    
     /** cross product
 	changed to return a new instance, not changing own content. (!!!!) 2011/08/03
     */
@@ -597,8 +597,33 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return distanceToPlane(planeDir,planePt)<resolution;
     }
     
-
-
+    
+    
+    /** visualize a vector as an arrow.
+	@param root A root position of the arrow.
+    */
+    public IVectorObject show(IVecI root){ return new IVectorObject(this, root); }
+    /** visualize a vector as an arrow. The root position of the arrow is the origin.
+     */
+    public IVectorObject show(){ return new IVectorObject(this); }
+    
+    /** visualize a vector as an arrow.
+	@param s A server to store the object.
+	@param root A root position of the arrow.
+    */
+    public IVectorObject show(IServerI s, IVecI root){
+	return new IVectorObject(s, this, root);
+    }
+    /** visualize a vector as an arrow. The root position of the arrow is the origin.
+	@param s A server to store the object.
+     */
+    public IVectorObject show(IServerI s){ return new IVectorObject(s, this); }
+    
+    
+    
+    /*************************************************************
+     * static methods
+     *************************************************************/
     
     public static boolean isFlat(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4){
 	return pt1.get().isOnPlane(pt2,pt3,pt4);

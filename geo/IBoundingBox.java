@@ -119,10 +119,21 @@ public class IBoundingBox{
 			else compare(m.vertex(i).get()); 
 		    }
 		}
+		else if(e instanceof IVectorObject){
+		    IVectorObject vobj = (IVectorObject)e;
+		    if(first){
+			init(vobj.vec.get()); first=false;
+			compare(vobj.root.get());
+		    }
+		    else{
+			compare(vobj.vec.get());
+			compare(vobj.root.get());
+		    }
+		}
 	    }
 	}
 	
-	if(min.eq(max, IConfig.minimumBoundingBox)){
+	if(min!=null && max!=null && min.eq(max, IConfig.minimumBoundingBox)){
 	    IOut.err("bounding box is too small. minimum size is set");
 	    IVec sz = new IVec(IConfig.minimumBoundingBox,
 			       IConfig.minimumBoundingBox,
@@ -135,18 +146,6 @@ public class IBoundingBox{
 	
 	if(objects.size()>1000) IOut.debug(10, "calculation of bounding box completed");
 	
-	//IOut.err("min = "+min);
-        //IOut.err("max = "+max);
-	
-	//debug
-	//new IPoint(min.x,min.y,min.z);
-	//new IPoint(max.x,min.y,min.z);
-	//new IPoint(min.x,max.y,min.z);
-	//new IPoint(max.x,max.y,min.z);
-	//new IPoint(min.x,min.y,max.z);
-	//new IPoint(max.x,min.y,max.z);
-	//new IPoint(min.x,max.y,max.z);
-	//new IPoint(max.x,max.y,max.z);
 	
     }
     
