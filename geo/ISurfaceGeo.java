@@ -347,6 +347,23 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         retval.z/=weight;
     }
     
+    /**
+       @param u u coordinates in uv parameter space
+       @param v v coordinates in uv parameter space
+       @param n length in normal direction in 3D space
+    */
+    public IVec pt(double u, double v, double n){
+	IVec retval = new IVec();
+	pt(u,v,retval);
+	return retval.add(nrml(u,v).len(n));
+    }
+    public IVec pt(IDoubleI u, IDoubleI v, IDoubleI n){
+	return pt(u.x(),v.x(),n.x());
+    }
+    public IVec pt(IVec v){ return pt(v.x,v.y,v.z); }
+    public IVec pt(IVecI v){ IVec vec=v.get(); return pt(vec.x,vec.y,vec.z); }
+    
+    
     public IVec utan(IVec2I v){ IVec2 vec=v.get(); return utan(vec.x,vec.y); }
     public IVec utan(IDoubleI u, IDoubleI v){ return utan(u.x(),v.x()); }
     public IVec utan(double u, double v){
@@ -462,14 +479,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     
     
-    public IVec normal(IVec2I v){ IVec2 vec=v.get(); return normal(vec.x,vec.y); }
-    public IVec normal(IDoubleI u, IDoubleI v){ return normal(u.x(),v.x()); }
-    public IVec normal(double u, double v){
+    public IVec nrml(IVec2I v){ IVec2 vec=v.get(); return nrml(vec.x,vec.y); }
+    public IVec nrml(IDoubleI u, IDoubleI v){ return nrml(u.x(),v.x()); }
+    public IVec nrml(double u, double v){
 	IVec retval = new IVec();
-	normal(u,v,retval);
+	nrml(u,v,retval);
 	return retval;
     }
-    public void normal(double u, double v, IVec retval){
+    public void nrml(double u, double v, IVec retval){
 	IVec vt = new IVec();
 	utan(u,v,retval);
 	vtan(u,v,vt);
@@ -482,8 +499,19 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    if(u>0.5){ vtan(0,v,retval); retval.icross(vt); }
 	    else{ vtan(1.,v,retval); retval.icross(vt).neg(); }
 	}
-	else IOut.p("normal is zero"); //
+	else IOut.debug(10,"normal is zero"); //
     }
+    
+    
+    public IVec normal(IVec2I v){ IVec2 vec=v.get(); return nrml(vec.x,vec.y); }
+    public IVec normal(IDoubleI u, IDoubleI v){ return nrml(u.x(),v.x()); }
+    public IVec normal(double u, double v){
+	IVec retval = new IVec();
+	nrml(u,v,retval);
+	return retval;
+    }
+    public void normal(double u, double v, IVec retval){ nrml(u,v,retval); }
+    
     
     public IVec cp(int i, int j){ return controlPoints[i][j].get(); }
     public IVecI cp(IIntegerI i, IIntegerI j){ return controlPoints[i.x()][j.x()]; }

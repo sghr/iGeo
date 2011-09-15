@@ -216,7 +216,8 @@ public class IRhino3dmImporter extends IRhino3dm{
     public static String readString(InputStream is)throws IOException{
 	final int maxStringLength = 65535;
 	int len = readInt(is);
-	if(len>0 && len < 65535){ // no more reality check?
+	if(len==0) return ""; // zero length string seems to happen regularly
+	if(len < 65535){ // no more reality check?
 	    byte[] b = read(is,len*2); // 1 character is 2 byte // the end of b is supposed to be null value
 	    return new String(b, 0, len*2-2, "UTF-16LE"); // 3dm is little endian, remove last null 2 bytes
 	}
@@ -398,6 +399,31 @@ public class IRhino3dmImporter extends IRhino3dm{
 	for(int i=0; i<count; i++){ array.add(readSurfaceCurvature(bais)); }
 	return array;
 	
+    }
+    
+    
+    public static ArrayList<UUIDIndex> readArrayUUIDIndex(InputStream is) throws IOException{
+	int count = readInt(is);
+	ArrayList<UUIDIndex> array = new ArrayList<UUIDIndex>(count);
+	for(int i=0; i<count; i++){
+	    UUIDIndex uuididx = new UUIDIndex();
+	    uuididx.id = readUUID(is);
+	    uuididx.i = readInt(is);
+	    array.add(uuididx);
+	}
+	return array;
+    }
+    
+    public static ArrayList<UUIDIndex> readArrayUUIDIndex(byte[] buf, int count) throws IOException{
+	ByteArrayInputStream bais = new ByteArrayInputStream(buf);
+	ArrayList<UUIDIndex> array = new ArrayList<UUIDIndex>(count);
+	for(int i=0; i<count; i++){
+	    UUIDIndex uuididx = new UUIDIndex();
+	    uuididx.id = readUUID(bais);
+	    uuididx.i = readInt(bais);
+	    array.add(uuididx);
+	}
+	return array;
     }
     
     public static PointArray readPointArray(InputStream is) throws IOException{
@@ -734,6 +760,8 @@ public class IRhino3dmImporter extends IRhino3dm{
 			if(object!=null &&
 			   chunks[i+1].header == tcodeOpenNurbsClassData){
 			    //return chunks[i+1].content;
+			    //IOut.err("content: "+ hex(chunks[i+1].content)); //
+			    
 			    byte[] data = chunks[i+1].content;
 			    object.read(context,data);
 			    return object;
@@ -1376,6 +1404,9 @@ public class IRhino3dmImporter extends IRhino3dm{
 	
 	for(Chunk c:chunks){
 	    Material m = readMaterial(c);
+	    
+	    //IOut.debug(20,"Matarial is read\n"+m);
+	    
 	    if(m!=null) materials.add(m);
 	}
 	
@@ -1404,10 +1435,22 @@ public class IRhino3dmImporter extends IRhino3dm{
     public Material readMaterial(Chunk chunk){
 	IOut.debug(10,"Rhino3dmImporter.readMaterial"); //
 	
-	//if(file.version==1) return null;
+	if(file.version==1){
+	    IOut.err("Material of Rhino version 1 3dm file is not supported");
+	    return null;
+	}
 	
-	Chunk c = readNestedChunk(chunk);
+	if(chunk.header != tcodeMaterialRecord){
+	    IOut.err("wrong header of chunk : "+hex(chunk.header));
+	    return null;
+	}
 	
+	RhinoObject robj = readObject(readNestedChunk(chunk));
+	if(robj instanceof Material){
+	    return (Material) robj;
+	}
+	
+	IOut.err("wrong type of object found " + robj); //
 	return null;
     }
     
@@ -2157,8 +2200,11 @@ public class IRhino3dmImporter extends IRhino3dm{
     }
     
     
-    /*
+    
     public static void main(String[] args){
+	
+	IOut.debugLevel(-1); //
+	
 	if(args.length>0){
 	    IOut.p("opening "+args[0]);
 	    //BufferedReader reader=null;
@@ -2174,7 +2220,7 @@ public class IRhino3dmImporter extends IRhino3dm{
 	    try{ if(fis!=null) fis.close(); }catch(Exception e){ e.printStackTrace(); }
 	}
     }
-    */
+    
     
 }
 

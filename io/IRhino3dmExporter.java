@@ -65,7 +65,7 @@ public class IRhino3dmExporter extends IRhino3dm{
     public IServerI server;
     
     public int currentPos;
-
+    
     
     public IRhino3dmExporter(OutputStream ostr, IServerI svr){ ostream = ostr; server = svr; }
     
@@ -649,6 +649,17 @@ public class IRhino3dmExporter extends IRhino3dm{
 	if(array!=null) count = array.size(); 
 	writeInt32(os,count,crc);
 	for(int i=0; array!=null&&i<count; i++) array.get(i).write(context, os,crc);
+    }
+    
+    
+    public static void writeArrayUUIDIndex(Rhino3dmFile context, OutputStream os, ArrayList<UUIDIndex> array, CRC32 crc) throws IOException{
+	int count = 0; // write zero size when array is null
+	if(array!=null) count = array.size(); 
+	writeInt32(os,count,crc);
+	for(int i=0; array!=null&&i<count; i++){
+	    writeUUID(os,array.get(i).id,crc);
+	    writeInt(os,array.get(i).i,crc);
+	}
     }
     
     

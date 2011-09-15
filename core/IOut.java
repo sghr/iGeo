@@ -44,6 +44,10 @@ public class IOut {
     public static boolean printDebugPrefix=true; //false;
     public static String errPrefix = "ERROR: ";
     public static String debugPrefix = "DEBUG: ";
+
+    /** depth of stack to show in the prefix. integer more than 1.
+     */
+    public static int stackDepth=1; //3; //1; 
     
     public static void setStream(PrintStream pstr){ ps=pstr; }
     public static void setErrStream(PrintStream pstr){ err=pstr; }
@@ -97,7 +101,17 @@ public class IOut {
     public static String currentStack(int stackOffset){
 	//final int stackNum=5; //4; //3; //4
 	final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
-	if(stk!=null && stk.length>stackOffset) return stack(stk[stackOffset]);
+	if(stk!=null && stk.length>stackOffset){
+	    if(stackDepth == 1) return stack(stk[stackOffset]);
+	    String retval = "";
+	    for(int i=stackDepth-1; i>=0; i--){
+		if( i+stackOffset < stk.length ){
+		    if(retval.length()>0) retval += "=>";
+		    retval += stack(stk[i+stackOffset]);
+		}
+	    }
+	    return retval;
+	}
 	return ""; // null // null or ""?
     }
     public static String stack(StackTraceElement stk){

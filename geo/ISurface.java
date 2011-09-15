@@ -38,7 +38,7 @@ public class ISurface extends IObject implements ISurfaceI{
     public ISurfaceGeo surface;
     //public ISurfaceI surface; // public?
     
-    public ISurface(){ surface = new ISurfaceGeo(); }
+    public ISurface(){ /*surface = new ISurfaceGeo();*/ }
     
     public ISurface(IVecI[][] cpts, int udegree, int vdegree, double[] uknots, double[] vknots,
 		    double ustart, double uend, double vstart, double vend){
@@ -121,7 +121,7 @@ public class ISurface extends IObject implements ISurfaceI{
     
     public ISurface(ISurfaceI srf){ surface = srf.get(); initSurface(null); }
     
-    public ISurface(IServerI s){ super(s); surface = new ISurfaceGeo(); /*initSurface(s);*/ }
+    public ISurface(IServerI s){ super(s); /*surface = new ISurfaceGeo();*/ /*initSurface(s);*/ }
     
     public ISurface(IServerI s,
 		    IVecI[][] cpts, int udegree, int vdegree,
@@ -250,6 +250,16 @@ public class ISurface extends IObject implements ISurfaceI{
     
     //public void pt(double u, double v, IVec retval){ surface.pt(u,v,retval); }
     
+    /**
+       @param u u coordinates in uv parameter space
+       @param v v coordinates in uv parameter space
+       @param n length in normal direction in 3D space
+    */
+    public IVec pt(double u, double v, double n){ return surface.pt(u,v,n); }
+    public IVec pt(IDoubleI u, IDoubleI v, IDoubleI n){ return surface.pt(u,v,n); }
+    public IVec pt(IVecI v){ return surface.pt(v); }
+    
+    
     public IVec utan(IVec2I v){ return surface.utan(v); }
     public IVec utan(IDoubleI u, IDoubleI v){ return surface.utan(u,v); }
     public IVec utan(double u, double v){ return surface.utan(u,v); }
@@ -264,6 +274,9 @@ public class ISurface extends IObject implements ISurfaceI{
     public IVec normal(IDoubleI u, IDoubleI v){ return surface.normal(u,v); }
     public IVec normal(double u, double v){ return surface.normal(u,v); }
     //public void normal(double u, double v, IVec retval){ surface.normal(u,v,retval); }
+    public IVec nrml(IVec2I v){ return surface.nrml(v); }
+    public IVec nrml(IDoubleI u, IDoubleI v){ return surface.nrml(u,v); }
+    public IVec nrml(double u, double v){ return surface.nrml(u,v); }
     
     public IVec cp(int i, int j){ return surface.cp(i,j); }
     public IVecI cp(IIntegerI i, IIntegerI j){ return surface.cp(i,j); }

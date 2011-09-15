@@ -58,12 +58,12 @@ public class IBoundingBox{
     }
     
     synchronized public void setObjects(ArrayList<IObject> objects){
-	
-	//IOut.p("objects.size()="+objects.size());
+	//IOut.err("objects.size()="+objects.size());
 	if(objects.size()>1000) IOut.debug(10, "calculating bounding box of "+objects.size()+" objects"); //
 	
 	boolean first = true;
 	for(IObject e:objects){
+	    
 	    if(e.visible()){
 		if(e instanceof IPoint){
 		    IPoint p = (IPoint)e;

@@ -34,36 +34,20 @@ import java.io.*;
 */
 public class IErr {
     public static PrintStream ps = System.err;
-    public static boolean printStack=true; //false;
+    public static boolean printPrefix=true; //false;
     public static boolean enabled=true; //false; //true; 
     public static String errPrefix = "ERROR: ";
     
     public static void setStream(PrintStream pstr){ ps=pstr; }
     
-    public static void enablePrintStakc(){ printStack=true; }
-    public static void disablePrintStakc(){ printStack=false; }
+    public static void enablePrefix(){ printPrefix=true; }
+    public static void disablePrefix(){ printPrefix=false; }
     public static void enablePrint(){ enabled=true; }
     public static void disablePrint(){ enabled=false; }
     
-    protected static void printCurrentStack(){
-	printCurrentStack(ps);
-    }
-    protected static void printCurrentStack(PrintStream p){
-	final int stackNum=3; //4
-	final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
-	if(stk!=null && stk.length>stackNum) printStack(p,stk[stackNum]);
-    }
-    protected static void printStack(PrintStream p, StackTraceElement stk){
-	String className = stk.getClassName();
-	int idx = className.lastIndexOf('.');
-	if(idx>=0) className = className.substring(idx+1);
-	p.print(className+"."+stk.getMethodName()+": "); //
-    }
-    
-    
     public static void p(Object str){
 	if(enabled){
-	    if(printStack) printCurrentStack(ps);
+	    if(printPrefix) IOut.printCurrentStack(ps);
 	    ps.print(errPrefix);
 	    ps.println(str);
 	}
@@ -71,7 +55,7 @@ public class IErr {
     
     public static void p(){
 	if(enabled){
-	    if(printStack) printCurrentStack(ps); // added
+	    if(printPrefix) IOut.printCurrentStack(ps); // added
 	    ps.print(errPrefix);
 	    ps.println();
 	}

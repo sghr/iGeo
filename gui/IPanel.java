@@ -49,7 +49,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     //public int fullPaneOrigX, fullPaneOrigY, fullPaneOrigWidth, fullPaneOrigHeight;
     
     public IBoundingBox boundingBox;
-    public int serverStatusCount;
+    public int serverStatusCount=-1;
     
     public IPanel(int x, int y, int width, int height){
 	super(x,y,width,height);
@@ -82,7 +82,9 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     
     /** focus on all pane
      */
-    public void focus(){ for(int i=0; i<panes.size(); i++) panes.get(i).focus(); }
+    public void focus(){
+	for(int i=0; i<panes.size(); i++) panes.get(i).focus(); 
+    }
     
     
     public void setSize(int w, int h){
@@ -288,6 +290,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	if(ig.server().statusCount!=serverStatusCount){
 	    boundingBox.setObjects(ig.server());
 	    serverStatusCount = ig.server().statusCount();
+	    //IOut.err("boundingBox Updated: "+boundingBox); //
 	}
     }
     

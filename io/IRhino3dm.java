@@ -1190,6 +1190,219 @@ public class IRhino3dm{
 	public boolean shared;
 	public ArrayList<Texture> textures;
 	public ArrayList<UUIDIndex> materialChannel;
+	public UUID pluginId;
+	
+	public void read(Rhino3dmFile context, InputStream is) throws IOException{
+	    
+	    int[] version = readChunkVersion(is);
+	    
+	    int majorVersion = version[0];
+	    int minorVersion = version[1];
+	    
+	    if(majorVersion==1){
+		readV3(context,is,minorVersion);
+	    }
+	    else if(majorVersion==2){
+		// v4 material
+		
+		Chunk ck = readChunk(is);
+		if(ck.content==null){
+		    IOut.err("chunk content is null"); //
+		    throw new IOException("chunk content is null");
+		}
+		ByteArrayInputStream bais = new ByteArrayInputStream(ck.content);
+		majorVersion = readInt(bais);
+		minorVersion = readInt(bais);
+
+		materialId = readUUID(bais);
+		materialIndex = readInt(bais);
+		materialName = readString(bais);
+		pluginId = readUUID(bais);
+		ambient = readColor(bais);
+		diffuse = readColor(bais);
+		emission = readColor(bais);
+		specular = readColor(bais);
+		reflection = readColor(bais);
+		transparent = readColor(bais);
+
+		if(context.openNurbsVersion < 200912010 &&
+		   transparent.getRed()==128 &&
+		   transparent.getGreen()==128 &&
+		   transparent.getBlue()==128 ){
+		    transparent = diffuse;
+		}
+		
+		indexOfRefraction = readDouble(bais);
+		reflectivity = readDouble(bais);
+		shine = readDouble(bais);
+		transparency = readDouble(bais);
+		
+		Chunk textureChunk = readChunk(bais);
+		if(ck.content==null){
+		    IOut.err("chunk content is null"); //
+		    throw new IOException("chunk content is null");
+		}
+		ByteArrayInputStream tis = new ByteArrayInputStream(textureChunk.content);
+		
+		int textureMajorVersion = readInt(tis);
+		int textureMinorVersion = readInt(tis);
+		
+		if(textureMajorVersion==1){
+		    int count = readInt(tis);
+		    for(int i=0; i<count; i++){
+			// reading texture
+			// not implemented
+		    }
+		}
+
+		if(minorVersion >= 1){
+		    flamingoLibrary = readString(bais);
+		    
+		    if(minorVersion>=2){
+			materialChannel = readArrayUUIDIndex(bais);
+		    }
+		}
+		
+	    }
+	}
+	
+	public void readV3(Rhino3dmFile context, InputStream is, int minorVersion) throws IOException{
+	    
+	    IOut.err(); //
+	    
+	    ambient = readColor(is);
+	    diffuse = readColor(is);
+	    emission = readColor(is);
+	    specular = readColor(is);
+	    
+	    shine = readDouble(is);
+	    final double maxShine=255.0;
+	    if(shine<0) shine=0; else if(shine>maxShine) shine=maxShine;
+	    
+	    transparency = readDouble(is);
+	    if(transparency<0) transparency=0; else if(transparency>1.) transparency=1.;
+	    
+	    readByte(is); // OBSOLETE; skipped; m_casts_shadows
+	    readByte(is); // OBSOLETE; skipped; m_shows_shadows
+	    readByte(is); // OBSOLETE; skipped; m_wire_mode
+	    readByte(is); // OBSOLETE; skipped; m_wire_density
+	    
+	    readColor(is); // OBSOLETE; skipped; m_wire_color
+	    
+	    readShort(is); // OBSOLETE;
+	    readShort(is); // OBSOLETE;
+	    readDouble(is); // OBSOLETE;
+	    readDouble(is); // OBSOLETE;
+
+	    String str = readString(is); // textureBitmapFileName
+	    int i = readInt(is);
+	    int j = readInt(is); // textureBitmapIndex
+	    
+	    if(str!=null && str.length()>0){
+		// adding texture
+		// not implemented yet
+	    }
+	    
+	    str = readString(is); // bumpBitmapFileName
+	    i = readInt(is);
+	    j = readInt(is); // bumpBitmapIndex
+	    
+	    double bumpScale = readDouble(is);
+	    if(str!=null && str.length()>0){
+		// adding bump map texture
+		// not implemented yet
+	    }
+	    
+	    str = readString(is); // emapBitmapFileName
+	    i = readInt(is);
+	    j = readInt(is);  // emapBitmapIndex
+	    
+	    if(str!=null && str.length()>0){
+		// adding emap texture
+		// not implemented yet
+	    }
+	    
+	    materialIndex = readInt(is);
+	    pluginId = readUUID(is);
+	    flamingoLibrary = readString(is);
+	    materialName = readString(is);
+	    
+	    if(minorVersion>=1){
+		// v 1.1
+		materialId = readUUID(is);
+		reflection = readColor(is);
+		transparent = readColor(is);
+		indexOfRefraction = readDouble(is);
+	    }
+	    else{
+		materialId = UUID.randomUUID();
+	    }
+	}
+	
+	
+	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc) throws IOException{
+	    
+	    // write only V4 file format. V2, V3 is ignored.
+	    
+	    writeChunkVersion(os, 2, 0, crc);
+	    
+	    ChunkOutputStream cos = new ChunkOutputStream(tcodeAnonymousChunk, 1, 2);
+	    
+	    writeUUID(cos, materialId, cos.getCRC());
+	    writeInt(cos, materialIndex, cos.getCRC());
+	    writeString(cos, materialName, cos.getCRC());
+	    
+	    writeUUID(cos, pluginId, cos.getCRC());
+	    
+	    writeColor(cos, ambient, cos.getCRC());
+	    writeColor(cos, diffuse, cos.getCRC());
+	    writeColor(cos, emission, cos.getCRC());
+	    writeColor(cos, specular, cos.getCRC());
+	    writeColor(cos, reflection, cos.getCRC());
+	    writeColor(cos, transparent, cos.getCRC());
+	    
+	    writeDouble(cos, indexOfRefraction, cos.getCRC());
+	    writeDouble(cos, reflectivity, cos.getCRC());
+	    writeDouble(cos, shine, cos.getCRC());
+	    writeDouble(cos, transparency, cos.getCRC());
+	    
+	    // textures
+	    ChunkOutputStream tos = new ChunkOutputStream(tcodeAnonymousChunk, 1, 0);
+	    // skipped; no texture
+	    writeInt( tos, 0,  tos.getCRC());
+	    
+	    writeChunk(cos, tos.getChunk());
+	    
+	    writeString(cos, flamingoLibrary, cos.getCRC());
+	    writeArrayUUIDIndex(context, cos, materialChannel, cos.getCRC());
+	    
+	    writeChunk(os, cos.getChunk());
+	    
+	}
+	
+	
+	public String toString(){
+	    return
+		"materialId = " + materialId +"\n"+
+		"materialIndex = " + materialIndex + "\n"+
+		"materialName = " + materialName + "\n" +
+		"flamingoLibrary = "+ flamingoLibrary + "\n" +
+		"ambient = "+ambient + "\n" +
+		"diffuse = "+diffuse + "\n" +
+		"emission = "+emission + "\n" +
+		"specular = "+specular + "\n" +
+		"reflection = "+reflection + "\n" +
+		"transparent = "+transparent + "\n" +
+		"indexOfRefraction = " + indexOfRefraction +"\n"+
+		"reflectivity = "+reflectivity + "\n" +
+		"shine = " + shine + "\n" +
+		"transparency = " + transparency + "\n" +
+		"shared = " + shared + "\n" +
+		"textures num = "+(textures==null?0:textures.size()) + "\n" +
+		"materialChannel num = "+(materialChannel==null?0:materialChannel.size()) + "\n"+
+		"pluginId = "+pluginId ;
+	}
+	
     }
     
     public static class MaterialRef{
@@ -2068,7 +2281,7 @@ public class IRhino3dm{
 	    
 	    name = readString(is);
 	    url = readString(is);
-	    
+	    	    
 	    visible = (mode&0x0F) != objectModeHiddenObject;
 	    
 	    if(minorVersion>=1){

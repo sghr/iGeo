@@ -54,13 +54,13 @@ public class INurbsGeo extends IParameterObject{
     }
     
     
-    public void normalizeKnots(double[] knots, double ustart, double uend){
+    public static void normalizeKnots(double[] knots, double ustart, double uend){
 	for(int i=0; i<knots.length; i++){
             knots[i] -= ustart;
             knots[i] /= (uend-ustart);
         }
     }
-    public double[] createKnots(int degree, int num, boolean closed){
+    public static double[] createKnots(int degree, int num, boolean closed){
 	if(closed) return createClosedKnots(degree,num);
 	return createKnots(degree,num);
     }
@@ -68,7 +68,7 @@ public class INurbsGeo extends IParameterObject{
     /**
        Creating generic knots. Knot values are already normalized.
     */
-    public double[] createKnots(int degree, int num){
+    public static double[] createKnots(int degree, int num){
         double knots[] = new double[degree+num+1];
         int k,m;
         for(k=0; k<=degree; k++) knots[k]=0;
@@ -76,13 +76,13 @@ public class INurbsGeo extends IParameterObject{
         for(; k<=(degree+num); k++) knots[k]=1.;
 	return knots; 
     }
-    public double[] createClosedKnots(int degree, int num){
+    public static double[] createClosedKnots(int degree, int num){
 	double knots[] = new double[degree+num+1];
 	for(int k=0,m=-degree; k<=(degree+num); k++,m++) knots[k]=(double)m/(num-degree);
 	return knots; 
     }
     
-    public IVecI[] createClosedControlPoints(IVecI[] cpts, int degree){
+    public static IVecI[] createClosedControlPoints(IVecI[] cpts, int degree){
 	int headNum = (degree-1)/2;
 	int tailNum = degree/2 + 1;
 	int len = cpts.length;

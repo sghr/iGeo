@@ -67,6 +67,9 @@ public class INavigator{
     public double keyAxonometricPanInc = IConfig.keyAxonometricPanSpeed;
     public double keyZoomInc = IConfig.keyZoomSpeed;
     
+    /** for orthogonal view not to rotate. lock can be turned off with ALT+drag */
+    public boolean rotateLock = false; 
+    
     
     public enum DragType{ Rotate, Pan, Zoom };
     
@@ -88,6 +91,7 @@ public class INavigator{
     public ArrayList<IMouseButton> panButtons;
     public ArrayList<IMouseButton> zoomButtons;
     
+    public ArrayList<IMouseButton> rotateUnlockButtons;
     
     public INavigator(IView v, IPane p){
 	this(v);
@@ -98,6 +102,8 @@ public class INavigator{
 	rotateButtons=new ArrayList<IMouseButton>();
 	panButtons=new ArrayList<IMouseButton>();
 	zoomButtons=new ArrayList<IMouseButton>();
+
+	rotateUnlockButtons=new ArrayList<IMouseButton>();
 	
 	rotateButtons.add(defaultRotateButton);
 	rotateButtons.add(defaultRotateButton2);
@@ -105,6 +111,9 @@ public class INavigator{
 	panButtons.add(defaultPanButton2);
 	zoomButtons.add(defaultZoomButton);
 	zoomButtons.add(defaultZoomButton2);
+	
+	rotateUnlockButtons.add(defaultRotateButton2);
+	
     }
     
     
@@ -120,6 +129,8 @@ public class INavigator{
     public void setPerspectiveZoomRatio(double zoomRatio){ persZoomRatio = zoomRatio; }
     public void setAxonometricZoomRatio(double zoomRatio){ axonZoomRatio = zoomRatio; }
     public void wheelZoomRatio(double zoomRatio){ wheelZoomRatio = zoomRatio; }
+
+    public void setRotateLock(boolean lock){ rotateLock = lock; }
     
     
     public void updateRotationByMouse(int x, int y){
@@ -277,7 +288,17 @@ public class INavigator{
     */
     
     public DragType getDragType(MouseEvent e){
-	for(IMouseButton b:rotateButtons) if(b.match(e)) return DragType.Rotate;
+	if(rotateLock){
+	    for(IMouseButton b:rotateUnlockButtons) if(b.match(e)){
+		rotateLock=false;
+		return DragType.Rotate;
+	    }
+	    // when locked, rotate becomes panning
+	    for(IMouseButton b:rotateButtons) if(b.match(e)) return DragType.Pan;
+	}
+	else{
+	    for(IMouseButton b:rotateButtons) if(b.match(e)) return DragType.Rotate;
+	}
 	for(IMouseButton b:panButtons) if(b.match(e)) return DragType.Pan;
 	for(IMouseButton b:zoomButtons) if(b.match(e)) return DragType.Zoom;
 	return null;

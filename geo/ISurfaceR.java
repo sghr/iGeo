@@ -82,6 +82,16 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public IVecI pt(IDoubleI u, IDoubleI v){ return surface.pt(u,v); }
     public IVecI pt(double u, double v){ return surface.pt(u,v); }
     
+    /**
+       @param u u coordinates in uv parameter space
+       @param v v coordinates in uv parameter space
+       @param n length in normal direction in 3D space
+    */
+    public IVecI pt(double u, double v, double n){ return surface.pt(u,v,n); }
+    public IVecI pt(IDoubleI u, IDoubleI v, IDoubleI n){ return surface.pt(u,v,n); }
+    public IVecI pt(IVecI v){ return surface.pt(v); }
+    
+    
     public IVecI utan(IVec2I v){ return surface.utan(v); }
     public IVecI utan(IDoubleI u, IDoubleI v){ return surface.utan(u,v); }
     public IVecI utan(double u, double v){ return surface.utan(u,v); }
@@ -93,6 +103,10 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public IVecI normal(IVec2I v){ return surface.normal(v); }
     public IVecI normal(IDoubleI u, IDoubleI v){ return surface.normal(u,v); }
     public IVecI normal(double u, double v){ return surface.normal(u,v); }
+    
+    public IVecI nrml(IVec2I v){ return surface.nrml(v); }
+    public IVecI nrml(IDoubleI u, IDoubleI v){ return surface.nrml(u,v); }
+    public IVecI nrml(double u, double v){ return surface.nrml(u,v); }
     
     public IVecI cp(int i, int j){ return surface.cp(i,j); }
     public IVecI cp(IIntegerI i, IIntegerI j){ return surface.cp(i,j); }

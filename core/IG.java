@@ -347,6 +347,7 @@ public class IG implements IServerI{
 	if(!f.isAbsolute() && basePath!=null)
 	    file = basePath + File.separator + file;
 	boolean retval = IIO.open(file,this);
+	server.update(); // update server status
 	inputFile = file;
 	focusView();
 	return retval;

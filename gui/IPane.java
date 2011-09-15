@@ -73,6 +73,8 @@ public class IPane extends IComponent{
     public float getBorderWidth(){ return borderWidth; }
     public void setBorderColor(Color c){ borderColor = c;}
     public Color getBorderColor(){ return borderColor; }
+
+    public INavigator navigator(){ return navigator; }
     
     public void setBounds(int x, int y, int w, int h){
 	//IOut.debug(10,"x="+x+", y="+y+", width="+w+", height="+h); //

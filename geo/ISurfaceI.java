@@ -45,6 +45,10 @@ public interface ISurfaceI extends ISurfaceOp{
     public IVecI pt(IDoubleI u, IDoubleI v);
     public IVecI pt(IVec2I uv);
     
+    public IVecI pt(double u, double v, double n); // n is length in normal dir
+    public IVecI pt(IDoubleI u, IDoubleI v, IDoubleI n);
+    public IVecI pt(IVecI uvn);
+    
     
     public IVecI utan(double u, double v);
     public IVecI utan(IDoubleI u, IDoubleI v);
@@ -57,6 +61,11 @@ public interface ISurfaceI extends ISurfaceOp{
     public IVecI normal(double u, double v);
     public IVecI normal(IDoubleI u, IDoubleI v);
     public IVecI normal(IVec2I uv);
+    
+    public IVecI nrml(double u, double v);
+    public IVecI nrml(IDoubleI u, IDoubleI v);
+    public IVecI nrml(IVec2I uv);
+    
     
     
     public IVecI cp(int i, int j);

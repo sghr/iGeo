@@ -119,17 +119,26 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 		    int paneY = y+ypos[j];
 		    int paneW = xpos[i+1]-xpos[i];
 		    int paneH = ypos[j+1]-ypos[j];
+
+		    boolean orthogonal = false;
 		    
 		    // only if it's 2x2 view and the first execution
 		    if(xnum==2&&ynum==2){
-			if(i==0&&j==0) // top
+			if(i==0&&j==0){ // top
 			    v = IView.getTopView(paneX,paneY,paneW,paneH);
-			else if(i==1&&j==0) // pers
+			    orthogonal = true;
+			}
+			else if(i==1&&j==0){ // pers
 			    v = IView.getDefaultPerspectiveView(paneX,paneY,paneW,paneH);
-			else if(i==0&&j==1) // front
+			}
+			else if(i==0&&j==1){ // front
 			    v = IView.getFrontView(paneX,paneY,paneW,paneH);
-			else if(i==1&&j==1) // right
+			    orthogonal = true;
+			}
+			else if(i==1&&j==1){ // right
 			    v = IView.getRightView(paneX,paneY,paneW,paneH);
+			    orthogonal = true;
+			}
 		    }
 		    else{ // default; axon
 			v = IView.getDefaultAxonometricView(paneX,paneY,paneW,paneH);
@@ -142,6 +151,11 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 		    v.setTarget(0,0,0); //
 		    
 		    gridPanes[i][j] = new IPane(paneX,paneY,paneW,paneH,v,this);
+		    if(orthogonal){
+			if(gridPanes[i][j].navigator()!=null){
+			    gridPanes[i][j].navigator().setRotateLock(true);
+			}
+		    }
                 }
             }
 	    
