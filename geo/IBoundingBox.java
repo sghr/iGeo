@@ -57,42 +57,51 @@ public class IBoundingBox{
 	max = new IVec(p);
     }
     
+    public void initBox(){ min=max=null; }
+    
     synchronized public void setObjects(ArrayList<IObject> objects){
 	//IOut.err("objects.size()="+objects.size());
 	if(objects.size()>1000) IOut.debug(10, "calculating bounding box of "+objects.size()+" objects"); //
 	
-	boolean first = true;
+	//boolean first = true;
+	initBox();
+	
 	for(IObject e:objects){
 	    
 	    if(e.visible()){
 		if(e instanceof IPoint){
 		    IPoint p = (IPoint)e;
-		    if(first){ init(p.get()); first=false; }
-		    else compare(p.get());
+		    compare(p.get());
+		    //if(first){ init(p.get()); first=false; }
+		    //else compare(p.get());
 		}
 		else if(e instanceof IPointR){
 		    IPointR p = (IPointR)e;
-		    if(first){ init(p.get()); first=false; }
-		    else compare(p.get());
+		    compare(p.get());
+		    //if(first){ init(p.get()); first=false; }
+		    //else compare(p.get());
 		}
 		else if(e instanceof ICurve){
 		    ICurve c = (ICurve)e;
 		    for(int i=0; i<c.num(); i++)
-			if(first){ init(c.cp(i).get()); first=false; }
-			else compare(c.cp(i).get());
+			compare(c.cp(i).get());
+			//if(first){ init(c.cp(i).get()); first=false; }
+			//else compare(c.cp(i).get());
 		}
 		else if(e instanceof ICurveR){
 		    ICurveR c = (ICurveR)e;
 		    for(int i=0; i<c.num(); i++)
-			if(first){ init(c.cp(i).get()); first=false; }
-			else compare(c.cp(i).get());
+			compare(c.cp(i).get());
+			//if(first){ init(c.cp(i).get()); first=false; }
+			//else compare(c.cp(i).get());
 		}
 		else if(e instanceof ISurface){
 		    ISurface s = (ISurface)e;
 		    for(int i=0; i<s.unum(); i++){
 			for(int j=0; j<s.vnum(); j++){
-			    if(first){ init(s.cp(i,j).get()); first=false; }
-			    else compare(s.cp(i,j).get());
+			    compare(s.cp(i,j).get());
+			    //if(first){ init(s.cp(i,j).get()); first=false; }
+			    //else compare(s.cp(i,j).get());
 			}
 		    }
 		}
@@ -100,35 +109,52 @@ public class IBoundingBox{
 		    ISurfaceR s = (ISurfaceR)e;
 		    for(int i=0; i<s.unum(); i++){
 			for(int j=0; j<s.vnum(); j++){
-			    if(first){ init(s.cp(i,j).get()); first=false; }
-			    else compare(s.cp(i,j).get());
+			    compare(s.cp(i,j).get());
+			    //if(first){ init(s.cp(i,j).get()); first=false; }
+			    //else compare(s.cp(i,j).get());
 			}
 		    }
 		}
 		else if(e instanceof IMesh){
 		    IMesh m = (IMesh)e;
 		    for(int i=0; i<m.vertexNum(); i++){
-			if(first){ init(m.vertex(i).get()); first=false; }
-			else compare(m.vertex(i).get()); 
+			compare(m.vertex(i).get()); 
+			//if(first){ init(m.vertex(i).get()); first=false; }
+			//else compare(m.vertex(i).get()); 
 		    }
 		}
 		else if(e instanceof IMeshR){
 		    IMeshR m = (IMeshR)e;
 		    for(int i=0; i<m.vertexNum(); i++){
-			if(first){ init(m.vertex(i).get()); first=false; }
-			else compare(m.vertex(i).get()); 
+			compare(m.vertex(i).get()); 
+			//if(first){ init(m.vertex(i).get()); first=false; }
+			//else compare(m.vertex(i).get()); 
+		    }
+		}
+		else if(e instanceof IBrep){
+		    IBrep b = (IBrep)e;
+		    for(int i=0; i<b.surfaces.length; i++){
+			for(int j=0; j<b.surfaces[i].unum(); j++){
+			    for(int k=0; k<b.surfaces[i].vnum(); k++){
+				compare(b.surfaces[i].cp(j,k).get());
+				//if(first){ init(s.cp(i,j).get()); first=false; }
+				//else compare(s.cp(i,j).get());
+			    }
+			}
 		    }
 		}
 		else if(e instanceof IVectorObject){
 		    IVectorObject vobj = (IVectorObject)e;
-		    if(first){
-			init(vobj.vec.get()); first=false;
-			compare(vobj.root.get());
-		    }
-		    else{
-			compare(vobj.vec.get());
-			compare(vobj.root.get());
-		    }
+		    compare(vobj.vec.get());
+		    compare(vobj.root.get());
+		    //if(first){
+		    //	init(vobj.vec.get()); first=false;
+		    //	compare(vobj.root.get());
+		    //}
+		    //else{
+		    //	compare(vobj.vec.get());
+		    //	compare(vobj.root.get());
+		    //}
 		}
 	    }
 	}

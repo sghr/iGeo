@@ -198,8 +198,60 @@ public class IRhino3dmExporter extends IRhino3dm{
 	writeChunkTable(tcodeTextureMappingTable);
     }
     
+    public Chunk getMaterialChunk(Material mat) throws IOException{
+	ChunkOutputStream cos = new ChunkOutputStream(tcodeMaterialRecord);
+	mat.write(file, cos, cos.getCRC());
+	return cos.getChunk();
+    }
+    
     public void writeMaterialTable() throws IOException{
-	writeChunkTable(tcodeMaterialTable);
+	
+	file.materials = new ArrayList<Material>();
+	file.imaterials = new ArrayList<IMaterial>();
+	
+	for(int i=0; i<server.server().objectNum(); i++){
+	    IAttribute attr = server.server().object(i).attr();
+	    if(attr!=null){
+		if(attr.material!=null){
+		    if(!file.imaterials.contains(attr.material)){
+			if(attr.material instanceof IBasicMaterial){
+			    IBasicMaterial bmat = (IBasicMaterial)attr.material;
+			    Material rmat = new Material(bmat);
+			    rmat.materialIndex = file.materials.size();
+			    file.imaterials.add(bmat);
+			    file.materials.add(rmat);
+			}
+		    }
+		}
+		else if(attr.color!=null){
+		    IBasicMaterial mat = new IBasicMaterial();
+		    mat.diffuse = attr.color; // only this? // to be rendered, diffuse needs to be set
+		    //mat.ambient = attr.color; // 
+		    //mat.specular = attr.color; // 
+		    //mat.emission = attr.color; // 
+		    mat.transparency = (double)(255 - attr.color.getAlpha())/255;
+		    
+		    Material rmat = new Material(mat);
+		    rmat.materialIndex = file.materials.size();
+		    file.imaterials.add(mat);
+		    file.materials.add(rmat);
+		    
+		    attr.material = mat;
+		}
+	    }
+	}
+	
+	ChunkTable materialTable = new ChunkTable(tcodeMaterialTable);
+	
+	for(int i=0; i<file.materials.size(); i++){
+	    //Chunk ck = getMaterialChunk(file.materials.get(i));
+	    materialTable.add(nestChunk(tcodeMaterialRecord,
+					getObjectChunk(file.materials.get(i))));
+	    //materialTable.add(ck);
+	}
+	
+	//writeChunkTable(tcodeMaterialTable);
+	writeChunkTable(materialTable);
     }
     
     public void writeLinetypeTable() throws IOException{
@@ -259,7 +311,7 @@ public class IRhino3dmExporter extends IRhino3dm{
 	writeChunkTable(objectTable);
     }
     
-    static public RhinoObject getRhinoObject(IObject e){
+    static public RhinoObject getRhinoObject(IObject e, Rhino3dmFile context){
 	RhinoObject obj=null;
 	if(e instanceof IPoint){
 	    obj = getRhinoPoint(((IPoint)e).get());
@@ -285,8 +337,11 @@ public class IRhino3dmExporter extends IRhino3dm{
 	else if(e instanceof IMeshR){
 	    obj = getRhinoMesh( ((IMeshR)e).mesh );
 	}
+	else if(e instanceof IBrep){
+	    obj = getRhinoBrep( (IBrep)e );
+	}
 	
-	if(obj!=null) obj.setAttributes(new ObjectAttributes(e));
+	if(obj!=null) obj.setAttributes(new ObjectAttributes(e,context));
 	
 	return obj;
     }
@@ -304,12 +359,14 @@ public class IRhino3dmExporter extends IRhino3dm{
 	//return new NurbsSurface(srf);
     }
     
+    static public Brep getRhinoBrep(IBrep brep){ return new Brep(brep); }
+    
     static public Mesh getRhinoMesh(IMeshI mesh){ return new Mesh(mesh); }
         
     public Chunk getObjectChunk(IObject e) throws IOException{
 	//IOut.p("e = "+e); //
 	
-	RhinoObject obj = getRhinoObject(e);
+	RhinoObject obj = getRhinoObject(e, file);
 	
 	if(obj==null) return null;
 	

@@ -36,14 +36,14 @@ import igeo.gui.*;
 */
 
 public class IBasicMaterial extends IMaterial{
-    Color ambient;
-    Color diffuse;
-    Color emission;
-    Color specular;
-    Color reflection;
-    Color transparent;
-    double refraction = 1.;
-    double reflectivity = 0.;
-    double shine = 0.;
-    double transparency = 0.;
+    public Color ambient;
+    public Color diffuse;
+    public Color emission;
+    public Color specular;
+    public Color reflection;
+    public Color transparent;
+    public double refraction = 1.;
+    public double reflectivity = 0.;
+    public double shine = 0.;
+    public double transparency = 0.;
 }

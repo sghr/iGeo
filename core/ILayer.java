@@ -38,16 +38,22 @@ public class ILayer extends IObject{
     
     public ArrayList<IObject> objects;
     //public ILayer parentLayer = null;
+    //public Color color;
+    //public IMaterial material;
+    //public boolean visible=true;
     
-    public Color color;
-    public IMaterial material;
+    public ILayer(){
+	attribute = new IAttribute();
+	objects = new ArrayList<IObject>();
+    }
+    public ILayer(String name){ this(); attribute.name = name; }
+    public ILayer(IServerI s){
+	super(s);
+	attribute = new IAttribute();
+	objects = new ArrayList<IObject>();
+    }
+    public ILayer(IServerI s, String name){ this(s); attribute.name = name; }
     
-    public boolean visible=true;
-    
-    public ILayer(){ objects=new ArrayList<IObject>(); }
-    public ILayer(String name){ this(); this.name = name; }
-    public ILayer(IServerI s){ super(s); objects=new ArrayList<IObject>(); }
-    public ILayer(IServerI s, String name){ this(s); this.name = name; }
     
     public int num(){ return objects.size(); }
     public IObject get(int i){ return objects.get(i); }
@@ -63,32 +69,73 @@ public class ILayer extends IObject{
     }
     public ILayer remove(int i){ objects.remove(i); return this; }
     public ILayer remove(IObject e){ objects.remove(e); return this; }
-
+    
     public boolean contains(IObject e){ return objects.contains(e); }
     
-    public ILayer name(String layerName){ name = layerName; return this; }
-
-    @Override public boolean visible(){ return visible; }
+    public ILayer name(String layerName){ attribute.name = layerName; return this; }
+    
+    @Override public boolean visible(){ return attribute.visible; }
     
     public ILayer setVisible(boolean v){ return visible(v); }
     public ILayer visible(boolean v){
-	visible=v;
-	if(visible) show(); else hide();
+	attribute.visible=v;
+	if(attribute.visible) show(); else hide();
 	return this;
     }
     public ILayer hide(){
 	super.hide();
+	attribute.visible=false;
 	for(IObject o: objects) o.hide();
 	return this;
     }
     public ILayer show(){
 	super.show();
+	attribute.visible=true;
 	for(IObject o: objects) o.show();
 	return this;
     }
     
     
+    public Color clr(){ return attribute.clr(); }
+    public ILayer clr(Color c){ attribute.clr(c); return this; }
+    public ILayer clr(int gray){ attribute.clr(gray); return this; }
+    public ILayer clr(float fgray){ attribute.clr(fgray); return this; }
+    public ILayer clr(double dgray){ attribute.clr(dgray); return this; }
+    public ILayer clr(int gray, int alpha){ attribute.clr(gray,alpha); return this; }
+    public ILayer clr(float fgray, float falpha){ attribute.clr(fgray,falpha); return this; }
+    public ILayer clr(double dgray, double dalpha){ attribute.clr(dgray,dalpha); return this; }
+    public ILayer clr(int r, int g, int b){ attribute.clr(r,g,b); return this; }
+    public ILayer clr(float fr, float fg, float fb){ attribute.clr(fr,fg,fb); return this; }
+    public ILayer clr(double dr, double dg, double db){ attribute.clr(dr,dg,db); return this; }
+    public ILayer clr(int r, int g, int b, int a){ attribute.clr(r,g,b,a); return this; }
+    public ILayer clr(float fr, float fg, float fb, float fa){ attribute.clr(fr,fg,fb,fa); return this; }
+    public ILayer clr(double dr, double dg, double db, double da){ attribute.clr(dr,dg,db,da); return this; }
+    public ILayer hsb(float h, float s, float b, float a){ attribute.hsb(h,s,b,a); return this; }
+    public ILayer hsb(double h, double s, double b, double a){ attribute.hsb(h,s,b,a); return this; }
+    public ILayer hsb(float h, float s, float b){ attribute.hsb(h,s,b); return this; }
+    public ILayer hsb(double h, double s, double b){ attribute.hsb(h,s,b); return this; }
     
+    public Color getColor(){ return clr(); }
+    public ILayer setColor(Color c){ return clr(c); }
+    public ILayer setColor(int gray){  return clr(gray); }
+    public ILayer setColor(float fgray){  return clr(fgray); }
+    public ILayer setColor(double dgray){ return clr(dgray); }
+    public ILayer setColor(int gray, int alpha){ return clr(gray,alpha); }
+    public ILayer setColor(float fgray, float falpha){ return clr(fgray,falpha); }
+    public ILayer setColor(double dgray, double dalpha){ return clr(dgray,dalpha); }
+    public ILayer setColor(int r, int g, int b){ return clr(r,g,b); }
+    public ILayer setColor(float fr, float fg, float fb){ return clr(fr,fg,fb); }
+    public ILayer setColor(double dr, double dg, double db){  return clr(dr,dg,db); }
+    public ILayer setColor(int r, int g, int b, int a){ return clr(r,g,b,a); }
+    public ILayer setColor(float fr, float fg, float fb, float fa){ return clr(fr,fg,fb,fa); }
+    public ILayer setColor(double dr, double dg, double db, double da){ return clr(dr,dg,db,da); }
+    public ILayer setHSBColor(float h, float s, float b, float a){ return hsb(h,s,b,a); }
+    public ILayer setHSBColor(double h, double s, double b, double a){ return hsb(h,s,b,a); }
+    public ILayer setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
+    public ILayer setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
+    
+    
+    /*
     public Color clr(){ return color; }
     public ILayer clr(Color c){ color = c; return this; }
     public ILayer clr(int gray){ color = IGraphicObject.getColor(gray); return this; }
@@ -126,8 +173,9 @@ public class ILayer extends IObject{
     public ILayer setHSBColor(double h, double s, double b, double a){ return hsb(h,s,b,a); }
     public ILayer setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
     public ILayer setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
+    */
     
     
-    public ILayer setMaterial(IMaterial mat){ material = mat; return this; }
+    public ILayer setMaterial(IMaterial mat){ attribute.material = mat; return this; }
     
 }

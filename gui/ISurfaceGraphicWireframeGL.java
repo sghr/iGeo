@@ -46,19 +46,36 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     
     public IGLLineStrip[] uline, vline;
     public IGLLineLoop[] inTrim=null, outTrim=null;
+
+    public boolean initialized=false;
     
-    public ISurfaceGraphicWireframeGL(ISurface srf){ super(srf); }
-    public ISurfaceGraphicWireframeGL(ISurfaceR srf){ super(srf); }
+    public ISurfaceGraphicWireframeGL(ISurface srf){
+	super(srf); surface = srf.surface;
+    }
+    public ISurfaceGraphicWireframeGL(ISurfaceR srf){
+	super(srf); surface = srf.surface;
+    }
+    public ISurfaceGraphicWireframeGL(IObject obj, ISurfaceI srf){
+	super(obj);
+	surface = srf;
+    }
     
     public ISurfaceGraphicWireframeGL(ISurface srf, int isoparmNumRatio){
 	super(srf);
+	surface = srf.surface;
 	this.isoparmNumRatio = isoparmNumRatio;
     }
     public ISurfaceGraphicWireframeGL(ISurfaceR srf, int isoparmNumRatio){
 	super(srf);
+	surface = srf.surface;
 	this.isoparmNumRatio = isoparmNumRatio;
     }
-    
+    public ISurfaceGraphicWireframeGL(IObject obj, ISurfaceI srf, int isoparmNumRatio){
+	super(obj);
+	surface = srf;
+	this.isoparmNumRatio = isoparmNumRatio;
+    }
+        
     public void setIsoparmNumberRatio(int p){ isoparmNumRatio = p; }
     
     
@@ -209,9 +226,8 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     
     
     public void initSurface(){
-	
-	if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
-	else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
+	//if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
+	//else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
 	
 	int uepnum = surface.uepNum();
 	int vepnum = surface.vepNum();
@@ -288,7 +304,8 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	    }
 	    vline = vl.toArray(new IGLLineStrip[vl.size()]);
 	}
-	
+		
+	initialized=true;
     }
     
     
@@ -297,7 +314,9 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     
     public void draw(IGraphics g){
 	
-	if(surface==null) initSurface();
+	//if(surface==null) initSurface();
+	if(!initialized) initSurface();
+	
 	
 	GL gl = g.getGL();
 	if(gl==null) return;

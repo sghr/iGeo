@@ -1404,14 +1404,13 @@ public class IRhino3dmImporter extends IRhino3dm{
 	
 	for(Chunk c:chunks){
 	    Material m = readMaterial(c);
-	    
-	    //IOut.debug(20,"Matarial is read\n"+m);
-	    
 	    if(m!=null) materials.add(m);
 	}
 	
-	if(materials.size()>0)
-	    file.materials = materials.toArray(new Material[materials.size()]);
+	IOut.debug(10,materials.size()+" materials imported"); 
+	
+	if(materials.size()>0) file.materials = materials;
+	//file.materials = materials.toArray(new Material[materials.size()]);
 	
 	/*
 	ByteArrayInputStream bais = new ByteArrayInputStream(chunk.content);

@@ -42,8 +42,8 @@ import igeo.gui.*;
 //public class IElement{
 public class IObject{
     
-    public int id; // or use String UUID or use object instance's hash code?
-    public String name;
+    //public int id; // or use String UUID or use object instance's hash code?
+    //public String name;
     
     public IServer server;
     
@@ -53,7 +53,9 @@ public class IObject{
     public ArrayList<IGraphicObject> graphics;
     public ArrayList<IDynamicObject> dynamics;
     
-    public ILayer layer;
+    //public ILayer layer;
+    
+    public IAttribute attribute;
     
     /**
        IObject is stored in default IServer (through current static IG instance)
@@ -203,134 +205,233 @@ public class IObject{
     }
     
     
-    public String name(){ return name; }
-    public IObject name(String name){ this.name = name; return this; }
+    public String name(){
+	if(attribute!=null) return attribute.name;
+	return null;
+    }
+    public IObject name(String name){
+	if(attribute==null) attribute = new IAttribute();
+	attribute.name = name;
+	return this;
+    }
     
+    public ILayer layer(){
+	//return layer;
+	if(attribute!=null) return attribute.layer;
+	return null;
+    }
     
-    public ILayer layer(){ return layer; }
     public IObject layer(ILayer l){
+	if(l==null){
+	    if(attribute!=null){ attribute.layer = null; }
+	}
+	else{
+	    if(attribute==null){
+		attribute = new IAttribute();
+		if(!l.contains(this)) l.add(this);
+		attribute.layer = l;
+	    }
+	    else if(attribute.layer!=l){
+		if(!l.contains(this)) l.add(this);
+		attribute.layer = l;
+	    }
+	}
+	/*
 	if(l==null) layer=null;
 	else if(layer!=l){
 	    if(!l.contains(this)) l.add(this);
 	    layer=l;
 	}
+	*/
 	return this;
     }
+    
+    public IAttribute attr(){ return attribute; }
+    public IObject attr(IAttribute at){ attribute=at; return this; }
     
     
     // shouldn't these methods be in other graphic class?
     
     
     public boolean visible(){
+	if(attribute==null) attribute=new IAttribute(); // default true?
+	return attribute.visible;
+	/*
 	if(graphics==null) return false;
 	for(IGraphicObject gr:graphics) if(gr.visible()) return true;
 	return false; // false if everything is false
+	*/
     }
     public boolean isVisible(){ return visible(); }
     
     public IObject hide(){
 	if(graphics!=null) for(IGraphicObject gr:graphics) gr.hide();
+	if(attribute==null) attribute=new IAttribute();
+	attribute.visible=false;
 	return this;
     }
     
     public IObject show(){
 	if(graphics!=null) for(IGraphicObject gr:graphics) gr.show();
+	if(attribute==null) attribute=new IAttribute();
+	attribute.visible=true;
 	return this;
     }
+
+    /** update color of all graphics by the color in attribute */
+    public void syncColor(){
+	if(attribute!=null && graphics!=null){
+	    for(IGraphicObject gr:graphics) gr.setColor(attribute.color);
+	}
+    }
+    
     
     /** @return returns whatever Color of any graphics member. (first found)
      */
     public Color clr(){
-	if(graphics==null) return null;
+	if(graphics==null && attribute==null) return null;
+	if(attribute!=null) return attribute.color;
 	for(IGraphicObject gr:graphics) if(gr.getColor()!=null) return gr.getColor();
 	return null;
     }
     
     public IObject clr(Color c){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(c);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(c);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(c);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(int gray){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(gray);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(gray);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(gray);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(double dgray){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor((float)dgray);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(dgray);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor((float)dgray);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(float fgray){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(fgray);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(fgray);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(fgray);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(int gray, int alpha){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(gray,alpha);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(gray,alpha);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(gray,alpha);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(double dgray, double dalpha){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor((float)dgray,(float)dalpha);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(dgray, dalpha);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor((float)dgray,(float)dalpha);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(float fgray, float falpha){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(fgray,falpha);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(fgray, falpha);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(fgray,falpha);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(int r, int g, int b){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(r,g,b);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(r,g,b);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(r,g,b);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(double dr, double dg, double db){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor((float)dr,(float)dg,(float)db);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(dr,dg,db);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor((float)dr,(float)dg,(float)db);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(float fr, float fg, float fb){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(fr,fg,fb);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(fr,fg,fb);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(fr,fg,fb);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(int r, int g, int b, int a){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(r,g,b,a);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(r,g,b,a);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(r,g,b,a);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(double dr, double dg, double db, double da){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor((float)dr,(float)dg,(float)db,(float)da);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(dr,dg,db,da);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor((float)dr,(float)dg,(float)db,(float)da);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject clr(float fr, float fg, float fb, float fa){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(fr,fg,fb,fa);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(fr,fg,fb,fa);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setColor(fr,fg,fb,fa);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject hsb(double dh, double ds, double db, double da){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setHSBColor((float)dh,(float)ds,(float)db,(float)da);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.hsb(dh,ds,db,da);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setHSBColor((float)dh,(float)ds,(float)db,(float)da);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject hsb(float h, float s, float b, float a){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setHSBColor(h,s,b,a);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.hsb(h,s,b,a);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setHSBColor(h,s,b,a);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject hsb(double dh, double ds, double db){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setHSBColor((float)dh,(float)ds,(float)db);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.hsb(dh,ds,db);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setHSBColor((float)dh,(float)ds,(float)db);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
     public IObject hsb(float h, float s, float b){
-	if(graphics!=null) for(IGraphicObject gr:graphics) gr.setHSBColor(h,s,b);
-	else IOut.err("no graphics created yet"); //
+	if(attribute==null) attribute = new IAttribute();
+	attribute.hsb(h,s,b);
+	syncColor();
+	//if(graphics!=null) for(IGraphicObject gr:graphics) gr.setHSBColor(h,s,b);
+	//else IOut.err("no graphics created yet"); //
 	return this;
     }
+    
     
     
     /** @return returns whatever Color of any graphics member. (first found)

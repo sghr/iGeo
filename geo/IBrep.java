@@ -23,6 +23,7 @@
 package igeo.geo;
 
 import igeo.core.*;
+import igeo.gui.*;
 import java.util.ArrayList;
 import java.awt.Color;
 
@@ -36,238 +37,144 @@ import java.awt.Color;
    @version 0.7.0.0;
 */
 public class IBrep extends IObject{
-    public ArrayList<ISurface> surfaces;
+    //public ArrayList<ISurface> surfaces;
+    //public ArrayList<ISurfaceGeo> surfaces;
+    public ISurfaceGeo[] surfaces;
     
-    public IBrep(){ this((IServerI)null); }
-    public IBrep(IServerI s){ super(s); surfaces = new ArrayList<ISurface>(); }
+    /** seams defines connection of surfaces (?) */
+    //public ArrayList<ICurveGeo> seams;
+    //public ICurveGeo[] seams; 
     
-    public IBrep(IBrep brep){
-	super(brep);
-	surfaces = new ArrayList<ISurface>(brep.surfaces.size());
-	for(int i=0; i<brep.surfaces.size(); i++)
-	    surfaces.add(brep.surfaces.get(i).dup()); // deep copy
+    //public ArrayList<IVec> seamPoints;
+    //public IVec[] seamPoints;
+    
+    public boolean solid=false;
+    
+    
+    //public IBrep(){ this((IServerI)null); }
+    
+    //public IBrep(ISurfaceGeo[] srfs, ICurveGeo[] seams, IVec[] seamPts){ this(null, srfs, seams, seamPts); }
+    
+    public IBrep(ISurfaceGeo[] srfs){ this(null, srfs); }
+    
+    //public IBrep(IServerI s){ super(s); surfaces = new ArrayList<ISurfaceGeo>(); }
+
+    /*
+    public IBrep(IServerI s, ISurfaceGeo[] srfs, ICurveGeo[] seams, IVec[] seamPts){
+	super(s);
+	surfaces = srfs;
+	this.seams = seams;
+	seamPoints = seamPts;
+	initBrep(s);
     }
+    */
+    
+    public IBrep(IServerI s, ISurfaceGeo[] srfs){ super(s); surfaces = srfs; initBrep(s); }
+    
+    public IBrep(IBrep brep){ this(brep.server,brep); }
+    
     public IBrep(IServerI s, IBrep brep){
 	super(s,brep);
-	surfaces = new ArrayList<ISurface>(brep.surfaces.size());
-	for(int i=0; i<brep.surfaces.size(); i++)
-	    surfaces.add(brep.surfaces.get(i).dup()); // deep copy
+	
+	//surfaces = new ArrayList<ISurfaceGeo>(brep.surfaces.size());
+	//for(int i=0; i<brep.surfaces.length; i++)surfaces.add(brep.surfaces.get(i).dup()); // deep copy
+	if(brep.surfaces!=null){
+	    surfaces = new ISurfaceGeo[brep.surfaces.length];
+	    for(int i=0; i<surfaces.length; i++) surfaces[i] = brep.surfaces[i].dup(); // deep copy
+	}
+	/*
+	if(brep.seams!=null){
+	    seams = new ICurveGeo[brep.seams.length];
+	    for(int i=0; i<seams.length; i++) seams[i] = brep.seams[i].dup(); // deep copy
+	}
+	if(brep.seamPoints!=null){
+	    seamPoints = new IVec[brep.seamPoints.length];
+	    for(int i=0; i<seamPoints.length; i++) seamPoints[i] = brep.seamPoints[i].dup(); // deep copy
+	}
+	*/
+	initBrep(s);
     }
     
-    public IBrep add(ISurface s){ surfaces.add(s); return this; }
     
-    public ISurface getSurface(int i){ return surfaces.get(i); }
+    public void initBrep(IServerI s){
+	parameter = null; // !!! what should this be? IBrepGeo?
+	if(graphics == null) initGraphic(s);
+    }
     
-    public int surfaceNum(){ return surfaces.size(); }
+    public IGraphicObject createGraphic(IGraphicMode m){
+        if(m.isGL()) return new IBrepGraphicGL(this);
+        return null;
+    }
+    
+    /*
+    public IBrep add(ISurfaceGeo s){ surfaces.add(s); return this; }
+    
+    public IBrep addSeam(ICurveGeo crv){
+	if(seams==null) seams = new ArrayList<ICurveGeo>();
+	seams.add(crv);
+	return this;
+    }
+    
+    public IBrep addSeamPoint(IVec pt){
+	if(seamPoints==null) seamPoints = new ArrayList<IVec>();
+	seamPoints.add(pt);
+	return this;
+    }
+    */
+    
+    public ISurfaceGeo surface(int i){ return surfaces[i]; }
+    
+    public int surfaceNum(){ return surfaces.length; }
     
     @Override public IBrep dup(){ return new IBrep(this); }
     
+    /*
     @Override public void del(){
 	super.del();
         for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).del();
     }
+    */
     
-    public IBrep name(String nm){
-	super.name(nm);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).name(nm+"_s"+i);
-	return this;
-    }
-    public IBrep layer(ILayer l){
-	super.layer(l);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).layer(l);
-	return this;
-    }
+    public IBrep name(String nm){ super.name(nm); return this; }
+    public IBrep layer(ILayer l){ super.layer(l); return this; }
     
-    public boolean visible(){
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++)
-	    if(surfaces.get(i).visible()) return true;
-	return false; // false if everything is false
-    }
+    public IBrep hide(){ super.hide(); return this; }
+    public IBrep show(){ super.show(); return this; }
     
-    public IBrep hide(){
-	super.hide();
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).hide();
-	return this;
-    }
-    public IBrep show(){
-	super.show();
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).show();
-	return this;
-    }
+    public IBrep clr(Color c){ super.clr(c); return this; }
+    public IBrep clr(int gray){ super.clr(gray); return this; }
+    public IBrep clr(float fgray){ super.clr(fgray); return this; }
+    public IBrep clr(double dgray){ super.clr(dgray); return this; }
+    public IBrep clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
+    public IBrep clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
+    public IBrep clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
+    public IBrep clr(int r, int g, int b){ super.clr(r,g,b); return this; }
+    public IBrep clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
+    public IBrep clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
+    public IBrep clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
+    public IBrep clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
+    public IBrep clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
+    public IBrep hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
+    public IBrep hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
+    public IBrep hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
+    public IBrep hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
-    public IBrep clr(Color c){
-	super.clr(c);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(c);
-	return this;
-    }
-    public IBrep clr(int gray){
-	super.clr(gray);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(gray);
-	return this;
-    }
-    public IBrep clr(float fgray){
-	super.clr(fgray);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(fgray);
-	return this;
-    }
-    public IBrep clr(double dgray){
-	super.clr(dgray);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(dgray);
-	return this;
-    }
-    public IBrep clr(int gray, int alpha){
-	super.clr(gray,alpha);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(gray,alpha);
-	return this;
-    }
-    public IBrep clr(float fgray, float falpha){
-	super.clr(fgray,falpha);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(fgray,falpha);
-	return this;
-    }
-    public IBrep clr(double dgray, double dalpha){
-	super.clr(dgray,dalpha);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(dgray,dalpha);
-	return this;
-    }
-    public IBrep clr(int r, int g, int b){
-	super.clr(r,g,b);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(r,g,b);
-	return this;
-    }
-    public IBrep clr(float fr, float fg, float fb){
-	super.clr(fr,fg,fb);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(fr,fg,fb);
-	return this;
-    }
-    public IBrep clr(double dr, double dg, double db){
-	super.clr(dr,dg,db);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(dr,dg,db);
-	return this;
-    }
-    public IBrep clr(int r, int g, int b, int a){
-	super.clr(r,g,b,a);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(r,g,b,a);
-	return this;
-    }
-    public IBrep clr(float fr, float fg, float fb, float fa){
-	super.clr(fr,fg,fb,fa);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(fr,fg,fb,fa);
-	return this;
-    }
-    public IBrep clr(double dr, double dg, double db, double da){
-	super.clr(dr,dg,db,da);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).clr(dr,dg,db,da);
-	return this;
-    }
-    public IBrep hsb(float h, float s, float b, float a){
-	super.hsb(h,s,b,a);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).hsb(h,s,b,a);
-	return this;
-    }
-    public IBrep hsb(double h, double s, double b, double a){
-	super.hsb(h,s,b,a);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).hsb(h,s,b,a);
-	return this;
-    }
-    public IBrep hsb(float h, float s, float b){
-	super.hsb(h,s,b);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).hsb(h,s,b);
-	return this;
-    }
-    public IBrep hsb(double h, double s, double b){
-	super.hsb(h,s,b);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).hsb(h,s,b);
-	return this;
-    }
-    
-    
-    public IBrep setColor(Color c){
-	super.setColor(c);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(c);
-	return this;
-    }
-    public IBrep setColor(int gray){
-	super.setColor(gray);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(gray);
-	return this;
-    }
-    public IBrep setColor(float fgray){
-	super.setColor(fgray);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(fgray);
-	return this;
-    }
-    public IBrep setColor(double dgray){
-	super.setColor(dgray);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(dgray);
-	return this;
-    }
-    public IBrep setColor(int gray, int alpha){
-	super.setColor(gray,alpha);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(gray,alpha);
-	return this;
-    }
-    public IBrep setColor(float fgray, int falpha){
-	super.setColor(fgray,falpha);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(fgray,falpha);
-	return this;
-    }
-    public IBrep setColor(double dgray, double dalpha){
-	super.setColor(dgray,dalpha);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(dgray,dalpha);
-	return this;
-    }
-    public IBrep setColor(int r, int g, int b){
-	super.setColor(r,g,b);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(r,g,b);
-	return this;
-    }
-    public IBrep setColor(float fr, float fg, float fb){
-	super.setColor(fr,fg,fb);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(fr,fg,fb);
-	return this;
-    }
-    public IBrep setColor(double dr, double dg, double db){
-	super.setColor(dr,dg,db);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(dr,dg,db);
-	return this;
-    }
-    public IBrep setColor(int r, int g, int b, int a){
-	super.setColor(r,g,b,a);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(r,g,b,a);
-	return this;
-    }
-    public IBrep setColor(float fr, float fg, float fb, float fa){
-	super.setColor(fr,fg,fb,fa);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(fr,fg,fb,fa);
-	return this;
-    }
-    public IBrep setColor(double dr, double dg, double db, double da){
-	super.setColor(dr,dg,db,da);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setColor(dr,dg,db,da);
-	return this;
-    }
-    public IBrep setHSBColor(float h, float s, float b, float a){
-	super.setHSBColor(h,s,b,a);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setHSBColor(h,s,b,a);
-	return this;
-    }
-    public IBrep setHSBColor(double h, double s, double b, double a){
-	super.setHSBColor(h,s,b,a);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setHSBColor(h,s,b,a);
-	return this;
-    }
-    public IBrep setHSBColor(float h, float s, float b){
-	super.setHSBColor(h,s,b);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setHSBColor(h,s,b);
-	return this;
-    }
-    public IBrep setHSBColor(double h, double s, double b){
-	super.setHSBColor(h,s,b);
-	for(int i=0;surfaces!=null&&i<surfaces.size();i++) surfaces.get(i).setHSBColor(h,s,b);
-	return this;
-    }
-    
-    
+    public IBrep setColor(Color c){ super.setColor(c); return this; }
+    public IBrep setColor(int gray){ super.setColor(gray); return this; }
+    public IBrep setColor(float fgray){ super.setColor(fgray); return this; }
+    public IBrep setColor(double dgray){ super.setColor(dgray); return this; }
+    public IBrep setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
+    public IBrep setColor(float fgray, int falpha){ super.setColor(fgray,falpha); return this; }
+    public IBrep setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
+    public IBrep setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
+    public IBrep setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
+    public IBrep setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
+    public IBrep setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
+    public IBrep setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
+    public IBrep setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
+    public IBrep setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
+    public IBrep setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
+    public IBrep setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
+    public IBrep setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
 }

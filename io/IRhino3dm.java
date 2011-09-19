@@ -671,7 +671,11 @@ public class IRhino3dm{
 	public Settings settings;
 	public Bitmap[] bitmaps;
 	public TextureMapping[] textureMappings;
-	public Material[] materials;
+	//public Material[] materials;
+	
+	public ArrayList<Material> materials;
+	public ArrayList<IMaterial> imaterials; // to check index number of IMaterial attributes
+	
 	public Linetype[] linetypes;
 	public Layer[] layers;
 	public Group[] groups;
@@ -686,7 +690,7 @@ public class IRhino3dm{
 	
 	public IServerI server;
 	public void setServer(IServerI srv){ server = srv; }
-
+	
 	public Rhino3dmFile(){}
 	public Rhino3dmFile(int ver, int openNurbsVer, IServerI serv){
 	    version = ver; openNurbsVersion = openNurbsVer; server = serv;
@@ -830,6 +834,7 @@ public class IRhino3dm{
 	
 	public Interval(){}
 	public Interval(double v1,double v2){ this.v1=v1; this.v2=v2; }
+	public Interval(Interval interval){ v1=interval.v1; v2=interval.v2; }
 	
 	public boolean isIncreasing(){ return v1<v2; }
 	//public boolean isIncreasing(){ return v1<=v2; }
@@ -1136,7 +1141,7 @@ public class IRhino3dm{
 	       attributes.layerIndex < context.layers.length){
 		layer = context.layers[attributes.layerIndex].ilayer;
 		layer.add(e);
-		IOut.debug(10,"layer name : "+layer.name); //
+		IOut.debug(10,"layer name : "+layer.name()); //
 		
 		if(!layer.isVisible()) e.hide();
 	    }
@@ -1192,6 +1197,49 @@ public class IRhino3dm{
 	public ArrayList<UUIDIndex> materialChannel;
 	public UUID pluginId;
 	
+	
+	IMaterial imaterial;
+	
+	
+	public Material(){
+	    materialIndex=0;
+	    materialId = UUID.nilValue;
+	    materialName = null;
+	    flamingoLibrary = null;
+	    ambient = new Color(0,0,0);
+	    diffuse = new Color(128,128,128);
+	    emission = new Color(0,0,0);
+	    specular = new Color(255,255,255);
+	    reflection = new Color(255,255,255);
+	    transparent = new Color(255,255,255);
+	    indexOfRefraction = 1.0;
+	    reflectivity = 0.0;
+	    shine = 0.0;
+	    transparency = 0.0;
+	    textures = null;
+	    pluginId = UUID.nilValue;
+	    shared=false;
+	    materialChannel = null;
+	}
+	
+	public Material(IBasicMaterial mat){
+	    this();
+	    
+	    if(mat.ambient!=null) ambient = mat.ambient;
+	    if(mat.diffuse!=null) diffuse = mat.diffuse;
+	    if(mat.emission!=null) emission = mat.emission;
+	    if(mat.specular!=null) specular = mat.specular;
+	    if(mat.reflection!=null) reflection = mat.reflection;
+	    if(mat.transparent!=null) transparent = mat.transparent;
+	    indexOfRefraction = mat.refraction;
+	    reflectivity = mat.reflectivity;
+	    shine = mat.shine;
+	    transparency = mat.transparency;
+
+	    imaterial = mat;
+	}
+	
+	
 	public void read(Rhino3dmFile context, InputStream is) throws IOException{
 	    
 	    int[] version = readChunkVersion(is);
@@ -1213,7 +1261,7 @@ public class IRhino3dm{
 		ByteArrayInputStream bais = new ByteArrayInputStream(ck.content);
 		majorVersion = readInt(bais);
 		minorVersion = readInt(bais);
-
+		
 		materialId = readUUID(bais);
 		materialIndex = readInt(bais);
 		materialName = readString(bais);
@@ -1236,6 +1284,25 @@ public class IRhino3dm{
 		reflectivity = readDouble(bais);
 		shine = readDouble(bais);
 		transparency = readDouble(bais);
+		
+		
+		IOut.debug(100,"materialId = "+materialId);
+		IOut.debug(100,"materialIndex = "+materialIndex);
+		IOut.debug(100,"materialName = "+materialName);
+		IOut.debug(100,"pluginId = "+pluginId);
+		IOut.debug(100,"ambient = "+ambient);
+		IOut.debug(100,"diffuse = "+diffuse);
+		IOut.debug(100,"emission = " + emission);
+		IOut.debug(100,"specular = " + specular);
+		IOut.debug(100,"reflaction = " + reflection);
+		IOut.debug(100,"transparent = " + transparent);
+		
+		IOut.debug(100,"indexOfRefraction = " + indexOfRefraction);
+		IOut.debug(100,"reflectivity = " + reflectivity);
+		IOut.debug(100,"shine = " + shine);
+		IOut.debug(100,"transparency = " + transparency);
+		
+		
 		
 		Chunk textureChunk = readChunk(bais);
 		if(ck.content==null){
@@ -1264,6 +1331,8 @@ public class IRhino3dm{
 		}
 		
 	    }
+
+	    
 	}
 	
 	public void readV3(Rhino3dmFile context, InputStream is, int minorVersion) throws IOException{
@@ -1777,7 +1846,7 @@ public class IRhino3dm{
 	    igesLevel=-1;
 	    materialIndex=-1;
 	    linetypeIndex=-1;
-	    color = ilayer.color;
+	    color = ilayer.clr();
 	    displayMaterialId=null;
 	    plotColor = new Color(255,255,255,0); // with 0xFFFFFF00 plot color, plot color follows layer color, which is currently desirable behavior.
 	    plotWeightMm=0.;
@@ -2073,13 +2142,13 @@ public class IRhino3dm{
 	}
 	
 	
-	public ObjectAttributes(IObject e){
+	public ObjectAttributes(IObject e, Rhino3dmFile file){
 	    objectUUID = UUID.randomUUID(); //null;
-	    name = e.name;
+	    name = e.name();
 	    url = null;
 	    
-	    if(e.layer!=null && e.server!=null && e.server.layers!=null){
-		layerIndex = e.server.layers.indexOf(e.layer);
+	    if(e.layer()!=null && e.server!=null && e.server.layers!=null){
+		layerIndex = e.server.layers.indexOf(e.layer());
 	    }
 	    else{
 		layerIndex = 0;
@@ -2089,7 +2158,23 @@ public class IRhino3dm{
 	    //IOut.err("LAYER INDEX = "+layerIndex); //
 	    
 	    linetypeIndex = -1;
-	    materialIndex = -1;
+	    
+	    if(e.attr()!=null && e.attr().material!=null && file.imaterials!=null){
+		
+		materialIndex = file.imaterials.indexOf(e.attr().material);
+				
+		/*
+		IMaterial mat = e.attr().material;
+		for(int i=0; i<file.materials.size()&&materialIndex<0; i++){
+		    if(file.materials.get(i).imaterial==mat) materialIndex=i;
+		}
+		*/
+		//IOut.err("materialIndex = "+materialIndex); //
+		
+		//materialIndex=-1;
+	    }
+	    else materialIndex = -1;
+	    
 	    renderingAttributes = new RenderingAttributes();
 	    color = e.getColor();
 	    plotColor = e.getColor();
@@ -2108,7 +2193,14 @@ public class IRhino3dm{
 	    
 	    plotColorSource = plotColorSourceFromLayer;
 	    plotWeightSource = plotWeightSourceFromLayer;
-	    materialSource = materialSourceFromLayer;
+	    
+	    if(materialIndex>=0){
+		materialSource = materialSourceFromObject;
+	    }
+	    else{
+		materialSource = materialSourceFromLayer;
+	    }
+	    
 	    linetypeSource = linetypeSourceFromLayer;
 	    group = null;
 	    dmref = null;
@@ -2120,7 +2212,7 @@ public class IRhino3dm{
 	    int[] version = readChunkVersion(is);
 	    int majorVersion = version[0];
 	    int minorVersion = version[1];
-
+	    
 	    int itemid = 0xFF;
 	    
 	    objectUUID = readUUID(is);
@@ -2233,7 +2325,7 @@ public class IRhino3dm{
 		}
 	    }
 	}
-
+	
 	/*
 	// for debug
 	public void read(Rhino3dmFile context, byte[] b)throws IOException{
@@ -2263,7 +2355,8 @@ public class IRhino3dm{
 	    materialIndex = readInt(is);
 	    color = readColor(is);
 	    
-	    //IOut.p("object attributes color = "+color); //
+	    //IOut.debug(20,"object attributes color = "+color); //
+	    //IOut.debug(20,"materialIndex = "+materialIndex); //
 	    
 	    short s = readShort(is);
 	    if(context.version < 4 || context.openNurbsVersion < 200503170){
@@ -2568,6 +2661,8 @@ public class IRhino3dm{
     }
     public static abstract class Curve extends Geometry{
 	public static final String uuid = "4ED7D4D7-E947-11d3-BFE5-0010830122F0";
+	
+	public ICurveGeo icurve; // for brep topology check
 	
 	public UUID getClassUUID(){ return new UUID(uuid); }
 	public int getType(){ return objectTypeCurve; }
@@ -2893,7 +2988,9 @@ public class IRhino3dm{
 	    super(pt);
 	    vertexIndex = vidx;
 	    edgeIndex = new ArrayList<Integer>();
-	    tolerance = 0.; // 
+	    tolerance = 0.; //
+	    
+	    //tolerance = IConfig.lengthResolution;
 	}
 	
 	public void addEdgeIndex(int i){ edgeIndex.add(i); }
@@ -2909,6 +3006,13 @@ public class IRhino3dm{
 	    
 	    tolerance = readDouble(is);
 	    
+	    
+	    IOut.debug(200,"vertexIndex = "+vertexIndex); //
+	    IOut.debug(200,"point = "+point); //
+	    String eidxStr = "";
+	    for(int i=0; i<edgeIndex.size(); i++) eidxStr+= edgeIndex.get(i)+", ";
+	    IOut.debug(200,"edgeIndex = "+eidxStr);
+	    IOut.debug(200,"tolerance = "+tolerance); 
 	}
 	
 	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
@@ -2974,6 +3078,14 @@ public class IRhino3dm{
 	    if(reversed!=0) reverse();
 	    setDomain(domain);
 	    
+	    //
+	    IOut.debug(200,"edgeIndex = "+edgeIndex);
+	    IOut.debug(200,"curve3Index = "+curve3Index);
+	    IOut.debug(200,"vertexIndex = "+vertexIndex[0] + ", "+vertexIndex[1]);
+	    IOut.debug(200,"trimIndex = "+trimIndex);
+	    IOut.debug(200,"tolerance = "+tolerance);
+	    IOut.debug(200,"domain = "+domain());
+	    
 	}
 	
 	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
@@ -2995,7 +3107,6 @@ public class IRhino3dm{
 		writeInterval(os,domain(),crc);
 	    }
 	}
-	
 	
     }
 
@@ -3153,6 +3264,12 @@ public class IRhino3dm{
 	    }
 	    return unknown;
 	}
+
+	public boolean reverse(){
+	    super.reverse();
+	    rev3d=!rev3d;
+	    return true;
+	}
 	
 	public void read(Rhino3dmFile context, InputStream is)throws IOException{
 	    
@@ -3197,6 +3314,20 @@ public class IRhino3dm{
 	    
 	    //IOut.p("reading complete");
 	    //IOut.p(this);
+	    
+	    //
+	    IOut.debug(200, "trimIndex = "+trimIndex);
+	    IOut.debug(200, "curve2Index = "+curve2Index);
+	    IOut.debug(200, "thisDomain = "+thisDomain);
+	    IOut.debug(200, "realCurveDomain = "+realCurveDomain);
+	    IOut.debug(200, "edgeIndex = "+edgeIndex);
+	    IOut.debug(200, "vertexIndex = "+vertexIndex[0]+", "+vertexIndex[1]);
+	    IOut.debug(200, "rev3d = "+rev3d); //
+	    IOut.debug(200, "type = "+type);
+	    IOut.debug(200, "iso = "+iso);
+	    IOut.debug(200, "loopIndex = "+loopIndex);
+	    IOut.debug(200, "tolerance = "+tolerance); 
+	    
 	}
 	
 	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
@@ -3715,7 +3846,50 @@ public class IRhino3dm{
 	public BoundingBox bbox;
 	public int isSolid;
 	
+	public ArrayList<ICurveGeo> icurves3; // to check joined trim edge
+	//public ArrayList<IVec> ivertices; // to check shared vertices
+	
+	
 	public Brep(){}
+	
+	public Brep(IBrep brep){
+	    
+	    curves2 = new CurveArray();
+	    curves3 = new CurveArray();
+	    surfaces = new SurfaceArray();
+	    vertices = new BrepVertexArray();
+	    edges = new BrepEdgeArray();
+	    trims = new BrepTrimArray();
+	    loops = new BrepLoopArray();
+	    faces = new BrepFaceArray();
+	    
+	    bbox = new BoundingBox();
+	    
+	    icurves3 = new ArrayList<ICurveGeo>();
+	    //ivertices = new ArrayList<ICurveGeo>();
+	    
+	    if(brep.solid) isSolid=1;
+	    else isSolid=0;
+	    
+	    IBoundingBox ibbox = new IBoundingBox();
+	    
+	    if(brep.surfaces!=null){
+		for(int i=0; i<brep.surfaces.length; i++){ addSurface(brep.surfaces[i], ibbox); }
+	    }
+	    
+	    /*
+	    //curves3
+	    if(brep.seams!=null){
+		for(int i=0; i<brep.seams.length; i++){
+		    NurbsCurve ncrv3 = new NurbsCurve(brep.seams[i]);
+		    curves3.add(ncrv3);
+		}
+	    }
+	    */
+	    
+	    bbox.min = ibbox.min;
+	    bbox.max = ibbox.max;
+	}
 	
 	// trimmed surface
 	public Brep(ISurfaceGeo srf){
@@ -3732,13 +3906,22 @@ public class IRhino3dm{
 	    bbox = new BoundingBox();
 	    isSolid=0;
 	    
+	    icurves3 = new ArrayList<ICurveGeo>();
+	    //ivertices = new ArrayList<IVec>();
+	    
+	    IBoundingBox ibbox = new IBoundingBox();
+	    
+	    addSurface(srf, ibbox);
+	    
+	    bbox.min = ibbox.min;
+	    bbox.max = ibbox.max;
+	    
+	    /*
 	    NurbsSurface nsrf = new NurbsSurface(srf);
 	    surfaces.add(nsrf);
 	    
 	    BrepFace face = new BrepFace(faces.size(),surfaces.size()-1,nsrf,this);
 	    faces.add(face);
-	    
-	    IBoundingBox ibbox = new IBoundingBox();
 	    
 	    // untrim area should not be included in bounding box?
 	    //for(int i=0; i<srf.unum(); i++) for(int j=0; j<srf.vnum(); j++) ibbox.comare(srf.cp(i,j));
@@ -3746,7 +3929,7 @@ public class IRhino3dm{
 	    ArrayList<ArrayList<ITrimCurve>> trimLoops = new ArrayList<ArrayList<ITrimCurve>>();
 	    ArrayList<BrepLoop.Type> loopType = new ArrayList<BrepLoop.Type>();
 	    
-	    if(!srf.hasOuterTrim() && srf.hasInnerTrim()){
+	    //if(!srf.hasOuterTrim() && srf.hasInnerTrim()){
 		// adding default outer trim
 		ArrayList<ITrimCurve> defaultLoop = new ArrayList<ITrimCurve>();
 		defaultLoop.add(new ITrimCurve(new IVec(0.,0.,0.),new IVec(1.,0.,0.)).surface(srf));
@@ -3771,11 +3954,9 @@ public class IRhino3dm{
 		loopType.add(BrepLoop.Type.Inner);
 	    }
 	    
-	    
 	    // check direction
 	    checkTrimLoopDirection(trimLoops, loopType);
-	    
-	    
+	    	    
 	    for(int i=0; i<trimLoops.size(); i++){
 		BrepLoop loop =
 		    new BrepLoop(loops.size(),faces.size()-1,loopType.get(i), this);
@@ -3789,7 +3970,7 @@ public class IRhino3dm{
 		    ICurveGeo trim3d = trim2d.get3d();
 		    NurbsCurve ncrv3 = new NurbsCurve(trim3d);
 		    curves3.add(ncrv3);
-
+		    
 		    // update bounding box; only approximation
 		    for(int k=0; k<trim3d.num(); k++) ibbox.compare(trim3d.cp(k));
 		    
@@ -3831,7 +4012,7 @@ public class IRhino3dm{
 		    vtx2.addEdgeIndex(edges.size()-1);
 		}
 	    }
-	    
+	    */
 	    
 	    
 	    /*
@@ -3952,10 +4133,350 @@ public class IRhino3dm{
 	    }
 	    */
 	    
-	    bbox.min = ibbox.min;
-	    bbox.max = ibbox.max;
-	    
+	    //bbox.min = ibbox.min;
+	    //bbox.max = ibbox.max;
 	}
+	
+
+	public void getTrimLoops(ISurfaceGeo srf,
+				 ArrayList<ArrayList<ITrimCurve>> trimLoops,
+				 ArrayList<BrepLoop.Type> loopType){
+	    
+	    //if(!srf.hasOuterTrim() && srf.hasInnerTrim()){
+	    if(!srf.hasOuterTrim()){ // in brep, every surface needs trim curve
+		// adding default outer trim
+		ArrayList<ITrimCurve> defaultLoop = new ArrayList<ITrimCurve>();
+		defaultLoop.add(new ITrimCurve(new IVec(0.,0.,0.),new IVec(1.,0.,0.)).surface(srf));
+		defaultLoop.add(new ITrimCurve(new IVec(1.,0.,0.),new IVec(1.,1.,0.)).surface(srf));
+		defaultLoop.add(new ITrimCurve(new IVec(1.,1.,0.),new IVec(0.,1.,0.)).surface(srf));
+		defaultLoop.add(new ITrimCurve(new IVec(0.,1.,0.),new IVec(0.,0.,0.)).surface(srf));
+		trimLoops.add(defaultLoop);
+		loopType.add(BrepLoop.Type.Outer);
+	    }
+	    
+	    for(int i=0; i<srf.outerTrimLoopNum(); i++){
+		ArrayList<ITrimCurve> outLoop = new ArrayList<ITrimCurve>();
+		for(int j=0; j<srf.outerTrimNum(i); j++) outLoop.add(srf.outerTrim(i,j).get());
+		trimLoops.add(outLoop);
+		loopType.add(BrepLoop.Type.Outer);
+	    }
+	    
+	    for(int i=0; i<srf.innerTrimLoopNum(); i++){
+		ArrayList<ITrimCurve> inLoop = new ArrayList<ITrimCurve>();
+		for(int j=0; j<srf.innerTrimNum(i); j++) inLoop.add(srf.innerTrim(i,j).get());
+		trimLoops.add(inLoop);
+		loopType.add(BrepLoop.Type.Inner);
+	    }
+	    
+	    // check direction
+	    checkTrimLoopDirection(trimLoops, loopType);
+	}
+	
+	
+	public boolean isEdgeTouching(ICurveGeo crv1, ICurveGeo crv2){
+	    return isEdgeTouching(crv1,crv2,IConfig.lengthResolution);
+	}
+	
+	public boolean isEdgeTouching(ICurveGeo crv1, ICurveGeo crv2, double reso){
+	    // check only start point and end point (!) (too rough?)
+	    IVec pt1a = crv1.start();
+	    IVec pt1b = crv1.end();
+	    IVec pt2a = crv2.start();
+	    IVec pt2b = crv2.end();
+	    if(pt1a.eq(pt2a,reso) && pt1b.eq(pt2b,reso)) return true;
+	    if(pt1a.eq(pt2b,reso) && pt1b.eq(pt2a,reso)) return true;
+	    return false;
+	}
+	
+	public ICurveGeo getSharedICurve(ICurveGeo crv){
+	    if(icurves3==null || icurves3.size()==0) return null;
+	    for(int i=0; i<icurves3.size(); i++){
+		if(isEdgeTouching(crv, icurves3.get(i))) return icurves3.get(i);
+	    }
+	    return null;
+	}
+	
+	public Curve getCurve3(ICurveGeo crv){
+	    for(int i=0; i<curves3.size(); i++){
+		if(curves3.get(i).icurve==crv) return curves3.get(i);
+	    }
+	    return null;
+	}
+	
+	public BrepEdge getBrepEdge(Curve c){
+	    int idx = curves3.indexOf(c);
+	    if(idx<0) return null;
+	    for(int i=0; i<edges.size(); i++){
+		if(edges.get(i).curve3Index == idx) return edges.get(i);
+	    }
+	    return null;
+	}
+
+	public BrepTrim getBrepTrim(BrepEdge edge){
+	    int idx = edges.indexOf(edge);
+	    if(idx<0) return null;
+	    for(int i=0; i<trims.size(); i++){
+		if(trims.get(i).edgeIndex == idx) return trims.get(i);
+	    }
+	    return null;
+	}
+	
+	public BrepVertex getSharedVertex(IVec pt){
+	    return getSharedVertex(pt, IConfig.lengthResolution);
+	}
+	public BrepVertex getSharedVertex(IVec pt, double reso){
+	    if(vertices==null||vertices.size()==0) return null;
+	    for(int i=0; i<vertices.size(); i++){
+		if(vertices.get(i).point.eq(pt, reso)) return vertices.get(i);
+	    }
+	    return null;
+	}
+	
+	public void addSurface(ISurfaceGeo srf, IBoundingBox ibbox){
+	    
+	    NurbsSurface nsrf = new NurbsSurface(srf);
+	    surfaces.add(nsrf);
+	    
+	    BrepFace face = new BrepFace(faces.size(),surfaces.size()-1,nsrf,this);
+	    faces.add(face);
+	    
+	    // untrim area should not be included in bounding box?
+	    //for(int i=0; i<srf.unum(); i++) for(int j=0; j<srf.vnum(); j++) ibbox.comare(srf.cp(i,j));
+	    
+	    ArrayList<ArrayList<ITrimCurve>> trimLoops = new ArrayList<ArrayList<ITrimCurve>>();
+	    ArrayList<BrepLoop.Type> loopType = new ArrayList<BrepLoop.Type>();
+	    
+	    getTrimLoops(srf, trimLoops, loopType);
+	    	    
+	    for(int i=0; i<trimLoops.size(); i++){
+		BrepLoop loop =
+		    new BrepLoop(loops.size(),faces.size()-1,loopType.get(i), this);
+		loops.add(loop);
+		face.addLoopIndex(loops.size()-1);
+		
+		//BrepVertex vtx0 = null;
+		
+		for(int j=0; j<trimLoops.get(i).size(); j++){
+		    ITrimCurve trim2d = trimLoops.get(i).get(j);
+		    
+		    NurbsCurve ncrv = new NurbsCurve(trim2d);
+		    curves2.add(ncrv);
+		    
+		    ICurveGeo trim3d = trim2d.get3d();
+		    
+		    ICurveGeo sharedICurve = getSharedICurve(trim3d);
+		    Curve sharedCurve3 = null;
+		    BrepEdge sharedEdge = null;
+		    
+		    if(sharedICurve!=null){
+			sharedCurve3 = getCurve3(sharedICurve);
+			if(sharedCurve3!=null){
+			    sharedEdge = getBrepEdge(sharedCurve3);
+			}
+		    }
+		    
+		    
+		    if(sharedEdge==null){ // new edge
+			
+			icurves3.add(trim3d);
+			
+			NurbsCurve ncrv3 = new NurbsCurve(trim3d);
+			curves3.add(ncrv3);
+			
+			// update bounding box; only approximation
+			for(int k=0; k<trim3d.num(); k++) ibbox.compare(trim3d.cp(k));
+			
+			IVec pt1 = trim3d.start();
+			BrepVertex vtx1 = getSharedVertex(pt1);
+			if(vtx1==null){
+			    vtx1 = new BrepVertex(vertices.size(),pt1);
+			    vertices.add(vtx1);
+			}
+			
+			IVec pt2 = trim3d.end();
+			BrepVertex vtx2 = getSharedVertex(pt2);
+			if(vtx2==null){
+			    vtx2 = new BrepVertex(vertices.size(),pt2);
+			    vertices.add(vtx2);
+			}
+			
+			//IOut.err("edges="+edges);
+			//IOut.err("curves3="+curves3);
+			//IOut.err("vtx1="+vtx1);
+			//IOut.err("vtx2="+vtx2);
+			
+			Interval c3domain = ncrv3.domain();
+			BrepEdge edge = new BrepEdge (edges.size(), curves3.indexOf(ncrv3), /*curves3.size()-1,*/
+						      vtx1.vertexIndex, vtx2.vertexIndex,
+						      c3domain, c3domain, this);
+			edges.add(edge);
+			
+			vtx1.addEdgeIndex(edge.edgeIndex);
+			vtx2.addEdgeIndex(edge.edgeIndex);
+			
+			Interval c2domain = ncrv.domain();
+			Interval c2ProxyDomain = new Interval(c2domain);
+			BrepTrim trim =
+			    new BrepTrim(trims.size(),
+					 curves2.indexOf(ncrv),
+					 edges.indexOf(edge), /*edges.size()-1,*/
+					 vtx1.vertexIndex, vtx2.vertexIndex, loop.loopIndex,/*loops.size()-1,*/
+					 c2ProxyDomain, c2domain, this, trim2d);
+			trims.add(trim);
+			loop.addTrimIndex(trim.trimIndex);
+			edge.addTrimIndex(trim.trimIndex);
+			
+		    }
+		    else{
+			Interval c2domain = ncrv.domain();
+			Interval c2ProxyDomain = new Interval(c2domain);
+			
+			BrepVertex vtx1 = vertices.get(sharedEdge.vertexIndex[0]);
+			BrepVertex vtx2 = vertices.get(sharedEdge.vertexIndex[1]);
+						
+			IVec pt1 = trim3d.start();
+			boolean reverse=false;
+			if(pt1.dist(vtx1.point) > pt1.dist(vtx2.point)){
+			    //vtx1 = vertices.get(sharedEdge.vertexIndex[1]);
+			    //vtx2 = vertices.get(sharedEdge.vertexIndex[0]);
+			    reverse=true;
+			}
+			
+			BrepTrim trim =
+			    new BrepTrim(trims.size(),
+					 curves2.indexOf(ncrv),
+					 sharedEdge.edgeIndex,
+					 vtx1.vertexIndex, vtx2.vertexIndex, loop.loopIndex , /*loops.size()-1,*/
+					 c2ProxyDomain, c2domain, this, trim2d);
+			
+			trim.type = BrepTrim.Type.Mated;
+			BrepTrim sharedTrim = getBrepTrim(sharedEdge);
+			if(sharedTrim!=null) sharedTrim.type = BrepTrim.Type.Mated;
+			
+			if(reverse) trim.reverse();
+			
+			trims.add(trim);
+			
+			loop.addTrimIndex(trim.trimIndex);
+			sharedEdge.addTrimIndex(trim.trimIndex);
+			
+		    }
+		}
+	    }
+	}
+	
+	
+	public void addSingleSurface(ISurfaceGeo srf, IBoundingBox ibbox){
+	    
+	    NurbsSurface nsrf = new NurbsSurface(srf);
+	    surfaces.add(nsrf);
+	    
+	    BrepFace face = new BrepFace(faces.size(),surfaces.size()-1,nsrf,this);
+	    faces.add(face);
+	    
+	    // untrim area should not be included in bounding box?
+	    //for(int i=0; i<srf.unum(); i++) for(int j=0; j<srf.vnum(); j++) ibbox.comare(srf.cp(i,j));
+	    
+	    ArrayList<ArrayList<ITrimCurve>> trimLoops = new ArrayList<ArrayList<ITrimCurve>>();
+	    ArrayList<BrepLoop.Type> loopType = new ArrayList<BrepLoop.Type>();
+	    
+	    //if(!srf.hasOuterTrim() && srf.hasInnerTrim()){
+	    if(!srf.hasOuterTrim()){ // in brep, every surface needs trim curve
+		// adding default outer trim
+		ArrayList<ITrimCurve> defaultLoop = new ArrayList<ITrimCurve>();
+		defaultLoop.add(new ITrimCurve(new IVec(0.,0.,0.),new IVec(1.,0.,0.)).surface(srf));
+		defaultLoop.add(new ITrimCurve(new IVec(1.,0.,0.),new IVec(1.,1.,0.)).surface(srf));
+		defaultLoop.add(new ITrimCurve(new IVec(1.,1.,0.),new IVec(0.,1.,0.)).surface(srf));
+		defaultLoop.add(new ITrimCurve(new IVec(0.,1.,0.),new IVec(0.,0.,0.)).surface(srf));
+		trimLoops.add(defaultLoop);
+		loopType.add(BrepLoop.Type.Outer);
+	    }
+	    
+	    for(int i=0; i<srf.outerTrimLoopNum(); i++){
+		ArrayList<ITrimCurve> outLoop = new ArrayList<ITrimCurve>();
+		for(int j=0; j<srf.outerTrimNum(i); j++) outLoop.add(srf.outerTrim(i,j).get());
+		trimLoops.add(outLoop);
+		loopType.add(BrepLoop.Type.Outer);
+	    }
+	    
+	    for(int i=0; i<srf.innerTrimLoopNum(); i++){
+		ArrayList<ITrimCurve> inLoop = new ArrayList<ITrimCurve>();
+		for(int j=0; j<srf.innerTrimNum(i); j++) inLoop.add(srf.innerTrim(i,j).get());
+		trimLoops.add(inLoop);
+		loopType.add(BrepLoop.Type.Inner);
+	    }
+	    
+	    
+	    // bbox
+	    //if(!srf.hasTrim()) for(int i=0; i<srf.unum(); i++) for(int j=0; j<srf.vnum(); j++) ibbox.compare(srf.cp(i,j));
+	    
+	    
+	    // check direction
+	    checkTrimLoopDirection(trimLoops, loopType);
+	    
+	    for(int i=0; i<trimLoops.size(); i++){
+		BrepLoop loop =
+		    new BrepLoop(loops.size(),faces.size()-1,loopType.get(i), this);
+		loops.add(loop);
+		face.addLoopIndex(loops.size()-1);
+		BrepVertex vtx0 = null;
+		for(int j=0; j<trimLoops.get(i).size(); j++){
+		    ITrimCurve trim2d = trimLoops.get(i).get(j);
+		    NurbsCurve ncrv = new NurbsCurve(trim2d);
+		    curves2.add(ncrv);
+		    ICurveGeo trim3d = trim2d.get3d();
+		    
+		    icurves3.add(trim3d);
+		    
+		    
+		    NurbsCurve ncrv3 = new NurbsCurve(trim3d);
+		    curves3.add(ncrv3);
+		    
+		    // update bounding box; only approximation
+		    for(int k=0; k<trim3d.num(); k++) ibbox.compare(trim3d.cp(k));
+		    
+		    BrepVertex vtx1 = null;
+		    if(j==0){
+			vtx1 = new BrepVertex(vertices.size(),trim3d.start());
+			vertices.add(vtx1);
+			vtx0 = vtx1; // start point of loop
+		    }
+		    else{
+			vtx1 = vertices.get(vertices.size()-1);
+		    }
+		    BrepVertex vtx2 = null;
+		    if(j < trimLoops.get(i).size()-1){
+			vtx2 = new BrepVertex(vertices.size(),trim3d.end());
+			vertices.add(vtx2);
+		    }
+		    else{ // last one or closed one
+			vtx2 = vtx0;
+		    }
+		    
+		    Interval c3domain = ncrv3.domain();
+		    BrepEdge edge = new BrepEdge (edges.size(), curves3.indexOf(ncrv3), /*curves3.size()-1,*/
+						  vtx1.vertexIndex, vtx2.vertexIndex,
+						  c3domain, c3domain, this);
+		    edges.add(edge);
+		    
+		    Interval c2domain = ncrv.domain();
+		    BrepTrim trim =
+			new BrepTrim(trims.size(),
+				     curves2.size()-1,
+				     edges.indexOf(edge), /*edges.size()-1,*/
+				     vtx1.vertexIndex, vtx2.vertexIndex, loops.size()-1,
+				     c2domain, c2domain, this, trim2d);
+		    trims.add(trim);
+		    loop.addTrimIndex(trims.size()-1);
+		    
+		    edge.addTrimIndex(trims.size()-1);
+		    
+		    vtx1.addEdgeIndex(edges.size()-1);
+		    vtx2.addEdgeIndex(edges.size()-1);
+		}
+	    }
+	}
+	
 	
 	static public void checkTrimLoopDirection(ArrayList<ArrayList<ITrimCurve>> trimLoops,
 						  ArrayList<BrepLoop.Type> loopType){
@@ -3984,41 +4505,42 @@ public class IRhino3dm{
 		
 	    }
 	    else if(majorVersion == 3){
+		int debugLv=100;
 		
 		// read curves2
-		//IOut.p("read curves2"); 
+		IOut.debug(debugLv, "read curves2"); 
 		curves2 = new CurveArray();
 		curves2.read(context,is);
 		int curves2Count = curves2.size();
-		//IOut.p("curves2Count = "+curves2Count); 
+		IOut.debug(debugLv,"curves2Count = "+curves2Count); 
 		
 		// read curves
-		//IOut.p("read curves3"); 
+		IOut.debug(debugLv,"read curves3"); 
 		curves3 = new CurveArray();
 		curves3.read(context,is);
 		int curves3Count = curves3.size();
-		//IOut.p("curves3Count = "+curves3Count); 
+		IOut.debug(debugLv,"curves3Count = "+curves3Count); 
 		
 		
 		// read surfaces
-		//IOut.p("read surface"); 
+		IOut.debug(debugLv,"read surface"); 
 		surfaces = new SurfaceArray();
 		surfaces.read(context,is);
 		int surfacesCount = surfaces.size();
-		//IOut.p("surfacesCount = "+surfacesCount);
+		IOut.debug(debugLv,"surfacesCount = "+surfacesCount);
 		
 		
 		// read vertices
-		//IOut.p("read vertices"); 
+		IOut.debug(debugLv,"read vertices"); 
 		vertices = new BrepVertexArray();
 		vertices.read(context,is);
-		//IOut.p("verticesCount = "+vertices.size());
+		IOut.debug(debugLv,"verticesCount = "+vertices.size());
 		
 		// read edges
-		//IOut.p("read edges"); 
+		IOut.debug(debugLv,"read edges"); 
 		edges = new BrepEdgeArray();
 		edges.read(context,is);
-		//IOut.p("edgeCount = "+edges.size());
+		IOut.debug(debugLv,"edgeCount = "+edges.size());
 		
 		for(int i=0; i<edges.size(); i++){
 		    BrepEdge e = edges.get(i);
@@ -4034,10 +4556,10 @@ public class IRhino3dm{
 		}
 		
 		// read trims
-		//IOut.p("read trims"); 
+		IOut.debug(debugLv, "read trims"); 
 		trims = new BrepTrimArray();
 		trims.read(context,is);
-		//IOut.p("trimCount = "+trims.size());
+		IOut.debug(debugLv, "trimCount = "+trims.size());
 		
 		for(int i=0; i<trims.size(); i++){
 		    BrepTrim trim = trims.get(i);
@@ -4053,19 +4575,19 @@ public class IRhino3dm{
 		}
 		
 		// read loops
-		//IOut.p("read loops"); 
+		IOut.debug(debugLv,"read loops"); 
 		loops = new BrepLoopArray();
 		loops.read(context,is);
-		//IOut.p("loopCount="+loops.size()); 
+		IOut.debug(debugLv,"loopCount="+loops.size()); 
 		for(int i=0; i<loops.size(); i++){
 		    loops.get(i).brep = this;
 		}
 		
 		// read faces
-		//IOut.p("read faces"); 
+		IOut.debug(debugLv,"read faces"); 
 		faces = new BrepFaceArray();
 		faces.read(context,is);
-		//IOut.p("facesCount="+faces.size()); 
+		IOut.debug(debugLv,"facesCount="+faces.size()); 
 		for(int i=0; i<faces.size(); i++){
 		    BrepFace face = faces.get(i);
 		    face.brep = this;
@@ -4075,11 +4597,11 @@ public class IRhino3dm{
 		}
 		
 		// bounding box
-		//IOut.p("read boundingbox"); 
+		//IOut.debug(debugLv,"read boundingbox"); 
 		bbox = new BoundingBox();
 		bbox.min = readPoint3(is);
 		bbox.max = readPoint3(is);
-		//IOut.p("boundingbox = "+bbox.min+", "+bbox.max); 
+		//IOut.p(debugLv,"boundingbox = "+bbox.min+", "+bbox.max); 
 		
 		// read fill in missing boxes
 		
@@ -4112,9 +4634,9 @@ public class IRhino3dm{
 	
 	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
 	    
-	    writeChunkVersion(os,3,0,crc); // version 3.0 is standard
+	    //writeChunkVersion(os,3,0,crc); // version 3.0 is standard
 	    //writeChunkVersion(os,3,1,crc); // version 3.1 includes rendering meshes
-	    //writeChunkVersion(os,3,2,crc); // version 3.2 includes isSolid
+	    writeChunkVersion(os,3,2,crc); // version 3.2 includes isSolid
 	    
 	    curves2.write(context,os,crc);
 	    curves3.write(context,os,crc);
@@ -4127,7 +4649,21 @@ public class IRhino3dm{
 	    writePoint(os,bbox.min,crc);
 	    writePoint(os,bbox.max,crc);
 	    
-	    // data for version 3.1 or 3.2 is skipped
+	    // data for version 3.1
+	    // render mesh
+	    ChunkOutputStream cos = new ChunkOutputStream(tcodeAnonymousChunk);
+	    byte b = 0; // skipped
+	    for(int i=0; i<faces.size(); i++) writeByte(cos, b, cos.getCRC());
+	    writeChunk(os, cos.getChunk());
+	    
+	    // analysis mesh
+	    cos = new ChunkOutputStream(tcodeAnonymousChunk);
+	    b = 0; // skipped
+	    for(int i=0; i<faces.size(); i++) writeByte(cos, b, cos.getCRC());
+	    writeChunk(os, cos.getChunk());
+	    
+	    // data for version 3.2 
+	    writeInt(os, isSolid, crc);
 	    
 	}
 	
@@ -4222,7 +4758,8 @@ public class IRhino3dm{
 	    //BrepLoopArray loops;
 	    //BrepFaceArray faces;
 	    
-	    ArrayList<ISurface> isurfaces = new ArrayList<ISurface>();
+	    //ArrayList<ISurface> isurfaces = new ArrayList<ISurface>();
+	    ArrayList<ISurfaceGeo> isurfgeo = new ArrayList<ISurfaceGeo>();
 	    
 	    for(int i=0; i<faces.size(); i++){
 		BrepFace face = faces.get(i);
@@ -4254,13 +4791,13 @@ public class IRhino3dm{
 			    }
 			}
 			
-			ISurface isurf = new ISurface(s,surf);
+			//ISurface isurf = new ISurface(s,surf);
+			//isurfaces.add(isurf);
 			
 			//setAttributesToIObject(context, isurf);
 			
-			isurfaces.add(isurf);
+			isurfgeo.add(surf);
 		    }
-		    
 		    else{
 			IOut.err("failed to instantiate: @ "+surfaces.get(face.faceIndex));
 		    }
@@ -4271,13 +4808,20 @@ public class IRhino3dm{
 		
 	    }
 	    
-	    if(isurfaces.size()==0) return null;
+	    //if(isurfaces.size()==0) return null;
+	    if(isurfgeo.size()==0) return null;
 	    
-	    if(isurfaces.size()==1) return isurfaces.get(0);
+	    // if num of surf is just 1, instantiate as ISurface
+	    if(isurfgeo.size()==1){ return new ISurface(s, isurfgeo.get(0)); }
 	    
-	    IBrep ibrep = new IBrep();
-	    for(int i=0; i<isurfaces.size(); i++) ibrep.add(isurfaces.get(i));
-	    return ibrep;
+	    // if num of surf more than 1, instantiate as IBrep
+	    
+	    //IBrep ibrep = new IBrep(s);
+	    //for(int i=0; i<isurfgeo.size(); i++) ibrep.add(isurfgeo.get(i));
+	    
+	    // how about seams, vertices or etc?
+	    //return new IBrep(s, isurfgeo.toArray(new ISurfaceGeo[isurfgeo.size()]),null,null);
+	    return new IBrep(s, isurfgeo.toArray(new ISurfaceGeo[isurfgeo.size()]));
 	}
 	
     }
@@ -4397,7 +4941,7 @@ public class IRhino3dm{
 		Interval cdom = realCurve.domain();
 		cdom.intersection(proxyCurveSubdomain);
 		if(cdom.isIncreasing()) realCurveDomain = cdom;
-		else{ IOut.err("domain is decreasing"); } //
+		//else{ IOut.err("domain is decreasing"); } //
 	    }
 	    else{
 		realCurveDomain = proxyCurveSubdomain;
@@ -4418,7 +4962,7 @@ public class IRhino3dm{
 	
 	public void setDomain(Interval domain){
 	    if(domain.isIncreasing()) thisDomain.set(domain);
-	    else IOut.err("domain is decreasing"); //
+	    //else{ IOut.err("domain is decreasing"); //
 	}
 	
 	public Interval domain(){ return thisDomain; }
@@ -4474,7 +5018,8 @@ public class IRhino3dm{
 		line = readLine(is);
 		t = readInterval(is);
 		dim = readInt32(is);
-		
+
+		IOut.debug(100,"line = "+line.from+", "+line.to);
 		//IOut.p("line = "+line.from+", "+line.to);
 		//IOut.p("interval = "+t.v1+", "+t.v2);
 		//IOut.p("dim = "+dim);
@@ -5363,6 +5908,8 @@ public class IRhino3dm{
 	    knot = getRhinoKnots(iknot);
 	    cv = new IVec[crv.num()];
 	    for(int i=0; i<crv.num(); i++) cv[i] = crv.cp(i);
+
+	    icurve = crv;
 	}
 	public NurbsCurve(ITrimCurve tcrv){
 	    dim = 2;
@@ -5429,7 +5976,7 @@ public class IRhino3dm{
 			cv[i].z /= w;
 		    }
 		    
-		    //IOut.p("cv["+i+"] = "+cv[i]);
+		    IOut.debug(100,"cv["+i+"] = "+cv[i]);
 		}
 		
 	    }
@@ -6534,8 +7081,52 @@ public class IRhino3dm{
 		    else{ IOut.err("wrong instance of class : "+obj); } // 
 		}
 	    }
+	    
 	}
+	
+	public ISurface createIObject(Rhino3dmFile context, IServerI s){
+	    ISurfaceGeo surf = createIGGeometry(context,s);
+	    return new ISurface(s,surf);
+	}
+	
+	public ISurfaceGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	    if(curve[0]==null || curve[1]==null || basepoint==null) return null;
+	    
+	    ICurveGeo crv1 = curve[0].createIGGeometry(context, s);
+	    ICurveGeo crv2 = curve[1].createIGGeometry(context, s);
+	    
+	    int udeg = crv1.deg();
+	    int vdeg = crv2.deg();
+	    
+	    double[] uknots = crv1.knots;
+	    double[] vknots = crv2.knots;
+	    
+	    int unum = crv1.num();
+	    int vnum = crv2.num();
+	    
+	    Interval udom = curve[0].domain();
+	    Interval vdom = curve[1].domain();
+	    
+	    IVecI[][] cpts = new IVecI[unum][vnum];
+	    
+	    for(int i=0; i<unum; i++){
+		for(int j=0; j<vnum; j++){
+		    cpts[i][j] = basepoint.dup().add(crv1.cp(i)).add(crv2.cp(j));
+		}
+	    }
+	    
+	    ISurfaceGeo isurf = new ISurfaceGeo(cpts, udeg, vdeg, uknots, vknots);
+	    
+	    isurf.ustart = udom.v1;
+	    isurf.uend = udom.v2;
+	    isurf.vstart = vdom.v1;
+	    isurf.vend = vdom.v2;
+	    
+	    return isurf;
+	}
+	
     }
+    
     public static class SurfaceProxy extends Surface{
 	public static final String uuid = "4ED7D4E2-E947-11d3-BFE5-0010830122F0";
 	public UUID getClassUUID(){ return new UUID(uuid); }

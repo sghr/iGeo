@@ -51,13 +51,24 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     public IGLQuadMatrix quadMatrix=null;
     public IGLTriangles triangles=null;
     
+    public boolean initialized=false;
+    
+    
     public ISurfaceGraphicFillGL(ISurface srf){
 	super(srf);
+	surface = srf.surface;
 	//initSurface();
     }
     
     public ISurfaceGraphicFillGL(ISurfaceR srf){
 	super(srf);
+	surface = srf.surface;
+	//initSurface();
+    }
+    
+    public ISurfaceGraphicFillGL(IObject obj, ISurfaceI srf){
+	super(obj);
+	surface = srf;
 	//initSurface();
     }
     
@@ -76,11 +87,14 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     }
     
     public void initSurface(){
-	if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
-	else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
+	//if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
+	//else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
+	
 	if(!surface.hasTrim()||!surface.hasInnerTrim()&&surface.hasDefaultTrim())
 	    initWithoutTrim(); // initialize IGLQuadMatrix
 	else initWithTrim(); // initialize IGLTriangles
+	
+	initialized=true;
     }
     
     public void initWithoutTrim(){
@@ -351,7 +365,8 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     public boolean isDrawable(IGraphicMode m){ return m.isGL()&&m.isFill(); }
     
     public void draw(IGraphics g){
-	if(surface==null) initSurface(); // not initizlized at the constructor // shouldn't it?
+	//if(surface==null) initSurface(); // not initizlized at the constructor // shouldn't it?
+	if(!initialized) initSurface();
 	
 	GL gl = g.getGL();
 	if(gl!=null){

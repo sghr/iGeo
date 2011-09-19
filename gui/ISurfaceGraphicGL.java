@@ -44,12 +44,30 @@ public class ISurfaceGraphicGL extends IGraphicObject{
 
     public static float defaultShininess=0.3f; //0.5f; //1f; //5f; //1f; //0.1f; //0.5f; //1f;
     
-    
     public ISurfaceGraphicFillGL fill;
     public ISurfaceGraphicWireframeGL wireframe;
     
-    public ISurfaceGraphicGL(ISurface srf){ super(srf); }
-    public ISurfaceGraphicGL(ISurfaceR srf){ super(srf); }
+    public ISurfaceGraphicGL(ISurface srf){
+	super(srf);
+	
+	// fill and wireframe are instantiated here but actual geometry initialization is done at the first draw by each object
+	wireframe = new ISurfaceGraphicWireframeGL(srf);
+	fill = new ISurfaceGraphicFillGL(srf);
+    }
+    public ISurfaceGraphicGL(ISurfaceR srf){
+	super(srf);
+	
+	// fill and wireframe are instantiated here but actual geometry initialization is done at the first draw by each object
+	wireframe = new ISurfaceGraphicWireframeGL(srf);
+	fill = new ISurfaceGraphicFillGL(srf);	
+    }
+    
+    public ISurfaceGraphicGL(IObject obj, ISurfaceGeo srf){
+	super(obj);
+	// fill and wireframe are instantiated here but actual geometry initialization is done at the first draw by each object
+	wireframe = new ISurfaceGraphicWireframeGL(obj,srf);
+	fill = new ISurfaceGraphicFillGL(obj,srf);
+    }
     
     public void setColor(Color c){
 	super.setColor(c);
@@ -61,6 +79,7 @@ public class ISurfaceGraphicGL extends IGraphicObject{
     
     public void draw(IGraphics g){
 	if(g.view().mode().isWireframe()){
+	    /*
 	    if(wireframe==null){
 		if(parent instanceof ISurface)
 		    wireframe = new ISurfaceGraphicWireframeGL((ISurface)parent);
@@ -68,10 +87,12 @@ public class ISurfaceGraphicGL extends IGraphicObject{
 		    wireframe = new ISurfaceGraphicWireframeGL((ISurfaceR)parent);
 		wireframe.setColor(color);
 	    }
+	    */
 	    wireframe.draw(g);
 	}
 	
 	if(g.view().mode().isFill()){
+	    /*
 	    if(fill==null){
 		if(parent instanceof ISurface)
 		    fill = new ISurfaceGraphicFillGL((ISurface)parent);
@@ -79,6 +100,7 @@ public class ISurfaceGraphicGL extends IGraphicObject{
 		    fill = new ISurfaceGraphicFillGL((ISurfaceR)parent);
 		fill.setColor(color);
 	    }
+	    */
 	    fill.draw(g);
 	}
     }
