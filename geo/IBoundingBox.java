@@ -171,7 +171,7 @@ public class IBoundingBox{
 	
 	
 	if(objects.size()>1000) IOut.debug(10, "calculation of bounding box completed");
-	
+	IOut.debug(100, this);
 	
     }
     

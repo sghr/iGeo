@@ -503,8 +503,9 @@ public class IRhino3dmImporter extends IRhino3dm{
     }
     
     public static boolean isShortChunk(int header){
-	final int shortChunkMask = 0x80000000;
-	return (header & shortChunkMask) != 0;
+	//final int shortChunkMask = 0x80000000;
+	//return (header & shortChunkMask) != 0;
+	return (header & tcodeShort) != 0;
     }
     
     
@@ -513,78 +514,21 @@ public class IRhino3dmImporter extends IRhino3dm{
 	//final int chunkBodyLen = 4;
 	
 	int header = readInt32(is);
-	//IOut.err("header="+hex(header)); //
 	int body = readInt32(is);
 	
-	//IOut.println();//
-	//IOut.println("header: "+hex(header)); //
-	//IOut.println("body: "+hex(body)); //
+	if(isShortChunk(header) ||
+	   body==0 // added 20110924; some file use zero length in big chunk.
+	   ) return new Chunk(header,body); // short chunk
 	
-	if(isShortChunk(header)) return new Chunk(header,body); // short chunk
-	
-	if(body<=0){
+	if(body<0){
 	    IOut.err("length of content isn't positive: "+body);
 	    return null;
 	}
-	
-	//IOut.println("length: "+body); //
+	// if file is corrupted, body (byte length) would be enormous number
+	// max int is 2,147,483,647
 	byte[] content = read(is,body);
 	
-	//IOut.print("content: ");
-	//printAsciiOrHex(content,IOut.ps); //
-	//printHex(content,IOut.ps); //
-	//IOut.p();
-	
 	return new Chunk(header,body,content); // big chunk
-	
-	/*
-	byte[] chunkHeader = new byte[chunkHeaderLen];
-	byte[] chunkBody = new byte[chunkBodyLen];
-	
-	int res=0;
-	
-	if(is.read(chunkHeader, 0, chunkHeaderLen)<0){
-	    IOut.p("Read3dImporter.readChunk: End of File"); //
-	    return null;
-	}
-	if(is.read(chunkBody, 0, chunkBodyLen)<0){
-	    IOut.p("Read3dImporter.readChunk: ERROR: unexpected EOF"); //
-	    return null;
-	}
-	
-	int header = readInt32(chunkHeader);
-	int body = readInt32(chunkBody);
-	
-	IOut.print("header: "); //
-	IOut.println(Chunk.hex(header)); //
-	IOut.print("body: "); //
-	//IOut.println(Chunk.hex(chunkBody)); //
-	IOut.println(Chunk.hex(body)); //
-	
-	//if(!Chunk.isShortChunk(chunkHeader)){
-	if(!Chunk.isShortChunk(header)){
-	    // read a content after the body
-	    //int contentLength = readLittleEndianUnsignedInteger(chunkBody);
-	    int contentLength = body;
-	    
-	    IOut.print("length: "); //
-	    IOut.println(contentLength); //
-	    
-	    byte[] chunkContent = new byte[contentLength];
-	    
-	    int res=0;
-	    if((res = is.read(chunkContent, 0, contentLength))<0){
-		return null;
-	    }
-	    IOut.print("content: "); //
-	    //IOut.println(Chunk.asciiOrHex(chunkContent)); //
-	    Chunk.asciiOrHex(chunkContent); //
-	    //IOut.println(chunkContent); //
-	    return new Chunk(header, body, chunkContent);
-	}
-	return new Chunk(header, body);
-	*/
-	
     }
     
     
@@ -614,12 +558,12 @@ public class IRhino3dmImporter extends IRhino3dm{
 	do{
 	    try{
 		//IOut.p("reading chunk #"+i); //
-		
 		ck = readChunk(bais);
-		
 		//IOut.p("chunk #"+i+ " = "+ck); //
-		if(ck.header == endTCode) ck=null;
-
+		
+		if(ck==null){ IOut.err("no chunk is read"); return null; }
+		else if(ck.header == endTCode) ck=null;
+		
 		i++;
 	    }
 	    catch(EOFException e){
@@ -728,24 +672,25 @@ public class IRhino3dmImporter extends IRhino3dm{
     }
     
     static public RhinoObject readObject(Rhino3dmFile context, Chunk chunk){
-	//if(chunk==null){ IOut.p("no chunk found"); return null; }
-	//chunk = readNestedChunk(chunk);
-	
+		
 	if(chunk == null ||chunk.header!=tcodeOpenNurbsClass){
 	    IOut.err("no tcodeOpenNurbsClass block found");
 	    return null;
 	}
-	//IOut.p("nested chunk : \n"+chunk); //
+	
 	Chunk[] chunks = readChunkTable(chunk, tcodeOpenNurbsClassEnd);
-	//IOut.p("chunk table size = "+chunks.length); //
+	
+	if(chunks == null){
+	    IOut.err("chunk table is null");
+	    return null;
+	}
+	
 	try{
 	    for(int i=0; i<chunks.length-1; i++){
-		//IOut.p("chunks["+i+"] = \n"+chunks[i]); //
 		
 		if(chunks[i].header == tcodeOpenNurbsClassUUID){
 		    // read uuid
 		    UUID uuid = readUUID(chunks[i]);
-		    //IOut.debug(10,"UUID = "+uuid); //
 		    
 		    Class<? extends RhinoObject> cls = ClassRegistry.get(uuid);
 		    IOut.debug(10,"uuid class = "+cls); //
@@ -769,7 +714,7 @@ public class IRhino3dmImporter extends IRhino3dm{
 		    }
 		}
 		//else if(chunks[i].header == tcodeOpenNurbsClassUserData){ // user data
-		//} // skip
+		//} // skipped
 	    }
 	}
 	catch(EOFException e){
@@ -841,7 +786,7 @@ public class IRhino3dmImporter extends IRhino3dm{
     public static byte[] readInflate(InputStream is, int len)throws IOException{
 	
 	Chunk chunk = readChunk(is);
-	
+	if(chunk==null){ IOut.err("no chunk is read"); return null; }
 	if(chunk.header != tcodeAnonymousChunk) throw new IOException("invalid type code = "+hex(chunk.header));	
 	
 	if(chunk.body <= 4)  throw new IOException("chunk length is too short = "+chunk.body);
@@ -907,65 +852,69 @@ public class IRhino3dmImporter extends IRhino3dm{
 		try{
 		    chunk = readChunk(istream);
 		    
-		    switch(chunk.header){
+		    if(chunk==null){ IOut.err("chunk is null"); }
+		    else{
 			
-		    case tcodeStartSection:
-			readStartSection(chunk);
+			switch(chunk.header){
+			    
+			case tcodeStartSection:
+			    readStartSection(chunk);
+			    break;
+			case tcodePropertiesTable:
+			    readPropertiesTable(chunk);
+			    break;
+			case tcodeSettingsTable:
+			    readSettingsTable(chunk);
+			    break;
+			case tcodeBitmapTable:
+			    readBitmapTable(chunk);
+			    break;
+			case tcodeTextureMappingTable:
+			    readTextureMappingTable(chunk);
+			    break;
+			case tcodeMaterialTable:
+			    readMaterialTable(chunk);
+			    break;
+			case tcodeLinetypeTable:
+			    readLinetypeTable(chunk);
+			    break;
+			case tcodeLayerTable:
+			    readLayerTable(chunk);
+			    break;
+			case tcodeGroupTable:
+			    readGroupTable(chunk);
+			    break;
+			case tcodeFontTable:
+			    readFontTable(chunk);
 			break;
-		    case tcodePropertiesTable:
-			readPropertiesTable(chunk);
-			break;
-		    case tcodeSettingsTable:
-			readSettingsTable(chunk);
-			break;
-		    case tcodeBitmapTable:
-			readBitmapTable(chunk);
-			break;
-		    case tcodeTextureMappingTable:
-			readTextureMappingTable(chunk);
-			break;
-		    case tcodeMaterialTable:
-			readMaterialTable(chunk);
-			break;
-		    case tcodeLinetypeTable:
-			readLinetypeTable(chunk);
-			break;
-		    case tcodeLayerTable:
-			readLayerTable(chunk);
-			break;
-		    case tcodeGroupTable:
-			readGroupTable(chunk);
-			break;
-		    case tcodeFontTable:
-			readFontTable(chunk);
-			break;
-		    case tcodeDimStyleTable:
-			readDimStyleTable(chunk);
-			break;
-		    case tcodeLightTable:
-			readLightTable(chunk);
-			break;
-		    case tcodeHatchPatternTable:
-			readHatchPatternTable(chunk);
-			break;
-		    case tcodeInstanceDefinitionTable:
-			readInstanceDefinitionTable(chunk);
-			break;
-		    case tcodeObjectTable:
-			readObjectTable(chunk);
-			break;
-		    case tcodeHistoryRecordTable:
-			readHistoryRecordTable(chunk);
-			break;
-		    case tcodeUserTable:
-			readUserDataTable(chunk);
-			break;
-		    case tcodeEndOfFile:
-			readEndMark(chunk);
-			break;
-			
-		    default:
-			IOut.err("unknown type code: "+hex(chunk.header));
+			case tcodeDimStyleTable:
+			    readDimStyleTable(chunk);
+			    break;
+			case tcodeLightTable:
+			    readLightTable(chunk);
+			    break;
+			case tcodeHatchPatternTable:
+			    readHatchPatternTable(chunk);
+			    break;
+			case tcodeInstanceDefinitionTable:
+			    readInstanceDefinitionTable(chunk);
+			    break;
+			case tcodeObjectTable:
+			    readObjectTable(chunk);
+			    break;
+			case tcodeHistoryRecordTable:
+			    readHistoryRecordTable(chunk);
+			    break;
+			case tcodeUserTable:
+			    readUserDataTable(chunk);
+			    break;
+			case tcodeEndOfFile:
+			    readEndMark(chunk);
+			    break;
+			    
+			default:
+			    IOut.err("unknown type code: "+hex(chunk.header));
+			}
 		    }
 		}
 		catch(EOFException e){
@@ -974,22 +923,12 @@ public class IRhino3dmImporter extends IRhino3dm{
 		}
 		catch(IOException e){ e.printStackTrace(); chunk=null; }
 		
-		//IOut.p("");
-		
-		if(chunk!=null){
-		    //chunkNum++;
-		    //IOut.p("chunk #"+chunkNum); //
-		    //chunk.print();
-		}
-		
 	    }while(chunk!=null);
 	    
 	    
 	}catch(IOException e){ e.printStackTrace(); }
 	
     }
-    
-    
     
     
     
@@ -1816,7 +1755,6 @@ public class IRhino3dmImporter extends IRhino3dm{
 	IOut.debug(10,"Rhino3dmImporter.readFontTable"); //
 	
 	Chunk[] chunks = readChunkTable(chunk);
-	
 	if(chunks==null) return; // no texture
 	
 	ArrayList<Font> fonts = new ArrayList<Font>();
@@ -2071,8 +2009,6 @@ public class IRhino3dmImporter extends IRhino3dm{
 	}
 	
 	Chunk[] chunks = readChunkTable(chunk, tcodeObjectRecordEnd);
-	
-	
 	if(chunks==null){
 	    IOut.err("no table item is found");
 	    return null; // ?
@@ -2166,7 +2102,7 @@ public class IRhino3dmImporter extends IRhino3dm{
     public void readUserDataTable(Chunk chunk){
 	IOut.debug(10,"Rhino3dmImporter.readUserDataTable"); //
 	Chunk[] chunks = readChunkTable(chunk);
-	if(chunks==null) return; // no dimstyle
+	if(chunks==null) return; // no user data
 	
 	ArrayList<UserData> userData = new ArrayList<UserData>();
 	
@@ -2176,6 +2112,19 @@ public class IRhino3dmImporter extends IRhino3dm{
 	}
 	
 	if(userData.size()>0) file.userData = userData.toArray(new UserData[userData.size()]);
+	/*
+	  80800020
+	  14000000
+	  4818A83A
+	  3556BB41
+	  ABDB0EC0
+	  69BC5519
+	  36D91A7D
+	  81000020
+	  00000000
+	  FFFFFFFF00000000
+	*/
+	
     }
     
     public UserData readUserData(Chunk chunk){

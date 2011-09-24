@@ -35,28 +35,37 @@ import igeo.gui.*;
 */
 public class ICylinder extends ISurface{
     public IVec pt1, pt2;
-    public double radius;
+    public double radius1, radius2;
     
     public ICylinder(IVec pt1, IVec pt2, double radius){
-	this(null,pt1,pt2,radius);
+	this(null,pt1,pt2,radius,radius);
     }
     public ICylinder(IServerI s, IVec pt1, IVec pt2, double radius){
+	this(s,pt1,pt2,radius,radius);
+    }
+
+    public ICylinder(IVec pt1, IVec pt2, double radius1, double radius2){
+	this(null,pt1,pt2,radius1,radius2);
+    }
+    public ICylinder(IServerI s, IVec pt1, IVec pt2, double radius1, double radius2){
 	super(s);
-	this.pt1 = pt1; this.pt2 = pt2; this.radius = radius;
+	this.pt1 = pt1; this.pt2 = pt2;
+	this.radius1 = radius1;
+	this.radius2 = radius2;
 	initCylinder(s);
     }
     
     public void initCylinder(IServerI s){
 	IVec normal = pt2.diff(pt1);
 	IVec[][] cpts = new IVec[2][];
-	cpts[0] = ICircleGeo.circleCP(pt1,normal,radius);
-	cpts[1] = ICircleGeo.circleCP(pt2,normal,radius);
+	cpts[0] = ICircleGeo.circleCP(pt1,normal,radius1);
+	cpts[1] = ICircleGeo.circleCP(pt2,normal,radius2);
 	surface = new ISurfaceGeo(cpts, 1,ICircleGeo.circleDeg(),
 				  INurbsGeo.createKnots(1,2),
 				  ICircleGeo.circleKnots());
 	//IVec roll = normal.cross(IVec.zaxis);
-	//cpts[0] = ICircleGeo.circleCPApprox(pt1,normal,roll,radius,radius);
-	//cpts[1] = ICircleGeo.circleCPApprox(pt2,normal,roll,radius,radius);
+	//cpts[0] = ICircleGeo.circleCPApprox(pt1,normal,roll,radius1,radius1);
+	//cpts[1] = ICircleGeo.circleCPApprox(pt2,normal,roll,radius2,radius2);
 	//surface = new ISurfaceGeo(cpts, 1, ICircleGeo.circleDeg());
 	super.initSurface(s);
     }

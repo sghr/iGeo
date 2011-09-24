@@ -383,6 +383,27 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public IVec mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
     
     
+    public IVec shear(double sxy, double syx, double syz, double szy, double szx, double sxz){
+	double tx,ty,tz;
+	tx =     x + sxy*y + sxz*z;
+	ty = syx*x +     y + syz*z;
+	tz = szx*x + szy*y +     z;
+	x = tx; y = ty; z = tz;
+	return this;
+    }
+    public IVec shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+		      IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	return shear(sxy.x(),syx.x(),syz.x(),szy.x(),szx.x(),sxz.x());
+    }
+    public IVec shear(IVecI center, double sxy, double syx, double syz, double szy, double szx, double sxz){
+	if(center==this) return this;
+	return sub(center).shear(sxy,syx,syz,szy,szx,sxz).add(center);
+    }
+    public IVec shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz, IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	return shear(center,sxy.x(),syx.x(),syz.x(),szy.x(),szx.x(),sxz.x());
+    }
+    
+    
     public IVec transform(IMatrix3I mat){ return set(mat.mul(this)); }
     public IVec transform(IMatrix4I mat){ return set(mat.mul(this)); }
     
