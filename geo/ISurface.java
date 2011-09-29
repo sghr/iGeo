@@ -114,6 +114,22 @@ public class ISurface extends IObject implements ISurfaceI{
 	surface = new ISurfaceGeo(xyzValues,udeg,vdeg,closeU,closeV); initSurface(null); 
     }
     
+    public ISurface(ICurveI trimCurve){
+	surface = new ISurfaceGeo(trimCurve); initSurface(null);
+    }
+    public ISurface(ICurveI[] trimCurves){
+	surface = new ISurfaceGeo(trimCurves); initSurface(null);
+    }
+    public ISurface(IVecI[] trimCrvPts){
+	surface = new ISurfaceGeo(trimCrvPts); initSurface(null);
+    }
+    public ISurface(IVecI[] trimCrvPts, int trimCrvDeg){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg); initSurface(null);
+    }
+    public ISurface(IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, trimCrvKnots); initSurface(null);
+    }
+    
     
     //public ISurface(ISurfaceGeo srf){ surface = new ISurfaceGeo(srf); initSurface(null); }
     public ISurface(ISurfaceGeo srf){ surface = srf; initSurface(null); }
@@ -202,6 +218,23 @@ public class ISurface extends IObject implements ISurfaceI{
 	super(s); surface = new ISurfaceGeo(xyzValues,udeg,vdeg,closeU,closeV); initSurface(s); 
     }
     
+    public ISurface(IServerI s, ICurveI trimCurve){
+	super(s); surface = new ISurfaceGeo(trimCurve); initSurface(s);
+    }
+    public ISurface(IServerI s, ICurveI[] trimCurves){
+	super(s); surface = new ISurfaceGeo(trimCurves); initSurface(s);
+    }
+    public ISurface(IServerI s, IVecI[] trimCrvPts){
+	super(s); surface = new ISurfaceGeo(trimCrvPts); initSurface(s);
+    }
+    public ISurface(IServerI s, IVecI[] trimCrvPts, int trimCrvDeg){
+	super(s); surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg); initSurface(s);
+    }
+    public ISurface(IServerI s, IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots){
+	super(s); surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, trimCrvKnots); initSurface(s);
+    }
+    
+    
     //public ISurface(IServerI s, ISurfaceGeo srf){ super(s); surface = new ISurfaceGeo(srf); initSurface(s); }
     public ISurface(IServerI s, ISurfaceGeo srf){ super(s); surface = srf; initSurface(s); }
     
@@ -270,18 +303,38 @@ public class ISurface extends IObject implements ISurfaceI{
     public IVec vtan(double u, double v){ return surface.vtan(u,v); }
     //public void vtan(double u, double v, IVec retval){ surface.vtan(u,v,retval); }
     
+    /** alias of nml */
     public IVec normal(IVec2I v){ return surface.normal(v); }
+    /** alias of nml */
     public IVec normal(IDoubleI u, IDoubleI v){ return surface.normal(u,v); }
+    /** alias of nml */
     public IVec normal(double u, double v){ return surface.normal(u,v); }
     //public void normal(double u, double v, IVec retval){ surface.normal(u,v,retval); }
+    /** alias of nml */
     public IVec nrml(IVec2I v){ return surface.nrml(v); }
+    /** alias of nml */
     public IVec nrml(IDoubleI u, IDoubleI v){ return surface.nrml(u,v); }
+    /** alias of nml */
     public IVec nrml(double u, double v){ return surface.nrml(u,v); }
+
+    /** getting normal vector */
+    public IVec nml(IVec2I v){ return surface.nml(v); }
+    /** getting normal vector */
+    public IVec nml(IDoubleI u, IDoubleI v){ return surface.nml(u,v); }
+    /** getting normal vector */
+    public IVec nml(double u, double v){ return surface.nml(u,v); }
     
-    public IVec cp(int i, int j){ return surface.cp(i,j); }
+    
+    /** getting control point at i and j */
+    public IVec cp(int i, int j){ return surface.cp(i,j).get(); }
+    /** getting control point at i and j */
     public IVecI cp(IIntegerI i, IIntegerI j){ return surface.cp(i,j); }
+
+    public IVecI[][] cps(){ return surface.cps(); }
     
+    /** getting edit point at i and j */
     public IVec ep(int i, int j){ return surface.ep(i,j); }
+    /** getting edit point at i and j */
     public IVec ep(IIntegerI i, IIntegerI j){ return surface.ep(i,j); }
     
     public IVec corner(int i, int j){ return surface.corner(i,j); }
@@ -294,6 +347,13 @@ public class ISurface extends IObject implements ISurfaceI{
     public IDouble uknot(IIntegerI i){ return surface.uknot(i); }
     public double vknot(int i){ return surface.vknot(i); }
     public IDouble vknot(IIntegerI i){ return surface.vknot(i); }
+    
+    public double[] uknots(){ return surface.uknots(); }
+    public double[] vknots(){ return surface.vknots(); }
+    public double[] uknots(ISwitchE e){ return uknots(); }
+    public double[] vknots(ISwitchE e){ return vknots(); }
+    public IDoubleI[] uknots(ISwitchR r){ return surface.uknots(r); }
+    public IDoubleI[] vknots(ISwitchR r){ return surface.vknots(r); }
     
     public int uknotNum(){ return surface.uknotNum(); }
     public int vknotNum(){ return surface.vknotNum(); }
@@ -369,6 +429,18 @@ public class ISurface extends IObject implements ISurfaceI{
     public IDouble uend(ISwitchR r){ return new IDouble(uend()); }
     public IDouble vstart(ISwitchR r){ return new IDouble(vstart()); }
     public IDouble vend(ISwitchR r){ return new IDouble(vend()); }
+
+    /** reverse U parameter internally without creating a new instance */
+    public ISurface revU(){ surface.revU(); return this; }
+    /** reverse V parameter internally without creating a new instance */
+    public ISurface revV(){ surface.revV(); return this; }
+    /** reverse U and V parameter internally without creating a new instance */
+    public ISurface revUV(){ surface.revUV(); return this; }
+    /** reverse normal direction by reversing V direction (UV and normal is dependent */
+    public ISurface revN(){ surface.revN(); return this; }
+    /** swap U and V parameter */
+    public ISurface swapUV(){ surface.swapUV(); return this; }
+    
     
     public boolean hasTrim(){ return surface.hasTrim(); }
     //public IBool hasTrimR(){ return surface.hasTrimR(); }
@@ -467,6 +539,165 @@ public class ISurface extends IObject implements ISurfaceI{
     public boolean isFlat(ISwitchE e){ return isFlat(); }
     public IBool isFlat(ISwitchR r){ return new IBool(isFlat()); }
     
+    
+    
+    /*********************************************************************************
+     * transformation methods; API of ITransformable interface
+     *********************************************************************************/
+    
+    public ISurface add(double x, double y, double z){ surface.add(x,y,z); return this; }
+    public ISurface add(IDoubleI x, IDoubleI y, IDoubleI z){ surface.add(x,y,z); return this; }
+    public ISurface add(IVecI v){ surface.add(v); return this; }
+    public ISurface sub(double x, double y, double z){ surface.sub(x,y,z); return this; }
+    public ISurface sub(IDoubleI x, IDoubleI y, IDoubleI z){ surface.sub(x,y,z); return this; }
+    public ISurface sub(IVecI v){ surface.sub(v); return this; }
+    public ISurface mul(IDoubleI v){ surface.mul(v); return this; }
+    public ISurface mul(double v){ surface.mul(v); return this; }
+    public ISurface div(IDoubleI v){ surface.div(v); return this; }
+    public ISurface div(double v){ surface.div(v); return this; }
+    
+    public ISurface neg(){ surface.neg(); return this; }
+    /** alias of neg */
+    public ISurface flip(){ return neg(); }
+    
+    
+    /** scale add */
+    public ISurface add(IVecI v, double f){ surface.add(v,f); return this; }
+    public ISurface add(IVecI v, IDoubleI f){ surface.add(v,f); return this; }
+    
+    public ISurface rot(IVecI axis, IDoubleI angle){ surface.rot(axis,angle); return this; }
+    public ISurface rot(IVecI axis, double angle){ surface.rot(axis,angle); return this; }
+    
+    public ISurface rot(IVecI center, IVecI axis, IDoubleI angle){ surface.rot(center,axis,angle); return this; }
+    public ISurface rot(IVecI center, IVecI axis, double angle){ surface.rot(center,axis,angle); return this; }
+    
+    /** rotate to destination direction vector */
+    public ISurface rot(IVecI axis, IVecI destDir){ surface.rot(axis,destDir); return this; }
+    /** rotate to destination point location */    
+    public ISurface rot(IVecI center, IVecI axis, IVecI destPt){ surface.rot(center,axis,destPt); return this; }
+    
+    
+    /** alias of mul */
+    public ISurface scale(IDoubleI f){ return mul(f); }
+    public ISurface scale(double f){ return mul(f); }
+    public ISurface scale(IVecI center, IDoubleI f){ surface.scale(center,f); return this; }
+    public ISurface scale(IVecI center, double f){ surface.scale(center,f); return this; }
+
+    /** scale only in 1 direction */
+    public ISurfaceI scale1d(IVecI axis, double f){ surface.scale1d(axis,f); return this; }
+    public ISurfaceI scale1d(IVecI axis, IDoubleI f){ surface.scale1d(axis,f); return this; }
+    public ISurfaceI scale1d(IVecI center, IVecI axis, double f){
+	surface.scale1d(center,axis,f); return this;
+    }
+    public ISurfaceI scale1d(IVecI center, IVecI axis, IDoubleI f){
+	surface.scale1d(center,axis,f); return this;
+    }
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public ISurface ref(IVecI planeDir){ surface.ref(planeDir); return this; }
+    public ISurface ref(IVecI center, IVecI planeDir){ surface.ref(center,planeDir); return this; }
+    /** mirror is alias of ref */
+    public ISurface mirror(IVecI planeDir){ return ref(planeDir); }
+    public ISurface mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
+    
+    /** shear operation */
+    public ISurface shear(double sxy, double syx, double syz,
+			  double szy, double szx, double sxz){
+	surface.shear(sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    
+    public ISurface shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			  IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	surface.shear(sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public ISurface shear(IVecI center, double sxy, double syx, double syz,
+			  double szy, double szx, double sxz){
+	surface.shear(center,sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public ISurface shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			  IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	surface.shear(center,sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    
+    public ISurface shearXY(double sxy, double syx){
+	surface.shearXY(sxy,syx); return this;
+    }
+    public ISurface shearXY(IDoubleI sxy, IDoubleI syx){
+	surface.shearXY(sxy,syx); return this;
+    }	
+    public ISurface shearXY(IVecI center, double sxy, double syx){
+	surface.shearXY(center,sxy,syx); return this;
+    }
+    public ISurface shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	surface.shearXY(center,sxy,syx); return this;
+    }
+    
+    public ISurface shearYZ(double syz, double szy){
+	surface.shearYZ(syz,szy); return this;
+    }
+    public ISurface shearYZ(IDoubleI syz, IDoubleI szy){
+	surface.shearYZ(syz,szy); return this;
+    }
+    public ISurface shearYZ(IVecI center, double syz, double szy){
+	surface.shearYZ(center,syz,szy); return this;
+    }
+    public ISurface shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	surface.shearYZ(center,syz,szy); return this;
+    }
+    
+    public ISurface shearZX(double szx, double sxz){
+	surface.shearZX(szx,sxz); return this;
+    }
+    public ISurface shearZX(IDoubleI szx, IDoubleI sxz){
+	surface.shearZX(szx,sxz); return this;
+    }
+    public ISurface shearZX(IVecI center, double szx, double sxz){
+	surface.shearZX(center,szx,sxz); return this;
+    }
+    public ISurface shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	surface.shearZX(center,szx,sxz); return this;
+    }
+    
+    
+    /** mv() is alias of add() */
+    public ISurface mv(double x, double y, double z){ return add(x,y,z); }
+    public ISurface mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ISurface mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public ISurface cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public ISurface cp(double x, double y, double z){ return dup().add(x,y,z); }
+    /** cp() is alias of dup().add() */
+    public ISurface cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    /** cp() is alias of dup().add() */
+    public ISurface cp(IVecI v){ return dup().add(v); }
+    
+    /** translate() is alias of add() */
+    public ISurface translate(double x, double y, double z){ return add(x,y,z); }
+    public ISurface translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ISurface translate(IVecI v){ return add(v); }
+    
+    public ISurface transform(IMatrix3I mat){ surface.transform(mat); return this; }
+    public ISurface transform(IMatrix4I mat){ surface.transform(mat); return this; }
+    public ISurface transform(IVecI xvec, IVecI yvec, IVecI zvec){
+	surface.transform(xvec,yvec,zvec); return this;
+    }
+    public ISurface transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
+	surface.transform(xvec,yvec,zvec,translate); return this;
+    }
+    
+    
+    /*********************************************************************************
+     * methods of IObject
+     *********************************************************************************/
     
     public ISurface name(String nm){ super.name(nm); return this; }
     public ISurface layer(ILayer l){ super.layer(l); return this; }

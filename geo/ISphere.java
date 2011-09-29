@@ -34,8 +34,8 @@ import igeo.gui.*;
    @version 0.7.0.0;
 */
 public class ISphere extends ISurface{
-    public IVec center;
-    public double radius;
+    public IVecI center;
+    public IDoubleI radius;
     
     public static double[] sphereKnots(){
 	return new double[]{ 0.,0.,0.,.5,.5,1.,1.,1. };
@@ -49,10 +49,19 @@ public class ISphere extends ISurface{
 	this(s,new IVec(x,y,z),radius);
     }
     
-    public ISphere(IVec center, double radius){
+    public ISphere(IVecI center, double radius){
 	this(null,center,radius);
     }
-    public ISphere(IServerI s, IVec center, double radius){
+    
+    public ISphere(IServerI s, IVecI center, double radius){
+	this(s,center,new IDouble(radius));
+    }
+    
+    public ISphere(IVecI center, IDoubleI radius){
+	this(null,center,radius);
+    }
+    
+    public ISphere(IServerI s, IVecI center, IDoubleI radius){
 	super(s);
 	this.center = center; this.radius = radius;
 	initSphere(s);
@@ -61,21 +70,23 @@ public class ISphere extends ISurface{
     public void initSphere(IServerI s){
 	IVec4[][] cpts = new IVec4[9][5];
 	double sqrt2 = Math.sqrt(2)/2;
+	double r = radius.x();
+	IVec cnt = center.get();
 	
-	IVec4 tpt = center.to4d().add(0,0,radius);
+	IVec4 tpt = cnt.to4d().add(0,0,r);
 	IVec4 tptw = tpt.dup(); tptw.w = sqrt2;
-	IVec4 bpt = center.to4d().add(0,0,-radius);
+	IVec4 bpt = cnt.get().to4d().add(0,0,-r);
 	IVec4 bptw = bpt.dup(); bptw.w = sqrt2;
-	IVec4[] circlePts = ICircleGeo.circleCP(center,new IVec(0,0,1),radius);
+	IVec4[] circlePts = ICircleGeo.circleCP(cnt,new IVec(0,0,1),r);
 	
 	for(int i=0; i<cpts.length; i++){
-	    if(i%2==0) cpts[i][0] = bpt; else cpts[i][0] = bptw;
-	    cpts[i][1] = circlePts[i].dup().add(0,0,-radius);
+	    if(i%2==0) cpts[i][0] = bpt.dup(); else cpts[i][0] = bptw.dup();
+	    cpts[i][1] = circlePts[i].dup().add(0,0,-r);
 	    cpts[i][1].w *= sqrt2;
 	    cpts[i][2] = circlePts[i];
-	    cpts[i][3] = circlePts[i].dup().add(0,0,radius);
+	    cpts[i][3] = circlePts[i].dup().add(0,0,r);
 	    cpts[i][3].w *= sqrt2;
-	    if(i%2==0) cpts[i][4] = tpt; else cpts[i][4] = tptw;
+	    if(i%2==0) cpts[i][4] = tpt.dup(); else cpts[i][4] = tptw.dup();
 	}
 	
 	surface = new ISurfaceGeo(cpts,

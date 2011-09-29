@@ -82,21 +82,22 @@ public class INurbsGeo extends IParameterObject{
 	return knots; 
     }
     
-    public static IVecI[] createClosedControlPoints(IVecI[] cpts, int degree){
+    public static IVecI[] createClosedCP(IVecI[] cpts, int degree){
 	int headNum = (degree-1)/2;
 	int tailNum = degree/2 + 1;
 	int len = cpts.length;
 	
 	if(cpts[0]==cpts[cpts.length-1] || cpts[0].eq(cpts[cpts.length-1])){
+	    if(cpts[0]==cpts[cpts.length-1]) cpts[cpts.length-1] = cpts[0].dup();
 	    if(degree==1) return cpts;
 	    len--;
 	}
 	
 	IVecI[] cpts2 = new IVecI[len+degree];
 	for(int i=0; i<cpts2.length; i++){
-	    if(i<headNum) cpts2[i] = cpts[(i-headNum+len)%len];
+	    if(i<headNum) cpts2[i] = cpts[(i-headNum+len)%len].dup();
 	    else if(i<cpts2.length-tailNum) cpts2[i] = cpts[i-headNum];
-	    else cpts2[i] = cpts[(i-(cpts2.length-tailNum))%len];
+	    else cpts2[i] = cpts[(i-(cpts2.length-tailNum))%len].dup(); // tail
 	}
 	return cpts2;
 	
@@ -123,6 +124,69 @@ public class INurbsGeo extends IParameterObject{
 	}
 	return cpts2;
 	*/
+    }
+    
+    
+    // close in U direction
+    public static IVecI[][] createClosedCPInU(IVecI[][] cpts, int udeg){
+	int headNum = (udeg-1)/2;
+	int tailNum = udeg/2 + 1;
+	int ulen = cpts.length;
+	int vlen = cpts[0].length;
+	boolean isEdgeClosed=true;
+	for(int i=0; i<vlen && isEdgeClosed; i++){
+	    if(cpts[0][i]!=cpts[ulen-1][i] && !cpts[0][i].eq(cpts[ulen-1][i])){
+		isEdgeClosed=false;
+	    }
+	}
+	if(isEdgeClosed){
+	    if(udeg==1){
+		for(int i=0; i<vlen ; i++)
+		    if(cpts[0][i] == cpts[ulen-1][i]) cpts[ulen-1][i] = cpts[0][i].dup();
+		return cpts;
+	    }
+	    ulen--;
+	}
+	IVecI[][] cpts2 = new IVecI[ulen+udeg][vlen];
+	for(int i=0; i<cpts2.length; i++){
+	    for(int j=0; j<vlen; j++){
+		if(i<headNum) cpts2[i][j] = cpts[(i-headNum+ulen)%ulen][j].dup();
+		else if(i<cpts2.length-tailNum) cpts2[i][j] = cpts[i-headNum][j];
+		else cpts2[i][j] = cpts[(i-(cpts2.length-tailNum))%ulen][j].dup(); // tail
+	    }
+	}
+	return cpts2;
+    }
+    
+    // close in V direction
+    public static IVecI[][] createClosedCPInV(IVecI[][] cpts, int vdeg){
+	int headNum = (vdeg-1)/2;
+	int tailNum = vdeg/2 + 1;
+	int ulen = cpts.length;
+	int vlen = cpts[0].length;
+	boolean isEdgeClosed=true;
+	for(int i=0; i<ulen && isEdgeClosed; i++){
+	    if(cpts[i][0]!=cpts[i][vlen-1] && !cpts[i][0].eq(cpts[i][vlen-1])){
+		isEdgeClosed=false;
+	    }
+	}
+	if(isEdgeClosed){
+	    if(vdeg==1){
+		for(int i=0; i<ulen ; i++)
+		    if(cpts[i][0] == cpts[i][vlen-1]) cpts[i][vlen-1] = cpts[i][0].dup();
+		return cpts;
+	    }
+	    vlen--;
+	}
+	IVecI[][] cpts2 = new IVecI[ulen][vlen+vdeg];
+	for(int i=0; i<ulen; i++){
+	    for(int j=0; j<cpts2[i].length; j++){
+		if(j<headNum) cpts2[i][j] = cpts[i][(j-headNum+vlen)%vlen].dup();
+		else if(j<cpts2[i].length-tailNum) cpts2[i][j] = cpts[i][j-headNum];
+		else cpts2[i][j] = cpts[i][(j-(cpts2[i].length-tailNum))%vlen].dup(); // tail
+	    }
+	}
+	return cpts2;
     }
     
     

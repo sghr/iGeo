@@ -28,7 +28,7 @@ package igeo.geo;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public interface ISurfaceI extends ISurfaceOp{
+public interface ISurfaceI extends ISurfaceOp, ITransformable{
     
     /**
        @return fixed value but in wrapper class
@@ -66,10 +66,17 @@ public interface ISurfaceI extends ISurfaceOp{
     public IVecI nrml(IDoubleI u, IDoubleI v);
     public IVecI nrml(IVec2I uv);
     
+    /** alias of normal */
+    public IVecI nml(double u, double v);
+    public IVecI nml(IDoubleI u, IDoubleI v);
+    public IVecI nml(IVec2I uv);
+    
     
     
     public IVecI cp(int i, int j);
     public IVecI cp(IIntegerI i, IIntegerI j);
+    
+    public IVecI[][] cps();
     
     public IVecI corner(int u, int v);
     public IVecI corner(IIntegerI u, IIntegerI v);
@@ -84,6 +91,14 @@ public interface ISurfaceI extends ISurfaceOp{
     public IDoubleI uknot(IIntegerI i);
     public /*IDoubleI*/ double vknot(int i);
     public IDoubleI vknot(IIntegerI i);
+
+    public double[] uknots();
+    public double[] uknots(ISwitchE e);
+    public IDoubleI[] uknots(ISwitchR r);
+    
+    public double[] vknots();
+    public double[] vknots(ISwitchE e);
+    public IDoubleI[] vknots(ISwitchR r);
     
     public int uknotNum();
     public int vknotNum();
@@ -167,6 +182,17 @@ public interface ISurfaceI extends ISurfaceOp{
     public IDoubleI uend(ISwitchR r);
     public IDoubleI vstart(ISwitchR r);
     public IDoubleI vend(ISwitchR r);
+    
+    /** reverse U parameter internally without creating a new instance */
+    public ISurfaceI revU();
+    /** reverse V parameter internally without creating a new instance */
+    public ISurfaceI revV();
+    /** reverse U and V parameter internally without creating a new instance */
+    public ISurfaceI revUV();
+    /** reverse normal direction by reversing V direction (UV and normal is dependent */
+    public ISurfaceI revN();
+    /** swap U and V parameter */
+    public ISurfaceI swapUV();
     
     
     // trim
@@ -261,5 +287,117 @@ public interface ISurfaceI extends ISurfaceOp{
     
     //public boolean isUClosed();
     //public boolean isVClosed();
+    
+    /**************************************************************************************
+     * transformation methods; API of ITransformable interface
+     *************************************************************************************/
+    
+    public ISurfaceI add(double x, double y, double z);
+    public ISurfaceI add(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ISurfaceI add(IVecI v);
+    public ISurfaceI sub(double x, double y, double z);
+    public ISurfaceI sub(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ISurfaceI sub(IVecI v);
+    public ISurfaceI mul(IDoubleI v);
+    public ISurfaceI mul(double v);
+    public ISurfaceI div(IDoubleI v);
+    public ISurfaceI div(double v);
+    
+    public ISurfaceI neg();
+    /** same with neg */
+    //public ISurfaceI rev(); // rev is used in curve to revrse u parameter
+    
+    public ISurfaceI flip();
+    
+    
+    
+    /** scale add */
+    public ISurfaceI add(IVecI v, double f);
+    public ISurfaceI add(IVecI v, IDoubleI f); 
+    
+    public ISurfaceI rot(IVecI axis, IDoubleI angle);
+    public ISurfaceI rot(IVecI axis, double angle);
+    
+    public ISurfaceI rot(IVecI center, IVecI axis, IDoubleI angle);
+    public ISurfaceI rot(IVecI center, IVecI axis, double angle);
+    
+    /** rotate to destination direction vector */
+    public ISurfaceI rot(IVecI axis, IVecI destDir);
+    /** rotate to destination point location */    
+    public ISurfaceI rot(IVecI center, IVecI axis, IVecI destPt);
+    
+    
+    /** alias of mul */
+    public ISurfaceI scale(IDoubleI f);
+    public ISurfaceI scale(double f);
+    public ISurfaceI scale(IVecI center, IDoubleI f);
+    public ISurfaceI scale(IVecI center, double f);
+    
+    /** scale only in 1 direction */
+    public ISurfaceI scale1d(IVecI axis, double f);
+    public ISurfaceI scale1d(IVecI axis, IDoubleI f);
+    public ISurfaceI scale1d(IVecI center, IVecI axis, double f);
+    public ISurfaceI scale1d(IVecI center, IVecI axis, IDoubleI f);
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public ISurfaceI ref(IVecI planeDir);
+    public ISurfaceI ref(IVecI center, IVecI planeDir);
+    /** mirror is alias of ref */
+    public ISurfaceI mirror(IVecI planeDir);
+    public ISurfaceI mirror(IVecI center, IVecI planeDir);
+    
+    
+    /** shear operation */
+    public ISurfaceI shear(double sxy, double syx, double syz,
+				double szy, double szx, double sxz);
+    public ISurfaceI shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+				IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    public ISurfaceI shear(IVecI center, double sxy, double syx, double syz,
+				double szy, double szx, double sxz);
+    public ISurfaceI shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+				IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    
+    public ISurfaceI shearXY(double sxy, double syx);
+    public ISurfaceI shearXY(IDoubleI sxy, IDoubleI syx);
+    public ISurfaceI shearXY(IVecI center, double sxy, double syx);
+    public ISurfaceI shearXY(IVecI center, IDoubleI sxy, IDoubleI syx);
+    
+    public ISurfaceI shearYZ(double syz, double szy);
+    public ISurfaceI shearYZ(IDoubleI syz, IDoubleI szy);
+    public ISurfaceI shearYZ(IVecI center, double syz, double szy);
+    public ISurfaceI shearYZ(IVecI center, IDoubleI syz, IDoubleI szy);
+    
+    public ISurfaceI shearZX(double szx, double sxz);
+    public ISurfaceI shearZX(IDoubleI szx, IDoubleI sxz);
+    public ISurfaceI shearZX(IVecI center, double szx, double sxz);
+    public ISurfaceI shearZX(IVecI center, IDoubleI szx, IDoubleI sxz);
+    
+    /** mv() is alias of add() */
+    public ISurfaceI mv(double x, double y, double z);
+    public ISurfaceI mv(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ISurfaceI mv(IVecI v);
+    
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public ISurfaceI cp();
+    
+    /** cp() is alias of dup().add() */
+    public ISurfaceI cp(double x, double y, double z);
+    public ISurfaceI cp(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ISurfaceI cp(IVecI v);
+    
+    
+    /** translate() is alias of add() */
+    public ISurfaceI translate(double x, double y, double z);
+    public ISurfaceI translate(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ISurfaceI translate(IVecI v);
+    
+    
+    public ISurfaceI transform(IMatrix3I mat);
+    public ISurfaceI transform(IMatrix4I mat);
+    public ISurfaceI transform(IVecI xvec, IVecI yvec, IVecI zvec);
+    public ISurfaceI transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate);
+    
     
 }

@@ -40,26 +40,18 @@ public class ICircleGeo extends ICurveGeo{
 	return new double[]{ 0.,0.,0.,.25,.25,.5,.5,.75,.75,1.,1.,1. };
     }
     
-    public static IVec4[] circleCP(IVec center,
-				   double radius){
+    public static IVec4[] circleCP(IVec center, double radius){
 	return circleCP(center,IVec.zaxis,null,radius,radius);
     }
-    public static IVec4[] circleCP(IVec center,
-				   IVec normal,
-				   double radius){
+    public static IVec4[] circleCP(IVec center, IVec normal, double radius){
 	return circleCP(center,normal,null,radius,radius);
     }
-    public static IVec4[] circleCP(IVec center,
-				   IVec normal,
-				   IVec rollDir,
-				   double radius){
+    public static IVec4[] circleCP(IVec center, IVec normal,
+				   IVec rollDir, double radius){
 	return circleCP(center,normal,rollDir,radius,radius);
     }
-    public static IVec4[] circleCP(IVec center,
-				   IVec normal,
-				   IVec rollDir,
-				   double xradius,
-				   double yradius){
+    public static IVec4[] circleCP(IVec center, IVec normal, IVec rollDir,
+				   double xradius, double yradius){
 	//IOut.err("center = "+center);
 	//IOut.err("normal = "+normal);
 	//IOut.err("rollDir = "+rollDir);
@@ -94,8 +86,7 @@ public class ICircleGeo extends ICurveGeo{
 	cpts[5].sub(x).sub(y).w = sqrt2;
 	cpts[6].sub(y);
 	cpts[7].add(x).sub(y).w = sqrt2;
-	cpts[8] = cpts[0];
-	
+	cpts[8] = cpts[0].dup();
 	
 	//for(int i=0; i<cpts.length-1; i++) IOut.p("cpts["+i+"]="+cpts[i]); //
 	
@@ -114,7 +105,7 @@ public class ICircleGeo extends ICurveGeo{
         cpts[5].sub(xaxis).sub(yaxis).w=sqrt2;
         cpts[6].sub(yaxis);
         cpts[7].add(xaxis).sub(yaxis).w=sqrt2;
-        cpts[8] = cpts[0];
+        cpts[8] = cpts[0].dup();
         return cpts;
     }	
     
@@ -152,7 +143,7 @@ public class ICircleGeo extends ICurveGeo{
         cpts[6].sub(y).sub(x.dup().mul(r));
         cpts[7].sub(y).add(x.dup().mul(r));
         cpts[8].add(x).sub(y.dup().mul(r));
-        cpts[9] = cpts[0];
+        cpts[9] = cpts[0].dup();
 	return cpts;
     }
     
@@ -169,7 +160,7 @@ public class ICircleGeo extends ICurveGeo{
         cpts[6].sub(yaxis).sub(xaxis.dup().mul(r));
         cpts[7].sub(yaxis).add(xaxis.dup().mul(r));
         cpts[8].add(xaxis).sub(yaxis.dup().mul(r));
-        cpts[9] = cpts[0];
+        cpts[9] = cpts[0].dup();
         return cpts;
     }
     

@@ -36,12 +36,11 @@ import java.awt.Color;
 */
 public class IBox extends IBrep{
 
-
     /**********************************************
      * static methods
      **********************************************/
     
-    public static ISurfaceGeo[] getBoxFaces(IVec[][][] corners){
+    public static ISurfaceGeo[] getBoxFaces(IVecI[][][] corners){
 	ISurfaceGeo[] faces = new ISurfaceGeo[6];
 	for(int i=0; i<2; i++){
 	    faces[i] = new ISurfaceGeo(corners[0][0][i],corners[1-i][i][i],
@@ -82,13 +81,22 @@ public class IBox extends IBrep{
     public IBox(double x, double y, double z, double w, double h, double d){
 	this(null,x,y,z,w,h,d);
     }
-    public IBox(IVec origin, double width, double height, double depth){
+    public IBox(IVecI origin, double width, double height, double depth){
 	this(null, origin, width, height, depth);
     }
-    public IBox(IVec origin, IVec xvec, IVec yvec, IVec zvec){
+    public IBox(IVecI origin, IVecI xvec, IVecI yvec, IVecI zvec){
 	this(null, origin, xvec, yvec, zvec);
     }
-    public IBox(IVec[][][] corners){ this(null, corners); }
+    /**
+       order of points in the argument is going round at the bottom and going round at the top
+    */
+    public IBox(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4,
+		IVecI pt5, IVecI pt6, IVecI pt7, IVecI pt8 ){
+	this(null, new IVecI[][][]{
+		 new IVecI[][]{ new IVecI[]{ pt1, pt5 }, new IVecI[]{ pt4, pt8 }},
+		 new IVecI[][]{ new IVecI[]{ pt2, pt6 }, new IVecI[]{ pt3, pt7 }}});
+    }
+    public IBox(IVecI[][][] corners){ this(null, corners); }
     public IBox(IServerI s, double x, double y, double z, double size){
 	this(s, new IVec(x,y,z), new IVec(size,0,0), new IVec(0,size,0), new IVec(0,0,size));
     }
@@ -97,24 +105,34 @@ public class IBox extends IBrep{
 	this(s, new IVec(x,y,z), new IVec(w,0,0), new IVec(0,h,0), new IVec(0,0,d));
     }
     
-    public IBox(IServerI s, IVec origin, double width, double height, double depth){
+    public IBox(IServerI s, IVecI origin, double width, double height, double depth){
 	this(s, origin, new IVec(width,0,0), new IVec(0,height,0), new IVec(0,0,depth));
     }
     
-    public IBox(IServerI s, IVec origin, IVec xvec, IVec yvec, IVec zvec){
-	this(s, new IVec[][][]{
-		 new IVec[][]{
-		     new IVec[]{ origin.dup(), origin.sum(xvec) },
-		     new IVec[]{ origin.sum(yvec), origin.sum(xvec).add(yvec) }
+    public IBox(IServerI s, IVecI origin, IVecI xvec, IVecI yvec, IVecI zvec){
+	this(s, new IVecI[][][]{
+		 new IVecI[][]{
+		     new IVecI[]{ origin.dup(), origin.sum(xvec) },
+		     new IVecI[]{ origin.sum(yvec), origin.sum(xvec).add(yvec) }
 		 },
-		 new IVec[][]{
-		     new IVec[]{ origin.sum(zvec), origin.sum(zvec).add(xvec) },
-		     new IVec[]{ origin.sum(zvec).add(yvec), origin.sum(zvec).add(xvec).add(yvec) }
+		 new IVecI[][]{
+		     new IVecI[]{ origin.sum(zvec), origin.sum(zvec).add(xvec) },
+		     new IVecI[]{ origin.sum(zvec).add(yvec), origin.sum(zvec).add(xvec).add(yvec) }
 		 }
 	     });
     }
+
+    /**
+       order of points in the argument is going round at the bottom and going round at the top
+    */
+    public IBox(IServerI s, IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4,
+		IVecI pt5, IVecI pt6, IVecI pt7, IVecI pt8 ){
+	this(s, new IVecI[][][]{
+		 new IVecI[][]{ new IVecI[]{ pt1, pt5 }, new IVecI[]{ pt4, pt8 }},
+		 new IVecI[][]{ new IVecI[]{ pt2, pt6 }, new IVecI[]{ pt3, pt7 }}});
+    }
     
-    public IBox(IServerI s, IVec[][][] corners){
+    public IBox(IServerI s, IVecI[][][] corners){
 	//super(s, getBoxFaces(corners), getBoxEdges(corners), getBoxVertices(corners));
 	super(s, getBoxFaces(corners));
 	solid=true;

@@ -113,6 +113,7 @@ public class IPoint extends IObject implements IVecI{
     public IPoint div(double v){ pos.div(v); return this; }
     public IPoint neg(){ pos.neg(); return this; }
     public IPoint rev(){ return neg(); }
+    public IPoint flip(){ return neg(); }
     
     public IPoint add(IVecI v, double f){ pos.add(v,f); return this; }
     public IPoint add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
@@ -205,13 +206,24 @@ public class IPoint extends IObject implements IVecI{
     }
     
     
-    /** same with mul */
+    /** alias of mul */
     public IPoint scale(IDoubleI f){ pos.scale(f); return this; }
-    /** same with mul */
+    /** alias of mul */
     public IPoint scale(double f){ pos.scale(f); return this; }
     
     public IPoint scale(IVecI center, IDoubleI f){ pos.scale(center,f); return this; }
     public IPoint scale(IVecI center, double f){ pos.scale(center,f); return this; }
+    
+    /** scale only in 1 direction */
+    public IPoint scale1d(IVecI axis, double f){ pos.scale1d(axis,f); return this; }
+    public IPoint scale1d(IVecI axis, IDoubleI f){ pos.scale1d(axis,f); return this; }
+    public IPoint scale1d(IVecI center, IVecI axis, double f){
+	pos.scale1d(center,axis,f); return this;
+    }
+    public IPoint scale1d(IVecI center, IVecI axis, IDoubleI f){
+	pos.scale1d(center,axis,f); return this;
+    }
+    
     
     /** reflect (mirror) 3 dimensionally to the other side of the plane */
     public IPoint ref(IVecI planeDir){ pos.ref(planeDir); return this; }
@@ -226,6 +238,57 @@ public class IPoint extends IObject implements IVecI{
 	pos.ref(center,planeDir); return this;
     }
     
+    /** shear operation */
+    public IPoint shear(double sxy, double syx, double syz,
+			double szy, double szx, double sxz){
+	pos.shear(sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IPoint shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	pos.shear(sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IPoint shear(IVecI center, double sxy, double syx, double syz,
+			double szy, double szx, double sxz){
+	pos.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IPoint shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	pos.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    
+    public IPoint shearXY(double sxy, double syx){ pos.shearXY(sxy,syx); return this; }
+    public IPoint shearXY(IDoubleI sxy, IDoubleI syx){ pos.shearXY(sxy,syx); return this; }
+    public IPoint shearXY(IVecI center, double sxy, double syx){
+	pos.shearXY(center,sxy,syx); return this;
+    }
+    public IPoint shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	pos.shearXY(center,sxy,syx); return this;
+    }
+    
+    public IPoint shearYZ(double syz, double szy){ pos.shearYZ(syz,szy); return this; }
+    public IPoint shearYZ(IDoubleI syz, IDoubleI szy){ pos.shearYZ(syz,szy); return this; }
+    public IPoint shearYZ(IVecI center, double syz, double szy){
+	pos.shearYZ(center,syz,szy); return this;
+    }
+    public IPoint shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	pos.shearYZ(center,syz,szy); return this;
+    }
+    
+    public IPoint shearZX(double szx, double sxz){ pos.shearZX(szx,sxz); return this; }
+    public IPoint shearZX(IDoubleI szx, IDoubleI sxz){ pos.shearZX(szx,sxz); return this; }
+    public IPoint shearZX(IVecI center, double szx, double sxz){
+	pos.shearZX(center,szx,sxz); return this;
+    }
+    public IPoint shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	pos.shearZX(center,szx,sxz); return this;
+    }
+    
+    /** translate is alias of add() */
+    public IPoint translate(double x, double y, double z){ pos.translate(x,y,z); return this; }
+    public IPoint translate(IDoubleI x, IDoubleI y, IDoubleI z){ pos.translate(x,y,z); return this; }
+    public IPoint translate(IVecI v){ pos.translate(v); return this; }
+    
+    
     public IPoint transform(IMatrix3I mat){ pos.transform(mat); return this; }
     public IPoint transform(IMatrix4I mat){ pos.transform(mat); return this; }
     public IPoint transform(IVecI xvec, IVecI yvec, IVecI zvec){
@@ -234,6 +297,23 @@ public class IPoint extends IObject implements IVecI{
     public IPoint transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
 	pos.transform(xvec,yvec,zvec,translate); return this;
     }
+    
+    
+    /** mv() is alias of add() */
+    public IPoint mv(double x, double y, double z){ return add(x,y,z); }
+    public IPoint mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IPoint mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public IPoint cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IPoint cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public IPoint cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IPoint cp(IVecI v){ return dup().add(v); }
+    
+    
     
     // methods creating new instance // returns IPoint?, not IVec?
     public IPoint diff(IVecI v){ return dup().sub(v); }

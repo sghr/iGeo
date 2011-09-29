@@ -34,20 +34,31 @@ import igeo.gui.*;
    @version 0.7.0.0;
 */
 public class ICylinder extends ISurface{
-    public IVec pt1, pt2;
-    public double radius1, radius2;
+    public IVecI pt1, pt2;
+    public IDoubleI radius1, radius2;
     
-    public ICylinder(IVec pt1, IVec pt2, double radius){
+    public ICylinder(IVecI pt1, IVecI pt2, double radius){
 	this(null,pt1,pt2,radius,radius);
     }
-    public ICylinder(IServerI s, IVec pt1, IVec pt2, double radius){
+    public ICylinder(IServerI s, IVecI pt1, IVecI pt2, double radius){
 	this(s,pt1,pt2,radius,radius);
     }
-
-    public ICylinder(IVec pt1, IVec pt2, double radius1, double radius2){
+    public ICylinder(IVecI pt1, IVecI pt2, double radius1, double radius2){
 	this(null,pt1,pt2,radius1,radius2);
     }
-    public ICylinder(IServerI s, IVec pt1, IVec pt2, double radius1, double radius2){
+    public ICylinder(IVecI pt1, IVecI pt2, IDoubleI radius){
+	this(null,pt1,pt2,radius,radius);
+    }
+    public ICylinder(IServerI s, IVecI pt1, IVecI pt2, IDoubleI radius){
+	this(s,pt1,pt2,radius,radius);
+    }
+    public ICylinder(IServerI s, IVecI pt1, IVecI pt2, double radius1, double radius2){
+	this(s,pt1,pt2,new IDouble(radius1),new IDouble(radius2));
+    }
+    public ICylinder(IVecI pt1, IVecI pt2, IDoubleI radius1, IDoubleI radius2){
+	this(null,pt1,pt2,radius1,radius2);
+    }
+    public ICylinder(IServerI s, IVecI pt1, IVecI pt2, IDoubleI radius1, IDoubleI radius2){
 	super(s);
 	this.pt1 = pt1; this.pt2 = pt2;
 	this.radius1 = radius1;
@@ -56,10 +67,12 @@ public class ICylinder extends ISurface{
     }
     
     public void initCylinder(IServerI s){
-	IVec normal = pt2.diff(pt1);
+	IVec p1 = pt1.get();
+	IVec p2 = pt2.get();
+	IVec normal = p2.diff(p1);
 	IVec[][] cpts = new IVec[2][];
-	cpts[0] = ICircleGeo.circleCP(pt1,normal,radius1);
-	cpts[1] = ICircleGeo.circleCP(pt2,normal,radius2);
+	cpts[0] = ICircleGeo.circleCP(p1,normal,radius1.x());
+	cpts[1] = ICircleGeo.circleCP(p2,normal,radius2.x());
 	surface = new ISurfaceGeo(cpts, 1,ICircleGeo.circleDeg(),
 				  INurbsGeo.createKnots(1,2),
 				  ICircleGeo.circleKnots());

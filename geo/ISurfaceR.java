@@ -108,8 +108,14 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public IVecI nrml(IDoubleI u, IDoubleI v){ return surface.nrml(u,v); }
     public IVecI nrml(double u, double v){ return surface.nrml(u,v); }
     
+    public IVecI nml(IVec2I v){ return surface.nml(v); }
+    public IVecI nml(IDoubleI u, IDoubleI v){ return surface.nml(u,v); }
+    public IVecI nml(double u, double v){ return surface.nml(u,v); }
+    
     public IVecI cp(int i, int j){ return surface.cp(i,j); }
     public IVecI cp(IIntegerI i, IIntegerI j){ return surface.cp(i,j); }
+    
+    public IVecI[][] cps(){ return surface.cps(); }
     
     public IVecI ep(int i, int j){ return surface.ep(i,j); }
     public IVecI ep(IIntegerI i, IIntegerI j){ return surface.ep(i,j); }
@@ -123,6 +129,13 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public IDoubleI uknot(IIntegerI i){ return surface.uknot(i); }
     public double vknot(int i){ return surface.vknot(i); }
     public IDoubleI vknot(IIntegerI i){ return surface.vknot(i); }
+    
+    public double[] uknots(){ return surface.uknots(); }
+    public double[] vknots(){ return surface.vknots(); }
+    public double[] uknots(ISwitchE e){ return uknots(); }
+    public double[] vknots(ISwitchE e){ return vknots(); }
+    public IDoubleI[] uknots(ISwitchR r){ return surface.uknots(r); }
+    public IDoubleI[] vknots(ISwitchR r){ return surface.vknots(r); }
     
     public int uknotNum(){ return surface.uknotNum(); }
     public int vknotNum(){ return surface.vknotNum(); }
@@ -197,6 +210,17 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public IDoubleI uend(ISwitchR r){ return surface.uend(r); }
     public IDoubleI vstart(ISwitchR r){ return surface.vstart(r); }
     public IDoubleI vend(ISwitchR r){ return surface.vend(r); }
+    
+    /** reverse U parameter internally without creating a new instance */
+    public ISurfaceR revU(){ surface.revU(); return this; }
+    /** reverse V parameter internally without creating a new instance */
+    public ISurfaceR revV(){ surface.revV(); return this; }
+    /** reverse U and V parameter internally without creating a new instance */
+    public ISurfaceR revUV(){ surface.revUV(); return this; }
+    /** reverse normal direction by reversing V direction (UV and normal is dependent */
+    public ISurfaceR revN(){ surface.revN(); return this; }
+    /** swap U and V parameter */
+    public ISurfaceR swapUV(){ surface.swapUV(); return this; }
     
     public boolean hasTrim(){ return surface.hasTrim(); }
     //public IBoolI hasTrimR(){ return surface.hasTrimR(); }
@@ -294,6 +318,168 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     //public IBoolI isFlatR(){ return surface.isFlatR(); }
     public boolean isFlat(ISwitchE e){ return surface.isFlat(); }
     public IBoolI isFlat(ISwitchR r){ return surface.isFlat(r); }
+
+
+    
+    
+    /*********************************************************************************
+     * transformation methods; API of ITransformable interface
+     *********************************************************************************/
+    
+    public ISurfaceR add(double x, double y, double z){ surface.add(x,y,z); return this; }
+    public ISurfaceR add(IDoubleI x, IDoubleI y, IDoubleI z){ surface.add(x,y,z); return this; }
+    public ISurfaceR add(IVecI v){ surface.add(v); return this; }
+    public ISurfaceR sub(double x, double y, double z){ surface.sub(x,y,z); return this; }
+    public ISurfaceR sub(IDoubleI x, IDoubleI y, IDoubleI z){ surface.sub(x,y,z); return this; }
+    public ISurfaceR sub(IVecI v){ surface.sub(v); return this; }
+    public ISurfaceR mul(IDoubleI v){ surface.mul(v); return this; }
+    public ISurfaceR mul(double v){ surface.mul(v); return this; }
+    public ISurfaceR div(IDoubleI v){ surface.div(v); return this; }
+    public ISurfaceR div(double v){ surface.div(v); return this; }
+    
+    public ISurfaceR neg(){ surface.neg(); return this; }
+    /** alias of neg */
+    public ISurfaceR flip(){ return neg(); }
+    
+    
+    /** scale add */
+    public ISurfaceR add(IVecI v, double f){ surface.add(v,f); return this; }
+    public ISurfaceR add(IVecI v, IDoubleI f){ surface.add(v,f); return this; }
+    
+    public ISurfaceR rot(IVecI axis, IDoubleI angle){ surface.rot(axis,angle); return this; }
+    public ISurfaceR rot(IVecI axis, double angle){ surface.rot(axis,angle); return this; }
+    
+    public ISurfaceR rot(IVecI center, IVecI axis, IDoubleI angle){ surface.rot(center,axis,angle); return this; }
+    public ISurfaceR rot(IVecI center, IVecI axis, double angle){ surface.rot(center,axis,angle); return this; }
+    
+    /** rotate to destination direction vector */
+    public ISurfaceR rot(IVecI axis, IVecI destDir){ surface.rot(axis,destDir); return this; }
+    /** rotate to destination point location */
+    public ISurfaceR rot(IVecI center, IVecI axis, IVecI destPt){ surface.rot(center,axis,destPt); return this; }
+    
+    
+    /** alias of mul */
+    public ISurfaceR scale(IDoubleI f){ return mul(f); }
+    public ISurfaceR scale(double f){ return mul(f); }
+    
+    public ISurfaceR scale(IVecI center, IDoubleI f){ surface.scale(center,f); return this; }
+    public ISurfaceR scale(IVecI center, double f){ surface.scale(center,f); return this; }
+    
+    /** scale only in 1 direction */
+    public ISurfaceR scale1d(IVecI axis, double f){ surface.scale1d(axis,f); return this; }
+    public ISurfaceR scale1d(IVecI axis, IDoubleI f){ surface.scale1d(axis,f); return this; }
+    public ISurfaceR scale1d(IVecI center, IVecI axis, double f){
+	surface.scale1d(center,axis,f); return this;
+    }
+    public ISurfaceR scale1d(IVecI center, IVecI axis, IDoubleI f){
+	surface.scale1d(center,axis,f); return this;
+    }
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public ISurfaceR ref(IVecI planeDir){ surface.ref(planeDir); return this; }
+    public ISurfaceR ref(IVecI center, IVecI planeDir){ surface.ref(center,planeDir); return this; }
+    /** mirror is alias of ref */
+    public ISurfaceR mirror(IVecI planeDir){ return ref(planeDir); }
+    public ISurfaceR mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
+    
+    /** shear operation */
+    public ISurfaceR shear(double sxy, double syx, double syz,
+			  double szy, double szx, double sxz){
+	surface.shear(sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    
+    public ISurfaceR shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			  IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	surface.shear(sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public ISurfaceR shear(IVecI center, double sxy, double syx, double syz,
+			  double szy, double szx, double sxz){
+	surface.shear(center,sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public ISurfaceR shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			  IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	surface.shear(center,sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    
+    public ISurfaceR shearXY(double sxy, double syx){
+	surface.shearXY(sxy,syx); return this;
+    }
+    public ISurfaceR shearXY(IDoubleI sxy, IDoubleI syx){
+	surface.shearXY(sxy,syx); return this;
+    }	
+    public ISurfaceR shearXY(IVecI center, double sxy, double syx){
+	surface.shearXY(center,sxy,syx); return this;
+    }
+    public ISurfaceR shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	surface.shearXY(center,sxy,syx); return this;
+    }
+    
+    public ISurfaceR shearYZ(double syz, double szy){
+	surface.shearYZ(syz,szy); return this;
+    }
+    public ISurfaceR shearYZ(IDoubleI syz, IDoubleI szy){
+	surface.shearYZ(syz,szy); return this;
+    }
+    public ISurfaceR shearYZ(IVecI center, double syz, double szy){
+	surface.shearYZ(center,syz,szy); return this;
+    }
+    public ISurfaceR shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	surface.shearYZ(center,syz,szy); return this;
+    }
+    
+    public ISurfaceR shearZX(double szx, double sxz){
+	surface.shearZX(szx,sxz); return this;
+    }
+    public ISurfaceR shearZX(IDoubleI szx, IDoubleI sxz){
+	surface.shearZX(szx,sxz); return this;
+    }
+    public ISurfaceR shearZX(IVecI center, double szx, double sxz){
+	surface.shearZX(center,szx,sxz); return this;
+    }
+    public ISurfaceR shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	surface.shearZX(center,szx,sxz); return this;
+    }
+    
+    
+    /** mv() is alias of add() */
+    public ISurfaceR mv(double x, double y, double z){ return add(x,y,z); }
+    public ISurfaceR mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ISurfaceR mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public ISurfaceR cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public ISurfaceR cp(double x, double y, double z){ return dup().add(x,y,z); }
+    /** cp() is alias of dup().add() */
+    public ISurfaceR cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    /** cp() is alias of dup().add() */
+    public ISurfaceR cp(IVecI v){ return dup().add(v); }
+    
+    /** translate() is alias of add() */
+    public ISurfaceR translate(double x, double y, double z){ return add(x,y,z); }
+    public ISurfaceR translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ISurfaceR translate(IVecI v){ return add(v); }
+    
+    public ISurfaceR transform(IMatrix3I mat){ surface.transform(mat); return this; }
+    public ISurfaceR transform(IMatrix4I mat){ surface.transform(mat); return this; }
+    public ISurfaceR transform(IVecI xvec, IVecI yvec, IVecI zvec){
+	surface.transform(xvec,yvec,zvec); return this;
+    }
+    public ISurfaceR transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
+	surface.transform(xvec,yvec,zvec,translate); return this;
+    }
+    
+    
+    /*********************************************************************************
+     * methods of IObject
+     *********************************************************************************/
     
     
     public ISurfaceR name(String nm){ super.name(nm); return this; }

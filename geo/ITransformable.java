@@ -42,8 +42,12 @@ public interface ITransformable{
     public ITransformable div(double v);
     
     public ITransformable neg();
-    /** same with neg */
-    public ITransformable rev();
+    /** alias of neg */
+    //public ITransformable rev(); // rev is used in curve to revrse u parameter
+    /** alias of neg */
+    public ITransformable flip();
+    
+    
     
     /** scale add */
     public ITransformable add(IVecI v, double f);
@@ -61,16 +65,21 @@ public interface ITransformable{
     public ITransformable rot(IVecI center, IVecI axis, IVecI destPt);
     
     
-    /** same with mul */
+    /** alias of mul */
     public ITransformable scale(IDoubleI f);
     public ITransformable scale(double f);
-    
     public ITransformable scale(IVecI center, IDoubleI f);
     public ITransformable scale(IVecI center, double f);
+
     
-    /**
-       reflect(mirror) 3 dimensionally to the other side of the plane
-    */
+    /** scale only in 1 direction */
+    public ITransformable scale1d(IVecI axis, double f);
+    public ITransformable scale1d(IVecI axis, IDoubleI f);
+    public ITransformable scale1d(IVecI center, IVecI axis, double f);
+    public ITransformable scale1d(IVecI center, IVecI axis, IDoubleI f);
+    
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
     public ITransformable ref(IVecI planeDir);
     public ITransformable ref(IVecI center, IVecI planeDir);
     /** mirror is alias of ref */
@@ -79,17 +88,50 @@ public interface ITransformable{
     
     
     /** shear operation */
-    public IVec shear(double sxy, double syx, double syz,
-		      double szy, double szx, double sxz);
-    public IVec shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
-		      IDoubleI szy, IDoubleI szx, IDoubleI sxz);
-    public IVec shear(IVecI center, double sxy, double syx, double syz,
-		      double szy, double szx, double sxz);
-    public IVec shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
-		      IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    public ITransformable shear(double sxy, double syx, double syz,
+				double szy, double szx, double sxz);
+    public ITransformable shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+				IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    public ITransformable shear(IVecI center, double sxy, double syx, double syz,
+				double szy, double szx, double sxz);
+    public ITransformable shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+				IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    
+    public ITransformable shearXY(double sxy, double syx);
+    public ITransformable shearXY(IDoubleI sxy, IDoubleI syx);
+    public ITransformable shearXY(IVecI center, double sxy, double syx);
+    public ITransformable shearXY(IVecI center, IDoubleI sxy, IDoubleI syx);
+    
+    public ITransformable shearYZ(double syz, double szy);
+    public ITransformable shearYZ(IDoubleI syz, IDoubleI szy);
+    public ITransformable shearYZ(IVecI center, double syz, double szy);
+    public ITransformable shearYZ(IVecI center, IDoubleI syz, IDoubleI szy);
+    
+    public ITransformable shearZX(double szx, double sxz);
+    public ITransformable shearZX(IDoubleI szx, IDoubleI sxz);
+    public ITransformable shearZX(IVecI center, double szx, double sxz);
+    public ITransformable shearZX(IVecI center, IDoubleI szx, IDoubleI sxz);
+    
+    /** mv() is alias of add() */
+    public ITransformable mv(double x, double y, double z);
+    public ITransformable mv(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ITransformable mv(IVecI v);
     
     
-    /** translate is alias of add() */
+    /** duplicate the instance */
+    public ITransformable dup();
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public ITransformable cp();
+    
+    /** cp() is alias of dup().add() */
+    public ITransformable cp(double x, double y, double z);
+    public ITransformable cp(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ITransformable cp(IVecI v);
+    
+    
+    /** translate() is alias of add() */
     public ITransformable translate(double x, double y, double z);
     public ITransformable translate(IDoubleI x, IDoubleI y, IDoubleI z);
     public ITransformable translate(IVecI v);

@@ -3178,15 +3178,15 @@ public class IRhino3dm{
 	    
 	    if(isStraightOnX(trimCurve)){
 		if(trimCurve.num()==2){
-		    if(trimCurve.cp(0).y == 0.0) return Surface.ISO.SIso;
-		    if(trimCurve.cp(0).y == 1.0) return Surface.ISO.NIso;
+		    if(trimCurve.cp(0).y() == 0.0) return Surface.ISO.SIso;
+		    if(trimCurve.cp(0).y() == 1.0) return Surface.ISO.NIso;
 		}
 		return Surface.ISO.XIso;
 	    }
 	    if(isStraightOnY(trimCurve)){
 		if(trimCurve.num()==2){
-		    if(trimCurve.cp(0).x == 0.0) return Surface.ISO.WIso;
-		    if(trimCurve.cp(0).x == 1.0) return Surface.ISO.EIso;
+		    if(trimCurve.cp(0).x() == 0.0) return Surface.ISO.WIso;
+		    if(trimCurve.cp(0).x() == 1.0) return Surface.ISO.EIso;
 		}
 		return Surface.ISO.YIso;
 	    }
@@ -4284,7 +4284,7 @@ public class IRhino3dm{
 			curves3.add(ncrv3);
 			
 			// update bounding box; only approximation
-			for(int k=0; k<trim3d.num(); k++) ibbox.compare(trim3d.cp(k));
+			for(int k=0; k<trim3d.num(); k++) ibbox.compare(trim3d.cp(k).get());
 			
 			IVec pt1 = trim3d.start();
 			BrepVertex vtx1 = getSharedVertex(pt1);
@@ -4433,7 +4433,7 @@ public class IRhino3dm{
 		    curves3.add(ncrv3);
 		    
 		    // update bounding box; only approximation
-		    for(int k=0; k<trim3d.num(); k++) ibbox.compare(trim3d.cp(k));
+		    for(int k=0; k<trim3d.num(); k++) ibbox.compare(trim3d.cp(k).get());
 		    
 		    BrepVertex vtx1 = null;
 		    if(j==0){
@@ -5907,7 +5907,7 @@ public class IRhino3dm{
 	    for(int i=0; i<crv.knotNum(); i++) iknot[i] = crv.knot(i);
 	    knot = getRhinoKnots(iknot);
 	    cv = new IVec[crv.num()];
-	    for(int i=0; i<crv.num(); i++) cv[i] = crv.cp(i);
+	    for(int i=0; i<crv.num(); i++) cv[i] = crv.cp(i).get();
 
 	    icurve = crv;
 	}
@@ -5920,7 +5920,7 @@ public class IRhino3dm{
 	    for(int i=0; i<tcrv.knotNum(); i++) iknot[i] = tcrv.knot(i);
 	    knot = getRhinoKnots(iknot);
 	    cv = new IVec[tcrv.num()];
-	    for(int i=0; i<tcrv.num(); i++) cv[i] = tcrv.cp(i);
+	    for(int i=0; i<tcrv.num(); i++) cv[i] = tcrv.cp(i).get();
 	}
 	
 	
@@ -6236,7 +6236,7 @@ public class IRhino3dm{
 	    cv = new IVec[cvCount[0]][cvCount[1]];
 	    for(int i=0; i<cvCount[0]; i++){
 		for(int j=0; j<cvCount[1]; j++){
-		    cv[i][j] = surf.cp(i,j);
+		    cv[i][j] = surf.cp(i,j).get();
 		}
 	    }
 	}
@@ -6982,7 +6982,7 @@ public class IRhino3dm{
 	    IVec[] centers = new IVec[profile.cpNum()];
 	    
 	    for(int i=0; i<profile.cpNum(); i++){
-		centers[i] = profile.cp(i).dup().projectToLine(axisCenter, axisDir);
+		centers[i] = profile.cp(i).get().dup().projectToLine(axisCenter, axisDir);
 	    }
 	    
 	    IVec4[][] cpts = new IVec4[profile.cpNum()][];
@@ -6997,7 +6997,7 @@ public class IRhino3dm{
 		vknots = IArcGeo.arcKnots(a);
 		vdeg = IArcGeo.arcDeg();
 		for(int i=0; i<profile.cpNum(); i++){
-		    IVec startPt = profile.cp(i).dup();
+		    IVec startPt = profile.cp(i).get().dup();
 		    startPt.rot(centers[i], axisDir, angle.v1);
 		    cpts[i] = IArcGeo.arcCP(centers[i], axisDir, startPt, a);
 		}

@@ -133,7 +133,8 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IVec4R div(IDoubleI u){ op=new Div(op,u); return this; }
     public IVec4R div(double u){ op=new Div(op,new IDouble(u)); return this; }
     public IVec4R neg(){ op=new Neg(op); return this; }
-    public IVec4R rev(){ op=new Neg(op); return this; }
+    public IVec4R rev(){ return neg(); }
+    public IVec4R flip(){ return neg(); }
     
     public IVec4R add(IVecI v, double f){ return add(v.dup().mul(f)); }
     public IVec4R add(IVecI v, IDoubleI f){ return add(v.dup().mul(f)); }
@@ -253,7 +254,8 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	if(center==this) return this;
 	return sub(center).rot(axis,destPt.diff(center)).add(center);
     }
-    
+
+    /** alias of mul */
     public IVec4R scale(IDoubleI f){ return mul(f); }
     public IVec4R scale(double f){ return mul(f); }
     
@@ -266,6 +268,20 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	return sub(center).mul(f).add(center);
     }
     
+    /** scale only in 1 direction */
+    public IVec4R scale1d(IVecI axis, double f){ return scale1d(axis,new IDouble(f)); }
+    public IVec4R scale1d(IVecI axis, IDoubleI f){
+	op = new Scale1d(op, axis, f); return this;
+    }
+    public IVec4R scale1d(IVecI center, IVecI axis, double f){
+	return scale1d(center,axis,new IDouble(f));
+    }
+    public IVec4R scale1d(IVecI center, IVecI axis, IDoubleI f){
+	if(center==this) return this;
+	return sub(center).scale1d(axis,f).add(center);
+    }
+    
+    
     public IVec4R ref(IVecI planeDir){ op=new Ref(op,planeDir); return this; }
     public IVec4R ref(IVecI center, IVecI planeDir){
         if(center==this) return this;
@@ -273,6 +289,59 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     }
     public IVec4R mirror(IVecI planeDir){ return ref(planeDir); }
     public IVec4R mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
+    
+    /** shear operation */
+    public IVec4R shear(double sxy, double syx, double syz, double szy, double szx, double sxz){
+	return shear(new IDouble(sxy),new IDouble(syx),new IDouble(syz),
+		     new IDouble(szy),new IDouble(szx),new IDouble(sxz));
+    }
+    public IVec4R shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	op = new Shear(op,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IVec4R shear(IVecI center, double sxy, double syx, double syz, double szy, double szx, double sxz){
+	if(center==this) return this;
+	return sub(center).shear(sxy,syx,syz,szy,szx,sxz).add(center);
+    }
+    public IVec4R shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz, IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	if(center==this) return this;
+	return sub(center).shear(sxy,syx,syz,szy,szx,sxz).add(center);
+    }
+    
+    public IVec4R shearXY(double sxy, double syx){ return shear(sxy,syx,0,0,0,0); }
+    public IVec4R shearXY(IDoubleI sxy, IDoubleI syx){ return shear(sxy,syx,null,null,null,null); }
+    public IVec4R shearXY(IVecI center, double sxy, double syx){
+	if(center==this){ return this; } return sub(center).shearXY(sxy,syx).add(center);
+    }
+    public IVec4R shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	if(center==this){ return this; } return sub(center).shearXY(sxy,syx).add(center);
+    }
+    
+    public IVec4R shearYZ(double syz, double szy){ return shear(0,0,syz,szy,0,0); }
+    public IVec4R shearYZ(IDoubleI syz, IDoubleI szy){ return shear(null,null,syz,szy,null,null); }
+    public IVec4R shearYZ(IVecI center, double syz, double szy){
+	if(center==this){ return this; } return sub(center).shearYZ(syz,szy).add(center);
+    }
+    public IVec4R shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	if(center==this){ return this; } return sub(center).shearYZ(syz,szy).add(center);
+    }
+    
+    public IVec4R shearZX(double szx, double sxz){ return shear(0,0,0,0,szx,sxz); }
+    public IVec4R shearZX(IDoubleI szx, IDoubleI sxz){ return shear(null,null,null,null,szx,sxz); }
+    public IVec4R shearZX(IVecI center, double szx, double sxz){
+	if(center==this){ return this; } return sub(center).shearZX(szx,sxz).add(center);
+    }
+    public IVec4R shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	if(center==this){ return this; } return sub(center).shearZX(szx,sxz).add(center);
+    }
+    
+        
+    /** translate is alias of add() */
+    public IVec4R translate(double x, double y, double z){ return add(x,y,z); }
+    public IVec4R translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IVec4R translate(IVecI v){ return add(v); }
+    
     
     public IVec4R transform(IMatrix3I mat){ op = new Transform3(op,mat); return this; }
     public IVec4R transform(IMatrix4I mat){ op = new Transform4(op,mat); return this; }
@@ -282,6 +351,22 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IVec4R transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
         op = new TransformVec4(op,xvec,yvec,zvec,translate); return this;
     }    
+    
+    
+    /** mv() is alias of add() */
+    public IVec4R mv(double x, double y, double z){ return add(x,y,z); }
+    public IVec4R mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IVec4R mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public IVec4R cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IVec4R cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public IVec4R cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IVec4R cp(IVecI v){ return dup().add(v); }
+    
     
     
     // methods creating new instance
@@ -573,12 +658,33 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	}
     }
     
+    static public class Scale1d extends IParameterObject implements IVec4Op{
+	public IVec4Op v;
+	public IVecOp axis;
+	public IDoubleI factor;
+	public Scale1d(IVec4Op v, IVecOp axis, IDoubleI factor){ this.v=v; this.axis=axis; this.factor=factor; }
+	public IVec4 get(){ return v.get().scale1d(axis.get(),factor.get()); }
+    }
     
     static public class Ref extends IParameterObject implements IVec4Op{
 	public IVec4Op v;
 	public IVecOp plane;
 	public Ref(IVec4Op v, IVecOp plane){ this.v=v; this.plane=plane; };
 	public IVec4 get(){ return (IVec4)v.get().ref(plane.get()); }
+    }
+    
+    static public class Shear extends IParameterObject implements IVec4Op{
+	public IVec4Op v;
+	public IDoubleOp sxy, syx, syz, szy, szx, sxz;
+	public Shear(IVec4Op v, IDoubleOp sxy, IDoubleOp syx, IDoubleOp syz,
+		     IDoubleOp szy, IDoubleOp szx, IDoubleOp sxz){
+	    this.v=v; this.sxy = sxy; this.syx = syx; this.syz = syz; this.szy = szy;
+	    this.szx = szx; this.sxz = sxz;
+	}
+	public IVec4 get(){ return v.get().shear(sxy.get(), syx.get(),
+						 syz.get(), szy.get(),
+						 szx.get(), sxz.get());
+	}
     }
     
     static public class Transform3 extends IParameterObject implements IVec4Op{

@@ -114,7 +114,10 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public IVec div(IDoubleI v){ return div(v.x()); }
     
     public IVec neg(){ x=-x; y=-y; z=-z; return this; }
+    /** alias of neg() */
     public IVec rev(){ return neg(); }
+    /** alias of neg() */
+    public IVec flip(){ return neg(); }
     
     
     /**
@@ -342,12 +345,10 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return rot(center.get(), axis.get(), destPt.get());
     }
     
-    /**
-       same with mul
-    */
+    /** alias of mul */
     public IVec scale(IDoubleI f){ return mul(f); }
     public IVec scale(double f){ return mul(f); }
-
+    
     public IVec scale(IVec center, double f){
 	if(center==this) return this;
 	return sub(center).scale(f).add(center);
@@ -357,6 +358,23 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     }
     public IVec scale(IVecI center, IDoubleI f){
 	return scale(center.get(),f.x());
+    }
+        
+    /** scale only in 1 direction */
+    public IVec scale1d(IVec axis, double f){
+	IVec n = axis.dup().unit();
+	n.mul(this.dot(n));
+	IVec t = this.diff(n);
+	return this.set(n.mul(f).add(t));
+    }
+    public IVec scale1d(IVecI axis, double f){ return scale1d(axis.get(),f); }
+    public IVec scale1d(IVecI axis, IDoubleI f){ return scale1d(axis.get(),f.x()); }
+    public IVec scale1d(IVecI center, IVecI axis, double f){
+	if(center==this) return this;
+	return sub(center).scale1d(axis,f).add(center);
+    }
+    public IVec scale1d(IVecI center, IVecI axis, IDoubleI f){
+	return scale1d(center,axis,f.x());
     }
     
     
@@ -393,7 +411,10 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     }
     public IVec shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
 		      IDoubleI szy, IDoubleI szx, IDoubleI sxz){
-	return shear(sxy.x(),syx.x(),syz.x(),szy.x(),szx.x(),sxz.x());
+	return shear((sxy==null)?0:sxy.x(), (syx==null)?0:syx.x(),
+		     (syz==null)?0:syz.x(), (szy==null)?0:szy.x(),
+		     (szx==null)?0:szx.x(), (sxz==null)?0:sxz.x());
+	// should I really accept null as zero?
     }
     public IVec shear(IVecI center, double sxy, double syx, double syz, double szy, double szx, double sxz){
 	if(center==this) return this;
@@ -402,6 +423,39 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public IVec shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz, IDoubleI szy, IDoubleI szx, IDoubleI sxz){
 	return shear(center,sxy.x(),syx.x(),syz.x(),szy.x(),szx.x(),sxz.x());
     }
+    
+    
+    public IVec shearXY(double sxy, double syx){ return shear(sxy,syx,0,0,0,0); }
+    public IVec shearXY(IDoubleI sxy, IDoubleI syx){ return shearXY(sxy.x(),syx.x()); }
+    public IVec shearXY(IVecI center, double sxy, double syx){
+	if(center==this){ return this; } return sub(center).shearXY(sxy,syx).add(center);
+    }
+    public IVec shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	return shearXY(center,sxy.x(),syx.x());
+    }
+    
+    public IVec shearYZ(double syz, double szy){ return shear(0,0,syz,szy,0,0); }
+    public IVec shearYZ(IDoubleI syz, IDoubleI szy){ return shearYZ(syz.x(),szy.x()); }
+    public IVec shearYZ(IVecI center, double syz, double szy){
+	if(center==this){ return this; } return sub(center).shearYZ(syz,szy).add(center);
+    }
+    public IVec shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	return shearYZ(center,syz.x(),szy.x());
+    }
+    
+    public IVec shearZX(double szx, double sxz){ return shear(0,0,0,0,szx,sxz); }
+    public IVec shearZX(IDoubleI szx, IDoubleI sxz){ return shearZX(szx.x(),sxz.x()); }
+    public IVec shearZX(IVecI center, double szx, double sxz){
+	if(center==this){ return this; } return sub(center).shearZX(szx,sxz).add(center);
+    }
+    public IVec shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	return shearZX(center,szx.x(),sxz.x());
+    }
+    
+    public IVec translate(double x, double y, double z){ return add(x,y,z); }
+    public IVec translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IVec translate(IVecI v){ return add(v); }
+    
     
     
     public IVec transform(IMatrix3I mat){ return set(mat.mul(this)); }
@@ -435,7 +489,26 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     }
     
     
-    // methods creating new instance
+    /** mv() is alias of add() */
+    public IVec mv(double x, double y, double z){ return add(x,y,z); }
+    public IVec mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IVec mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public IVec cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IVec cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public IVec cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IVec cp(IVecI v){ return dup().add(v); }
+    
+    
+    
+    /**********************************************************************************
+     * methods creating new instance
+     *********************************************************************************/
+    
     public IVec diff(IVec v){ return dup().sub(v); }
     public IVec diff(IVecI v){ return dup().sub(v); }
     public IVec mid(IVec v){ return dup().add(v).div(2); }
@@ -693,6 +766,31 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return false;
     }
     
-    
+    public static IVec averageNormal(IVecI[] pts){
+	if(pts==null){ IOut.err("pts is null"); return new IVec(0,0,1); /*default*/ }
+	
+	int n = pts.length;
+	if(n<=2){
+	    //IOut.err("number of pts is too small: "+pts.length);
+	    if(n<=1) return new IVec(0,0,1);
+	    IVec nml = pts[1].get().diff(pts[0]).cross(xaxis); /*default*/
+	    if(!nml.eq(origin)) return nml.unit();
+	    return pts[1].get().diff(pts[0]).cross(yaxis).unit(); /*default*/
+	}
+	
+        if(n==3) return pts[1].get().diff(pts[0]).cross(pts[2].get().diff(pts[1])).unit();
+        
+        IVec nml = new IVec();
+        for(int i=0; i<n; i++){
+            IVec diff1 = pts[(i+1)%n].get().diff(pts[i]);
+            IVec diff2 = pts[(i+2)%n].get().diff(pts[(i+1)%n]);
+            nml.add(diff1.cross(diff2));
+        }
+	
+	// when all the points are on a stragiht line
+	if(nml.eq(origin)) return new IVec(0,0,1); /* default */
+	
+        return nml.unit();
+    }
     
 }

@@ -82,6 +82,12 @@ public /*interface*/ class IConfig{
     */
     public static int surfaceTrimEdgeResolution=4; //2;
     
+    /*****************************
+     * dynamics properties
+     *****************************/
+    
+    /** update speed of dynamics thread in millisecond */
+    public static int dynamicsUpdateSpeed = 30; 
     
     /*****************************
      * mouse properties in INavigator
@@ -162,5 +168,17 @@ public /*interface*/ class IConfig{
        Minimum size to create bounding box and to zoom into.
     */
     public static double minimumBoundingBox = 0.002;
+
+    
+    /*************************************************************************************
+     * NURBS geometry construction
+     ************************************************************************************/
+    
+    /** when NURBS geometry is created at a constructor, if control points on edges share a same instance, another instance is created with dup().  This can be overridden by checkDuplicatedControlPoint. Duplicate is avoided to apply tranfromation to all the control points equally. */
+    public static boolean checkDuplicatedControlPointOnEdge=true;
+
+    /** when NURBS geometry is created at a constructor, if any control points share a same instance, another instance is created with dup(). Duplicate is avoided to apply tranfromation to all the control points equally. */
+    public static boolean checkDuplicatedControlPoint=true;
+    
 }
     

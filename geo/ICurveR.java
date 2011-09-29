@@ -70,7 +70,7 @@ public class ICurveR extends IObject implements ICurveI{
     
     public ICurveGeo get(){ return curve.get(); } //?
     
-    public ICurve dup(){ return new ICurve(this); }    
+    public ICurveR dup(){ return new ICurveR(this); }    
     
     
     public IVecI pt(IDoubleI u){ return curve.pt(u); }
@@ -81,10 +81,16 @@ public class ICurveR extends IObject implements ICurveI{
     public IVecI tan(double u){ return curve.tan(u); }
     //public void tan(double u, IVec retval){ curve.tan(u,retval); }
     
+    /** getting i-th control point */
     public IVecI cp(int i){ return curve.cp(i); }
+    /** getting i-th control point */
     public IVecI cp(IIntegerI i){ return curve.cp(i); }
     
+    public IVecI[] cps(){ return curve.cps(); }
+
+    /** getting i-th edit point */
     public IVecI ep(int i){ return curve.ep(i); }
+    /** getting i-th edit point */
     public IVecI ep(IIntegerI i){ return curve.ep(i); }
     
     public IVecI start(){ return curve.start(); }
@@ -95,6 +101,10 @@ public class ICurveR extends IObject implements ICurveI{
     
     public double knot(int i){ return curve.knot(i); }
     public IDoubleI knot(IIntegerI i){ return curve.knot(i); }
+    
+    public double[] knots(){ return curve.knots(); }
+    public double[] knots(ISwitchE e){ return knots(); }
+    public IDoubleI[] knots(ISwitchR r){ return curve.knots(r); }
     
     public int knotNum(){ return curve.knotNum(); }
     //public IIntegerI knotNumR(){ return curve.knotNumR(); }
@@ -154,15 +164,158 @@ public class ICurveR extends IObject implements ICurveI{
     
     public ICurveR rev(){ curve.rev(); return this; }
     
+    
+    /******************************************************************************
+     * transformation methods; API of ITransformable interface
+     ******************************************************************************/
+    
+    public ICurveR add(double x, double y, double z){
+	curve.add(x,y,z); return this;
+    }
+    public ICurveR add(IDoubleI x, IDoubleI y, IDoubleI z){
+	curve.add(x,y,z); return this;
+    }
+    public ICurveR add(IVecI v){ curve.add(v); return this; }
+    public ICurveR sub(double x, double y, double z){
+	curve.sub(x,y,z); return this;
+    }
+    public ICurveR sub(IDoubleI x, IDoubleI y, IDoubleI z){
+	curve.sub(x,y,z); return this;
+    }
+    public ICurveR sub(IVecI v){ curve.sub(v); return this; }
+    public ICurveR mul(IDoubleI v){ curve.mul(v); return this; }
+    public ICurveR mul(double v){ curve.mul(v); return this; }
+    public ICurveR div(IDoubleI v){ curve.div(v); return this; }
+    public ICurveR div(double v){ curve.div(v); return this; }
+    
+    public ICurveR neg(){ curve.neg(); return this; }
+    public ICurveR flip(){ curve.neg(); return this; }
+    
+    
+    /** scale add */
+    public ICurveR add(IVecI v, double f){ curve.add(v,f); return this; }
+    public ICurveR add(IVecI v, IDoubleI f){ curve.add(v,f); return this; }
+    
+    public ICurveR rot(IVecI axis, IDoubleI angle){ curve.rot(axis,angle); return this; }
+    public ICurveR rot(IVecI axis, double angle){ curve.rot(axis,angle); return this; }
+    public ICurveR rot(IVecI center, IVecI axis, IDoubleI angle){
+	curve.rot(center,axis,angle); return this;
+    }
+    public ICurveR rot(IVecI center, IVecI axis, double angle){
+	curve.rot(center,axis,angle); return this;
+    }
+    
+    /** rotate to destination direction vector */
+    public ICurveR rot(IVecI axis, IVecI destDir){
+	curve.rot(axis,destDir); return this;
+    }
+    /** rotate to destination point location */    
+    public ICurveR rot(IVecI center, IVecI axis, IVecI destPt){
+	curve.rot(center,axis,destPt); return this;
+    }
+    
+    
+    /** alias of mul */
+    public ICurveR scale(IDoubleI f){ return mul(f); }
+    public ICurveR scale(double f){ return mul(f); }
+    public ICurveR scale(IVecI center, IDoubleI f){ curve.scale(center,f); return this; }
+    public ICurveR scale(IVecI center, double f){ curve.scale(center,f); return this; }
+    
+    /** scale only in 1 direction */
+    public ICurveR scale1d(IVecI axis, double f){ curve.scale1d(axis,f); return this; }
+    public ICurveR scale1d(IVecI axis, IDoubleI f){ curve.scale1d(axis,f); return this; }
+    public ICurveR scale1d(IVecI center, IVecI axis, double f){
+	curve.scale1d(center,axis,f); return this;
+    }
+    public ICurveR scale1d(IVecI center, IVecI axis, IDoubleI f){
+	curve.scale1d(center,axis,f); return this;
+    }
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public ICurveR ref(IVecI planeDir){ curve.ref(planeDir); return this; }
+    public ICurveR ref(IVecI center, IVecI planeDir){ curve.ref(center,planeDir); return this; }
+    /** mirror is alias of ref */
+    public ICurveR mirror(IVecI planeDir){ return ref(planeDir); }
+    public ICurveR mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
+    
+    /** shear operation */
+    public ICurveR shear(double sxy, double syx, double syz,
+			double szy, double szx, double sxz){
+	curve.shear(sxy, syx, syz, szy, szx, sxz); return this;
+    }
+    public ICurveR shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	curve.shear(sxy, syx, syz, szy, szx, sxz); return this;
+    }
+    public ICurveR shear(IVecI center, double sxy, double syx, double syz,
+			double szy, double szx, double sxz){
+	curve.shear(center, sxy, syx, syz, szy, szx, sxz); return this;
+    }
+    public ICurveR shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	curve.shear(center, sxy, syx, syz, szy, szx, sxz); return this;
+    }
+    
+    public ICurveR shearXY(double sxy, double syx){ curve.shearXY(sxy,syx); return this; }
+    public ICurveR shearXY(IDoubleI sxy, IDoubleI syx){ curve.shearXY(sxy,syx); return this; }
+    public ICurveR shearXY(IVecI center, double sxy, double syx){ curve.shearXY(center,sxy,syx); return this; }
+    public ICurveR shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){ curve.shearXY(center,sxy,syx); return this; }
+    
+    public ICurveR shearYZ(double syz, double szy){ curve.shearYZ(syz,szy); return this; }
+    public ICurveR shearYZ(IDoubleI syz, IDoubleI szy){ curve.shearYZ(syz,szy); return this; }
+    public ICurveR shearYZ(IVecI center, double syz, double szy){ curve.shearYZ(center,syz,szy); return this; }
+    public ICurveR shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){ curve.shearYZ(center,syz,szy); return this; }
+    
+    public ICurveR shearZX(double szx, double sxz){ curve.shearZX(szx,sxz); return this; }
+    public ICurveR shearZX(IDoubleI szx, IDoubleI sxz){ curve.shearZX(szx,sxz); return this; }
+    public ICurveR shearZX(IVecI center, double szx, double sxz){ curve.shearZX(center,szx,sxz); return this; }
+    public ICurveR shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){ curve.shearZX(center,szx,sxz); return this; }
+    
+    
+    /** translate is alias of add() */
+    public ICurveR translate(double x, double y, double z){ return add(x,y,z); }
+    public ICurveR translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ICurveR translate(IVecI v){ return add(v); }
+    
+    
+    /** mv() is alias of add() */
+    public ICurveR mv(double x, double y, double z){ return add(x,y,z); }
+    public ICurveR mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ICurveR mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public ICurveR cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public ICurveR cp(double x, double y, double z){ return dup().add(x,y,z); }
+    /** cp() is alias of dup().add() */
+    public ICurveR cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    /** cp() is alias of dup().add() */
+    public ICurveR cp(IVecI v){ return dup().add(v); }
+    
+    
+    public ICurveR transform(IMatrix3I mat){ curve.transform(mat); return this; }
+    public ICurveR transform(IMatrix4I mat){ curve.transform(mat); return this; }
+    public ICurveR transform(IVecI xvec, IVecI yvec, IVecI zvec){
+	curve.transform(xvec,yvec,zvec); return this;
+    }
+    public ICurveR transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
+	curve.transform(xvec,yvec,zvec,translate); return this;
+    }
+    
+    
+    /******************************************************************************
+     * IObject methods
+     ******************************************************************************/
+    
+    
     public ICurveR name(String nm){ super.name(nm); return this; }
     public ICurveR layer(ILayer l){ super.layer(l); return this; }
 
     public ICurveR hide(){ super.hide(); return this; }
     public ICurveR show(){ super.show(); return this; }
-        
-   
-    
-    
     
     
     

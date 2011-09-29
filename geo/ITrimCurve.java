@@ -272,4 +272,151 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
     
     public ITrimCurve rev(){ super.rev(); return this; }
     
+    
+    
+    
+    /********************************************************************************
+     * transformation methods
+     *******************************************************************************/
+    
+    public ITrimCurve add(double x, double y, double z){ super.add(x,y,z); return this; }
+    public ITrimCurve add(IDoubleI x, IDoubleI y, IDoubleI z){ super.add(x,y,z); return this; }
+    public ITrimCurve add(IVecI v){ super.add(v); return this; }
+    public ITrimCurve sub(double x, double y, double z){ super.sub(x,y,z); return this; }
+    public ITrimCurve sub(IDoubleI x, IDoubleI y, IDoubleI z){ super.sub(x,y,z); return this; }
+    public ITrimCurve sub(IVecI v){ super.sub(v); return this; }
+    public ITrimCurve mul(IDoubleI v){ super.mul(v); return this; }
+    public ITrimCurve mul(double v){ super.mul(v); return this; }
+    public ITrimCurve div(IDoubleI v){ super.div(v); return this; }
+    public ITrimCurve div(double v){ super.div(v); return this; }
+    
+    public ITrimCurve neg(){ super.neg(); return this; }
+    /** alias of neg */
+    public ITrimCurve flip(){ return neg(); }
+    
+    
+    /** scale add */
+    public ITrimCurve add(IVecI v, double f){ super.add(v,f); return this; }
+    public ITrimCurve add(IVecI v, IDoubleI f){ super.add(v,f); return this; }
+    
+    public ITrimCurve rot(IVecI axis, IDoubleI angle){ super.rot(axis,angle); return this; }
+    public ITrimCurve rot(IVecI axis, double angle){ super.rot(axis,angle); return this; }
+    public ITrimCurve rot(IVecI center, IVecI axis, IDoubleI angle){
+	super.rot(center,axis,angle); return this;
+    }
+    public ITrimCurve rot(IVecI center, IVecI axis, double angle){
+	super.rot(center,axis,angle); return this;
+    }
+    /** rotate to destination direction vector */
+    public ITrimCurve rot(IVecI axis, IVecI destDir){
+	super.rot(axis,destDir); return this;
+    }
+    /** rotate to destination point location */
+    public ITrimCurve rot(IVecI center, IVecI axis, IVecI destPt){
+	super.rot(center,axis,destPt); return this;
+    }
+    
+    /** same with mul */
+    public ITrimCurve scale(IDoubleI f){ return mul(f); }
+    public ITrimCurve scale(double f){ return mul(f); }
+    public ITrimCurve scale(IVecI center, IDoubleI f){ super.scale(center,f); return this; }
+    public ITrimCurve scale(IVecI center, double f){ super.scale(center,f); return this; }
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public ITrimCurve ref(IVecI planeDir){ super.ref(planeDir); return this; }
+    public ITrimCurve ref(IVecI center, IVecI planeDir){ super.ref(center,planeDir); return this; }
+    
+    /** mirror is alias of ref */
+    public ITrimCurve mirror(IVecI planeDir){ return ref(planeDir); }
+    public ITrimCurve mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
+    
+    /** shear operation */
+    public ITrimCurve shear(double sxy, double syx, double syz,
+			    double szy, double szx, double sxz){
+	super.shear(sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public ITrimCurve shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			    IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	super.shear(sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public ITrimCurve shear(IVecI center, double sxy, double syx, double syz,
+			    double szy, double szx, double sxz){
+	super.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public ITrimCurve shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			    IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	super.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    
+    public ITrimCurve shearXY(double sxy, double syx){
+	super.shearXY(sxy,syx); return this;
+    }
+    public ITrimCurve shearXY(IDoubleI sxy, IDoubleI syx){
+	super.shearXY(sxy,syx); return this;
+    }
+    public ITrimCurve shearXY(IVecI center, double sxy, double syx){
+	super.shearXY(center,sxy,syx); return this;
+    }
+    public ITrimCurve shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	super.shearXY(center,sxy,syx); return this;
+    }
+    
+    public ITrimCurve shearYZ(double syz, double szy){
+	super.shearYZ(syz,szy); return this;
+    }
+    public ITrimCurve shearYZ(IDoubleI syz, IDoubleI szy){
+	super.shearYZ(syz,szy); return this;
+    }
+    public ITrimCurve shearYZ(IVecI center, double syz, double szy){
+	super.shearYZ(center,syz,szy); return this;
+    }
+    public ITrimCurve shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	super.shearYZ(center,syz,szy); return this;
+    }
+    
+    public ITrimCurve shearZX(double szx, double sxz){
+	super.shearZX(szx,sxz); return this;
+    }
+    public ITrimCurve shearZX(IDoubleI szx, IDoubleI sxz){
+	super.shearZX(szx,sxz); return this;
+    }
+    public ITrimCurve shearZX(IVecI center, double szx, double sxz){
+	super.shearZX(center,szx,sxz); return this;
+    }
+    public ITrimCurve shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	super.shearZX(center,szx,sxz); return this;
+    }
+    
+    /** translate is alias of add() */
+    public ITrimCurve translate(double x, double y, double z){ return add(x,y,z); }
+    public ITrimCurve translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ITrimCurve translate(IVecI v){ return add(v); }
+    
+    
+    public ITrimCurve transform(IMatrix3I mat){ super.transform(mat); return this; }
+    public ITrimCurve transform(IMatrix4I mat){ super.transform(mat); return this; }
+    public ITrimCurve transform(IVecI xvec, IVecI yvec, IVecI zvec){
+	super.transform(xvec,yvec,zvec); return this;
+    }
+    public ITrimCurve transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
+	super.transform(xvec,yvec,zvec,translate); return this;
+    }
+    
+    
+    /** mv() is alias of add() */
+    public ITrimCurve mv(double x, double y, double z){ return add(x,y,z); }
+    public ITrimCurve mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ITrimCurve mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public ITrimCurve cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public ITrimCurve cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public ITrimCurve cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public ITrimCurve cp(IVecI v){ return dup().add(v); }
+    
+    
 }

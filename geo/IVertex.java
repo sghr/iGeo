@@ -123,8 +123,8 @@ public class IVertex implements IVecI{
     public IVertex div(IDoubleI v){ pos.div(v); return this; }
     public IVertex div(double v){ pos.div(v); return this; }
     public IVertex neg(){ pos.neg(); return this; }
-    
-    public IVertex rev(){ pos.rev(); return this; }
+    public IVertex rev(){ return neg(); }
+    public IVertex flip(){ return neg(); }
     
     public IVertex add(IVecI v, double f){ pos.add(v,f); return this; }
     public IVertex add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
@@ -203,22 +203,98 @@ public class IVertex implements IVecI{
     public IVertex rot(IVecI axis, IVecI destDir){ pos.rot(axis,destDir); return this; }
     public IVecI rot(IVecI center, IVecI axis, IVecI destPt){ pos.rot(center,axis,destPt); return this; }
     
-    
     public IVertex scale(IDoubleI f){ pos.scale(f); return this; }
     public IVertex scale(double f){ pos.scale(f); return this; }
-    
     public IVertex scale(IVecI center, IDoubleI f){ pos.scale(center,f); return this; }
     public IVertex scale(IVecI center, double f){ pos.scale(center,f); return this; }
+    
+    /** scale only in 1 direction */
+    public IVertex scale1d(IVecI axis, double f){ pos.scale1d(axis,f); return this; }
+    public IVertex scale1d(IVecI axis, IDoubleI f){ pos.scale1d(axis,f); return this; }
+    public IVertex scale1d(IVecI center, IVecI axis, double f){
+	pos.scale1d(center,axis,f); return this;
+    }
+    public IVertex scale1d(IVecI center, IVecI axis, IDoubleI f){
+	pos.scale1d(center,axis,f); return this;
+    }
+    
     
     public IVertex ref(IVecI planeDir){ pos.ref(planeDir); return this; }
     public IVertex ref(IVecI center, IVecI planeDir){ pos.ref(center,planeDir); return this; }
     public IVertex mirror(IVecI planeDir){ pos.ref(planeDir); return this; }
     public IVertex mirror(IVecI center, IVecI planeDir){ pos.ref(center,planeDir); return this; }
     
+    /** shear operation */
+    public IVertex shear(double sxy, double syx, double syz,
+			 double szy, double szx, double sxz){
+	pos.shear(sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IVertex shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			 IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	pos.shear(sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IVertex shear(IVecI center, double sxy, double syx, double syz,
+			 double szy, double szx, double sxz){
+	pos.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IVertex shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			 IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	pos.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    
+    public IVertex shearXY(double sxy, double syx){ pos.shearXY(sxy,syx); return this; }
+    public IVertex shearXY(IDoubleI sxy, IDoubleI syx){ pos.shearXY(sxy,syx); return this; }
+    public IVertex shearXY(IVecI center, double sxy, double syx){
+	pos.shearXY(center,sxy,syx); return this;
+    }
+    public IVertex shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	pos.shearXY(center,sxy,syx); return this;
+    }
+    
+    public IVertex shearYZ(double syz, double szy){ pos.shearYZ(syz,szy); return this; }
+    public IVertex shearYZ(IDoubleI syz, IDoubleI szy){ pos.shearYZ(syz,szy); return this; }
+    public IVertex shearYZ(IVecI center, double syz, double szy){
+	pos.shearYZ(center,syz,szy); return this;
+    }
+    public IVertex shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	pos.shearYZ(center,syz,szy); return this;
+    }
+    
+    public IVertex shearZX(double szx, double sxz){ pos.shearZX(szx,sxz); return this; }
+    public IVertex shearZX(IDoubleI szx, IDoubleI sxz){ pos.shearZX(szx,sxz); return this; }
+    public IVertex shearZX(IVecI center, double szx, double sxz){
+	pos.shearZX(center,szx,sxz); return this;
+    }
+    public IVertex shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	pos.shearZX(center,szx,sxz); return this;
+    }
+    
+    /** translate is alias of add() */
+    public IVertex translate(double x, double y, double z){ pos.translate(x,y,z); return this; }
+    public IVertex translate(IDoubleI x, IDoubleI y, IDoubleI z){ pos.translate(x,y,z); return this; }
+    public IVertex translate(IVecI v){ pos.translate(v); return this; }
+        
+    
     public IVertex transform(IMatrix3I mat){ pos.transform(mat); return this; }
     public IVertex transform(IMatrix4I mat){ pos.transform(mat); return this; }
     public IVertex transform(IVecI xvec, IVecI yvec, IVecI zvec){ pos.transform(xvec,yvec,zvec); return this; }
     public IVertex transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){ pos.transform(xvec,yvec,zvec,translate); return this; }
+    
+    
+    /** mv() is alias of add() */
+    public IVertex mv(double x, double y, double z){ return add(x,y,z); }
+    public IVertex mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IVertex mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public IVertex cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IVertex cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public IVertex cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IVertex cp(IVecI v){ return dup().add(v); }
+    
     
     public IVertex diff(IVecI v){ return dup().sub(v); }
     public IVertex mid(IVecI v){ return dup().add(v).div(2); }
@@ -298,7 +374,8 @@ public class IVertex implements IVecI{
     public IFace face(int i){ return faces.get(i); }
     public int faceNum(){ return faces.size(); }
     
-    public IVertex getLinkedVertex(int i){ return linkedVertices.get(i); }
+    //public IVertex getLinkedVertex(int i){ return linkedVertices.get(i); }
+    public IVertex linkedVertex(int i){ return linkedVertices.get(i); }
     
     public int linkedVertexNum(){ return linkedVertices.size(); }
     

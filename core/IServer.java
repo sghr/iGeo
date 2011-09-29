@@ -39,11 +39,13 @@ public class IServer implements IServerI{
     
     public ArrayList<IObject> objects; // elements
     //ArrayList<IGraphicObject> graphics;
-    public ArrayList<IDynamicObject> dynamics;
+    //public ArrayList<IDynamicObject> dynamics;
     
     public ArrayList<ILayer> layers;
     
     public IGraphicServer graphicServer; // non null in graphic mode
+    public IDynamicServer dynamicServer; // non null when dynamic subobject is used
+    
     public IG ig; // parent
     //IPanel panel; // non null in graphic mode
     
@@ -56,8 +58,9 @@ public class IServer implements IServerI{
 	this.ig =ig;
 	objects = new ArrayList<IObject>();
 	//graphics = new ArrayList<IGraphicObject>();
-	dynamics = new ArrayList<IDynamicObject>();
+	//dynamics = new ArrayList<IDynamicObject>();
 	//graphicServer = new IGraphicServer(this);
+	dynamicServer = new IDynamicServer(this);
 	layers = new ArrayList<ILayer>();
     }
     
@@ -66,9 +69,10 @@ public class IServer implements IServerI{
 	this.ig =ig;
 	objects = new ArrayList<IObject>();
 	//graphics = new ArrayList<IGraphicObject>();
-	dynamics = new ArrayList<IDynamicObject>();
+	//dynamics = new ArrayList<IDynamicObject>();
 	//graphicServer = new IGraphicServer(this);
 	graphicServer = new IGraphicServer(this, panel);
+	dynamicServer = new IDynamicServer(this);
 	layers = new ArrayList<ILayer>();
     }
     
@@ -77,11 +81,13 @@ public class IServer implements IServerI{
     public IGraphicServer graphicServer(){ return graphicServer; }
     
     public void add(IObject e){
-	synchronized(IG.lock){
+	//synchronized(IG.lock){
+	synchronized(ig){
 	    if(!objects.contains(e)) objects.add(e);
 	    e.server = this;
 	    if(e instanceof ILayer){ layers.add((ILayer)e); }
 	    //if(isGraphicMode()) graphicServer.add(e);
+	    if(e.dynamicsNum()>0){ dynamicServer.add(e); }
 	    update();
 	}
     }
@@ -90,13 +96,14 @@ public class IServer implements IServerI{
 	synchronized(IG.lock){ graphics.add(e); }
     }
     */
+    /*
     public void add(IDynamicObject e){
 	synchronized(IG.lock){
 	    dynamics.add(e);
 	    update();
 	}
     }
-    
+    */
     //public IPanel getPanel(){ return panel; }
     
     public boolean isGraphicMode(){ return graphicServer!=null; }
@@ -117,23 +124,110 @@ public class IServer implements IServerI{
     }
     //public IGraphicObject getGraphicObject(int i){ return graphics.get(i); }
     //public IDynamicObject getDynamicObject(int i){ return dynamics.get(i); }
-    public IDynamicObject getDynamicObject(int i){ return dynamicObject(i); }
-    public IDynamicObject dynamicObject(int i){
-	if(i<0||i>=dynamics.size()) return null;
-	return dynamics.get(i);
-    }
-    
+    //public IDynamicObject getDynamicObject(int i){ return dynamicObject(i); }
+    //public IDynamicObject dynamicObject(int i){ if(i<0||i>=dynamics.size()){ return null; } return dynamics.get(i); }
     
     public int objectNum(){ return objects.size(); }
     //public int graphicObjectNum(){ return graphics.size(); }
-    public int dynamicObjectNum(){ return dynamics.size(); }
+    //public int dynamicObjectNum(){ return dynamics.size(); }
+    
+    
+    
+    
+    public void remove(int i){
+	if(i<0||i>=objects.size()) return;
+	//synchronized(IG.lock){
+	synchronized(ig){
+	    if(graphicServer!=null && objects.get(i).graphics!=null){
+		IObject e = objects.get(i);
+		for(int j=0; j<e.graphics.size(); j++) graphicServer.remove(e.graphics.get(j));
+	    }
+	    if(objects.get(i).dynamics!=null){
+		IObject e = objects.get(i);
+		for(int j=0; j<e.dynamics.size(); j++) dynamicServer.remove(e.dynamics.get(j)); //removeDynamicObject(e.dynamics.get(j));
+	    }
+	    objects.remove(i);
+	    update();
+	}
+    }
+    
+    public void remove(IObject e){
+	//synchronized(IG.lock){
+	synchronized(ig){
+	    if(graphicServer!=null && e.graphics!=null){
+		for(int j=0; j<e.graphics.size(); j++) graphicServer.remove(e.graphics.get(j));
+	    }
+	    if(e.dynamics!=null){
+		for(int j=0; j<e.dynamics.size(); j++) dynamicServer.remove(e.dynamics.get(j)); //removeDynamicObject(e.dynamics.get(j));
+	    }
+	    objects.remove(e);
+	    if(e instanceof ILayer){ layers.remove(e); }
+	    update();
+	}
+    }
+    
+    
+    //public void removeGraphicObject(int i){ graphics.remove(i); }
+    //public void removeGraphicObject(IGraphicObject g){ graphics.remove(g); }
+    /*
+    public void removeGraphicObject(IGraphicObject g){
+	if(graphicServer!=null) graphicServer.remove(g);
+    }
+    */
+    /*
+    public void removeDynamicObject(int i){
+	dynamics.remove(i);
+	update();
+    }
+    public void removeDynamicObject(IDynamicObject d){
+	dynamics.remove(d);
+	update();
+    }
+    */
+    
+    //public void getGraphic(IGraphicObject e, IView v){ graphicServer.add(e,v); }
+    
+    //public void delete(){ objects.clear(); }
+    public void clear(){
+	objects.clear();
+	//dynamics.clear();
+	if(graphicServer!=null) graphicServer.clearObjects();
+	if(dynamicServer!=null) dynamicServer.clear();
+	layers.clear();
+	update(); // not clearing the number
+    }
+    
+    public int statusCount(){ return statusCount; }
+    public void update(){ statusCount++; }
+    
+    /*
+    public void setGraphicMode(IGraphicMode mode){
+	//for(IObject e:objects) e.setGraphicMode(mode);
+	graphicServer.setGraphicMode(mode);
+    }
+    */
+    /*
+    public void draw(IGraphics g){
+	for(int i=0; i<graphics.size(); i++){
+	    graphics.get(i).draw(g);
+	}
+    }
+    */
+    
+    
+    
+    
+    /***********************************************************************
+     * Object Selection
+     **********************************************************************/
     
     /** Returns all point objects contained in objects.
 	IPointR objects are not included.
      */
     public IPoint[] getPoints(){
 	ArrayList<IPoint> points = new ArrayList<IPoint>();
-	synchronized(IG.lock){
+	//synchronized(IG.lock){
+	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(objects.get(i) instanceof IPoint)
 		    points.add((IPoint)objects.get(i));
@@ -146,7 +240,8 @@ public class IServer implements IServerI{
      */
     public ICurve[] getCurves(){
 	ArrayList<ICurve> curves = new ArrayList<ICurve>();
-	synchronized(IG.lock){
+	//synchronized(IG.lock){
+	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(objects.get(i) instanceof ICurve)
 		    curves.add((ICurve)objects.get(i));
@@ -159,7 +254,8 @@ public class IServer implements IServerI{
      */
     public ISurface[] getSurfaces(){
 	ArrayList<ISurface> surfaces = new ArrayList<ISurface>();
-	synchronized(IG.lock){
+	//synchronized(IG.lock){
+	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(objects.get(i) instanceof ISurface)
 		    surfaces.add((ISurface)objects.get(i));
@@ -172,7 +268,8 @@ public class IServer implements IServerI{
      */
     public IMesh[] getMeshes(){
 	ArrayList<IMesh> meshes = new ArrayList<IMesh>();
-	synchronized(IG.lock){
+	//synchronized(IG.lock){
+	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(objects.get(i) instanceof IMesh)
 		    meshes.add((IMesh)objects.get(i));
@@ -183,7 +280,8 @@ public class IServer implements IServerI{
     
     public IObject[] getObjects(Class cls){
 	ArrayList<IObject> objects = new ArrayList<IObject>();
-	synchronized(IG.lock){
+	//synchronized(IG.lock){
+	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(cls.isInstance(objects.get(i))) objects.add(objects.get(i));
 	}
@@ -213,81 +311,4 @@ public class IServer implements IServerI{
 	for(ILayer l:layers) if(l.name().equals(layerName)) remove(l);
     }
     
-    public void remove(int i){
-	if(i<0||i>=objects.size()) return;
-	synchronized(IG.lock){
-	    if(graphicServer!=null && objects.get(i).graphics!=null){
-		IObject e = objects.get(i);
-		for(int j=0; j<e.graphics.size(); j++) graphicServer.remove(e.graphics.get(j));
-	    }
-	    if(objects.get(i).dynamics!=null){
-		IObject e = objects.get(i);
-		for(int j=0; j<e.dynamics.size(); j++) removeDynamicObject(e.dynamics.get(j));
-	    }
-	    objects.remove(i);
-	    update();
-	}
-    }
-    
-    public void remove(IObject e){
-	synchronized(IG.lock){
-	    if(graphicServer!=null && e.graphics!=null){
-		for(int j=0; j<e.graphics.size(); j++) graphicServer.remove(e.graphics.get(j));
-	    }
-	    if(e.dynamics!=null){
-		for(int j=0; j<e.dynamics.size(); j++) removeDynamicObject(e.dynamics.get(j));
-	    }
-	    objects.remove(e);
-	    if(e instanceof ILayer){ layers.remove(e); }
-	    update();
-	}
-    }
-    
-    
-    //public void removeGraphicObject(int i){ graphics.remove(i); }
-    //public void removeGraphicObject(IGraphicObject g){ graphics.remove(g); }
-    /*
-    public void removeGraphicObject(IGraphicObject g){
-	if(graphicServer!=null) graphicServer.remove(g);
-    }
-    */
-    
-    public void removeDynamicObject(int i){
-	dynamics.remove(i);
-	update();
-    }
-    public void removeDynamicObject(IDynamicObject d){
-	dynamics.remove(d);
-	update();
-    }
-    
-    
-    //public void getGraphic(IGraphicObject e, IView v){ graphicServer.add(e,v); }
-    
-    
-    //public void delete(){ objects.clear(); }
-    public void clear(){
-	objects.clear();
-	dynamics.clear();
-	if(graphicServer!=null) graphicServer.clearObjects();
-	layers.clear();
-	update(); // not clearing the number
-    }
-    
-    public int statusCount(){ return statusCount; }
-    public void update(){ statusCount++; }
-    
-    /*
-    public void setGraphicMode(IGraphicMode mode){
-	//for(IObject e:objects) e.setGraphicMode(mode);
-	graphicServer.setGraphicMode(mode);
-    }
-    */
-    /*
-    public void draw(IGraphics g){
-	for(int i=0; i<graphics.size(); i++){
-	    graphics.get(i).draw(g);
-	}
-    }
-    */
 }

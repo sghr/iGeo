@@ -286,7 +286,7 @@ public class IGraphicServer{
     }
     
     
-    /** remove all views
+    /** remove all views.
 	don't clearViews before clearObjects
      */
     public void clearViews(){ views.clear(); }

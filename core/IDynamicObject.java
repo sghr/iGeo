@@ -29,5 +29,12 @@ package igeo.core;
    @version 0.7.0.0
 */
 public class IDynamicObject extends ISubobject{
-    
+    /** behavior definition of interaction with other dynamic objects.
+	interaction happens between every two dynamic objects in a server.
+	interact() is called for every combination of two but
+	when A.interact(B) happens, B.interact(A) doesn't happen.
+	Just once for each combination */
+    public void interact(IDynamicObject obj){}
+    /** behavior definition of updating dynamics in each time frame */
+    public void update(){}
 }

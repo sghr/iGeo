@@ -75,7 +75,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	uend=knots[knots.length-1];
 	//if(IConfig.normalizeKnots && (knots[0]!=0. || knots[knots.length-1]!=1.)) 
 	//  normalizeKnots(knots, knots[0], knots[knots.length-1]);
-	if(knots[0]!=0. || knots[knots.length-1]!=1.)
+	if(knots[0]!=0.0 || knots[knots.length-1]!=1.0)
 	    normalizeKnots(knots, knots[0], knots[knots.length-1]);
 	init(cpts, degree, knots);
     }
@@ -157,7 +157,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
     public void init(IVecI[] cpts, int degree, boolean close){
 	if(close){
-	    IVecI[] cpts2 = createClosedControlPoints(cpts,degree);
+	    IVecI[] cpts2 = createClosedCP(cpts,degree);
 	    init(cpts2, degree, createClosedKnots(degree, cpts2.length));
 	}
 	else{
@@ -166,6 +166,10 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     }
     
     public void init(IVecI[] cpts, int degree, double[] knots){
+	// duplicate of control points is avoided
+	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(cpts); }
+	else if(IConfig.checkDuplicatedControlPointOnEdge){ checkDuplicatedCPOnEdge(cpts); }
+	
 	controlPoints = cpts;
 	this.degree = degree;
 	this.knots = knots;
@@ -175,6 +179,16 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	for(int i=0; i<cpts.length; i++){
 	    defaultWeights[i] = !(cpts[i] instanceof IVec4I);
 	}
+    }
+    
+    static public void checkDuplicatedCP(IVecI[] cpts){
+	for(int i=0; i<cpts.length; i++)
+	    for(int j=i+1; j<cpts.length; j++)
+		if(cpts[j]==cpts[i]) cpts[j] = cpts[i].dup();
+    }
+    
+    static public void checkDuplicatedCPOnEdge(IVecI[] cpts){
+	if(cpts[0]==cpts[cpts.length-1]) cpts[cpts.length-1] = cpts[0].dup();
     }
     
     static public IVec[] getPointsFromArray(double[][] xyzvalues){
@@ -273,13 +287,16 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
         retval.z = (val2.z-val1.z)/val1.w;
     }
     
-    
-    public IVec cp(int i){ return controlPoints[i].get(); }
+    /** getting i-th control point */
+    public IVecI cp(int i){ return controlPoints[i]/*.get()*/; }
+    /** getting i-th control point */
     public IVecI cp(IIntegerI i){ return controlPoints[i.x()]; }
+    
+    public IVecI[] cps(){ return controlPoints; }
     
     public IVec ep(int i){ return pt(knots[i+degree]); }
     public IVec ep(IIntegerI i){ return pt(knots[i.x()+degree]); }
-
+    
     public IVec start(){ return pt(0.); }
     public IVec end(){ return pt(1.); }
     
@@ -288,6 +305,14 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
     public double knot(int i){ return knots[i]; }
     public IDouble knot(IIntegerI i){ return new IDouble(knots[i.x()]); }
+
+    public double[] knots(){ return knots; }
+    public double[] knots(ISwitchE e){ return knots(); }
+    public IDouble[] knots(ISwitchR r){
+	IDouble[] kn = new IDouble[knots.length];
+	for(int i=0; i<knots.length; i++) kn[i] = new IDouble(knots[i]);
+	return kn;
+    }
     
     public int knotNum(){ return knots.length; }
     //public IInteger knotNumR(){ return new IInteger(knots.length); }
@@ -349,7 +374,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public IDouble uend(ISwitchR r){ return new IDouble(uend()); }
     
     
-    // not teste; test this
+    // not tested; test this
     public boolean isClosed(){
 	// check if start and end of parameter match with knots[0] and knots[knots.length-1]
 	boolean knotsEndMatch=true;
@@ -414,5 +439,193 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	}
 	return this;
     }
+    
+    
+    
+    /********************************************************************************
+     * transformation methods
+     *******************************************************************************/
+    
+    public ICurveGeo add(double x, double y, double z){
+	for(IVecI p:controlPoints){ p.add(x,y,z); } return this;
+    }
+    public ICurveGeo add(IDoubleI x, IDoubleI y, IDoubleI z){
+	for(IVecI p:controlPoints){ p.add(x,y,z); } return this;
+    }
+    public ICurveGeo add(IVecI v){ for(IVecI p:controlPoints){ p.add(v); } return this; }
+    public ICurveGeo sub(double x, double y, double z){
+	for(IVecI p:controlPoints){ p.sub(x,y,z); } return this;
+    }
+    public ICurveGeo sub(IDoubleI x, IDoubleI y, IDoubleI z){
+	for(IVecI p:controlPoints){ p.sub(x,y,z); } return this;
+    }
+    public ICurveGeo sub(IVecI v){ for(IVecI p:controlPoints){ p.sub(v); } return this; }
+    public ICurveGeo mul(IDoubleI v){ for(IVecI p:controlPoints){ p.mul(v); } return this; }
+    public ICurveGeo mul(double v){ for(IVecI p:controlPoints){ p.mul(v); } return this; }
+    public ICurveGeo div(IDoubleI v){ for(IVecI p:controlPoints){ p.div(v); } return this; }
+    public ICurveGeo div(double v){ for(IVecI p:controlPoints){ p.div(v); } return this; }
+    
+    public ICurveGeo neg(){ for(IVecI p:controlPoints){ p.neg(); } return this; }
+    /** alias of neg */
+    public ICurveGeo flip(){ return neg(); }
+    
+    
+    /** scale add */
+    public ICurveGeo add(IVecI v, double f){ for(IVecI p:controlPoints){ p.add(v,f); } return this; }
+    public ICurveGeo add(IVecI v, IDoubleI f){ for(IVecI p:controlPoints){ p.add(v,f); } return this; }
+    
+    public ICurveGeo rot(IVecI axis, IDoubleI angle){
+	for(IVecI p:controlPoints){ p.rot(axis,angle); } return this;
+    }
+    public ICurveGeo rot(IVecI axis, double angle){
+	for(IVecI p:controlPoints){ p.rot(axis,angle); } return this;
+    }
+    public ICurveGeo rot(IVecI center, IVecI axis, IDoubleI angle){
+	for(IVecI p:controlPoints){ p.rot(center,axis,angle); } return this;
+    }
+    public ICurveGeo rot(IVecI center, IVecI axis, double angle){
+	for(IVecI p:controlPoints){ p.rot(center,axis,angle); } return this;
+    }
+    /** rotate to destination direction vector */
+    public ICurveGeo rot(IVecI axis, IVecI destDir){
+	for(IVecI p:controlPoints){ p.rot(axis,destDir); } return this;
+    }
+    /** rotate to destination point location */
+    public ICurveGeo rot(IVecI center, IVecI axis, IVecI destPt){
+	for(IVecI p:controlPoints){ p.rot(center,axis,destPt); } return this;
+    }
+    
+    /** alias of mul */
+    public ICurveGeo scale(IDoubleI f){ return mul(f); }
+    public ICurveGeo scale(double f){ return mul(f); }
+    public ICurveGeo scale(IVecI center, IDoubleI f){
+	for(IVecI p:controlPoints){ p.scale(center,f); } return this;
+    }
+    public ICurveGeo scale(IVecI center, double f){
+	for(IVecI p:controlPoints){ p.scale(center,f); } return this;
+    }
+    
+    /** scale only in 1 direction */
+    public ICurveGeo scale1d(IVecI axis, double f){
+	for(IVecI p:controlPoints){ p.scale1d(axis,f); } return this;
+    }
+    public ICurveGeo scale1d(IVecI axis, IDoubleI f){
+	for(IVecI p:controlPoints){ p.scale1d(axis,f); } return this;
+    }
+    public ICurveGeo scale1d(IVecI center, IVecI axis, double f){
+	for(IVecI p:controlPoints){ p.scale1d(center,axis,f); } return this;
+    }
+    public ICurveGeo scale1d(IVecI center, IVecI axis, IDoubleI f){
+	for(IVecI p:controlPoints){ p.scale1d(center,axis,f); } return this;
+    }
+    
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public ICurveGeo ref(IVecI planeDir){
+	for(IVecI p:controlPoints){ p.ref(planeDir); } return this;
+    }
+    public ICurveGeo ref(IVecI center, IVecI planeDir){
+	for(IVecI p:controlPoints){ p.ref(center,planeDir); } return this;
+    }
+    /** mirror is alias of ref */
+    public ICurveGeo mirror(IVecI planeDir){ return ref(planeDir); }
+    public ICurveGeo mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
+    
+    /** shear operation */
+    public ICurveGeo shear(double sxy, double syx, double syz,
+			   double szy, double szx, double sxz){
+	for(IVecI p:controlPoints){ p.shear(sxy,syx,syz,szy,szx,sxz); } return this;
+    }
+    public ICurveGeo shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			   IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	for(IVecI p:controlPoints){ p.shear(sxy,syx,syz,szy,szx,sxz); } return this;
+    }
+    public ICurveGeo shear(IVecI center, double sxy, double syx, double syz,
+			   double szy, double szx, double sxz){
+	for(IVecI p:controlPoints){ p.shear(center,sxy,syx,syz,szy,szx,sxz); } return this;
+    }
+    public ICurveGeo shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			   IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	for(IVecI p:controlPoints){ p.shear(center,sxy,syx,syz,szy,szx,sxz); } return this;
+    }
+    
+    public ICurveGeo shearXY(double sxy, double syx){
+	for(IVecI p:controlPoints){ p.shearXY(sxy,syx); } return this;
+    }
+    public ICurveGeo shearXY(IDoubleI sxy, IDoubleI syx){
+	for(IVecI p:controlPoints){ p.shearXY(sxy,syx); } return this;
+    }
+    public ICurveGeo shearXY(IVecI center, double sxy, double syx){
+	for(IVecI p:controlPoints){ p.shearXY(center,sxy,syx); } return this;
+    }
+    public ICurveGeo shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	for(IVecI p:controlPoints){ p.shearXY(center,sxy,syx); } return this;
+    }
+    
+    public ICurveGeo shearYZ(double syz, double szy){
+	for(IVecI p:controlPoints){ p.shearYZ(syz,szy); } return this;
+    }
+    public ICurveGeo shearYZ(IDoubleI syz, IDoubleI szy){
+	for(IVecI p:controlPoints){ p.shearYZ(syz,szy); } return this;
+    }
+    public ICurveGeo shearYZ(IVecI center, double syz, double szy){
+	for(IVecI p:controlPoints){ p.shearYZ(center,syz,szy); } return this;
+    }
+    public ICurveGeo shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	for(IVecI p:controlPoints){ p.shearYZ(center,syz,szy); } return this;
+    }
+    
+    public ICurveGeo shearZX(double szx, double sxz){
+	for(IVecI p:controlPoints){ p.shearZX(szx,sxz); } return this;
+    }
+    public ICurveGeo shearZX(IDoubleI szx, IDoubleI sxz){
+	for(IVecI p:controlPoints){ p.shearZX(szx,sxz); } return this;
+    }
+    public ICurveGeo shearZX(IVecI center, double szx, double sxz){
+	for(IVecI p:controlPoints){ p.shearZX(center,szx,sxz); } return this;
+    }
+    public ICurveGeo shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	for(IVecI p:controlPoints){ p.shearZX(center,szx,sxz); } return this;
+    }
+    
+    /** translate is alias of add() */
+    public ICurveGeo translate(double x, double y, double z){ return add(x,y,z); }
+    public ICurveGeo translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ICurveGeo translate(IVecI v){ return add(v); }
+    
+    
+    public ICurveGeo transform(IMatrix3I mat){
+	for(IVecI p:controlPoints){ p.transform(mat); } return this;
+    }
+    public ICurveGeo transform(IMatrix4I mat){
+	for(IVecI p:controlPoints){ p.transform(mat); } return this;
+    }
+    public ICurveGeo transform(IVecI xvec, IVecI yvec, IVecI zvec){
+	for(IVecI p:controlPoints){ p.transform(xvec,yvec,zvec); } return this;
+    }
+    public ICurveGeo transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
+	for(IVecI p:controlPoints){ p.transform(xvec,yvec,zvec,translate); } return this;
+    }
+    
+    
+    /** mv() is alias of add() */
+    public ICurveGeo mv(double x, double y, double z){ return add(x,y,z); }
+    public ICurveGeo mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public ICurveGeo mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public ICurveGeo cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public ICurveGeo cp(double x, double y, double z){ return dup().add(x,y,z); }
+    /** cp() is alias of dup().add() */
+    public ICurveGeo cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    /** cp() is alias of dup().add() */
+    public ICurveGeo cp(IVecI v){ return dup().add(v); }
+    
+    
+    
     
 }

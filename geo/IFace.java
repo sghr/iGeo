@@ -219,7 +219,7 @@ public class IFace{
     }
     
     // average normal
-
+    
     public IVec getAverageNormal(){
 	int n = vertices.length;
 	IVec nrm = new IVec();

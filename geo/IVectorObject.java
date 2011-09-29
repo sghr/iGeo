@@ -122,6 +122,7 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject div(double v){ vec.div(v); return this; }
     public IVectorObject neg(){ vec.neg(); return this; }
     public IVectorObject rev(){ return neg(); }
+    public IVectorObject flip(){ return neg(); }
     
     public IVectorObject add(IVecI v, double f){ vec.add(v,f); return this; }
     public IVectorObject add(IVecI v, IDoubleI f){ vec.add(v,f); return this; }
@@ -200,26 +201,29 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject rot(IVecI center, IVecI axis, IDoubleI angle){
 	vec.rot(center, axis,angle); return this;
     }
-        
-    /**
-       rotate to destination direction vector
-    */
+    
+    /** rotate to destination direction vector */
     public IVectorObject rot(IVecI axis, IVecI destDir){ vec.rot(axis,destDir); return this; }
-    /**
-       rotate to destination point location
-    */
+    /** rotate to destination point location */
     public IVectorObject rot(IVecI center, IVecI axis, IVecI destPt){
 	vec.rot(center,axis,destPt); return this;
     }
     
-    /**
-       same with mul
-    */
+    /** alias of mul */
     public IVectorObject scale(IDoubleI f){ vec.scale(f); return this; }
     public IVectorObject scale(double f){ vec.scale(f); return this; }
-    
     public IVectorObject scale(IVecI center, IDoubleI f){ vec.scale(center,f); return this; }
     public IVectorObject scale(IVecI center, double f){ vec.scale(center,f); return this; }
+    
+    /** scale only in 1 direction */
+    public IVectorObject scale1d(IVecI axis, double f){ vec.scale1d(axis,f); return this; }
+    public IVectorObject scale1d(IVecI axis, IDoubleI f){ vec.scale1d(axis,f); return this; }
+    public IVectorObject scale1d(IVecI center, IVecI axis, double f){
+	vec.scale1d(center,axis,f); return this;
+    }
+    public IVectorObject scale1d(IVecI center, IVecI axis, IDoubleI f){
+	vec.scale1d(center,axis,f); return this;
+    }
     
     /** reflect (mirror) 3 dimensionally to the other side of the plane */
     public IVectorObject ref(IVecI planeDir){ vec.ref(planeDir); return this; }
@@ -231,6 +235,73 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject mirror(IVecI center, IVecI planeDir){
 	vec.ref(center,planeDir); return this;
     }
+    
+    
+    /** shear operation */
+    public IVectorObject shear(double sxy, double syx, double syz,
+			       double szy, double szx, double sxz){
+	vec.shear(sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IVectorObject shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			       IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	vec.shear(sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IVectorObject shear(IVecI center, double sxy, double syx, double syz,
+			       double szy, double szx, double sxz){
+	vec.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    public IVectorObject shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			       IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	vec.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+    }
+    
+    public IVectorObject shearXY(double sxy, double syx){ vec.shearXY(sxy,syx); return this; }
+    public IVectorObject shearXY(IDoubleI sxy, IDoubleI syx){ vec.shearXY(sxy,syx); return this; }
+    public IVectorObject shearXY(IVecI center, double sxy, double syx){
+	vec.shearXY(center,sxy,syx); return this;
+    }
+    public IVectorObject shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	vec.shearXY(center,sxy,syx); return this;
+    }
+    
+    public IVectorObject shearYZ(double syz, double szy){ vec.shearYZ(syz,szy); return this; }
+    public IVectorObject shearYZ(IDoubleI syz, IDoubleI szy){ vec.shearYZ(syz,szy); return this; }
+    public IVectorObject shearYZ(IVecI center, double syz, double szy){
+	vec.shearYZ(center,syz,szy); return this;
+    }
+    public IVectorObject shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	vec.shearYZ(center,syz,szy); return this;
+    }
+    
+    public IVectorObject shearZX(double szx, double sxz){ vec.shearZX(szx,sxz); return this; }
+    public IVectorObject shearZX(IDoubleI szx, IDoubleI sxz){ vec.shearZX(szx,sxz); return this; }
+    public IVectorObject shearZX(IVecI center, double szx, double sxz){
+	vec.shearZX(center,szx,sxz); return this;
+    }
+    public IVectorObject shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	vec.shearZX(center,szx,sxz); return this;
+    }
+    
+    /** translate is alias of add() */
+    public IVectorObject translate(double x, double y, double z){ vec.translate(x,y,z); return this; }
+    public IVectorObject translate(IDoubleI x, IDoubleI y, IDoubleI z){ vec.translate(x,y,z); return this; }
+    public IVectorObject translate(IVecI v){ vec.translate(v); return this; }
+    
+    
+    /** mv() is alias of add() */
+    public IVectorObject mv(double x, double y, double z){ return add(x,y,z); }
+    public IVectorObject mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IVectorObject mv(IVecI v){ return add(v); }
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public IVectorObject cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IVectorObject cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public IVectorObject cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IVectorObject cp(IVecI v){ return dup().add(v); }
+    
     
     public IVectorObject transform(IMatrix3I mat){ vec.transform(mat); return this; }
     public IVectorObject transform(IMatrix4I mat){ vec.transform(mat); return this; }

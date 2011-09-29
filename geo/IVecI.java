@@ -28,7 +28,7 @@ package igeo.geo;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public interface IVecI extends IVecOp{
+public interface IVecI extends IVecOp, ITransformable{
     //public static final IVec xaxis = new IVec(1,0,0);
     //public static final IVec yaxis = new IVec(0,1,0);
     //public static final IVec zaxis = new IVec(0,0,1);
@@ -65,10 +65,10 @@ public interface IVecI extends IVecOp{
     public IVecI div(IDoubleI v);
     public IVecI div(double v);
     public IVecI neg();
-    /**
-       same with neg
-    */
+    /** alias of neg() */
     public IVecI rev();
+    /** alias of neg() */
+    public IVecI flip();
     
     /**
        scale add
@@ -193,33 +193,64 @@ public interface IVecI extends IVecOp{
     public IVecI rot(IVecI center, IVecI axis, IDoubleI angle);
     public IVecI rot(IVecI center, IVecI axis, double angle);
     
-    /**
-       rotate to destination direction vector
-    */
+    /** rotate to destination direction vector */
     public IVecI rot(IVecI axis, IVecI destDir);
-    /**
-       rotate to destination point location
-    */
+    /** rotate to destination point location */
     public IVecI rot(IVecI center, IVecI axis, IVecI destPt);
     
     
-    /**
-       same with mul
-    */
+    /** alias of mul */
     public IVecI scale(IDoubleI f);
     public IVecI scale(double f);
-    
     public IVecI scale(IVecI center, IDoubleI f);
     public IVecI scale(IVecI center, double f);
     
-    /**
-       reflect(mirror) 3 dimensionally to the other side of the plane
-    */
+    
+    /** scale only in 1 direction */
+    public IVecI scale1d(IVecI axis, double f);
+    public IVecI scale1d(IVecI axis, IDoubleI f);
+    public IVecI scale1d(IVecI center, IVecI axis, double f);
+    public IVecI scale1d(IVecI center, IVecI axis, IDoubleI f);
+    
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
     public IVecI ref(IVecI planeDir);
     public IVecI ref(IVecI center, IVecI planeDir);
-    
     public IVecI mirror(IVecI planeDir);
     public IVecI mirror(IVecI center, IVecI planeDir);
+    
+    
+    /** shear operation */
+    public IVecI shear(double sxy, double syx, double syz,
+				double szy, double szx, double sxz);
+    public IVecI shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+				IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    public IVecI shear(IVecI center, double sxy, double syx, double syz,
+				double szy, double szx, double sxz);
+    public IVecI shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+				IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    
+    public IVecI shearXY(double sxy, double syx);
+    public IVecI shearXY(IDoubleI sxy, IDoubleI syx);
+    public IVecI shearXY(IVecI center, double sxy, double syx);
+    public IVecI shearXY(IVecI center, IDoubleI sxy, IDoubleI syx);
+    
+    public IVecI shearYZ(double syz, double szy);
+    public IVecI shearYZ(IDoubleI syz, IDoubleI szy);
+    public IVecI shearYZ(IVecI center, double syz, double szy);
+    public IVecI shearYZ(IVecI center, IDoubleI syz, IDoubleI szy);
+    
+    public IVecI shearZX(double szx, double sxz);
+    public IVecI shearZX(IDoubleI szx, IDoubleI sxz);
+    public IVecI shearZX(IVecI center, double szx, double sxz);
+    public IVecI shearZX(IVecI center, IDoubleI szx, IDoubleI sxz);
+    
+    
+    /** translate is alias of add() */
+    public IVecI translate(double x, double y, double z);
+    public IVecI translate(IDoubleI x, IDoubleI y, IDoubleI z);
+    public IVecI translate(IVecI v);
+    
     
     public IVecI transform(IMatrix3I mat);
     public IVecI transform(IMatrix4I mat);
@@ -227,6 +258,21 @@ public interface IVecI extends IVecOp{
     public IVecI transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate);
     
     
+    /** mv() is alias of add() */
+    public IVecI mv(double x, double y, double z);
+    public IVecI mv(IDoubleI x, IDoubleI y, IDoubleI z);
+    public IVecI mv(IVecI v);
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public IVecI cp();
+    
+    /** cp() is alias of dup().add() */
+    public IVecI cp(double x, double y, double z);
+    public IVecI cp(IDoubleI x, IDoubleI y, IDoubleI z);
+    public IVecI cp(IVecI v);
+    
+        
     // methods creating new instance
     public IVecI diff(IVecI v);
     public IVecI mid(IVecI v);
