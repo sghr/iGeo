@@ -26,7 +26,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 
-import igeo.core.IOut;
+import igeo.core.*;
 
 /**
    Class to provide function to load image from external file into Java AWT Image object.
@@ -36,6 +36,9 @@ import igeo.core.IOut;
 */
 public class IImageLoader implements ImageObserver{
     public static final IImageLoader observer=new IImageLoader();
+
+    public static boolean convertFilePath=true;
+    
     
     public static Image getImage(String filename){
 	return getImage(filename, new Container());
@@ -43,6 +46,18 @@ public class IImageLoader implements ImageObserver{
     }
     
     public static Image getImage(String filename, Component component){
+	
+	if(convertFilePath){
+	    File f = new File(filename);
+	    if(!f.isAbsolute()){
+		IG ig = IG.current();
+		if(ig!=null && ig.getBasePath()!=null){
+		    filename = ig.getBasePath() + File.separator + filename;
+		}
+	    }
+	}
+	
+	
 	MediaTracker mt = new MediaTracker(component);
 	Image image=null;
 	IOut.debug(10,"opening image of "+filename); //

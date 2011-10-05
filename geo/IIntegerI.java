@@ -72,7 +72,8 @@ public interface IIntegerI extends IIntegerOp{
     
     public IIntegerI mod(IIntegerI v);
     public IIntegerI mod(int v);
-    
+
+    public boolean eq(int v);
     public boolean eq(IIntegerI v);
     //public IBoolI eqR(IIntegerI v);
     public boolean eq(ISwitchE e, IIntegerI v);

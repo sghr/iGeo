@@ -80,9 +80,207 @@ public class ICurveCreator{
     }
     public static ICurve curve(ICurveI crv){ return new ICurve(server, crv); }
     
-    // rect, circle, oval, arc, 
-    public static ICurve rect(){
-	return null;
+    
+    public static ICurve rect(IVecI corner, double xwidth, double yheight){
+	return rect(corner, new IVec(xwidth,0,0), new IVec(0,yheight,0));
     }
+    public static ICurve rect(IVecI corner, IVecI width, IVecI height){
+	IVecI[] cpts = new IVecI[5];
+	cpts[0] = corner;
+	cpts[1] = corner.dup().add(width);
+	cpts[2] = corner.dup().add(width).add(height); 
+	cpts[3] = corner.dup().add(height);
+	cpts[4] = corner.dup();
+	return new ICurve(server, cpts);
+    }
+    
+    public static ICurve rect(double x, double y, double z, double xwidth, double yheight){
+	return rect(new IVec(x,y,z),xwidth,yheight);
+    }
+    
+    public static ICircle circle(IVecI center, IVecI normal, IDoubleI radius){
+	return new ICircle(server, center, normal, radius);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, double radius){
+        return new ICircle(server, center, normal, radius);
+    }
+    public static ICircle circle(IVecI center, IDoubleI radius){
+	return new ICircle(server,center,radius);
+    }
+    public static ICircle circle(IVecI center, double radius){
+        return new ICircle(server,center,radius);
+    }
+    public static ICircle circle(double x, double y, double z, double radius){
+        return new ICircle(server,x,y,z,radius);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IDoubleI xradius, IDoubleI yradius){
+        return new ICircle(server,center, normal, xradius, yradius);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, double xradius, double yradius){
+        return new ICircle(server,center, normal, xradius, yradius);
+    }
+    public static ICircle circle(IVecI center, IDoubleI xradius, IDoubleI yradius){
+        return new ICircle(server,center, xradius, yradius);
+    }
+    public static ICircle circle(IVecI center, double xradius, double yradius){
+        return new ICircle(server,center, xradius, yradius);
+    }
+    public static ICircle circle(double x, double y, double z, double xradius, double yradius){
+        return new ICircle(server,x,y,z,xradius,yradius);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IVecI rollDir, double radius){
+        return new ICircle(server,center,normal,rollDir,radius);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IVecI rollDir, IDoubleI radius){
+        return new ICircle(server, center, normal, rollDir, radius);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IVecI rollDir, double xradius, double yradius){
+        return new ICircle(server, center, normal, rollDir, xradius, yradius);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IVecI rollDir, IDoubleI xradius, IDoubleI yradius){
+        return new ICircle(server, center, normal, rollDir, xradius, yradius);
+    }
+    public static ICircle circle(IVecI center, IVecI xradiusVec, IVecI yradiusVec){
+        return new ICircle(server, center, xradiusVec, yradiusVec);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IDoubleI radius, boolean approx){
+        return new ICircle(server,center,normal,radius,approx);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, double radius, boolean approx){
+        return new ICircle(server,center,normal,radius,approx);
+    }
+    public static ICircle circle(IVecI center, IDoubleI radius, boolean approx){
+        return new ICircle(server,center,radius,approx);
+    }
+    public static ICircle circle(IVecI center, double radius, boolean approx){
+        return new ICircle(server,center,radius,approx);
+    }
+    public static ICircle circle(double x, double y, double z, double radius, boolean approx){
+        return new ICircle(server,x,y,z,radius,approx);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, double xradius, double yradius, boolean approx){
+	return new ICircle(server,center,normal,xradius,yradius,approx);
+	
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IDoubleI xradius, IDoubleI yradius, boolean approx){
+        return new ICircle(server,center,normal,xradius,yradius,approx);
+    }
+    public static ICircle circle(IVecI center, double xradius, double yradius, boolean approx){
+        return new ICircle(server,center,xradius,yradius,approx);
+    }
+    public static ICircle circle(IVecI center, IDoubleI xradius, IDoubleI yradius, boolean approx){
+        return new ICircle(server,center,xradius,yradius,approx);
+    }
+    public static ICircle circle(double x, double y, double z, double xradius, double yradius, boolean approx){
+        return new ICircle(server,x,y,z,xradius,yradius,approx);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IVecI rollDir, double radius, boolean approx){
+        return new ICircle(server,center,normal,rollDir,radius,approx);
+    }
+    public static ICircle circle(IVecI center, IVecI normal, IVecI rollDir, IDoubleI radius, boolean approx){
+	return new ICircle(server,center,normal,rollDir,radius,approx);
+    }
+    
+    public static ICircle circle(IVecI center, IVecI normal, IVecI rollDir, double xradius, double yradius, boolean approx){
+        return new ICircle(server,center,normal,rollDir,xradius,yradius,approx);
+    }
+    
+    public static ICircle circle(IVecI center, IVecI normal, IVecI rollDir, IDoubleI xradius, IDoubleI yradius, boolean approx){
+        return new ICircle(server,center,normal,rollDir,xradius,yradius,approx);
+    }
+    
+    public static ICircle circle(IVecI center, IVecI xradiusVec, IVecI yradiusVec, boolean approx){
+	return new ICircle(server,center,xradiusVec,yradiusVec,approx);
+    }
+    
+    
+    public static ICircle ellipse(IVecI center, IVecI xradiusVec, IVecI yradiusVec){
+	return new ICircle(server,center,xradiusVec,yradiusVec);
+    }
+    public static ICircle ellipse(IVecI center, IDoubleI xradius, IDoubleI yradius){
+        return new ICircle(server,center, xradius, yradius);
+    }
+    public static ICircle ellipse(IVecI center, double xradius, double yradius){
+        return new ICircle(server,center, xradius, yradius);
+    }
+    public static ICircle ellipse(double x, double y, double z, double xradius, double yradius){
+        return new ICircle(server,x,y,z,xradius,yradius);
+    }
+    
+    
+    
+    // rect, circle, oval, arc,
+    public static IArc arc(IVecI center, IVecI normal, IVecI startPt, double angle){
+        return new IArc(server, center, normal, startPt, angle);
+    }
+    public static IArc arc(IVecI center, IVecI normal, IVecI startPt, IDoubleI angle){
+        return new IArc(server, center, normal, startPt, angle);
+    }
+    public static IArc arc(IVecI center, IVecI startPt, double angle){
+        return new IArc(server, center, startPt, angle);
+    }
+    public static IArc arc(IVecI center, IVecI startPt, IDoubleI angle){
+        return new IArc(server, center, startPt, angle);
+    }
+    public static IArc arc(double x, double y, double z, double startX, double startY, double startZ, double angle){
+        return new IArc(server,x,y,z,startX,startY,startZ,angle);
+    }
+    public static IArc arc(IVecI center, IVecI startPt, IVecI endPt, IBoolI flipArcSide){
+        return new IArc(server,center,startPt,endPt,flipArcSide);
+    }
+    public static IArc arc(IVecI center, IVecI startPt, IVecI endPt, boolean flipArcSide){
+        return new IArc(server,center,startPt,endPt,flipArcSide);
+    }
+    public static IArc arc(IVecI center, IVecI startPt, IVecI midPt, IVecI endPt, IVecI normal){
+        return new IArc(server,center,startPt,midPt,endPt,normal);
+    }
+    
+    public static ICurve offset(ICurveI curve, double width, IVecI planeNormal){
+	double[] knots = new double[curve.knotNum()];
+	for(int i=0; i<knots.length; i++) knots[i] = curve.knot(i);
+	if(!curve.isClosed()){
+	    return new ICurve(IVec.offset(curve.cps(),width,planeNormal),
+			      curve.deg(), knots);
+	}
+	IVecI[] cpts = new IVec[curve.num()-curve.deg()+1];
+	for(int i=0; i<cpts.length; i++) cpts[i] = curve.cp(i);
+	return new ICurve(IVec.offset(cpts,width,planeNormal), curve.deg(), knots);
+    }
+    
+    public static ICurve offset(ICurveI curve, IDoubleI width, IVecI planeNormal){
+	double[] knots = new double[curve.knotNum()];
+	for(int i=0; i<knots.length; i++) knots[i] = curve.knot(i);
+	if(!curve.isClosed()){
+	    return new ICurve(IVec.offset(curve.cps(),width,planeNormal),
+			      curve.deg(), knots);
+	}
+	IVecI[] cpts = new IVec[curve.num()-curve.deg()+1];
+	for(int i=0; i<cpts.length; i++) cpts[i] = curve.cp(i);
+	return new ICurve(IVec.offset(cpts,width,planeNormal), curve.deg(), knots);
+    }
+    
+    public static ICurve offset(ICurveI curve, double width){
+	double[] knots = new double[curve.knotNum()];
+	for(int i=0; i<knots.length; i++) knots[i] = curve.knot(i);
+	if(!curve.isClosed()){
+	    return new ICurve(IVec.offset(curve.cps(),width),curve.deg(),knots);
+	}
+	IVecI[] cpts = new IVec[curve.num()-curve.deg()+1];
+	for(int i=0; i<cpts.length; i++) cpts[i] = curve.cp(i);
+	return new ICurve(IVec.offset(cpts,width), curve.deg(), knots);
+    }
+    
+    public static ICurve offset(ICurveI curve, IDoubleI width){
+	double[] knots = new double[curve.knotNum()];
+	for(int i=0; i<knots.length; i++) knots[i] = curve.knot(i);
+	if(!curve.isClosed()){
+	    return new ICurve(IVec.offset(curve.cps(),width),curve.deg(),knots);
+	}
+	IVecI[] cpts = new IVec[curve.num()-curve.deg()+1];
+	for(int i=0; i<cpts.length; i++) cpts[i] = curve.cp(i);
+	return new ICurve(IVec.offset(cpts,width), curve.deg(), knots);
+    }
+    
+    
     
 }

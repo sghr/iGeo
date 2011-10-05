@@ -133,7 +133,8 @@ public class IVertex implements IVecI{
     public double dot(ISwitchE e, IVecI v){ return pos.dot(e,v); }
     public IDoubleI dot(ISwitchR r, IVecI v){ return pos.dot(r,v); }
     
-    public IVecI cross(IVecI v){ return pos.cross(v); }
+    //public IVecI cross(IVecI v){ return pos.cross(v); }
+    public IVertex cross(IVecI v){ return dup().set(pos.cross(v)); }
     
     public double len(){ return pos.len(); }
     public double len(ISwitchE e){ return pos.len(e); }
@@ -313,6 +314,16 @@ public class IVertex implements IVecI{
     public IVertex sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return dup().mul(w1).add(v2,w2); }
     public IVertex sum(IVecI v2, IDoubleI w2){ return dup().mul((new IDouble(1.0)).sub(w2)).add(v2,w2); }
     
+    
+    /** alias of cross. (not unitized ... ?) */
+    public IVertex nml(IVecI v){ return cross(v); }
+    /** create normal vector from 3 points of self, pt1 and pt2 */
+    public IVertex nml(IVecI pt1, IVecI pt2){
+	return this.diff(pt1).cross(this.diff(pt2)).unit();
+    }
+    
+
+    
     public IVec getAverageNormal(){
 	if(faces==null || faces.size()==0) return new IVec(0,0,1); // default
 	IVec n=new IVec(0,0,0);
@@ -326,17 +337,20 @@ public class IVertex implements IVecI{
 	normal = getAverageNormal();
     }
     
-    public IVecI normal(){ return nrml(); }
-    public IVecI nrml(){
+    public IVecI normal(){ return nml(); }
+    public IVecI nrml(){ return nml(); }
+    public IVecI nml(){
 	if(normal==null) calcNormal();
 	return normal;
     }
     //public IVecI nrml(){ return normal.dup(); } //1. why dup? 2. crash if normal is null.
     
-    public IVertex normal(IVec n){ nrml(n); return this; }
-    public IVertex normal(double x, double y, double z){ nrml(x,y,z); return this; }
-    public IVertex nrml(IVec n){ normal = n; return this; }
-    public IVertex nrml(double x, double y, double z){ nrml(new IVec(x,y,z)); return this; }
+    public IVertex normal(IVec n){ return nml(n); }
+    public IVertex normal(double x, double y, double z){ return nml(x,y,z); }
+    public IVertex nrml(IVec n){ return nml(n); }
+    public IVertex nrml(double x, double y, double z){ return nml(x,y,z); }
+    public IVertex nml(IVec n){ normal = n; return this; }
+    public IVertex nml(double x, double y, double z){ nrml(new IVec(x,y,z)); return this; }
     
     public IVec2I texture(){ return texture; }
     public IVertex texture(IVec2I t){ texture = t; return this; }

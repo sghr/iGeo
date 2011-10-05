@@ -30,7 +30,7 @@ package igeo.geo;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public interface IVec4I extends IVec4Op{
+public interface IVec4I extends IVec4Op, IVecI{
     public double x();
     public double y();
     public double z();

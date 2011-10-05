@@ -42,8 +42,8 @@ public class IMap{
     
     public static final double densityMinDelta = 1.0/10000;
     
-    public DoubleMap uIntegration=null, vIntegration=null;
-        
+    public IDoubleMap uIntegration=null, vIntegration=null;
+    
     
     /**
        A main method to get a value of the map.
@@ -55,11 +55,13 @@ public class IMap{
     */
     public double get(double u, double v){ return 0.0; }
     
+    public double get(IVec2I v){ return get(v.x(),v.y()); }
+    
     public void initDensityMapU(){ initDensityMapU(defaultDensityWidth, defaultDensityHeight); }
     public void initDensityMapV(){ initDensityMapV(defaultDensityWidth, defaultDensityHeight); }
     
     public void initDensityMapU(int width, int height){
-	uIntegration = new DoubleMap(width+1,height);
+	uIntegration = new IDoubleMap(width+1,height);
 	
 	for(int j=0; j<height; j++){
 	    double sum = 0;
@@ -79,7 +81,7 @@ public class IMap{
 	}
     }
     public void initDensityMapV(int width, int height){
-	vIntegration = new DoubleMap(width,height+1);
+	vIntegration = new IDoubleMap(width,height+1);
 	
 	for(int i=0; i<width; i++){
 	    double sum = 0;
@@ -102,7 +104,7 @@ public class IMap{
     
     public void scaleDensityMapU(double factor){ uIntegration.scale(factor); }
     public void scaleDensityMapV(double factor){ vIntegration.scale(factor); }
-
+    
     public void matchUDensityWithMap(IMap map, double u, double v){
 	matchUDensityWithMap(map,u,u+densityMinDelta,v);
     }
@@ -177,11 +179,12 @@ public class IMap{
        to be defined in sub class
     */
     public void flipV(){}
-
+    
     
     /**
        A subclass of IMap containing 2D array of double to implement a map.
     */
+    /*
     public static class DoubleMap extends IMap{
 	public boolean interpolation=true;
 	public int width, height;
@@ -251,12 +254,13 @@ public class IMap{
 	public void add(double val){
 	    for(int i=0; i<width; i++) for(int j=0; j<height; j++) map[i][j] += val;
 	}
-	
     }
+    */
     
     /**
        A subclass of IMap defined by two value to generate gradient map in u direction.
     */
+    /*
     public static class ULinearMap extends IMap{
 	public double uval1, uval2;
 	public ULinearMap(double u1, double u2){ uval1 = u1; uval2 = u2; }
@@ -265,9 +269,11 @@ public class IMap{
 	    double tmp = uval1; uval1 = uval2; uval2 = tmp;
 	}
     }
+    */
     /**
        A subclass of IMap defined by two value to generate gradient map in v direction.
     */
+    /*
     public static class VLinearMap extends IMap{
 	public double vval1, vval2;
 	public VLinearMap(double v1, double v2){ vval1 = v1; vval2 = v2; }
@@ -276,11 +282,12 @@ public class IMap{
 	    double tmp = vval1; vval1 = vval2; vval2 = tmp;
 	}
     }
-    
+    */
     /**
        A subclass of IMap defined by multiple u domain and multiple values.
        A value on the map is calculated by interpolation of assigned values.
     */
+    /*
     public static class UPiecewiseLinearMap extends IMap{
 	public ArrayList<Double> domains;
 	public ArrayList<Double> values;
@@ -288,10 +295,6 @@ public class IMap{
 	    domains = new ArrayList<Double>();
 	    values = new ArrayList<Double>();
 	}
-	/**
-	   this needs to be called in order of domain
-	   @param domain [0,1]
-	*/
 	public void addValue(double domain, double value){
 	    domains.add(domain);
 	    values.add(value);
@@ -325,11 +328,12 @@ public class IMap{
 	    values = newvalues;
 	}
     }
-    
+    */
     /**
        A subclass of IMap defined by multiple v domain and multiple values.
        A value on the map is calculated by interpolation of assigned values.
     */
+    /*
     public static class VPiecewiseLinearMap extends IMap{
 	public ArrayList<Double> domains;
 	public ArrayList<Double> values;
@@ -337,10 +341,6 @@ public class IMap{
 	    domains = new ArrayList<Double>();
 	    values = new ArrayList<Double>();
 	}
-	/**
-	   this needs to be called in order of domain
-	   @param domain [0,1]
-	*/
 	public void addValue(double domain, double value){
 	    domains.add(domain);
 	    values.add(value);
@@ -374,11 +374,12 @@ public class IMap{
 	    values = newvalues;
 	}
     }
-    
+    */
     
     /**
        A subclass of IMap defined by sine curve in u direction.
     */
+    /*
     public static class USineMap extends IMap{
 	public double minValue, maxValue;
 	public double frequency;
@@ -398,11 +399,12 @@ public class IMap{
 	    return (Math.sin( (x-phase)*2*Math.PI*frequency )+1)/2*(maxValue-minValue)+minValue;
 	}
     }
-    
+    */
     
     /**
        A subclass of IMap defined by sine curve in v direction.
     */
+    /*
     public static class VSineMap extends IMap{
 	public double minValue, maxValue;
 	public double frequency;
@@ -415,18 +417,17 @@ public class IMap{
 	    phase = phs;
 	}
 	
-	public double get(double u, double v){
-	    return get(v);
-	}
+	public double get(double u, double v){ return get(v); }
 	public double get(double x){
 	    return (Math.sin( (x-phase)*frequency*2*Math.PI)+1)/2*(maxValue-minValue)+minValue;
 	}
     }
-    
+    */
     
     /**
        A subclass of IMap defined by a bitmap image.
     */
+    /*
     public static class ImageMap extends DoubleMap{
 	public Image image;
 	
@@ -477,19 +478,16 @@ public class IMap{
 	public void initDensityMapU(){ initDensityMapU(this.width, this.height); }
 	public void initDensityMapV(){ initDensityMapV(this.width, this.height); }
     }
-    
-    
+    */
     
     /**
        A subclass of IMap defined by accumulated curvature of a surface
     */
+    /*
     public static class SurfaceDensityMap extends IMap{
 	public ISurfaceI surface;
 	public IVec orig, uvec, vvec;
 	
-	/**
-	   @param surf surface should be rectangle
-	 */
 	public SurfaceDensityMap(ISurfaceI surf){
 	    surface=surf;
 	    initMap();
@@ -525,27 +523,22 @@ public class IMap{
 	}
 	
     }
-    
-    
-    
+    */
     
     /**
        A subclass of IMap defined by depth of surface in the assigned depth direction.
     */
+    /*
     public static class SurfaceDepthMap extends IMap{
 	public ISurfaceI surface;
 	public IVec orig, uvec, vvec;
 	//double minDepth,maxDepth;
 	
-	/**
-	   maxDepthDir is a normal vector
-	*/
+	// maxDepthDir is a normal vector
 	public IVec minDepthPt=null, depthDir=null;
 	public double maxDepth=0;
 	
-	/**
-	   @param surf surface should be rectangle
-	*/
+	// @param surf surface should be rectangle
 	public SurfaceDepthMap(ISurfaceI surf){
 	    surface=surf;
 	    initMap();
@@ -605,11 +598,9 @@ public class IMap{
 	    }
 	}
 	
-	
 	public double getDepth(double u, double v){
 	    return getDepth(surface.pt(u,v).get());
 	}
-	
 	
 	public double getDepth(IVec pt){
 	    IVec diff = pt.diff(minDepthPt);
@@ -621,10 +612,12 @@ public class IMap{
 	    return depthDir.dot(diff)/maxDepth;
 	}
     }
+    */
     
     /**
        A subclass of IMap defined by z depth of surface. 
     */
+    /*
     public static class SurfaceZDepthMap extends SurfaceDepthMap{
 	public SurfaceZDepthMap(ISurfaceI surf, double minZ, double maxZ){
 	    super(surf, new IVec(0,0,1), new IVec(0,0,minZ), new IVec(0,0,maxZ));
@@ -651,11 +644,12 @@ public class IMap{
 	    maxDepth = maxz-minz;
 	}
     }
-    
+    */
     
     /**
        A subclass of IMap defined by another map and parameter shift in u direction in a stripe way in v direction
     */
+    /*
     public static class UStripeShiftMap extends IMap{
 	public ArrayList<Double> domains;
 	public ArrayList<Double> shiftAmounts;
@@ -699,11 +693,12 @@ public class IMap{
 	}
 	
     }
-    
+    */
     
     /**
        A subclass of IMap defined by another map and parameter shift in v direction in a stripe way in u direction
     */
+    /*
     public static class VStripeShiftMap extends IMap{
 	public ArrayList<Double> domains;
 	public ArrayList<Double> shiftAmounts;
@@ -747,12 +742,13 @@ public class IMap{
 	}
 	
     }
-    
+    */
     
     /**
        A subclass of IMap defined by addition of two maps.
        Output value is crampped with 0.0 - 1.0.
     */
+    /*
     public static class AddedMap extends IMap{
 	public IMap map1, map2;
 	public AddedMap(IMap m1,IMap m2){ map1=m1; map2=m2; }
@@ -765,10 +761,13 @@ public class IMap{
 	public void flipU(){ map1.flipU(); map2.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map1.flipV(); map2.flipV(); } //is it ok to modify the original?
     }
+    */
+    
     /**
        A subclass of IMap defined by subtraction of two maps.
        Output value is crampped with 0.0 - 1.0.
     */
+    /*
     public static class SubtractedMap extends IMap{
 	public IMap map1, map2;
 	public SubtractedMap(IMap m1,IMap m2){ map1=m1; map2=m2; }
@@ -781,10 +780,13 @@ public class IMap{
 	public void flipU(){ map1.flipU(); map2.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map1.flipV(); map2.flipV(); } //is it ok to modify the original?
     }
+    */
+    
     /**
        A subclass of IMap defined by multiplication of two maps.
        Output value is NOT crampped.
     */
+    /*
     public static class MultipliedMap extends IMap{
 	public IMap map1, map2;
 	public MultipliedMap(IMap m1,IMap m2){ map1=m1; map2=m2; }
@@ -792,9 +794,12 @@ public class IMap{
 	public void flipU(){ map1.flipU(); map2.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map1.flipV(); map2.flipV(); } //is it ok to modify the original?
     }
+    */
+    
     /**
        A subclass of IMap defined by taking larger value of two maps.
     */
+    /*
     public static class MaxMap extends IMap{
 	public IMap map1, map2;
 	public MaxMap(IMap m1,IMap m2){ map1=m1; map2=m2; }
@@ -807,9 +812,12 @@ public class IMap{
 	public void flipU(){ map1.flipU(); map2.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map1.flipV(); map2.flipV(); } //is it ok to modify the original?
     }
+    */
+    
     /**
        A subclass of IMap defined by taking smaller value of two maps.
     */
+    /*
     public static class MinMap extends IMap{
 	public IMap map1, map2;
 	public MinMap(IMap m1,IMap m2){ map1=m1; map2=m2; }
@@ -822,9 +830,12 @@ public class IMap{
 	public void flipU(){ map1.flipU(); map2.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map1.flipV(); map2.flipV(); } //is it ok to modify the original?
     }
+    */
+    
     /**
        A subclass of IMap defined by inverting value from 0 to 1 and 1 to 0.
     */
+    /*
     public static class InvertMap extends IMap{
 	public IMap map;
 	public InvertMap(IMap m){ map = m; }
@@ -832,11 +843,13 @@ public class IMap{
 	public void flipU(){ map.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map.flipV(); } //is it ok to modify the original?
     }
+    */
     
     /**
        A subclass of IMap defined by scaling another map.
        Output value is crampped with 0.0 - 1.0.
     */
+    /*
     public static class ScaledMap extends IMap{
 	public IMap map;
 	public double scaleFactor;
@@ -845,10 +858,12 @@ public class IMap{
 	public void flipU(){ map.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map.flipV(); } //is it ok to modify the original?
     }
+    */
     
     /**
        A subclass of IMap defined by flipping another map in u direction.
     */
+    /*
     public static class UFlippedMap extends IMap{
 	public IMap map;
 	public UFlippedMap(IMap m){ map = m; }
@@ -856,10 +871,12 @@ public class IMap{
 	public void flipU(){ map.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map.flipV(); } //is it ok to modify the original?
     }
+    */
     
     /**
        A subclass of IMap defined by flipping another map in v direction.
     */
+    /*
     public static class VFlippedMap extends IMap{
 	public IMap map;
 	public VFlippedMap(IMap m){ map = m; }
@@ -867,11 +884,12 @@ public class IMap{
 	public void flipU(){ map.flipU(); } //is it ok to modify the original?
 	public void flipV(){ map.flipV(); } //is it ok to modify the original?
     }
-    
+    */
     
     /**
        A subclass of IMap defined by extracting part of another map.
     */
+    /*
     public static class SubMap extends IMap{
 	public IMap map;
 	public double u1,u2,v1,v2;
@@ -884,14 +902,17 @@ public class IMap{
 	}
 	public double get(double u, double v){ return map.get((u2-u1)*u+u1,(v2-v1)*v+v1); }
     }
+    */
     
     /**
        A subclass of IMap defined by one constant number
     */
+    /*
     public static class ConstantMap extends IMap{
 	public double value;
 	public ConstantMap(double val){ value=val; }
 	public double get(double u, double v){ return value; }
     }
+    */
     
 }

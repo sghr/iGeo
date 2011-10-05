@@ -83,7 +83,8 @@ public class IInteger extends IParameterObject implements IIntegerI, IEntityPara
     public IInteger mod(int i){ x=x%i; return this; }
     public IInteger mod(IInteger v){ x=x%v.x; return this; }
     public IInteger mod(IIntegerI v){ x=x%v.x(); return this; }
-    
+
+    public boolean eq(int v){ return x==v; }
     public boolean eq(IInteger v){ return x==v.x; }
     public boolean eq(IIntegerI v){ return x==v.x(); }
     //public IBool eqR(IIntegerI v){ return new IBool(eq(v)); }

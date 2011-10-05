@@ -291,4 +291,13 @@ public interface IVecI extends IVecOp, ITransformable{
     public IVecI sum(IVecI v2, IDoubleI w2);
     
     
+    /**
+       alias of cross
+    */
+    public IVecI nml(IVecI v);
+    /**
+       create normal vector from 3 points of self, pt1 and pt2
+    */
+    public IVecI nml(IVecI pt1, IVecI pt2);
+    
 }

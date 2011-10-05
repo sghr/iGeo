@@ -132,7 +132,8 @@ public class IVectorObject extends IObject implements IVecI{
     public double dot(ISwitchE e, IVecI v){ return vec.dot(e,v); }
     public IDoubleI dot(ISwitchR r, IVecI v){ return vec.dot(r,v); }
     
-    public IVecI cross(IVecI v){ return vec.cross(v); }
+    //public IVecI cross(IVecI v){ return vec.cross(v); }
+    public IVectorObject cross(IVecI v){ return dup().set(vec.cross(v)); }
     
     public double len(){ return vec.len(); }
     public double len(ISwitchE e){ return vec.len(e); }
@@ -341,6 +342,13 @@ public class IVectorObject extends IObject implements IVecI{
     }
     public IVectorObject sum(IVecI v2, IDoubleI w2){
 	return dup().mul(new IDouble(1.0).sub(w2)).add(v2,w2);
+    }
+    
+    /** alias of cross. (not unitized ... ?) */
+    public IVectorObject nml(IVecI v){ return cross(v); }
+    /** create normal vector from 3 points of self, pt1 and pt2 */
+    public IVectorObject nml(IVecI pt1, IVecI pt2){
+	return this.diff(pt1).cross(this.diff(pt2)).unit();
     }
     
     

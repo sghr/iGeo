@@ -161,10 +161,7 @@ public class ISurfaceCreator{
     }
     
     public static ISurface plane(IVecI corner, double xwidth, double yheight){
-	IVec w = new IVec(xwidth,0,0);
-	IVec h = new IVec(0,yheight,0);
-	return new ISurface(server, corner, corner.dup().add(w),
-			    corner.dup().add(w).add(h), corner.dup().add(h));
+	return plane(corner, new IVec(xwidth,0,0), new IVec(0,yheight,0));
     }
     
     public static ISurface plane(IVecI corner, IVecI widthVec, IVecI heightVec){
@@ -565,6 +562,18 @@ public class ISurfaceCreator{
 	return pts2;
     }
     
+    
+    public static IVecI[] duplicatePoints(IVecI[] pts, double weight){
+	IVecI[] pts2 = new IVecI[pts.length];
+	for(int i=0; i<pts.length; i++){
+	    double w = 1.0;
+	    if(pts[i] instanceof IVec4I){ w = ((IVec4I)pts[i]).w(); }
+	    pts2[i] = pts[i].to4d(w*weight);
+	}
+	return pts2;
+    }
+    
+    
     public static IVecI[] orient(IVecI[] pts, IVecI center, IVec n, IVecI location, IVecI dir){
 	IVec axis = null;
 	double angle = 0;
@@ -583,6 +592,8 @@ public class ISurfaceCreator{
 	
 	if(!parallel) n.rot(axis,angle);
 	center.set(location);
+	// multiply weight
+	if(location instanceof IVec4I) return duplicatePoints(pts, ((IVec4I)location).w());
 	
 	return duplicatePoints(pts);
     }
@@ -597,7 +608,11 @@ public class ISurfaceCreator{
 	    parallel = angle < IConfig.angleResolution;
 	}
 	
-	IVecI[] bsct = duplicatePoints(pts);
+	IVecI[] bsct = null;
+	// multiply weight
+	if(location instanceof IVec4I) bsct = duplicatePoints(pts, ((IVec4I)location).w());
+	else bsct = duplicatePoints(pts);
+	
 	double bangle = angle/2;
 	
 	for(IVecI p:pts){
@@ -819,6 +834,107 @@ public class ISurfaceCreator{
 	if(!same) IOut.err("num of control points needs to be same for lofting");
 	return min;
     }
+    
+    
+    public static IVecI[][] checkCPNumForLoft(IVecI[][] pts){
+	if(pts==null||pts.length==0){ IOut.err("no pts is provided"); return null; }
+	int min = pts[0].length;
+	boolean same=true;
+	for(int i=1; i<pts.length; i++){
+	    if(pts[i].length != min){
+		same=false;
+		if(pts[i].length < min) min = pts[i].length;
+	    }
+	}
+	if(!same) IOut.err("num of control points needs to be same for lofting");
+	//return min;
+	
+	if(same) return pts;
+	
+	IVecI[][] pts2 = new IVecI[pts.length][min];
+	for(int i=0; i<pts.length; i++)
+	    for(int j=0; j<min; j++) pts2[i][j] = pts[i][j];
+	return pts2;
+    }
+    
+    public static ISurface loft(IVecI[][] pts){
+	return surface(checkCPNumForLoft(pts));
+    }
+    
+    public static ISurface loft(IVecI[][] pts, boolean closeLoft, boolean closePts){
+	return surface(checkCPNumForLoft(pts),closeLoft, closePts);
+    }
+    
+    public static ISurface loft(IVecI[][] pts, int loftDeg, int ptsDeg){
+	return surface(checkCPNumForLoft(pts), loftDeg, ptsDeg);
+    }
+    
+    public static ISurface loft(IVecI[][] pts, int loftDeg, int ptsDeg,
+				boolean closeLoft, boolean closePts){
+	return surface(checkCPNumForLoft(pts), loftDeg, ptsDeg, closeLoft, closePts);
+    }
+    
+    public static ISurface loft(IVecI[] pts1, IVecI[] pts2){
+	IVecI[][] cpts = new IVecI[2][];
+	cpts[0] = pts1;
+	cpts[1] = pts2;
+	return surface(checkCPNumForLoft(cpts));
+    }
+    
+    public static ISurface loft(IVecI[] pts1, IVecI[] pts2, boolean closePts){
+	IVecI[][] cpts = new IVecI[2][];
+	cpts[0] = pts1;
+	cpts[1] = pts2;
+	return surface(checkCPNumForLoft(cpts),false,closePts);
+    }
+    
+    public static ISurface loft(IVecI[] pts1, IVecI[] pts2, int ptsDeg){
+	IVecI[][] cpts = new IVecI[2][];
+	cpts[0] = pts1;
+	cpts[1] = pts2;
+	return surface(checkCPNumForLoft(cpts), 1, ptsDeg);
+    }
+    
+    public static ISurface loft(IVecI[] pts1, IVecI[] pts2, int ptsDeg, boolean closePts){
+	IVecI[][] cpts = new IVecI[2][];
+	cpts[0] = pts1;
+	cpts[1] = pts2;
+	return surface(checkCPNumForLoft(cpts), 1, ptsDeg, false, closePts);
+    }
+        
+    public static ISurface loft(IVecI[] pts1, IVecI[] pts2, IVecI[] pts3){
+	IVecI[][] cpts = new IVecI[3][];
+	cpts[0] = pts1;
+	cpts[1] = pts2;
+	cpts[2] = pts3;
+	return surface(checkCPNumForLoft(cpts));
+    }
+    
+    public static ISurface loft(IVecI[] pts1, IVecI[] pts2, IVecI[] pts3,
+				boolean closePts){
+	IVecI[][] cpts = new IVecI[3][];
+	cpts[0] = pts1;
+	cpts[1] = pts2;
+	cpts[2] = pts3;
+	return surface(checkCPNumForLoft(cpts),false,closePts);
+    }
+    
+    public static ISurface loft(IVecI[] pts1, IVecI[] pts2, IVecI[] pts3, int loftDeg, int ptsDeg){
+	IVecI[][] cpts = new IVecI[3][];
+	cpts[0] = pts1;
+	cpts[1] = pts2;
+	cpts[2] = pts3;
+	return surface(checkCPNumForLoft(cpts),loftDeg,ptsDeg);
+    }
+    
+    public static ISurface loft(IVecI[] pts1, IVecI[] pts2, IVecI[] pts3, int loftDeg, int ptsDeg, boolean closePts){
+	IVecI[][] cpts = new IVecI[3][];
+	cpts[0] = pts1;
+	cpts[1] = pts2;
+	cpts[2] = pts3;
+	return surface(checkCPNumForLoft(cpts),loftDeg,ptsDeg,false,closePts);
+    }
+    
     
     /** loft with sorted curves in x */
     public static ISurface loftX(ICurveI[] curves){ return loftX(curves, 1, false);}

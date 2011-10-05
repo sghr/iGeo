@@ -150,8 +150,8 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     }
     public IVec cross(IVecI v){ return cross(v.get()); }
 
-    /** cross product
-	changes its values by itself. no new instance created.
+    /** cross product,
+	changing its values by itself. no new instance created.
     */
     public IVec icross(IVec v){
         double xt = y*v.z - z*v.y;
@@ -174,7 +174,12 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public IVec len(double l){ l /= len(); x*=l; y*=l; z*=l; return this; }
     public IVec len(IDoubleI l){ return len(l.x()); }
     
-    public IVec unit(){ double l=len(); x/=l; y/=l; z/=l; return this; }
+    public IVec unit(){
+	double l=len();
+	//if(l==0){ IOut.err("vector length is zero"); return this; } // added 20111002 // removed 20111003
+	x/=l; y/=l; z/=l;
+	return this;
+    }
     
     public double dist(IVec v){
 	return Math.sqrt( (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y) + (z-v.z)*(z-v.z) );
@@ -485,7 +490,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     }
     
     public IVec transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
-	return transform(xvec.get(),yvec.get(),zvec.get());
+	return transform(xvec.get(),yvec.get(),zvec.get(),translate.get());
     }
     
     
@@ -557,22 +562,32 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     }
     
     
+    /**
+       alias of cross. (not unitized ... ?)
+    */
+    public IVec nml(IVecI v){ return cross(v); }
+    /**
+       create normal vector from 3 points of self, pt1 and pt2
+    */
+    public IVec nml(IVecI pt1, IVecI pt2){
+	return this.diff(pt1).cross(this.diff(pt2)).unit();
+    }
+    public IVec nml(IVec pt1, IVec pt2){
+	return this.diff(pt1).icross(this.diff(pt2)).unit();
+    }
     
     public static IVecI getNormal(IVecI pt1, IVecI pt2, IVecI pt3){
-	return pt2.diff(pt1).cross(pt3.diff(pt1)).unit();
+	return pt1.nml(pt2,pt3);
     }
     
     public static IVec getNormal(IVec pt1, IVec pt2, IVec pt3){
-	return pt2.diff(pt1).icross(pt3.diff(pt1)).unit();
+	return pt1.nml(pt2,pt3);
     }
     
-    public IVecI getNormal(IVecI pt2, IVecI pt3){
-	return pt2.diff(this).cross(pt3.diff(this)).unit();
-    }
+    public IVecI getNormal(IVecI pt2, IVecI pt3){ return nml(pt2,pt3); }
     
-    public IVec getNormal(IVec pt2, IVec pt3){
-	return pt2.diff(this).icross(pt3.diff(this)).unit();
-    }
+    public IVec getNormal(IVec pt2, IVec pt3){ return nml(pt2,pt3); }
+    
     
     public IVec projectToPlane(IVecI projectDir, IVecI planeNormal){
 	double ipRatio = dot(planeNormal)/projectDir.dot(planeNormal);
@@ -792,5 +807,450 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	
         return nml.unit();
     }
+    
+
+    public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal){
+	IVecI[] out = offset((IVecI[])pts,width,planeNormal);
+	if(out==null) return null;
+	IVec[] retval = new IVec[out.length];
+	for(int i=0; i<out.length; i++) retval[i] = out[i].get();
+	return retval;
+    }
+    
+    public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal, boolean close){
+	IVecI[] out = offset((IVecI[])pts,width,planeNormal,close);
+	if(out==null) return null;
+	IVec[] retval = new IVec[out.length];
+	for(int i=0; i<out.length; i++) retval[i] = out[i].get();
+	return retval;
+    }
+    
+    public static IVecI[] offset(IVecI[] pts, double width, IVecI planeNormal, boolean close){
+	if(!close || pts[0].eq(pts[pts.length-1]) ){
+	    return offset(pts,width,planeNormal);
+	}
+	IVecI[] pts2 = new IVecI[pts.length+1];
+	for(int i=0; i<pts.length; i++) pts2[i] = pts[i];
+	pts2[pts.length] = pts[0].dup();
+	IVecI[] out = offset(pts2,width,planeNormal);
+	if(out==null) return out;
+	IVecI[] retval = new IVecI[pts.length];
+	for(int i=0; i<pts.length; i++) retval[i] = out[i]; // one less
+	return retval;
+    }
+    
+    
+    public static IVecI[] offset(IVecI[] pts, double width, IVecI planeNormal){
+	if(pts==null){ IOut.err("pts is null"); return null; }
+	
+	int num = pts.length;
+        IVecI[] pts2 = new IVecI[num];
+        
+        for(int i=0; i<num; i++) pts2[i] = pts[i].dup();
+        if(width==0) return pts2; 
+        
+        IVecI[] normal = new IVecI[num-1];
+        for(int i=0; i<num-1; i++){
+            IVecI dir = pts[i+1].diff(pts[i]);
+            normal[i] = dir.cross(planeNormal);
+            normal[i].len(width);
+        }
+	
+        if(pts2[0].eq(pts[num-1])){ // in case of closed curve 
+            IVecI v = normal[num-2].dup().add(normal[0]);
+            v.mul(2*width*width/v.len2());
+            pts2[0].add(v);
+            pts2[num-1].add(v);
+        }
+        else{
+            pts2[0].add(normal[0]);
+            pts2[num-1].add(normal[num-2]);
+        }
+	
+	for(int i=1; i<num-1; i++){
+            IVecI v = normal[i-1].dup().add(normal[i]);
+            v.mul(2*width*width/v.len2());
+            pts2[i].add(v);
+        }
+        return pts2;
+    }
+    
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI planeNormal, boolean close){
+	if(!close || pts[0].eq(pts[pts.length-1]) ){
+	    return offset(pts,width,planeNormal);
+	}
+	IVecI[] pts2 = new IVecI[pts.length+1];
+	for(int i=0; i<pts.length; i++) pts2[i] = pts[i];
+	pts2[pts.length] = pts[0].dup();
+	IVecI[] out = offset(pts2,width,planeNormal);
+	if(out==null) return out;
+	IVecI[] retval = new IVecI[pts.length];
+	for(int i=0; i<pts.length; i++) retval[i] = out[i]; // one less
+	return retval;
+    }
+    
+    
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI planeNormal){
+	if(pts==null){ IOut.err("pts is null"); return null; }
+	
+	int num = pts.length;
+        IVecI[] pts2 = new IVecI[num];
+        
+        for(int i=0; i<num; i++) pts2[i] = pts[i].dup();
+        if(width.x()==0) return pts2; 
+        
+        IVecI[] normal = new IVecI[num-1];
+        for(int i=0; i<num-1; i++){
+            IVecI dir = pts[i+1].diff(pts[i]);
+            normal[i] = dir.cross(planeNormal);
+            normal[i].len(width);
+        }
+	
+        if(pts2[0].eq(pts[num-1])){ // in case of closed curve 
+            IVecI v = normal[num-2].dup().add(normal[0]);
+            v.mul(width.dup().pow(2).mul(2).div(v.len2(Ir.i)));
+            pts2[0].add(v);
+            pts2[num-1].add(v);
+        }
+        else{
+            pts2[0].add(normal[0]);
+            pts2[num-1].add(normal[num-2]);
+        }
+	
+	for(int i=1; i<num-1; i++){
+            IVecI v = normal[i-1].dup().add(normal[i]);
+            v.mul(width.dup().pow(2).mul(2).div(v.len2(Ir.i)));
+            pts2[i].add(v);
+        }
+        return pts2;
+    }
+    
+    
+    
+    public static IVecI[] offset(IVecI[] pts, IVecI[] normal, double width){
+	if(normal.length<pts.length){ IOut.err("normal array size ("+normal.length+") doesn't match with pts."); }
+	
+	int num = pts.length;
+        IVecI[] pts2 = new IVecI[num];
+        
+        for(int i=0; i<num; i++) pts2[i] = pts[i].dup();
+        if(width==0) return pts2; 
+	
+        if(pts[0].eq(pts[num-1])){ // in case of closed curve 
+	    IVecI off1 = pts[num-1].diff(pts[num-2]).cross(normal[0]).len(width);
+	    IVecI off2 = pts[1].diff(pts[0]).cross(normal[0]).len(width);
+	    IVecI v = off1.add(off2);
+            v.mul(2*width*width/v.len2());
+            pts2[0].add(v);
+            pts2[num-1].add(v);
+        }
+        else{
+	    IVecI off1 = pts[1].diff(pts[0]).cross(normal[0]).len(width);
+	    IVecI off2 = pts[num-1].diff(pts[num-2]).cross(normal[num-1]).len(width);
+            pts2[0].add(off1);
+            pts2[num-1].add(off2);
+        }
+	
+	for(int i=1; i<num-1; i++){
+	    IVecI off1 = pts[i].diff(pts[i-1]).cross(normal[i]).len(width);
+	    IVecI off2 = pts[i+1].diff(pts[i]).cross(normal[i]).len(width);
+	    
+	    IVecI v = off1.add(off2);
+            v.mul(2*width*width/v.len2());
+            pts2[i].add(v);
+        }
+        return pts2;
+    }
+    
+    
+    public static IVecI[] offset(IVecI[] pts, IVecI[] normal, IDoubleI width){
+	if(normal.length<pts.length){ IOut.err("normal array size ("+normal.length+") doesn't match with pts."); }
+	
+	int num = pts.length;
+        IVecI[] pts2 = new IVecI[num];
+        
+        for(int i=0; i<num; i++) pts2[i] = pts[i].dup();
+        if(width.x()==0) return pts2; 
+	
+        if(pts[0].eq(pts[num-1])){ // in case of closed curve 
+	    IVecI off1 = pts[num-1].diff(pts[num-2]).cross(normal[0]).len(width);
+	    IVecI off2 = pts[1].diff(pts[0]).cross(normal[0]).len(width);
+	    IVecI v = off1.add(off2);
+            v.mul(width.dup().pow(2).mul(2).div(v.len2(Ir.i)));
+            pts2[0].add(v);
+            pts2[num-1].add(v);
+        }
+        else{
+	    IVecI off1 = pts[1].diff(pts[0]).cross(normal[0]).len(width);
+	    IVecI off2 = pts[num-1].diff(pts[num-2]).cross(normal[num-1]).len(width);
+            pts2[0].add(off1);
+            pts2[num-1].add(off2);
+        }
+	
+	for(int i=1; i<num-1; i++){
+	    IVecI off1 = pts[i].diff(pts[i-1]).cross(normal[i]).len(width);
+	    IVecI off2 = pts[i+1].diff(pts[i]).cross(normal[i]).len(width);
+	    
+	    IVecI v = off1.add(off2);
+            v.mul(width.dup().pow(2).mul(2).div(v.len2(Ir.i)));
+            pts2[i].add(v);
+        }
+        return pts2;
+    }
+    
+    
+    /*
+    public static IVecI[] offset(IVecI[] pts, IVecI[] offsetDir, double width){
+	if(offsetDir.length<pts.length-1){ IOut.err("offsetDir length is too small ("+offsetDir.length+"). needs to be more than pts.length-1"); }
+	
+	int num = pts.length;
+        IVecI[] pts2 = new IVecI[num];
+        
+        for(int i=0; i<num; i++) pts2[i] = pts[i].dup();
+        if(width==0) return pts2; 
+        
+        IVecI[] off = new IVecI[num-1];
+        for(int i=0; i<num-1; i++) off[i] = offsetDir[i].dup().len(width);
+	
+        if(pts2[0].eq(pts[num-1])){ // in case of closed curve 
+            IVecI v = off[num-2].dup().add(off[0]);
+            v.mul(2*width*width/v.len2());
+            pts2[0].add(v);
+            pts2[num-1].add(v);
+        }
+        else{
+            pts2[0].add(off[0]);
+            pts2[num-1].add(off[num-2]);
+        }
+	
+	for(int i=1; i<num-1; i++){
+            IVecI v = off[i-1].dup().add(off[i]);
+            v.mul(2*width*width/v.len2());
+            pts2[i].add(v);
+        }
+        return pts2;
+    }
+    */
+    
+    /*
+    public static IVecI[] offset(IVecI[] pts, IVecI[] tangents,
+				 double width,IVecI planeNormal){
+	if(pts==null){ IOut.err("pts is null"); return null; }
+	
+        int num = pts.length;
+        IVecI[] pts2 = new IVecI[num];
+        IVecI[] normal = new IVecI[num];
+        for(int i=0; i<num; i++){
+            normal[i] = tangents[i].cross(planeNormal);
+            normal[i].len(width);
+            pts2[i] = pts[i].dup();
+            pts2[i].add(normal[i]);
+        }
+        return pts2;
+    }
+    public static IVecI[] offset(IVecI[] pts, IVecI[] tangents,
+				 IDoubleI width,IVecI planeNormal){
+	if(pts==null){ IOut.err("pts is null"); return null; }
+	
+        int num = pts.length;
+        IVecI[] pts2 = new IVecI[num];
+        IVecI[] normal = new IVecI[num];
+        for(int i=0; i<num; i++){
+            normal[i] = tangents[i].cross(planeNormal);
+            normal[i].len(width);
+            pts2[i] = pts[i].dup();
+            pts2[i].add(normal[i]);
+        }
+        return pts2;
+    }
+    */
+    
+    public static IVec[] offset(IVec[] pts, double width){
+	IVecI[] out = offset((IVecI[])pts,width);
+	if(out==null) return null;
+	IVec[] retval = new IVec[out.length];
+	for(int i=0; i<out.length; i++) retval[i] = out[i].get();
+	return retval;
+    }
+    
+    public static IVec[] offset(IVec[] pts, double width, boolean close){
+	IVecI[] out = offset((IVecI[])pts,width,close);
+	if(out==null) return null;
+	IVec[] retval = new IVec[out.length];
+	for(int i=0; i<out.length; i++) retval[i] = out[i].get();
+	return retval;
+    }
+    
+    public static IVecI[] offset(IVecI[] pts, double width, boolean close){
+	if(!close || pts[0].eq(pts[pts.length-1]) ){
+	    return offset(pts,width);
+	}
+	IVecI[] pts2 = new IVecI[pts.length+1];
+	for(int i=0; i<pts.length; i++) pts2[i] = pts[i];
+	pts2[pts.length] = pts[0].dup();
+	IVecI[] out = offset(pts2,width);
+	if(out==null) return out;
+	IVecI[] retval = new IVecI[pts.length];
+	for(int i=0; i<pts.length; i++) retval[i] = out[i]; // one less
+	return retval;
+    }
+    
+    public static IVecI[] offset(IVecI[] pts, double width){
+	if(pts==null){ IOut.err("pts is null"); return null; }
+	if(pts.length==1){ IOut.err("pts has only one point"); return null; }
+	
+	//IVecI[] offsetDir = new IVecI[pts.length-1];
+	IVecI[] normals = new IVecI[pts.length];
+	
+	if(pts.length==2){
+	    IVec normal = new IVec(0,0,1); // default
+	    IVecI diff = pts[1].diff(pts[0]);
+	    if(normal.isParallel(diff)){
+		normal = new IVec(1,0,0); // another default
+	    }
+	    //offsetDir[0] = diff.cross(normal);
+	    normals[0] = normal;
+	    normals[1] = normal;
+	    //return offset(pts,offsetDir,width);
+	    return offset(pts,normals,width);
+	}
+	
+	boolean close=false;
+	if(pts[0].eq(pts[pts.length-1])) close=true;
+	
+	IVecI normal=null, n0=null;
+	for(int i=0; i<pts.length; i++){
+	    if(i==0){
+		if(close){
+		    if(pts[pts.length-2].get().isStraight(pts[i],pts[i+1])){
+			normal = pts[pts.length-2].nml(pts[i],pts[i+1]);
+		    }
+		}
+		for(int j=i; j<pts.length-2 && normal==null; j++){
+		    if(!pts[j].get().isStraight(pts[j+1],pts[j+2])){
+			normal = pts[j].nml(pts[j+1],pts[j+2]);
+		    }
+		}
+		// if all straight
+		if(normal==null){
+		    normal = new IVec(0,0,1); // default;
+		    if(normal.get().isParallel(pts[i+1].diff(pts[i]))){
+			normal = new IVec(1,0,0); // default;
+		    }
+		}
+		n0=normal; // to be used at the end in case closed
+	    }
+	    else if(i<pts.length-1){
+		if(!pts[i-1].get().isStraight(pts[i],pts[i+1])){
+		    normal = pts[i-1].nml(pts[i],pts[i+1]);
+		}
+		else{} // use previous normal
+	    }
+	    else{ // i==pts.length==1
+		if(close) normal = n0;
+		else{} // use previous normal
+	    }
+	    //IVecI diff = pts[i+1].diff(pts[i]);
+	    //offsetDir[i] = diff.cross(normal);
+	    normals[i] = normal;
+	}
+	
+	// align normals
+	for(int i=1; i<normals.length; i++){
+	    if(!close || i<normals.length-1){
+		if( normals[i].dot(normals[i-1]) < 0 ) normals[i].neg();
+	    }
+	}
+	//return offset(pts, offsetDir, width);
+	return offset(pts, normals, width);
+    }
+    
+    
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, boolean close){
+	if(!close || pts[0].eq(pts[pts.length-1]) ){
+	    return offset(pts,width);
+	}
+	IVecI[] pts2 = new IVecI[pts.length+1];
+	for(int i=0; i<pts.length; i++) pts2[i] = pts[i];
+	pts2[pts.length] = pts[0].dup();
+	IVecI[] out = offset(pts2,width);
+	if(out==null) return out;
+	IVecI[] retval = new IVecI[pts.length];
+	for(int i=0; i<pts.length; i++) retval[i] = out[i]; // one less
+	return retval;
+    }
+    
+    
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width){
+	if(pts==null){ IOut.err("pts is null"); return null; }
+	if(pts.length==1){ IOut.err("pts has only one point"); return null; }
+	
+	//IVecI[] offsetDir = new IVecI[pts.length-1];
+	IVecI[] normals = new IVecI[pts.length];
+	
+	if(pts.length==2){
+	    IVec normal = new IVec(0,0,1); // default
+	    IVecI diff = pts[1].diff(pts[0]);
+	    if(normal.isParallel(diff)){
+		normal = new IVec(1,0,0); // another default
+	    }
+	    //offsetDir[0] = diff.cross(normal);
+	    normals[0] = normal;
+	    normals[1] = normal;
+	    //return offset(pts,offsetDir,width);
+	    return offset(pts,normals,width);
+	}
+	
+	boolean close=false;
+	if(pts[0].eq(pts[pts.length-1])) close=true;
+	
+	IVecI normal=null, n0=null;
+	for(int i=0; i<pts.length; i++){
+	    if(i==0){
+		if(close){
+		    if(pts[pts.length-2].get().isStraight(pts[i],pts[i+1])){
+			normal = pts[pts.length-2].nml(pts[i],pts[i+1]);
+		    }
+		}
+		for(int j=i; j<pts.length-2 && normal==null; j++){
+		    if(!pts[j].get().isStraight(pts[j+1],pts[j+2])){
+			normal = pts[j].nml(pts[j+1],pts[j+2]);
+		    }
+		}
+		// if all straight
+		if(normal==null){
+		    normal = new IVec(0,0,1); // default;
+		    if(normal.get().isParallel(pts[i+1].diff(pts[i]))){
+			normal = new IVec(1,0,0); // default;
+		    }
+		}
+		n0=normal; // to be used at the end in case closed
+	    }
+	    else if(i<pts.length-1){
+		if(!pts[i-1].get().isStraight(pts[i],pts[i+1])){
+		    normal = pts[i-1].nml(pts[i],pts[i+1]);
+		}
+		else{} // use previous normal
+	    }
+	    else{ // i==pts.length==1
+		if(close) normal = n0;
+		else{} // use previous normal
+	    }
+	    //IVecI diff = pts[i+1].diff(pts[i]);
+	    //offsetDir[i] = diff.cross(normal);
+	    normals[i] = normal;
+	}
+	
+	// align normals
+	for(int i=1; i<normals.length; i++){
+	    if(!close || i<normals.length-1){
+		if( normals[i].dot(normals[i-1]) < 0 ) normals[i].neg();
+	    }
+	}
+	//return offset(pts, offsetDir, width);
+	return offset(pts, normals, width);
+    }
+    
+    
     
 }

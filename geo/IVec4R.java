@@ -396,6 +396,18 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     }
     public IVec4R sum(IVecI v2, double w2){ return sum(v2,new IDouble(w2)); }    
     
+
+    /**
+       alias of cross. (not unitized ... ?)
+    */
+    public IVec4R nml(IVecI v){ return cross(v); }
+    /**
+       create normal vector from 3 points of self, pt1 and pt2
+    */
+    public IVec4R nml(IVecI pt1, IVecI pt2){
+	return this.diff(pt1).cross(this.diff(pt2)).unit();
+    }
+    
     
     
     static public class FromVec extends IParameterObject implements IVec4Op{

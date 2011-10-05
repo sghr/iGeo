@@ -65,7 +65,8 @@ public class IIntegerR extends IParameterObject implements IIntegerI, IReference
     
     public IIntegerR mod(IIntegerI u){ op=new Mod(op,u); return this; }
     public IIntegerR mod(int u){ op=new Mod(op,new IInteger(u)); return this; }
-    
+
+    public boolean eq(int v){ return op.get().eq(v); }
     public boolean eq(IIntegerI v){ return op.get().eq(v.get()); }
     //public IBoolR eqR(IIntegerI v){ return new IBoolR(new Eq(op,v)); }
     public boolean eq(ISwitchE e, IIntegerI v){ return eq(v); }

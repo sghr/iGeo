@@ -91,11 +91,13 @@ public class IDoubleR extends IParameterObject implements IDoubleI, IReferencePa
     public IDoubleI deg(){ op = new Deg(op); return this; }
     public IDoubleI rad(){ op = new Rad(op); return this; }
     
+    public boolean eq(double v){ return get().eq(v); }
     public boolean eq(IDoubleI v){ return get().eq(v); }
     //public IBoolR eqR(IDoubleI v){ return new IBoolR(new Eq(op,v)); }
     public boolean eq(ISwitchE e, IDoubleI v){ return eq(v); }
     public IBoolR eq(ISwitchR r, IDoubleI v){ return new IBoolR(new Eq(op,v)); }
     
+    public boolean eq(double v, double resolution){ return get().eq(v,resolution); }
     public boolean eq(IDoubleI v, double resolution){ return get().eq(v,resolution); }
     //public IBoolR eqR(IDoubleI v, IDoubleI resolution){ return new IBoolR(new Eq(op,v,resolution)); }
     public boolean eq(ISwitchE e, IDoubleI v, double resolution){ return eq(v,resolution); }

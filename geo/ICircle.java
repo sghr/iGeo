@@ -276,4 +276,7 @@ public class ICircle extends ICurve{
     }
     
     
+    // name(), layer(), clr() etc.
+    
+    
 }

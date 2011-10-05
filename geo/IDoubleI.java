@@ -88,12 +88,14 @@ public interface IDoubleI extends IDoubleOp{
     
     public IDoubleI deg();
     public IDoubleI rad();
-    
+
+    public boolean eq(double v);
     public boolean eq(IDoubleI v);
     //public IBoolI eqR(IDoubleI v);
     public boolean eq(ISwitchE e, IDoubleI v);
     public IBoolI eq(ISwitchR r, IDoubleI v);
     
+    public boolean eq(double v, double resolution);
     public boolean eq(IDoubleI v, double resolution);
     //public IBoolI eqR(IDoubleI v, IDoubleI resolution);
     public boolean eq(ISwitchE e, IDoubleI v, double resolution);

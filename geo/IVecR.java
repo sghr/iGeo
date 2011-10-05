@@ -370,7 +370,16 @@ public class IVecR extends IParameterObject implements IVecI, IReferenceParamete
     public IVecR sum(IVecI v2, double w2){ return sum(v2,new IDouble(w2)); }
     
     
-    
+    /**
+       alias of cross. (not unitized ... ?)
+    */
+    public IVecR nml(IVecI v){ return cross(v); }
+    /**
+       create normal vector from 3 points of self, pt1 and pt2
+    */
+    public IVecR nml(IVecI pt1, IVecI pt2){
+	return this.diff(pt1).cross(this.diff(pt2)).unit();
+    }
     
     
     // /////////////////////////////////

@@ -338,7 +338,15 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return sum(v2.get(),w1.x(),w2.x()); }
     public IVec4 sum(IVecI v2, IDoubleI w2){ return sum(v2.get(),w2.x()); }
     
+    /** alias of cross. (not unitized ... ?) */
+    public IVec4 nml(IVecI v){ return cross(v); }
+
+    /** create normal vector from 3 points of self, pt1 and pt2 */
+    public IVec nml(IVecI pt1, IVecI pt2){
+	return this.diff(pt1).cross(this.diff(pt2)).unit();
+    }
     
+        
     public String toString(){
 	return "("+String.valueOf(x)+","+String.valueOf(y)+","+String.valueOf(z)+
 	    ","+String.valueOf(w)+")";
