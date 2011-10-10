@@ -240,11 +240,18 @@ public class ICurveCreator{
 	for(int i=0; i<knots.length; i++) knots[i] = curve.knot(i);
 	if(!curve.isClosed()){
 	    return new ICurve(IVec.offset(curve.cps(),width,planeNormal),
-			      curve.deg(), knots);
+			      curve.deg(), knots, 0.0, 1.0);
 	}
 	IVecI[] cpts = new IVec[curve.num()-curve.deg()+1];
 	for(int i=0; i<cpts.length; i++) cpts[i] = curve.cp(i);
-	return new ICurve(IVec.offset(cpts,width,planeNormal), curve.deg(), knots);
+	IVecI[] cpts2 = IVec.offset(cpts,width,planeNormal);
+	if(curve.deg()==1) return new ICurve(cpts2, curve.deg(), knots, 0.0, 1.0);
+	IVecI[] cpts3 = new IVec[curve.num()];
+	for(int i=0; i<cpts3.length; i++){
+	    if(i<cpts2.length){ cpts3[i] = cpts2[i]; }
+	    else{ cpts3[i] = cpts2[i%(cpts2.length-1)].dup(); } // -1 is to skip degree 1 overlapping point
+	}
+	return new ICurve(cpts3, curve.deg(), knots, 0.0, 1.0);
     }
     
     public static ICurve offset(ICurveI curve, IDoubleI width, IVecI planeNormal){
@@ -252,33 +259,54 @@ public class ICurveCreator{
 	for(int i=0; i<knots.length; i++) knots[i] = curve.knot(i);
 	if(!curve.isClosed()){
 	    return new ICurve(IVec.offset(curve.cps(),width,planeNormal),
-			      curve.deg(), knots);
+			      curve.deg(), knots, 0.0, 1.0);
 	}
 	IVecI[] cpts = new IVec[curve.num()-curve.deg()+1];
 	for(int i=0; i<cpts.length; i++) cpts[i] = curve.cp(i);
-	return new ICurve(IVec.offset(cpts,width,planeNormal), curve.deg(), knots);
+	IVecI[] cpts2 = IVec.offset(cpts,width,planeNormal);
+	if(curve.deg()==1) return new ICurve(cpts2, curve.deg(), knots, 0.0, 1.0);
+	IVecI[] cpts3 = new IVec[curve.num()];
+	for(int i=0; i<cpts3.length; i++){
+	    if(i<cpts2.length){ cpts3[i] = cpts2[i]; }
+	    else{ cpts3[i] = cpts2[i%(cpts2.length-1)].dup(); } // -1 is to skip degree 1 overlapping point
+	}
+	return new ICurve(cpts3, curve.deg(), knots, 0.0, 1.0);
     }
     
     public static ICurve offset(ICurveI curve, double width){
 	double[] knots = new double[curve.knotNum()];
 	for(int i=0; i<knots.length; i++) knots[i] = curve.knot(i);
 	if(!curve.isClosed()){
-	    return new ICurve(IVec.offset(curve.cps(),width),curve.deg(),knots);
+	    return new ICurve(IVec.offset(curve.cps(),width),curve.deg(),knots, 0.0, 1.0);
 	}
 	IVecI[] cpts = new IVec[curve.num()-curve.deg()+1];
 	for(int i=0; i<cpts.length; i++) cpts[i] = curve.cp(i);
-	return new ICurve(IVec.offset(cpts,width), curve.deg(), knots);
+	IVecI[] cpts2 = IVec.offset(cpts,width);
+	if(curve.deg()==1){ return new ICurve(cpts2, curve.deg(), knots, 0.0, 1.0); }
+	IVecI[] cpts3 = new IVec[curve.num()];
+	for(int i=0; i<cpts3.length; i++){
+	    if(i<cpts2.length){ cpts3[i] = cpts2[i]; }
+	    else{ cpts3[i] = cpts2[i%(cpts2.length-1)].dup(); } // -1 is to skip degree 1 overlapping point
+	}
+	return new ICurve(cpts3, curve.deg(), knots, 0.0, 1.0);
     }
     
     public static ICurve offset(ICurveI curve, IDoubleI width){
 	double[] knots = new double[curve.knotNum()];
 	for(int i=0; i<knots.length; i++) knots[i] = curve.knot(i);
 	if(!curve.isClosed()){
-	    return new ICurve(IVec.offset(curve.cps(),width),curve.deg(),knots);
+	    return new ICurve(IVec.offset(curve.cps(),width),curve.deg(),knots, 0.0, 1.0);
 	}
 	IVecI[] cpts = new IVec[curve.num()-curve.deg()+1];
 	for(int i=0; i<cpts.length; i++) cpts[i] = curve.cp(i);
-	return new ICurve(IVec.offset(cpts,width), curve.deg(), knots);
+	IVecI[] cpts2 = IVec.offset(cpts,width);
+	if(curve.deg()==1) return new ICurve(cpts2, curve.deg(), knots, 0.0, 1.0);
+	IVecI[] cpts3 = new IVec[curve.num()];
+	for(int i=0; i<cpts3.length; i++){
+	    if(i<cpts2.length){ cpts3[i] = cpts2[i]; }
+	    else{ cpts3[i] = cpts2[i%(cpts2.length-1)].dup(); } // -1 is to skip degree 1 overlapping point
+	}
+	return new ICurve(cpts3, curve.deg(), knots, 0.0, 1.0);
     }
     
     

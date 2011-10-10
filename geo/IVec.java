@@ -943,7 +943,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
             v.mul(2*width*width/v.len2());
             pts2[0].add(v);
             pts2[num-1].add(v);
-        }
+	}
         else{
 	    IVecI off1 = pts[1].diff(pts[0]).cross(normal[0]).len(width);
 	    IVecI off2 = pts[num-1].diff(pts[num-2]).cross(normal[num-1]).len(width);
@@ -956,6 +956,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	    IVecI off2 = pts[i+1].diff(pts[i]).cross(normal[i]).len(width);
 	    
 	    IVecI v = off1.add(off2);
+	    
             v.mul(2*width*width/v.len2());
             pts2[i].add(v);
         }
@@ -1117,12 +1118,12 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	
 	boolean close=false;
 	if(pts[0].eq(pts[pts.length-1])) close=true;
-	
+			
 	IVecI normal=null, n0=null;
 	for(int i=0; i<pts.length; i++){
 	    if(i==0){
 		if(close){
-		    if(pts[pts.length-2].get().isStraight(pts[i],pts[i+1])){
+		    if(!pts[pts.length-2].get().isStraight(pts[i],pts[i+1])){
 			normal = pts[pts.length-2].nml(pts[i],pts[i+1]);
 		    }
 		}
@@ -1208,7 +1209,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	for(int i=0; i<pts.length; i++){
 	    if(i==0){
 		if(close){
-		    if(pts[pts.length-2].get().isStraight(pts[i],pts[i+1])){
+		    if(!pts[pts.length-2].get().isStraight(pts[i],pts[i+1])){
 			normal = pts[pts.length-2].nml(pts[i],pts[i+1]);
 		    }
 		}

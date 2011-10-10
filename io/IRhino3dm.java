@@ -6841,7 +6841,20 @@ public class IRhino3dm{
 	    return new IPolycurve(icrvs);
 	    //return null;
 	}
-	
+	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	    if(segment==null ||segment.size()==0) return null;
+	    // return only first curve
+	    return segment.get(0).createIGGeometry(context,s);
+	}
+
+	/*
+	// get geometry of each segment at index i.
+	public ICurveGeo createIGGeometryOfEach(Rhino3dmFile context, IServerI s, int i){
+	    if(segment==null ||i>=segment.size()) return null;
+	    return segment.get(i).createIGGeometry(context,s);
+	}
+	*/
+		
 	// this needs to be implemented
 	public ITrimCurve createTrimCurve(Rhino3dmFile context, IServerI s, ISurfaceI srf){
 	    return null; // !!! 
@@ -7094,6 +7107,11 @@ public class IRhino3dm{
 	    
 	    ICurveGeo crv1 = curve[0].createIGGeometry(context, s);
 	    ICurveGeo crv2 = curve[1].createIGGeometry(context, s);
+
+	    //IOut.err("curve[0] == "+curve[0]);
+	    //IOut.err("curve[1] == "+curve[1]);
+	    
+	    if(crv1==null||crv2==null) return null; //?
 	    
 	    int udeg = crv1.deg();
 	    int vdeg = crv2.deg();

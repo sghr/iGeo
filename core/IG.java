@@ -684,6 +684,55 @@ public class IG implements IServerI{
     }
     
     
+    /************
+     * offset points
+     ***********/
+    
+    public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal){
+	return IVec.offset(pts,width,planeNormal);
+    }    
+    public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal, boolean close){
+	return IVec.offset(pts,width,planeNormal,close);
+    }
+    
+    public static IVecI[] offset(IVecI[] pts, double width, IVecI planeNormal, boolean close){
+        return IVec.offset(pts,width,planeNormal,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, double width, IVecI planeNormal){
+	return IVec.offset(pts,width,planeNormal);
+    }
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI planeNormal, boolean close){
+	return IVec.offset(pts,width,planeNormal,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI planeNormal){
+	return IVec.offset(pts,width,planeNormal);
+    }
+    
+    public static IVecI[] offset(IVecI[] pts, IVecI[] normal, double width){
+	return IVec.offset(pts,normal,width);
+    }
+    public static IVecI[] offset(IVecI[] pts, IVecI[] normal, IDoubleI width){
+        return IVec.offset(pts, normal, width);
+    }
+    public static IVec[] offset(IVec[] pts, double width){
+	return IVec.offset(pts,width);
+    }
+    public static IVec[] offset(IVec[] pts, double width, boolean close){
+	return IVec.offset(pts,width,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, double width, boolean close){
+	return IVec.offset(pts,width,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, double width){
+	return IVec.offset(pts,width);
+    }       
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, boolean close){
+	return IVec.offset(pts,width,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width){
+	return IVec.offset(pts,width);
+    }
+    
     
     
     /*****************************************************************
@@ -892,6 +941,14 @@ public class IG implements IServerI{
 	return ISurfaceCreator.extrude(profile,extrudeDir);
     }
     
+    public static ISurface extrude(ICurveI profile, double extrudeDepth){
+	return ISurfaceCreator.extrude(profile,extrudeDepth);
+    }
+    public static ISurface extrude(ICurveI profile, IDoubleI extrudeDepth){
+	return ISurfaceCreator.extrude(profile,extrudeDepth);
+    }
+    
+    
     /** extrusion along path (profile control points are copied parallely) */
     public static ISurface extrude(IVecI[] profile, IVecI[] rail){
 	return ISurfaceCreator.extrude(profile,rail);
@@ -1025,6 +1082,9 @@ public class IG implements IServerI{
      * pipe
      *********************/
     
+    public static ISurface pipe(IVecI pt1, IVecI pt2, double radius){
+	return ISurfaceCreator.pipe(pt1,pt2,radius);
+    }
     public static ISurface pipe(IVecI[] rail, double radius){
 	return ISurfaceCreator.pipe(rail,radius);
     }
@@ -1042,6 +1102,9 @@ public class IG implements IServerI{
     }
     
     
+    public static ISurface squarePipe(IVecI pt1, IVecI pt2, double size){
+	return ISurfaceCreator.squarePipe(pt1,pt2,size);
+    }
     public static ISurface squarePipe(IVecI[] rail, double size){
 	return ISurfaceCreator.squarePipe(rail,size);
     }
@@ -1063,6 +1126,9 @@ public class IG implements IServerI{
        @param width size in the direction of offset of rail
        @param height size in the direction of normal of rail
     */
+    public static ISurface rectPipe(IVecI pt1, IVecI pt2, double width, double height){
+	return ISurfaceCreator.rectPipe(pt1,pt2,width,height);
+    }
     public static ISurface rectPipe(IVecI[] rail, double width, double height){
 	return ISurfaceCreator.rectPipe(rail,width,height);
     }
@@ -1087,6 +1153,10 @@ public class IG implements IServerI{
     
     public static ISurface loft(ICurveI[] curves){
 	return ISurfaceCreator.loft(curves);
+    }
+    
+    public static ISurface loft(ICurveI curve1, ICurveI curve2 ){
+	return ISurfaceCreator.loft(curve1,curve2);
     }
     
     public static ISurface loft(ICurveI[] curves, int deg){

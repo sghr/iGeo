@@ -273,6 +273,13 @@ public class ISurfaceCreator{
 			    0., 1., 0., 1.); // to have knots not normalized, it needs to put 0.0 and 1.0
     }
     
+    public static ISurface extrude(ICurveI profile, double extrudeDepth){
+	return extrude(profile, IVec.averageNormal(profile.cps()).len(extrudeDepth));
+    }
+    public static ISurface extrude(ICurveI profile, IDoubleI extrudeDepth){
+	return extrude(profile, IVec.averageNormal(profile.cps()).len(extrudeDepth));
+    }
+    
     /** extrusion along path (profile control points are copied parallely) */
     public static ISurface extrude(IVecI[] profile, IVecI[] rail){
 	return extrude(profile,1,false,rail,1,false);
@@ -667,6 +674,9 @@ public class ISurfaceCreator{
      * pipe
      *********************/
     
+    public static ISurface pipe(IVecI pt1, IVecI pt2, double radius){
+	return pipe(new IVecI[]{pt1, pt2}, 1, false, radius);
+    }
     public static ISurface pipe(IVecI[] rail, double radius){
 	return pipe(rail, 1, false, radius);
     }
@@ -699,7 +709,9 @@ public class ISurfaceCreator{
 	return sweep(profile, profDeg, profKnots, center, rail, railDeg, railKnots);
     }
     
-    
+    public static ISurface squarePipe(IVecI pt1, IVecI pt2, double size){
+	return rectPipe(new IVecI[]{ pt1, pt2 }, size, size);
+    }
     public static ISurface squarePipe(IVecI[] rail, double size){
 	return rectPipe(rail, size, size);
     }
@@ -735,6 +747,9 @@ public class ISurfaceCreator{
        @param width size in the direction of offset of rail
        @param height size in the direction of normal of rail
     */
+    public static ISurface rectPipe(IVecI pt1, IVecI pt2, double width, double height){
+	return rectPipe(new IVecI[]{ pt1, pt2 }, 1, false, width, height);
+    }
     public static ISurface rectPipe(IVecI[] rail, double width, double height){
 	return rectPipe(rail, 1, false, width, height);
     }
@@ -786,6 +801,10 @@ public class ISurfaceCreator{
     
     public static ISurface loft(ICurveI[] curves){
 	return loft(curves, 1, false);
+    }
+    
+    public static ISurface loft(ICurveI curve1, ICurveI curve2 ){
+	return loft(new ICurveI[]{ curve1, curve2 }, 1, false);
     }
     
     public static ISurface loft(ICurveI[] curves, int deg){
