@@ -321,6 +321,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     
     public void init(IVecI[][] cpts, int udeg, int vdeg, double[] uk, double[] vk){
 	
+	// check validity (costly?)
+	if(IConfig.checkValidControlPoint){ isValidCP(cpts, udeg, vdeg, uk, vk); }
+	
+	// duplicate of control points is avoided
+        if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(cpts); }
+        else if(IConfig.checkDuplicatedControlPointOnEdge){ checkDuplicatedCPOnEdge(cpts); }
+	
+	
 	controlPoints = cpts;
 	udegree = udeg;
 	vdegree = vdeg;
@@ -453,6 +461,96 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	
 	addOuterTrimLoop(trimCurves.toArray(new ITrimCurve[trimCurves.size()]));
     }
+    
+    
+    public boolean isValid(){
+	return isValidCP(controlPoints, udegree, vdegree, uknots, vknots);
+    }
+    
+    public static boolean isValidCP(IVecI[][] cpts, int udeg, int vdeg,
+				    double[] uknots, double[] vknots){
+	if(cpts==null){
+	    IOut.err("control points are null");
+	    return false;
+	}
+	
+	if(uknots==null){
+	    IOut.err("uknots are null");
+	    return false;
+	}
+	
+	if(vknots==null){
+	    IOut.err("vknots are null");
+	    return false;
+	}
+	
+	if(udeg <= 0){
+	    IOut.err("invalid udeg ("+udeg+")");
+	    return false;
+	}
+	
+	if(vdeg <= 0){
+	    IOut.err("invalid vdeg ("+vdeg+")");
+	    return false;
+	}
+	
+	int unum = cpts.length;
+	int vnum = cpts[0].length;
+	
+	for(int i=1; i<unum; i++){
+	    if(cpts[i].length!=vnum){
+		IOut.err("vnum("+vnum+") in control point array is inconsistent ("+
+			 cpts[i].length+")");
+		return false;
+	    }
+	}
+	
+	if(unum <= udeg){
+	    IOut.err("too less control points in u direction ("+unum+") for u degree "+udeg+". it needs minimum "+(udeg+1));
+	    return false;
+	}
+	
+	if(vnum <= vdeg){
+	    IOut.err("too less control points in v direction ("+vnum+") for v degree "+vdeg+". it needs minimum "+(vdeg+1));
+	    return false;
+	}
+	
+	if(uknots.length != (udeg+unum+1)){
+	    IOut.err("uknot array length is invalid. it needs to be "+(udeg+unum+1));
+	    return false;
+	}
+	
+	if(vknots.length != (vdeg+vnum+1)){
+	    IOut.err("vknot array length is invalid. it needs to be "+(vdeg+vnum+1));
+	    return false;
+	}
+
+	if(!isValidCP(cpts)) return false;
+	
+	if(!isValidKnots(uknots)){
+	    IOut.err("uknot has invalid value");
+	    return false;
+	}
+	if(!isValidKnots(vknots)){
+	    IOut.err("uknot has invalid value");
+	    return false;
+	}
+	
+	return true;
+    }
+    
+    public static boolean isValidCP(IVecI[][] cpts){
+	for(int i=0; i<cpts.length; i++){
+	    for(int j=0; j<cpts[i].length; j++){
+		if(!cpts[i][j].isValid()){
+		    IOut.err("controlPoint at "+i+","+j+" is invalid");
+		    return false;
+		}
+	    }
+	}
+	return true;
+    }
+    
     
     public static void checkDuplicatedCP(IVecI[][] cpts){
 	int un = cpts.length;

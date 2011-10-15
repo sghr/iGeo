@@ -28,7 +28,9 @@ package igeo.core;
    @author Satoru Sugihara
    @version 0.7.0.0
 */
-public class IParameterObject extends ISubobject{
+public class IParameterObject /*extends*/ implements ISubobject{
+    
+    public IObject parent;
     
     /**
        default constractor doesn't instantiate parent IObject
@@ -48,5 +50,11 @@ public class IParameterObject extends ISubobject{
 	parent = new IObject(holder);
 	parent.setParameter(this);
     }
+
+    // implementation of ISubobject
+    public IObject parent(){ return parent; }
+    public ISubobject parent(IObject parent){ this.parent=parent; return this; }
+    
+
     
 }

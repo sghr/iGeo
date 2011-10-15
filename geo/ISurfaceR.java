@@ -74,6 +74,8 @@ public class ISurfaceR extends IObject implements ISurfaceI{
         return null;
     }
     
+    public boolean isValid(){ return surface.isValid(); }
+    
     public ISurfaceGeo get(){ return surface.get(); } // ?
     
     public ISurfaceR dup(){ return new ISurfaceR(this); }    

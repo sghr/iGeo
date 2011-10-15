@@ -362,26 +362,40 @@ public class ISurfaceCreator{
     
     /** sweep (profile is redirected perpendicular to rail and centered(actually just on bisector of control points)) */
     public static ISurface sweep(IVecI[] profile, IVecI[] rail){
-	return sweep(profile,1,false,null,rail,1,false);
+	return sweep(profile,1,false,null,null,rail,1,false);
     }
     public static ISurface sweep(IVecI[] profile, IVecI profileCenter, IVecI[] rail){
-	return sweep(profile,1,false,profileCenter,rail,1,false);
+	return sweep(profile,1,false,profileCenter,null,rail,1,false);
+    }
+    public static ISurface sweep(IVecI[] profile, IVecI profileCenter, IVecI profileDir, IVecI[] rail){
+	return sweep(profile,1,false,profileCenter,profileDir,rail,1,false);
     }
     public static ISurface sweep(IVecI[] profile, int profileDeg, IVecI[] rail, int railDeg){
-	return sweep(profile,profileDeg,false,null,rail,railDeg,false);
+	return sweep(profile,profileDeg,false,null,null,rail,railDeg,false);
     }
     public static ISurface sweep(IVecI[] profile, int profileDeg, IVecI profileCenter,
 				 IVecI[] rail, int railDeg){
-	return sweep(profile,profileDeg,false,profileCenter,rail,railDeg,false);
+	return sweep(profile,profileDeg,false,profileCenter,null,rail,railDeg,false);
+    }
+    
+    public static ISurface sweep(IVecI[] profile, int profileDeg,
+				 IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail, int railDeg){
+	return sweep(profile,profileDeg,false,profileCenter,profileDir,rail,railDeg,false);
     }
     
     public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
 				 IVecI[] rail, int railDeg, boolean closeRail){
-	return sweep(profile,profileDeg, closeProfile, null,  rail, railDeg, closeRail);
+	return sweep(profile,profileDeg, closeProfile, null, null, rail, railDeg, closeRail);
     }
     
     public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
 				 IVecI profileCenter, 
+				 IVecI[] rail, int railDeg, boolean closeRail){
+	return sweep(profile,profileDeg,closeProfile,profileCenter,null,rail,railDeg,closeRail);
+    }
+    public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
+				 IVecI profileCenter, IVecI profileDir,
 				 IVecI[] rail, int railDeg, boolean closeRail){
 	IVecI[] profPts = null;
 	double[] profKnots = null;
@@ -404,15 +418,21 @@ public class ISurfaceCreator{
 	    railPts = rail;
 	    railKnots = INurbsGeo.createKnots(railDeg,railPts.length);
 	}
-	return sweep(profPts, profileDeg, profKnots, profileCenter, railPts, railDeg, railKnots);
+	return sweep(profPts, profileDeg, profKnots, profileCenter, profileDir,
+		     railPts, railDeg, railKnots);
     }
-
+    
     public static ISurface sweep(IVecI[] profile, ICurveI rail){
 	return sweep(profile, 1, null, null, rail.cps(), rail.deg(), rail.knots());
     }
     
     public static ISurface sweep(IVecI[] profile, IVecI profileCenter, ICurveI rail){
 	return sweep(profile, 1, null, profileCenter, rail.cps(), rail.deg(), rail.knots());
+    }
+    
+    public static ISurface sweep(IVecI[] profile, IVecI profileCenter, IVecI profileDir,
+				 ICurveI rail){
+	return sweep(profile, 1, null, profileCenter, profileDir, rail.cps(), rail.deg(), rail.knots());
     }
     
     public static ISurface sweep(IVecI[] profile, int profileDeg, ICurveI rail){
@@ -424,8 +444,23 @@ public class ISurfaceCreator{
 	return sweep(profile, profileDeg, null, profileCenter, rail.cps(), rail.deg(), rail.knots());
     }
     
+    public static ISurface sweep(IVecI[] profile, int profileDeg,
+				 IVecI profileCenter, IVecI profileDir, ICurveI rail){
+	return sweep(profile, profileDeg, null, profileCenter, profileDir,
+		     rail.cps(), rail.deg(), rail.knots());
+    }
+    
+    public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile, ICurveI rail){
+	return sweep(profile,profileDeg,closeProfile,null,null,rail);
+    }    
+    
     public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
 				 IVecI profileCenter, ICurveI rail){
+	return sweep(profile,profileDeg,closeProfile,profileCenter,null,rail);
+    }
+    
+    public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
+				 IVecI profileCenter, IVecI profileDir, ICurveI rail){
 	IVecI[] profPts = null;
 	double[] profKnots = null;
 	if(closeProfile){
@@ -436,16 +471,8 @@ public class ISurfaceCreator{
 	    profPts = profile;
 	    profKnots = INurbsGeo.createKnots(profileDeg,profPts.length);
 	}
-	return sweep(profPts, profileDeg, profKnots, profileCenter, rail.cps(), rail.deg(), rail.knots());
-    }
-    
-    public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile, ICurveI rail){
-	return sweep(profile,profileDeg,closeProfile,null,rail);
-    }    
-    
-    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail){
-	return sweep(profile.cps(), profile.deg(), profile.knots(), profileCenter,
-		     rail, 1, null);
+	return sweep(profPts, profileDeg, profKnots, profileCenter, profileDir,
+		     rail.cps(), rail.deg(), rail.knots());
     }
     
     public static ISurface sweep(ICurveI profile, IVecI[] rail){
@@ -453,9 +480,15 @@ public class ISurfaceCreator{
 		     rail, 1, null);
     }
     
-    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail,int railDeg){
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail){
 	return sweep(profile.cps(), profile.deg(), profile.knots(), profileCenter,
-		     rail, railDeg, null);
+		     rail, 1, null);
+    }
+    
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail){
+	return sweep(profile.cps(), profile.deg(), profile.knots(),
+		     profileCenter, profileDir, rail, 1, null);
     }
     
     public static ISurface sweep(ICurveI profile, IVecI[] rail, int railDeg){
@@ -463,8 +496,28 @@ public class ISurfaceCreator{
 		     rail, railDeg, null);
     }
     
-    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail,
-				 int railDeg, boolean closeRail){
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail,int railDeg){
+	return sweep(profile.cps(), profile.deg(), profile.knots(), profileCenter,
+		     rail, railDeg, null);
+    }
+    
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail,int railDeg){
+	return sweep(profile.cps(), profile.deg(), profile.knots(),
+		     profileCenter, profileDir, rail, railDeg, null);
+    }
+    
+    public static ISurface sweep(ICurveI profile, IVecI[] rail, int railDeg, boolean closeRail){
+	return sweep(profile, null, null, rail, railDeg, closeRail);
+    }
+    
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter,
+				 IVecI[] rail, int railDeg, boolean closeRail){
+	return sweep(profile,profileCenter,null,rail,railDeg,closeRail);
+    }
+    
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail, int railDeg, boolean closeRail){
 	IVecI[] railPts = null;
 	double[] railKnots = null;
 	if(closeRail){
@@ -475,22 +528,31 @@ public class ISurfaceCreator{
 	    railPts = rail;
 	    railKnots = INurbsGeo.createKnots(railDeg,railPts.length);
 	}
-	return sweep(profile.cps(), profile.deg(), profile.knots(), profileCenter,
-		     railPts, railDeg, railKnots);
+	return sweep(profile.cps(), profile.deg(), profile.knots(),
+		     profileCenter, profileDir, railPts, railDeg, railKnots);
     }
         
-    public static ISurface sweep(ICurveI profile, IVecI[] rail, int railDeg, boolean closeRail){
-	return sweep(profile, null, rail, railDeg, closeRail);
-    }
-    
-    
     public static ISurface sweep(ICurveI profile, ICurveI rail){
 	return sweep(profile.cps(), profile.deg(), profile.knots(),
 		     rail.cps(), rail.deg(), rail.knots());
     }
     
     public static ISurface sweep(ICurveI profile, IVecI profileCenter, ICurveI rail){
-	return sweep(profile.cps(), profile.deg(), profile.knots(), profileCenter,
+	return sweep(profile.cps(), profile.deg(), profile.knots(), profileCenter, null,
+		     rail.cps(), rail.deg(), rail.knots());
+    }
+    
+    /**
+       sweep.
+       @param profileCenter point on profile to be located at the points of rail
+       @param profileDir direction on profile to be aligned with the normal of rail
+    */
+    public static ISurface sweep(ICurveI profile,
+				 IVecI profileCenter,
+				 IVecI profileDir,
+				 ICurveI rail){
+	return sweep(profile.cps(), profile.deg(), profile.knots(),
+		     profileCenter, profileDir,
 		     rail.cps(), rail.deg(), rail.knots());
     }
     
@@ -500,7 +562,19 @@ public class ISurfaceCreator{
     }
     
     public static ISurface sweep(IVecI[] profile, int profileDeg, double[] profileKnots,
-				 IVecI profileCenter,
+				 IVecI profileCenter, 
+				 IVecI[] rail, int railDeg, double[] railKnots){
+	return sweep(profile,profileDeg,profileKnots,profileCenter,null,
+		     rail,railDeg,railKnots);
+    }
+    
+    /**
+       sweep.
+       @param profileCenter point on profile to be located at the points of rail
+       @param profileDir direction on profile to be aligned with the normal of rail
+    */
+    public static ISurface sweep(IVecI[] profile, int profileDeg, double[] profileKnots,
+				 IVecI profileCenter, IVecI profileDir, 
 				 IVecI[] rail, int railDeg, double[] railKnots){
 	
 	if(profile==null || profile.length<=1){
@@ -515,11 +589,15 @@ public class ISurfaceCreator{
 	if(profileKnots==null) profileKnots = INurbsGeo.createKnots(profileDeg,profile.length);
 	if(railKnots==null) railKnots = INurbsGeo.createKnots(railDeg,rail.length);
 	
-	IVec n = IVec.averageNormal(profile);
+	IVec profileNormal = IVec.averageNormal(profile);
 	if(profileCenter==null) profileCenter = getCenter(profile,profileDeg);
 	else{ profileCenter = profileCenter.dup(); } // profileCenter changes
 	
 	boolean railClosed=isClosed(rail,railDeg);
+	
+	IVec railNormal = null;
+	if(profileDir!=null){ railNormal = IVec.averageNormal(rail); }
+	
 	
 	IVecI[] ppts = duplicatePoints(profile);
 	IVecI[][] cpts = new IVecI[rail.length][];
@@ -532,10 +610,14 @@ public class ISurfaceCreator{
 		    dir = rail[rail.length-railDeg].diff(rail[rail.length-railDeg-1]);
 		}
 		
-		IVecI[] ppts2 = orient(ppts, profileCenter, n, rail[i], dir);
+		//IVecI[] ppts2 = orient(ppts, profileCenter, profileNormal, rail[i], dir);
+		IVecI[] ppts2 = orient(ppts, profileCenter, profileNormal, profileDir,
+				       rail[i], dir, railNormal);
 		if(railClosed){
 		    if(i<rail.length-1){ dir = rail[i+1].diff(rail[i]); }
-		    ppts2 = orientAndBisect(ppts, profileCenter, n, rail[i], dir);
+		    //ppts2 = orientAndBisect(ppts, profileCenter, profileNormal, rail[i], dir);
+		    ppts2 = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
+					    rail[i], dir, railNormal);
 		}
 		//new ICurve(ppts2); //
 		cpts[i] = ppts2;
@@ -544,18 +626,24 @@ public class ISurfaceCreator{
 		cpts[i] = duplicatePoints(cpts[i - (rail.length-railDeg)]);
 		//new ICurve(cpts[i]).clr(1.0,0,0); //
 	    }
+	    else if(i==rail.length-1){ // last rail point (not railClosed)
+		// direction is already set in the previous orientAndBisector
+		orient(ppts, profileCenter, rail[i]);
+		cpts[i] = ppts;
+	    }
 	    else{
 		if(i<rail.length-1) dir = rail[i+1].diff(rail[i]);
 		else dir = rail[i].diff(rail[i-1]);
 		
-		IVecI[] bsct = orientAndBisect(ppts, profileCenter, n, rail[i], dir);
+		//IVecI[] bsct = orientAndBisect(ppts, profileCenter, profileNormal, rail[i], dir);
+		IVecI[] bsct = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
+					       rail[i], dir, railNormal);
 		//new ICurve(bsct); //
 		cpts[i] = bsct;
 	    }
-	    
 	}
 	
-	return new ISurface(server,cpts, railDeg, profileDeg, railKnots, profileKnots,
+	return new ISurface(server, cpts, railDeg, profileDeg, railKnots, profileKnots,
 			    0.0, 1.0, 0.0, 1.0);
     }
     
@@ -579,74 +667,133 @@ public class ISurfaceCreator{
 	}
 	return pts2;
     }
-    
-    
-    public static IVecI[] orient(IVecI[] pts, IVecI center, IVec n, IVecI location, IVecI dir){
-	IVec axis = null;
-	double angle = 0;
-	boolean parallel = true;
-	if(dir!=null){
-	    axis = n.cross(dir);
-	    angle = n.angle(dir,axis);
-	    parallel = angle < IConfig.angleResolution;
-	}
+
+    /**
+       only moving profile points form profCenter to railPt. points are not duplicated.
+    */
+    public static IVecI[] orient(IVecI[] profile, IVecI profCenter, IVecI railPt){
 	
-	for(IVecI p:pts){
-	    p.sub(center);
-	    if(!parallel) p.rot(axis,angle);
-	    p.add(location);
-	}
-	
-	if(!parallel) n.rot(axis,angle);
-	center.set(location);
-	// multiply weight
-	if(location instanceof IVec4I) return duplicatePoints(pts, ((IVec4I)location).w());
-	
-	return duplicatePoints(pts);
+	IVec diff = railPt.get().diff(profCenter);
+	for(IVecI p:profile) p.add(diff);
+	profCenter.set(railPt);
+	return profile;
+    }
+    public static IVecI[] orient(IVecI[] profile,
+				 IVecI profCenter, IVecI profNml,
+				 IVecI railPt, IVecI railDir){
+	return orient(profile,profCenter,profNml,null,railPt,railDir,null);
     }
     
-    public static IVecI[] orientAndBisect(IVecI[] pts, IVecI center, IVec n, IVecI location, IVecI dir){
+    /**
+       orienting profile points by matching profCenter with railPt, profNml with railDir,
+       profDir with railNml.
+    */
+    public static IVecI[] orient(IVecI[] profile,
+				 IVecI profCenter, IVecI profNml, IVecI profDir,
+				 IVecI railPt, IVecI railDir, IVecI railNml){
 	IVec axis = null;
 	double angle = 0;
-	boolean parallel = true;
-	if(dir!=null){
-	    axis = n.cross(dir);
-	    angle = n.angle(dir,axis);
-	    parallel = angle < IConfig.angleResolution;
+	//boolean parallel = true;
+	if(railDir!=null && !profNml.get().isParallel(railDir)){
+	    axis = profNml.get().cross(railDir);
+	    angle = profNml.angle(railDir,axis);
+	    //parallel = angle < IConfig.angleResolution;
+	}
+	
+	for(IVecI p:profile){
+	    p.sub(profCenter);
+	    /*if(!parallel)*/
+	    if(axis!=null) p.rot(axis,angle);
+	    //p.add(railPt);
+	}
+	
+	//if(!parallel){
+	if(axis!=null) profNml.rot(axis,angle);
+	if(profDir!=null){
+	    if(axis!=null) profDir.rot(axis,angle);
+	    if(railNml!=null && !profDir.get().isParallel(railNml)){
+		angle = profDir.angle(railNml, railDir);
+		for(IVecI p:profile) p.rot(railDir,angle);
+		profDir.rot(railDir,angle);
+	    }
+	}
+	//}
+	
+	for(IVecI p:profile) p.add(railPt);
+	profCenter.set(railPt);
+	// multiply weight
+	if(railPt instanceof IVec4I) return duplicatePoints(profile, ((IVec4I)railPt).w());
+	return duplicatePoints(profile);
+    }
+    
+    public static IVecI[] orientAndBisect(IVecI[] profile, IVecI profCenter, IVecI profNml,
+					  IVecI railPt, IVecI railDir){
+	return orientAndBisect(profile,profCenter,profNml,null,railPt,railDir,null);
+    }
+    
+    public static IVecI[] orientAndBisect(IVecI[] profile,
+					  IVecI profCenter, IVecI profNml, IVecI profDir,
+					  IVecI railPt, IVecI railDir, IVecI railNml){
+	IVec axis = null;
+	double angle = 0;
+	//boolean parallel = true;
+	if(railDir!=null && !profNml.get().isParallel(railDir)){
+	    axis = profNml.get().cross(railDir);
+	    angle = profNml.angle(railDir,axis);
+	    //parallel = angle < IConfig.angleResolution;
+	}
+	
+	for(IVecI p:profile) p.sub(profCenter);
+	
+	double bangle = angle/2;
+	IVec bisectDir = null;
+	if(axis!=null){
+	    for(IVecI p:profile){
+		//p.sub(profCenter);
+		//if(!parallel)
+		p.rot(axis,angle);
+		//p.add(railPt);
+	    }
+	    
+	    bisectDir = profNml.get().cross(axis);
+	    //if(!parallel)
+	    bisectDir.rot(axis,bangle);
+	    
+	    profNml.rot(axis,angle);
+	    
+	    if(profDir!=null) profDir.rot(axis,angle);
+	}
+	
+	if(profDir!=null && railNml!=null && !profDir.get().isParallel(railNml)){
+	    angle = profDir.angle(railNml, railDir);
+	    for(IVecI p:profile) p.rot(railDir,angle);
+	    profDir.rot(railDir,angle);
 	}
 	
 	IVecI[] bsct = null;
 	// multiply weight
-	if(location instanceof IVec4I) bsct = duplicatePoints(pts, ((IVec4I)location).w());
-	else bsct = duplicatePoints(pts);
+	if(railPt instanceof IVec4I) bsct = duplicatePoints(profile, ((IVec4I)railPt).w());
+	else bsct = duplicatePoints(profile);
 	
-	double bangle = angle/2;
-	
-	for(IVecI p:pts){
-	    p.sub(center);
-	    if(!parallel) p.rot(axis,angle);
-	    p.add(location);
-	}
-	
-	IVec bdir = n.cross(axis);
-	if(!parallel) bdir.rot(axis,bangle);
-	
-	for(IVecI b:bsct){
-	    b.sub(center);
-	    if(!parallel){
-		b.rot(axis,bangle);
+	if(axis != null){
+	    for(IVecI b:bsct){
+		//b.sub(profCenter);
+		//if(!parallel){
+		//b.rot(axis,bangle);
+		b.rot(axis,-bangle);
 		// scale 1d
 		if(Math.abs(bangle-Math.PI/2)>=IConfig.angleResolution){
 		    double scale = 1.0/Math.abs(Math.cos(bangle));
-		    b.scale1d(bdir,scale);
+		    b.scale1d(bisectDir,scale);
 		}
+		//}
+		//b.add(railPt);
 	    }
-	    b.add(location);
 	}
 	
-	if(!parallel) n.rot(axis,angle);
-	center.set(location);
-	
+	for(IVecI p:profile) p.add(railPt);
+	for(IVecI b:bsct) b.add(railPt);
+	profCenter.set(railPt);
 	return bsct;
     }
     
@@ -703,10 +850,12 @@ public class ISurfaceCreator{
 	IVec n = IVec.averageNormal(rail);
 	IVec dir = rail[1].get().diff(rail[0]);
 	IVec center = rail[0].get();
-	IVec[] profile = ICircleGeo.circleCP(center, dir, dir.cross(n), radius);
+	IVec roll = dir.cross(n);
+	IVec[] profile = ICircleGeo.circleCP(center, dir, roll, radius);
 	int profDeg = ICircleGeo.circleDeg();
 	double[] profKnots = ICircleGeo.circleKnots();
-	return sweep(profile, profDeg, profKnots, center, rail, railDeg, railKnots);
+	//return sweep(profile, profDeg, profKnots, center, rail, railDeg, railKnots);
+	return sweep(profile, profDeg, profKnots, center, roll, rail, railDeg, railKnots);
     }
     
     public static ISurface squarePipe(IVecI pt1, IVecI pt2, double size){
@@ -750,13 +899,26 @@ public class ISurfaceCreator{
     public static ISurface rectPipe(IVecI pt1, IVecI pt2, double width, double height){
 	return rectPipe(new IVecI[]{ pt1, pt2 }, 1, false, width, height);
     }
+    public static ISurface rectPipe(IVecI pt1, IVecI pt2,
+				    double left, double right, double bottom, double top){
+	return rectPipe(new IVecI[]{ pt1, pt2 }, 1, false, left, right, bottom, top);
+    }
     public static ISurface rectPipe(IVecI[] rail, double width, double height){
 	return rectPipe(rail, 1, false, width, height);
+    }
+    public static ISurface rectPipe(IVecI[] rail, double left, double right, double bottom, double top){
+	return rectPipe(rail, 1, false, left, right, bottom, top);
     }
     public static ISurface rectPipe(IVecI[] rail, int deg, double width, double height){
 	return rectPipe(rail, deg, false, width, height);
     }
+    public static ISurface rectPipe(IVecI[] rail, int deg,
+				    double left, double right, double bottom, double top){
+	return rectPipe(rail, deg, false, left, right, bottom, top);
+    }
     public static ISurface rectPipe(IVecI[] rail, int deg, boolean close, double width, double height){
+	return rectPipe(rail,deg,close,-width/2,width/2,-height/2,height/2);
+	/*
 	IVecI[] railPts = null;
 	double[] railKnots = null;
 	if(close){
@@ -768,11 +930,34 @@ public class ISurfaceCreator{
 	    railKnots = INurbsGeo.createKnots(deg,railPts.length);
 	}
 	return rectPipe(railPts, deg, railKnots, width, height);
+	*/
     }
+    
+    public static ISurface rectPipe(IVecI[] rail, int deg, boolean close,
+				    double left, double right, double bottom, double top){
+	IVecI[] railPts = null;
+	double[] railKnots = null;
+	if(close){
+	    railPts = INurbsGeo.createClosedCP(rail, deg);
+	    railKnots = INurbsGeo.createClosedKnots(deg, railPts.length);
+	}
+	else{
+	    railPts = rail;
+	    railKnots = INurbsGeo.createKnots(deg,railPts.length);
+	}
+	return rectPipe(railPts, deg, railKnots, left, right, bottom, top);
+    }
+    
     public static ISurface rectPipe(ICurveI rail, double width, double height){
 	return rectPipe(rail.cps(),rail.deg(),rail.knots(),width,height);
     }
+    public static ISurface rectPipe(ICurveI rail, double left, double right, double bottom, double top){
+	return rectPipe(rail.cps(),rail.deg(),rail.knots(),left,right,bottom,top);
+    }
+    
     public static ISurface rectPipe(IVecI[] rail, int deg, double[] knots, double width, double height){
+	return rectPipe(rail,deg,knots,-width/2,width/2,-height/2,height/2);
+	/*
 	IVec n = IVec.averageNormal(rail);
 	IVec dir = rail[1].get().diff(rail[0]);
 	IVec center = rail[0].get();
@@ -790,9 +975,30 @@ public class ISurfaceCreator{
 	profile[3] = center.dup().sub(wdir).add(hdir);
 	profile[4] = profile[0].dup();
 	double[] profKnots = INurbsGeo.createClosedKnots(1,profile.length);
-	return sweep(profile, 1, profKnots, center, rail, deg, knots);
+	//return sweep(profile, 1, profKnots, center, rail, deg, knots);
+	return sweep(profile, 1, profKnots, center, hdir,rail, deg, knots);
+	*/
     }
     
+    
+    public static ISurface rectPipe(IVecI[] rail, int deg, double[] knots, double left, double right, double bottom, double top){
+	IVec n = IVec.averageNormal(rail);
+	IVec dir = rail[1].get().diff(rail[0]);
+	IVec center = rail[0].get();
+	IVec wdir = dir.cross(n);
+	if(wdir.eq(new IVec(0,0,0))) wdir=new IVec(1,0,0);
+	IVec hdir = dir.cross(wdir);
+	if(hdir.eq(new IVec(0,0,0))) wdir=new IVec(0,1,0);
+	IVec[] profile = new IVec[5];
+	profile[0] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(bottom));
+	profile[1] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
+	profile[2] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(top));
+	profile[3] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
+	profile[4] = profile[0].cp();
+	double[] profKnots = INurbsGeo.createClosedKnots(1,profile.length);
+	//return sweep(profile, 1, profKnots, center, rail, deg, knots);
+	return sweep(profile, 1, profKnots, center, hdir, rail, deg, knots);
+    }
     
     
     /*********************
@@ -1018,5 +1224,41 @@ public class ISurfaceCreator{
 	}
     }
     
-    // sphere , cylinder, cone,  ruled surf, loft, extrusion, rect, planarSurf
+    // sphere, cylinder, cone,  ruled surf, loft, extrusion, rect, planarSurf
+
+    public static ISurface flatten(ISurfaceI surface, IVecI planeDir, IVecI planePt){
+	IVecI[][] cpts = new IVecI[surface.unum()][surface.vnum()];
+	for(int i=0; i<surface.unum(); i++)
+	    for(int j=0; j<surface.vnum(); j++) cpts[i][j] = surface.cp(i,j);
+	IVec.projectToPlane(cpts, planeDir, planePt);
+	double[] uk = new double[surface.uknotNum()];
+	for(int i=0; i<surface.uknotNum(); i++) uk[i] = surface.uknot(i);
+	double[] vk = new double[surface.vknotNum()];
+	for(int i=0; i<surface.vknotNum(); i++) vk[i] = surface.vknot(i);
+	return surface(cpts,surface.udeg(),surface.vdeg(),uk,vk,0.0,1.0,0.0,1.0);
+    }
+    
+    public static ISurface flatten(ISurfaceI surface, IVecI planeDir){
+	IVecI[][] cpts = new IVecI[surface.unum()][surface.vnum()];
+	for(int i=0; i<surface.unum(); i++)
+	    for(int j=0; j<surface.vnum(); j++) cpts[i][j] = surface.cp(i,j);
+	IVec.projectToPlane(cpts, planeDir);
+	double[] uk = new double[surface.uknotNum()];
+	for(int i=0; i<surface.uknotNum(); i++) uk[i] = surface.uknot(i);
+	double[] vk = new double[surface.vknotNum()];
+	for(int i=0; i<surface.vknotNum(); i++) vk[i] = surface.vknot(i);
+	return surface(cpts,surface.udeg(),surface.vdeg(),uk,vk,0.0,1.0,0.0,1.0);
+    }
+    
+    public static ISurface flatten(ISurfaceI surface){
+	IVecI[][] cpts = new IVecI[surface.unum()][surface.vnum()];
+	for(int i=0; i<surface.unum(); i++)
+	    for(int j=0; j<surface.vnum(); j++) cpts[i][j] = surface.cp(i,j);
+	IVec.projectToPlane(cpts);
+	double[] uk = new double[surface.uknotNum()];
+	for(int i=0; i<surface.uknotNum(); i++) uk[i] = surface.uknot(i);
+	double[] vk = new double[surface.vknotNum()];
+	for(int i=0; i<surface.vknotNum(); i++) vk[i] = surface.vknot(i);
+	return surface(cpts,surface.udeg(),surface.vdeg(),uk,vk,0.0,1.0,0.0,1.0);
+    }
 }

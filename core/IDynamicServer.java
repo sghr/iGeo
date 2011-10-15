@@ -38,28 +38,32 @@ public class IDynamicServer implements Runnable{
     public IServer server;
     
     public boolean runningDynamics=false;
-
-    public ArrayList<IDynamicObject> dynamics;
+    public boolean startedOnce=false;
+    
+    public ArrayList<IDynamicObjectI> dynamics;
     
     public IDynamicServer(IServerI s){
 	server = s.server();
-	dynamics = new ArrayList<IDynamicObject>();
+	dynamics = new ArrayList<IDynamicObjectI>();
     }
     
     public synchronized void add(IObject e){
-	for(IDynamicObject d:e.dynamics) add(d);
+	for(IDynamicObjectI d:e.dynamics) add(d);
     }
     
-    public synchronized void add(IDynamicObject e){
-	if(!dynamics.contains(e)){ dynamics.add(e); }
+    public synchronized void add(IDynamicObjectI e){
+	if(!dynamics.contains(e)){
+	    dynamics.add(e);
+	    if(!startedOnce) start(); // here is the point to start the thread.
+	}
     }
     
     public int num(){ return dynamics.size(); }
-    public IDynamicObject get(int i){ return dynamics.get(i); }
+    public IDynamicObjectI get(int i){ return dynamics.get(i); }
     
     
     public synchronized void remove(int i){ dynamics.remove(i); }
-    public synchronized void remove(IDynamicObject d){ dynamics.remove(d); }
+    public synchronized void remove(IDynamicObjectI d){ dynamics.remove(d); }
     
     public synchronized void clear(){ dynamics.clear(); }
     
@@ -69,6 +73,7 @@ public class IDynamicServer implements Runnable{
     public void start(){
 	thread = new Thread(this);
 	runningDynamics=true;
+	startedOnce=true;
 	thread.start();
     }
     
@@ -88,7 +93,7 @@ public class IDynamicServer implements Runnable{
 			    dynamics.get(i).interact(dynamics.get(j));
 			}
 		    }
-		    for(IDynamicObject d:dynamics){ d.update(); }
+		    for(IDynamicObjectI d:dynamics){ d.update(); }
 		}
 	    }
 	    

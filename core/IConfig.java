@@ -180,5 +180,8 @@ public /*interface*/ class IConfig{
     /** when NURBS geometry is created at a constructor, if any control points share a same instance, another instance is created with dup(). Duplicate is avoided to apply tranfromation to all the control points equally. */
     public static boolean checkDuplicatedControlPoint=true;
     
+    /** when NURBS geometry is created at a constructor, checking validity (not infinite nor NaN) of numbers if this is true. */
+    public static boolean checkValidControlPoint=true;
+    
 }
     

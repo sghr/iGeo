@@ -41,6 +41,9 @@ public interface ISurfaceI extends ISurfaceOp, ITransformable{
     public ISurfaceI dup();
     
     
+    public boolean isValid();
+    
+    
     public IVecI pt(double u, double v);
     public IVecI pt(IDoubleI u, IDoubleI v);
     public IVecI pt(IVec2I uv);

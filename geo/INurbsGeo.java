@@ -190,4 +190,11 @@ public class INurbsGeo extends IParameterObject{
     }
     
     
+    public static boolean isValidKnots(double[] knots){
+	for(int i=0; i<knots.length; i++){
+	    if(!IDouble.isValid(knots[i])) return false;
+	}
+	return true;
+    }
+    
 }

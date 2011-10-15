@@ -22,6 +22,7 @@
 
 package igeo.geo;
 
+import java.awt.Color;
 import igeo.core.*;
 import igeo.gui.*;
 
@@ -278,5 +279,46 @@ public class ICircle extends ICurve{
     
     // name(), layer(), clr() etc.
     
+    public ICircle name(String nm){ super.name(nm); return this; }
+    public ICircle layer(ILayer l){ super.layer(l); return this; }
+    
+    public ICircle hide(){ super.hide(); return this; }
+    public ICircle show(){ super.show(); return this; }
+    
+    public ICircle clr(Color c){ super.clr(c); return this; }
+    public ICircle clr(int gray){ super.clr(gray); return this; }
+    public ICircle clr(float fgray){ super.clr(fgray); return this; }
+    public ICircle clr(double dgray){ super.clr(dgray); return this; }
+    public ICircle clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
+    public ICircle clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
+    public ICircle clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
+    public ICircle clr(int r, int g, int b){ super.clr(r,g,b); return this; }
+    public ICircle clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
+    public ICircle clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
+    public ICircle clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
+    public ICircle clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
+    public ICircle clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
+    public ICircle hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
+    public ICircle hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
+    public ICircle hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
+    public ICircle hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
+    
+    public ICircle setColor(Color c){ super.setColor(c); return this; }
+    public ICircle setColor(int gray){ super.setColor(gray); return this; }
+    public ICircle setColor(float fgray){ super.setColor(fgray); return this; }
+    public ICircle setColor(double dgray){ super.setColor(dgray); return this; }
+    public ICircle setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
+    public ICircle setColor(float fgray, float falpha){ super.setColor(fgray,falpha); return this; }
+    public ICircle setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
+    public ICircle setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
+    public ICircle setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
+    public ICircle setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
+    public ICircle setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
+    public ICircle setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
+    public ICircle setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
+    public ICircle setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
+    public ICircle setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
+    public ICircle setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
+    public ICircle setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
 }

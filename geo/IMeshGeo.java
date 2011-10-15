@@ -256,6 +256,16 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public IMeshGeo get(){ return this; }
     
     public IMeshGeo dup(){ return new IMeshGeo(this); }
+
+    public boolean isValid(){
+	for(int i=0; i<vertices.size(); i++){
+	    if(!vertices.get(i).isValid()){
+		IOut.err("vertices at "+i+" is invalid");
+		return false;
+	    }
+	}
+	return true;
+    }
     
     /** For use in copy constructor */
     protected void replaceVertex(IVertex origVertex, IVertex newVertex){

@@ -29,9 +29,16 @@ package igeo.core;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ISubobject /*implements ISubelementI*/{
-    public IObject parent=null;
-    //public ISubobject(){}
-    //public ISubobject(IServerI holder){}
-    public IObject parent(){ return parent; }
+public /*class*/ interface ISubobject /*implements ISubelementI*/{
+    //public IObject parent=null;
+    ////public ISubobject(){}
+    ////public ISubobject(IServerI holder){}
+    //public IObject parent(){ return parent; }
+    //public ISubobject parent(IObject parent){ this.parent=parent; return this; }
+    
+    /** getting parent object */
+    public IObject parent();
+    /** setting parent object */
+    public ISubobject parent(IObject parent);
+    
 }

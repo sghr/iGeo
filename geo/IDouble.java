@@ -29,6 +29,7 @@ package igeo.geo;
 import igeo.core.IParameterObject;
 import igeo.core.IServerI;
 import igeo.core.IConfig;
+import igeo.core.IOut;
 
 
 /**
@@ -121,5 +122,16 @@ public class IDouble extends IParameterObject implements IDoubleI, IEntityParame
     //public IBool eqR(IDoubleI v, IDoubleI resolution){ return new IBool(eq(v,resolution.x())); }
     public boolean eq(ISwitchE e, IDoubleI v, double resolution){ return eq(v,resolution); }
     public IBool eq(ISwitchR r, IDoubleI v, IDoubleI resolution){ return new IBool(eq(v,resolution.x())); }
+    
+    public boolean isValid(){
+	if(!isValid(x)){ IOut.err("invalid valud "+x); return false; }
+	return true;
+    }
+    
+    public static boolean isValid(double val){
+	if(Double.isNaN(val)) return false;
+	if(Double.isInfinite(val)) return false;
+	return true;
+    }
     
 }

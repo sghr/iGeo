@@ -41,6 +41,9 @@ public interface ICurveI extends ICurveOp, ITransformable{
     public ICurveI dup();
     
     
+    public boolean isValid();
+    
+    
     public IVecI pt(double u);
     public IVecI pt(IDoubleI u);
     

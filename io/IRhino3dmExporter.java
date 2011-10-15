@@ -303,8 +303,14 @@ public class IRhino3dmExporter extends IRhino3dm{
 	    
 	    if(i%100==0&&i>0){ IOut.debug(1, "object #"+i+"/"+server.server().objectNum()); } //
 	    
-	    Chunk objChunk = getObjectChunk(server.server().getObject(i));
-	    if(objChunk!=null) objectTable.add(objChunk);
+	    IObject obj = server.server().getObject(i);
+	    if(obj.isValid()){
+		Chunk objChunk = getObjectChunk(server.server().getObject(i));
+		if(objChunk!=null) objectTable.add(objChunk);
+	    }
+	    else{
+		IOut.err("invalid object " + obj + " is skipped.");
+	    }
 	}
 	IOut.debug(1, objectTable.chunks.size() + " objects are wrote"); //
 	objectTable.serialize();

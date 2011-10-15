@@ -149,5 +149,10 @@ public interface IVec4I extends IVec4Op, IVecI{
     
     public IVec4I sum(IVecI v2, IDoubleI w1, IDoubleI w2);
     public IVec4I sum(IVecI v2, IDoubleI w2);
+
+
+    /** checking x, y, and z is valid number (not Infinite, nor NaN). */
+    public boolean isValid();
+    
     
 }

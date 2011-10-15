@@ -544,6 +544,13 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
     
     
+    /** checking x, y, and z is valid number (not Infinite, nor NaN). */
+    public boolean isValid(){
+	if(!IDouble.isValid(x)){ IOut.err("invalid x ("+x+")"); return false; }
+	if(!IDouble.isValid(y)){ IOut.err("invalid y ("+y+")"); return false; }
+	if(!IDouble.isValid(z)){ IOut.err("invalid z ("+z+")"); return false; }
+	return true;
+    }
     
     public String toString(){ return "("+String.valueOf(x)+","+String.valueOf(y)+","+String.valueOf(z)+")"; }
     
@@ -601,7 +608,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	if(planePoint==this) return this;
 	return sub(planePoint).projectToPlane(projectDir,planeNormal).add(planePoint);
     }
-
+    
     public IVec projectToLine(IVecI linePt, IVecI lineDir){
 	if(linePt==this) return this;
 	IVec diff = this.diff(linePt);
@@ -640,6 +647,16 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return coef;
     }
     
+    
+    /**
+       project this vector to the input vector and returns projection coefficient.
+       @param v a vector for this vector to project on.
+    */
+    public double projectToVec(IVecI v){
+	double coef = this.dot(v)/v.len2();
+	this.set(v).mul(coef);
+	return coef;
+    }
     
     /** decompose the vector to two input vectors and another perpendicular vector of those two and returns three decomposed vector. the vector itself doensn't change.
 	this = return[0] + return[1] + return[2];
@@ -780,7 +797,11 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	}
 	return false;
     }
-    
+
+    /**
+       average normal of point array in form of a polyline.
+       It return IVec, not IVecI. (Should it return IVecI?)
+    */
     public static IVec averageNormal(IVecI[] pts){
 	if(pts==null){ IOut.err("pts is null"); return new IVec(0,0,1); /*default*/ }
 	
@@ -808,7 +829,47 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
         return nml.unit();
     }
     
+    
+    /**
+       average normal of point array in form of a matrix.
+       It return IVec, not IVecI. (Should it return IVecI?)
+    */
+    public static IVec averageNormal(IVecI[][] pts){
+	if(pts==null || pts.length==0){
+	    IOut.err("pts is null"); return new IVec(0,0,1); /*default*/
+	}
+	
+	if(pts.length==1) return averageNormal(pts[0]);
+	
+	if(pts[0].length==0){
+	    IOut.err("pts is null"); return new IVec(0,0,1); /*default*/
+	}
+	
+	if(pts[0].length==1){
+	    IVecI[] pts2 = new IVecI[pts.length];
+	    for(int i=0; i<pts.length; i++) pts2[i] = pts[i][0];
+	    return averageNormal(pts2);
+	}
+	
+	IVec nml = new IVec();
+	
+	for(int i=0; i<pts.length-1; i++){
+	    for(int j=0; j<pts[i].length-1; j++){
+		nml.add(pts[i+1][j].diff(pts[i][j]).cross(pts[i][j+1].diff(pts[i][j])));
+		nml.add(pts[i+1][j+1].diff(pts[i+1][j]).cross(pts[i][j].diff(pts[i+1][j])));
+		nml.add(pts[i][j+1].diff(pts[i+1][j+1]).cross(pts[i+1][j].diff(pts[i+1][j+1])));
+		nml.add(pts[i][j].diff(pts[i][j+1]).cross(pts[i+1][j+1].diff(pts[i][j+1])));
+	    }
+	}
+	
+	// in case nml is zero
+	if(nml.eq(origin)) return new IVec(0,0,1); /* default */
+	
+        return nml.unit();
+    }
+    
 
+    
     public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal){
 	IVecI[] out = offset((IVecI[])pts,width,planeNormal);
 	if(out==null) return null;
@@ -1251,7 +1312,83 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	//return offset(pts, offsetDir, width);
 	return offset(pts, normals, width);
     }
+
+    
+    /**
+       project point a plane. input IVecI point pt is changed.
+       doing same thing with projectToPlane(IVecI,IVecI,IVecI) but this is for IVecI.
+    */
+    public static IVecI projectToPlane(IVecI pt, IVecI projectDir, IVecI planeNormal, IVecI planePt){
+	if(planePt==pt) return pt;
+	pt.sub(planePt);
+	IDoubleI ip = pt.dot(Ir.i, planeNormal).div(projectDir.dot(Ir.i, planeNormal));
+	return pt.sub( projectDir.dup().mul(ip) ).add(planePt);
+    }
+    
+    /**
+       project point array to a plane. input points are changed.
+    */
+    public static void projectToPlane(IVecI[] pts, IVecI projectDir, IVecI planeNormal, IVecI planePt){
+	for(IVecI p : pts) projectToPlane(p,projectDir,planeNormal,planePt); 
+    }
+    
+    /**
+       project point array to a plane. input points are changed.
+    */
+    public static void projectToPlane(IVecI[][] pts, IVecI projectDir, IVecI planeNormal, IVecI planePt){
+	for(IVecI[] ps:pts) for(IVecI p:ps) projectToPlane(p,projectDir,planeNormal,planePt); 
+    }
+    
+    /**
+       project point array to a plane. input points are changed.
+    */
+    public static void projectToPlane(IVecI[] pts, IVecI planeNormal, IVecI planePt){
+	projectToPlane(pts,planeNormal,planeNormal,planePt);
+    }
+    
+    /**
+       project point array to a plane. input points are changed.
+    */
+    public static void projectToPlane(IVecI[][] pts, IVecI planeNormal, IVecI planePt){
+	projectToPlane(pts,planeNormal,planeNormal,planePt);
+    }
     
     
+    /**
+       project point array to a plane. input points are changed.
+       projection plane point is the first element in the array. (should it be center?)
+    */
+    public static void projectToPlane(IVecI[] pts, IVecI planeNormal){
+	projectToPlane(pts,planeNormal,pts[0]);
+    }
+    
+    /**
+       project point array to a plane. input points are changed.
+       projection plane point is the first element in the array. (should it be center?)
+    */
+    public static void projectToPlane(IVecI[][] pts, IVecI planeNormal){
+	projectToPlane(pts,planeNormal,pts[0][0]);
+    }
+    
+    
+    /**
+       project point array to a plane. input points are changed.
+       projection plane normal is average normal of pts.
+       projection plane point is the first element in the array. (should it be center?)
+    */
+    public static void projectToPlane(IVecI[] pts){
+	if(pts==null || pts.length==0) return;
+	projectToPlane(pts,averageNormal(pts),pts[0]);
+    }
+    
+    /**
+       project point array to a plane. input points are changed.
+       projection plane normal is average normal of pts.
+       projection plane point is the first element in the array. (should it be center?)
+    */
+    public static void projectToPlane(IVecI[][] pts){
+	if(pts==null || pts.length==0 || pts[0].length==0) return;
+	projectToPlane(pts,averageNormal(pts),pts[0][0]);
+    }
     
 }

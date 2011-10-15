@@ -123,8 +123,9 @@ public class IPoint extends IObject implements IVecI{
     public double dot(ISwitchE e, IVecI v){ return pos.dot(e,v); }
     public IDouble dot(ISwitchR r, IVecI v){ return pos.dot(r,v); }
     
-    //public IVec cross(IVecI v){ return pos.cross(v); }
-    public IPoint cross(IVecI v){ return dup().set(pos.cross(v)); }
+    // creating IPoint is too much (in terms of memory occupancy)
+    public IVec cross(IVecI v){ return pos.cross(v); }
+    //public IPoint cross(IVecI v){ return dup().set(pos.cross(v)); }
     
     public double len(){ return pos.len(); }
     public double len(ISwitchE e){ return pos.len(e); }
@@ -317,46 +318,49 @@ public class IPoint extends IObject implements IVecI{
     
     
     // methods creating new instance // returns IPoint?, not IVec?
-    public IPoint diff(IVecI v){ return dup().sub(v); }
-    public IPoint mid(IVecI v){ return dup().add(v).div(2); }
-    public IPoint sum(IVecI v){ return dup().add(v); }
-    public IPoint sum(IVecI... v){
-	IPoint ret = this.dup();
-        for(IVecI vi: v) ret.add(vi);
-        return ret;
-    }
-    
-    public IPoint bisect(IVecI v){
-	return dup().unit().add(v.dup().unit());
-    }
+    // returns IVec, not IPoint (2011/10/12)
+    //public IPoint diff(IVecI v){ return dup().sub(v); }
+    public IVec diff(IVecI v){ return pos.diff(v); }
+    //public IPoint mid(IVecI v){ return dup().add(v).div(2); }
+    public IVec mid(IVecI v){ return pos.mid(v); }
+    //public IPoint sum(IVecI v){ return dup().add(v); }
+    public IVec sum(IVecI v){ return pos.sum(v); }
+    //public IPoint sum(IVecI... v){ IPoint ret = this.dup(); for(IVecI vi: v) ret.add(vi); return ret; }
+    public IVec sum(IVecI... v){ return pos.sum(v); }
+    //public IPoint bisect(IVecI v){ return dup().unit().add(v.dup().unit()); }
+    public IVec bisect(IVecI v){ return pos.bisect(v); }
     
     
     
     /**
-       weighted sum
+       weighted sum.
+       @return IVec
     */
-    public IPoint sum(IVecI v2, double w1, double w2){
-	return dup().mul(w1).add(v2,w2);
-    }
-    public IPoint sum(IVecI v2, double w2){
-	return dup().mul(1.0-w2).add(v2,w2);
-    }
+    //public IPoint sum(IVecI v2, double w1, double w2){ return dup().mul(w1).add(v2,w2); }
+    public IVec sum(IVecI v2, double w1, double w2){ return pos.sum(v2,w1,w2); }
+    //public IPoint sum(IVecI v2, double w2){ return dup().mul(1.0-w2).add(v2,w2); }
+    public IVec sum(IVecI v2, double w2){ return pos.sum(v2,w2); }
     
-    public IPoint sum(IVecI v2, IDoubleI w1, IDoubleI w2){
-	return dup().mul(w1).add(v2,w2);
-    }
-    public IPoint sum(IVecI v2, IDoubleI w2){
-	return dup().mul(new IDouble(1.0).sub(w2)).add(v2,w2);
-    }
+    
+    //public IPoint sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return dup().mul(w1).add(v2,w2); }
+    public IVec sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return sum(v2,w1,w2); }
+    
+    //public IPoint sum(IVecI v2, IDoubleI w2){ return dup().mul(new IDouble(1.0).sub(w2)).add(v2,w2); }
+    public IVec sum(IVecI v2, IDoubleI w2){ return sum(v2,w2); }
+    
     
     /** alias of cross. (not unitized ... ?) */
-    public IPoint nml(IVecI v){ return cross(v); }
+    //public IPoint nml(IVecI v){ return cross(v); }
+    public IVec nml(IVecI v){ return pos.nml(v); }
     /** create normal vector from 3 points of self, pt1 and pt2 */
-    public IPoint nml(IVecI pt1, IVecI pt2){
-	return this.diff(pt1).cross(this.diff(pt2)).unit();
-    }
+    //public IPoint nml(IVecI pt1, IVecI pt2){ return this.diff(pt1).cross(this.diff(pt2)).unit(); }
+    public IVec nml(IVecI pt1, IVecI pt2){ return pos.nml(pt1,pt2); }
     
-
+    
+    /** checking x, y, and z is valid number (not Infinite, nor NaN). */
+    public boolean isValid(){ return pos.isValid(); }
+    
+    
     public String toString(){ return pos.toString(); }
     
     

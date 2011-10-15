@@ -96,14 +96,16 @@ public class IServer implements IServerI{
 	synchronized(IG.lock){ graphics.add(e); }
     }
     */
-    /*
-    public void add(IDynamicObject e){
+    
+    public void add(IDynamicObjectI e){
 	synchronized(IG.lock){
-	    dynamics.add(e);
+	    //dynamics.add(e);
+	    //update();
+	    dynamicServer.add(e);
 	    update();
 	}
     }
-    */
+    
     //public IPanel getPanel(){ return panel; }
     
     public boolean isGraphicMode(){ return graphicServer!=null; }

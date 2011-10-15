@@ -408,6 +408,9 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	return this.diff(pt1).cross(this.diff(pt2)).unit();
     }
     
+    /** checking x, y, and z is valid number (not Infinite, nor NaN). */
+    public boolean isValid(){ return get().isValid(); }
+    
     
     
     static public class FromVec extends IParameterObject implements IVec4Op{

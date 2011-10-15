@@ -166,9 +166,13 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     }
     
     public void init(IVecI[] cpts, int degree, double[] knots){
+	
+	if(IConfig.checkValidControlPoint){ isValidCP(cpts, degree, knots); }
+	
 	// duplicate of control points is avoided
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(cpts); }
 	else if(IConfig.checkDuplicatedControlPointOnEdge){ checkDuplicatedCPOnEdge(cpts); }
+	
 	
 	controlPoints = cpts;
 	this.degree = degree;
@@ -179,6 +183,57 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	for(int i=0; i<cpts.length; i++){
 	    defaultWeights[i] = !(cpts[i] instanceof IVec4I);
 	}
+    }
+    public boolean isValid(){
+	return isValidCP(controlPoints, degree, knots);
+    }
+    
+    public static boolean isValidCP(IVecI[] cpts, int deg, double[] knots){
+	if(cpts==null){
+	    IOut.err("control points are null");
+	    return false;
+	}
+	
+	if(knots==null){
+	    IOut.err("knots are null");
+	    return false;
+	}
+	
+	if(deg <= 0){
+	    IOut.err("invalid degree ("+deg+")");
+	    return false;
+	}
+	
+	int num = cpts.length;
+	
+	if(num <= deg){
+	    IOut.err("too less control points ("+num+") for degree "+deg+". it needs minimum "+(deg+1));
+	    return false;
+	}
+	
+	if(knots.length != (deg+num+1)){
+	    IOut.err("knot array length is invalid. it needs to be "+(deg+num+1));
+	    return false;
+	}
+	
+	if(!isValidCP(cpts)) return false;
+	
+	if(!isValidKnots(knots)){
+	    IOut.err("knot has invalid value");
+	    return false;
+	}
+	
+	return true;
+    }
+    
+    public static boolean isValidCP(IVecI[] cpts){
+	for(int i=0; i<cpts.length; i++){
+	    if(!cpts[i].isValid()){
+		IOut.err("controlPoint at "+i+" is invalid");
+		return false;
+	    }
+	}
+	return true;
     }
     
     static public void checkDuplicatedCP(IVecI[] cpts){

@@ -133,8 +133,9 @@ public class IVertex implements IVecI{
     public double dot(ISwitchE e, IVecI v){ return pos.dot(e,v); }
     public IDoubleI dot(ISwitchR r, IVecI v){ return pos.dot(r,v); }
     
-    //public IVecI cross(IVecI v){ return pos.cross(v); }
-    public IVertex cross(IVecI v){ return dup().set(pos.cross(v)); }
+    // returns IVecI, not IVertex (2011/10/12)
+    public IVecI cross(IVecI v){ return pos.cross(v); }
+    //public IVertex cross(IVecI v){ return dup().set(pos.cross(v)); }
     
     public double len(){ return pos.len(); }
     public double len(ISwitchE e){ return pos.len(e); }
@@ -297,32 +298,38 @@ public class IVertex implements IVecI{
     public IVertex cp(IVecI v){ return dup().add(v); }
     
     
-    public IVertex diff(IVecI v){ return dup().sub(v); }
-    public IVertex mid(IVecI v){ return dup().add(v).div(2); }
-    public IVertex sum(IVecI v){ return dup().add(v); }
-    public IVertex sum(IVecI... v){
-	IVertex ret = this.dup();
-        for(IVecI vi: v) ret.add(vi);
-        return ret;
-    }
-    
-    public IVertex bisect(IVecI v){ return dup().unit().add(v.dup().unit()); }
-    
-    public IVertex sum(IVecI v2, double w1, double w2){ return dup().mul(w1).add(v2,w2); }
-    public IVertex sum(IVecI v2, double w2){ return dup().mul(1.0-w2).add(v2,w2); }
-    
-    public IVertex sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return dup().mul(w1).add(v2,w2); }
-    public IVertex sum(IVecI v2, IDoubleI w2){ return dup().mul((new IDouble(1.0)).sub(w2)).add(v2,w2); }
+    // returns IVecI not IVertex (2011/10/12)
+    //public IVertex diff(IVecI v){ return dup().sub(v); }
+    public IVecI diff(IVecI v){ return pos.diff(v); }
+    //public IVertex mid(IVecI v){ return dup().add(v).div(2); }
+    public IVecI mid(IVecI v){ return pos.mid(v); }
+    //public IVertex sum(IVecI v){ return dup().add(v); }
+    public IVecI sum(IVecI v){ return dup().add(v); }
+    //public IVertex sum(IVecI... v){IVertex ret=this.dup();for(IVecI vi:v)ret.add(vi);return ret; }
+    public IVecI sum(IVecI... v){ return pos.sum(v); }
     
     
-    /** alias of cross. (not unitized ... ?) */
-    public IVertex nml(IVecI v){ return cross(v); }
+    //public IVertex bisect(IVecI v){ return dup().unit().add(v.dup().unit()); }
+    public IVecI bisect(IVecI v){ return pos.bisect(v); }
+    
+    //public IVertex sum(IVecI v2, double w1, double w2){ return dup().mul(w1).add(v2,w2); }
+    public IVecI sum(IVecI v2, double w1, double w2){ return pos.sum(v2,w1,w2); }
+    //public IVertex sum(IVecI v2, double w2){ return dup().mul(1.0-w2).add(v2,w2); }
+    public IVecI sum(IVecI v2, double w2){ return pos.sum(v2,w2); }
+    
+    //public IVertex sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return dup().mul(w1).add(v2,w2); }
+    public IVecI sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return pos.sum(v2,w1,w2); }
+    //public IVertex sum(IVecI v2, IDoubleI w2){ return dup().mul((new IDouble(1.0)).sub(w2)).add(v2,w2); }
+    public IVecI sum(IVecI v2, IDoubleI w2){ return pos.sum(v2,w2); }
+    
+    
+    /** alias of cross. (not unitized ... ?) returns IVecI */
+    //public IVertex nml(IVecI v){ return cross(v); }
+    public IVecI nml(IVecI v){ return pos.nml(v); }
     /** create normal vector from 3 points of self, pt1 and pt2 */
-    public IVertex nml(IVecI pt1, IVecI pt2){
-	return this.diff(pt1).cross(this.diff(pt2)).unit();
-    }
+    //public IVertex nml(IVecI pt1, IVecI pt2){ return this.diff(pt1).cross(this.diff(pt2)).unit(); }
+    public IVecI nml(IVecI pt1, IVecI pt2){ return pos.nml(pt1,pt2); }
     
-
     
     public IVec getAverageNormal(){
 	if(faces==null || faces.size()==0) return new IVec(0,0,1); // default
@@ -351,6 +358,10 @@ public class IVertex implements IVecI{
     public IVertex nrml(double x, double y, double z){ return nml(x,y,z); }
     public IVertex nml(IVec n){ normal = n; return this; }
     public IVertex nml(double x, double y, double z){ nrml(new IVec(x,y,z)); return this; }
+    
+    
+    public boolean isValid(){ return pos.isValid(); }
+    
     
     public IVec2I texture(){ return texture; }
     public IVertex texture(IVec2I t){ texture = t; return this; }

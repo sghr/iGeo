@@ -44,15 +44,15 @@ import igeo.io.*;
    @see IPanel
    
    @author Satoru Sugihara
-   @version 0.7.1.0
+   @version 0.7.2.8
 */
 public class IG implements IServerI{
     
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 7; }
-    public static int buildVersion(){ return 0; }
-    public static int revisionVersion(){ return 0; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2011, 8, 31); }
+    public static int buildVersion(){ return 2; }
+    public static int revisionVersion(){ return 8; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2011, 10, 15); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -981,12 +981,21 @@ public class IG implements IServerI{
     public static ISurface sweep(IVecI[] profile, IVecI profileCenter, IVecI[] rail){
 	return ISurfaceCreator.sweep(profile,profileCenter,rail);
     }
+    public static ISurface sweep(IVecI[] profile, IVecI profileCenter, IVecI profileDir, IVecI[] rail){
+	return ISurfaceCreator.sweep(profile,profileCenter,profileDir,rail);
+    }
     public static ISurface sweep(IVecI[] profile, int profileDeg, IVecI[] rail, int railDeg){
 	return ISurfaceCreator.sweep(profile,profileDeg,rail,railDeg);
     }
     public static ISurface sweep(IVecI[] profile, int profileDeg, IVecI profileCenter,
 				 IVecI[] rail, int railDeg){
 	return ISurfaceCreator.sweep(profile,profileDeg,profileCenter,
+				     rail,railDeg);
+    }
+    public static ISurface sweep(IVecI[] profile, int profileDeg,
+				 IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail, int railDeg){
+	return ISurfaceCreator.sweep(profile,profileDeg,profileCenter,profileDir,
 				     rail,railDeg);
     }
     
@@ -1003,6 +1012,14 @@ public class IG implements IServerI{
 				     profileCenter,
 				     rail,railDeg,closeRail);
     }
+    
+    public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
+				 IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail, int railDeg, boolean closeRail){
+	return ISurfaceCreator.sweep(profile,profileDeg,closeProfile,
+				     profileCenter, profileDir,
+				     rail,railDeg,closeRail);
+    }
 
     public static ISurface sweep(IVecI[] profile, ICurveI rail){
 	return ISurfaceCreator.sweep(profile,rail);
@@ -1010,6 +1027,11 @@ public class IG implements IServerI{
     
     public static ISurface sweep(IVecI[] profile, IVecI profileCenter, ICurveI rail){
 	return ISurfaceCreator.sweep(profile,profileCenter,rail);
+    }
+    
+    public static ISurface sweep(IVecI[] profile, IVecI profileCenter, IVecI profileDir,
+				 ICurveI rail){
+	return ISurfaceCreator.sweep(profile,profileCenter,profileDir,rail);
     }
     
     public static ISurface sweep(IVecI[] profile, int profileDeg, ICurveI rail){
@@ -1021,40 +1043,63 @@ public class IG implements IServerI{
 	return ISurfaceCreator.sweep(profile,profileDeg,profileCenter,rail);
     }
     
-    public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
-				 IVecI profileCenter, ICurveI rail){
-	return ISurfaceCreator.sweep(profile,profileDeg,closeProfile,profileCenter,rail);
+    public static ISurface sweep(IVecI[] profile, int profileDeg,
+				 IVecI profileCenter, IVecI profileDir, ICurveI rail){
+	return ISurfaceCreator.sweep(profile,profileDeg,profileCenter,profileDir,rail);
     }
     
     public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile, ICurveI rail){
 	return ISurfaceCreator.sweep(profile,profileDeg,closeProfile,rail);
     }    
     
-    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail){
-	return ISurfaceCreator.sweep(profile,profileCenter,rail);
+    public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
+				 IVecI profileCenter, ICurveI rail){
+	return ISurfaceCreator.sweep(profile,profileDeg,closeProfile,profileCenter,rail);
+    }
+    
+    public static ISurface sweep(IVecI[] profile, int profileDeg, boolean closeProfile,
+				 IVecI profileCenter, IVecI profileDir, ICurveI rail){
+	return ISurfaceCreator.sweep(profile,profileDeg,closeProfile,
+				     profileCenter,profileDir,rail);
     }
     
     public static ISurface sweep(ICurveI profile, IVecI[] rail){
 	return ISurfaceCreator.sweep(profile,rail);
     }
     
-    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail,int railDeg){
-	return ISurfaceCreator.sweep(profile,profileCenter,rail,railDeg);
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail){
+	return ISurfaceCreator.sweep(profile,profileCenter,rail);
+    }
+    
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI profileDir, IVecI[] rail){
+	return ISurfaceCreator.sweep(profile,profileCenter,profileDir,rail);
     }
     
     public static ISurface sweep(ICurveI profile, IVecI[] rail, int railDeg){
 	return ISurfaceCreator.sweep(profile,rail,railDeg);
     }
     
-    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail,
-				 int railDeg, boolean closeRail){
-	return ISurfaceCreator.sweep(profile,profileCenter,rail,railDeg,closeRail);
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI[] rail,int railDeg){
+	return ISurfaceCreator.sweep(profile,profileCenter,rail,railDeg);
     }
-        
+    
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail,int railDeg){
+	return ISurfaceCreator.sweep(profile,profileCenter,profileDir,rail,railDeg);
+    }
+    
     public static ISurface sweep(ICurveI profile, IVecI[] rail, int railDeg, boolean closeRail){
 	return ISurfaceCreator.sweep(profile,rail,railDeg,closeRail);
     }
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter,
+				 IVecI[] rail, int railDeg, boolean closeRail){
+	return ISurfaceCreator.sweep(profile,profileCenter,rail,railDeg,closeRail);
+    }
     
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail, int railDeg, boolean closeRail){
+	return ISurfaceCreator.sweep(profile,profileCenter,profileDir,rail,railDeg,closeRail);
+    }
     
     public static ISurface sweep(ICurveI profile, ICurveI rail){
 	return ISurfaceCreator.sweep(profile,rail);
@@ -1064,17 +1109,39 @@ public class IG implements IServerI{
 	return ISurfaceCreator.sweep(profile,profileCenter,rail);
     }
     
+    public static ISurface sweep(ICurveI profile, IVecI profileCenter,
+				 IVecI profileDir, ICurveI rail){
+	return ISurfaceCreator.sweep(profile,profileCenter,profileDir,rail);
+    }
+    
     public static ISurface sweep(IVecI[] profile, int profileDeg, double[] profileKnots,
 				 IVecI[] rail, int railDeg, double[] railKnots){
 	return ISurfaceCreator.sweep(profile,profileDeg,profileKnots,
 				     rail,railDeg,railKnots);
     }
     
+    /**
+       sweep.
+       @param profileCenter point on profile to be located at the points of rail
+    */
     public static ISurface sweep(IVecI[] profile, int profileDeg, double[] profileKnots,
 				 IVecI profileCenter,
 				 IVecI[] rail, int railDeg, double[] railKnots){
 	return ISurfaceCreator.sweep(profile,profileDeg,profileKnots,
 				     profileCenter,
+				     rail,railDeg,railKnots);
+    }
+    
+    /**
+       sweep.
+       @param profileCenter point on profile to be located at the points of rail
+       @param profileDir direction on profile to be aligned with the normal of rail
+    */
+    public static ISurface sweep(IVecI[] profile, int profileDeg, double[] profileKnots,
+				 IVecI profileCenter, IVecI profileDir,
+				 IVecI[] rail, int railDeg, double[] railKnots){
+	return ISurfaceCreator.sweep(profile,profileDeg,profileKnots,
+				     profileCenter, profileDir,
 				     rail,railDeg,railKnots);
     }
     
@@ -1129,20 +1196,42 @@ public class IG implements IServerI{
     public static ISurface rectPipe(IVecI pt1, IVecI pt2, double width, double height){
 	return ISurfaceCreator.rectPipe(pt1,pt2,width,height);
     }
+    public static ISurface rectPipe(IVecI pt1, IVecI pt2, double left, double right, double bottom, double top){
+	return ISurfaceCreator.rectPipe(pt1,pt2,left,right,bottom,top);
+    }
     public static ISurface rectPipe(IVecI[] rail, double width, double height){
 	return ISurfaceCreator.rectPipe(rail,width,height);
+    }
+    public static ISurface rectPipe(IVecI[] rail, double left, double right, double bottom, double top){
+	return ISurfaceCreator.rectPipe(rail,left,right,bottom,top);
     }
     public static ISurface rectPipe(IVecI[] rail, int deg, double width, double height){
 	return ISurfaceCreator.rectPipe(rail,deg,width,height);
     }
+    public static ISurface rectPipe(IVecI[] rail, int deg,
+				    double left, double right, double bottom, double top){
+	return ISurfaceCreator.rectPipe(rail,deg,left,right,bottom,top);
+    }
     public static ISurface rectPipe(IVecI[] rail, int deg, boolean close, double width, double height){
 	return ISurfaceCreator.rectPipe(rail,deg,close,width,height);
+    }
+    public static ISurface rectPipe(IVecI[] rail, int deg, boolean close,
+				    double left, double right, double bottom, double top){
+	return ISurfaceCreator.rectPipe(rail,deg,close,left,right,bottom,top);
     }
     public static ISurface rectPipe(ICurveI rail, double width, double height){
 	return ISurfaceCreator.rectPipe(rail,width,height);
     }
+    public static ISurface rectPipe(ICurveI rail,
+				    double left, double right, double bottom, double top){
+	return ISurfaceCreator.rectPipe(rail,left,right,bottom,top);
+    }
     public static ISurface rectPipe(IVecI[] rail, int deg, double[] knots, double width, double height){
 	return ISurfaceCreator.rectPipe(rail,deg,knots,width,height);
+    }
+    public static ISurface rectPipe(IVecI[] rail, int deg, double[] knots,
+				    double left, double right, double bottom, double top){
+	return ISurfaceCreator.rectPipe(rail,deg,knots,left,right,bottom,top);
     }
     
     
@@ -1248,6 +1337,27 @@ public class IG implements IServerI{
 	return ISurfaceCreator.loftZ(curves,deg,close);
     }
 
+    /*********************************************************
+     * flattening
+     ********************************************************/
+    
+    public static ICurve flatten(ICurveI curve, IVecI planeDir, IVecI planePt){
+	return ICurveCreator.flatten(curve,planeDir,planePt);
+    }
+    public static ICurve flatten(ICurveI curve, IVecI planeDir){
+	return ICurveCreator.flatten(curve,planeDir);
+    }
+    public static ICurve flatten(ICurveI curve){ return ICurveCreator.flatten(curve); }
+    
+    public static ISurface flatten(ISurfaceI surface, IVecI planeDir, IVecI planePt){
+	return ISurfaceCreator.flatten(surface,planeDir,planePt);
+    }
+    public static ISurface flatten(ISurfaceI surface, IVecI planeDir){
+	return ISurfaceCreator.flatten(surface,planeDir);
+    }
+    public static ISurface flatten(ISurfaceI surface){ return ISurfaceCreator.flatten(surface); }
+    
+    
 
     /*********************************************************
      * creating vector 

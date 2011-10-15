@@ -23,25 +23,18 @@
 package igeo.core;
 
 /**
-   A subobject of IObject to control dynamic behavior of IObject.
+   Interface of a subobject of IObject to control dynamic behavior of IObject.
    
    @author Satoru Sugihara
    @version 0.7.0.0
 */
-public class IDynamicObject implements IDynamicObjectI{
-    
-    public IObject parent=null;
-    // implementation of IDynamicObjectI
-    
-    public IObject parent(){ return parent; }
-    public ISubobject parent(IObject parent){ this.parent=parent; return this; }    
-    
+public /*class*/interface IDynamicObjectI extends ISubobject{
     /** behavior definition of interaction with other dynamic objects.
 	interaction happens between every two dynamic objects in a server.
 	interact() is called for every combination of two but
 	when A.interact(B) happens, B.interact(A) doesn't happen.
 	Just once for each combination */
-    public void interact(IDynamicObjectI obj){}
+    public void interact(IDynamicObjectI obj);
     /** behavior definition of updating dynamics in each time frame */
-    public void update(){}
+    public void update();
 }

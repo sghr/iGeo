@@ -51,7 +51,7 @@ public class IObject{
     //IGraphicObject graphic;
     //IDynamicObject dynamic;
     public ArrayList<IGraphicObject> graphics;
-    public ArrayList<IDynamicObject> dynamics;
+    public ArrayList<IDynamicObjectI> dynamics;
     
     //public ILayer layer;
     
@@ -127,6 +127,10 @@ public class IObject{
     }
     
     
+    /** checking parameters validity. to be overriden. */
+    public boolean isValid(){ return true; }
+    
+    
     public void setParameter(IParameterObject param){
 	if(parameter!=null) IOut.err("parameter is already set. overwrote."); 
 	parameter = param;
@@ -153,20 +157,25 @@ public class IObject{
     }
     */
     
+    public void addDynamics(IDynamicObjectI dyna){
+	if(dynamics==null) dynamics = new ArrayList<IDynamicObjectI>();
+	if(!dynamics.contains(dyna)) dynamics.add(dyna);
+	if(server!=null) server.add(dyna);
+    }
     
     public IParameterObject getParameter(){ return parameter; }
     public IGraphicObject getGraphic(int i){
 	if(graphics==null) return null;
 	return graphics.get(i);
     }
-    public IDynamicObject getDynamics(int i){
+    public IDynamicObjectI getDynamics(int i){
 	if(dynamics==null) return null;
 	return dynamics.get(i);
     }
     
     public int graphicsNum(){ if(graphics==null) return 0; return graphics.size(); }
     public int dynamicsNum(){ if(dynamics==null) return 0; return dynamics.size(); }
-        
+    
     public void clearGraphics(){ if(graphics!=null) graphics.clear(); }
     public void clearDynamics(){ if(dynamics!=null) dynamics.clear(); }
     

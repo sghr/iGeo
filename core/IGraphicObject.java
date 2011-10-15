@@ -31,7 +31,7 @@ import igeo.gui.*;
    @author Satoru Sugihara
    @version 0.7.0.0
 */
-abstract public class IGraphicObject extends ISubobject implements IGraphicI{
+abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobject, IGraphicI{
     
     // should be synchronized with color range in processing when used in processing
     static int colorRange1i = 255;  
@@ -48,11 +48,17 @@ abstract public class IGraphicObject extends ISubobject implements IGraphicI{
     public Color color;
     public boolean visible=true;
     
+    public IObject parent;
     
     public IGraphicObject(IObject p){
 	parent = p;
 	//parent.server.add(this);
     }
+    
+    // implementation of ISubobject
+    public IObject parent(){ return parent; }
+    public ISubobject parent(IObject parent){ this.parent=parent; return this; }
+    
     
     abstract public void draw(IGraphics g);
     

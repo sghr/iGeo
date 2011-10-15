@@ -156,6 +156,8 @@ public class IMesh extends IObject implements IMeshI{
     
     public IMesh dup(){ return new IMesh(this); }
     
+    public boolean isValid(){ return mesh.isValid(); }
+    
     
     public void initMesh(IServerI s){
 	parameter = mesh;

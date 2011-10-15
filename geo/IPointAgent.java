@@ -22,39 +22,33 @@
 
 package igeo.geo;
 
+import java.util.ArrayList;
+
+import igeo.core.*;
+import igeo.util.*;
+
 /**
-   Abstract interface of polygon mesh.
+   Class of an agent based on one point.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public interface IMeshI{
-
-    public IMeshGeo get();
-
-    public IMeshI dup();
-
-    public boolean isValid();
+public class IPointAgent extends IAgent{
     
-    public int vertexNum();
-    public int edgeNum();
-    public int faceNum();
+    public IVec pos;
+    public IPoint point;
     
-    public int vertexNum(ISwitchE e);
-    public int edgeNum(ISwitchE e);
-    public int faceNum(ISwitchE e);
+    public IPointAgent(){ this(new IVec()); show(); }
+    public IPointAgent(double x, double y, double z){ super(); pos=new IVec(x,y,z); show(); }
+    public IPointAgent(IVec p){ super(); pos=p; show(); }
+    public IPointAgent(IVecI p){ super(); pos=p.get(); show(); }
     
-    public IIntegerI vertexNum(ISwitchR r);
-    public IIntegerI edgeNum(ISwitchR r);
-    public IIntegerI faceNum(ISwitchR r);
+    public IPointAgent show(){
+	if(point==null){ point = new IPoint(pos).clr(super.clr()); }
+	else{ point.show(); }
+	return this;
+    }
     
-    public IVertex vertex(int i);
-    public IEdge edge(int i);
-    public IFace face(int i);
-    
-    public IVertex vertex(IIntegerI i);
-    public IEdge edge(IIntegerI i);
-    public IFace face(IIntegerI i);
-    
+    public IPointAgent hide(){ if(point!=null) hide(); return this; }
     
 }

@@ -346,6 +346,16 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
 	return this.diff(pt1).cross(this.diff(pt2)).unit();
     }
     
+    /** checking x, y, and z is valid number (not Infinite, nor NaN). */
+    public boolean isValid(){
+	if(!IDouble.isValid(x)){ IOut.err("invalid x ("+x+")"); return false; }
+	if(!IDouble.isValid(y)){ IOut.err("invalid y ("+y+")"); return false; }
+	if(!IDouble.isValid(z)){ IOut.err("invalid z ("+z+")"); return false; }
+	if(!IDouble.isValid(w)){ IOut.err("invalid w ("+w+")"); return false; }
+	return true;
+    }
+    
+    
         
     public String toString(){
 	return "("+String.valueOf(x)+","+String.valueOf(y)+","+String.valueOf(z)+

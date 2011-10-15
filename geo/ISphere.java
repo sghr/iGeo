@@ -96,5 +96,51 @@ public class ISphere extends ISurface{
 	super.initSurface(s);
     }
     
-
+    
+    
+    // name(), layer(), clr() etc.
+    
+    public ISphere name(String nm){ super.name(nm); return this; }
+    public ISphere layer(ILayer l){ super.layer(l); return this; }
+    
+    public ISphere hide(){ super.hide(); return this; }
+    public ISphere show(){ super.show(); return this; }
+    
+    public ISphere clr(Color c){ super.clr(c); return this; }
+    public ISphere clr(int gray){ super.clr(gray); return this; }
+    public ISphere clr(float fgray){ super.clr(fgray); return this; }
+    public ISphere clr(double dgray){ super.clr(dgray); return this; }
+    public ISphere clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
+    public ISphere clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
+    public ISphere clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
+    public ISphere clr(int r, int g, int b){ super.clr(r,g,b); return this; }
+    public ISphere clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
+    public ISphere clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
+    public ISphere clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
+    public ISphere clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
+    public ISphere clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
+    public ISphere hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
+    public ISphere hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
+    public ISphere hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
+    public ISphere hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
+    
+    public ISphere setColor(Color c){ super.setColor(c); return this; }
+    public ISphere setColor(int gray){ super.setColor(gray); return this; }
+    public ISphere setColor(float fgray){ super.setColor(fgray); return this; }
+    public ISphere setColor(double dgray){ super.setColor(dgray); return this; }
+    public ISphere setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
+    public ISphere setColor(float fgray, float falpha){ super.setColor(fgray,falpha); return this; }
+    public ISphere setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
+    public ISphere setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
+    public ISphere setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
+    public ISphere setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
+    public ISphere setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
+    public ISphere setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
+    public ISphere setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
+    public ISphere setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
+    public ISphere setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
+    public ISphere setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
+    public ISphere setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
+    
+    
 }

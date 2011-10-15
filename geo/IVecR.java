@@ -381,6 +381,8 @@ public class IVecR extends IParameterObject implements IVecI, IReferenceParamete
 	return this.diff(pt1).cross(this.diff(pt2)).unit();
     }
     
+    /** checking x, y, and z is valid number (not Infinite, nor NaN). */
+    public boolean isValid(){ return get().isValid(); }
     
     // /////////////////////////////////
     // subclasses

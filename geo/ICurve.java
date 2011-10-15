@@ -194,6 +194,8 @@ public class ICurve extends IObject implements ICurveI{
 	return null;
     }
     
+    public boolean isValid(){ return curve.isValid(); }
+    
     public ICurveGeo get(){ return curve.get(); } //?
     
     public ICurve dup(){ return new ICurve(this); }    

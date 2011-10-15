@@ -300,4 +300,6 @@ public interface IVecI extends IVecOp, ITransformable{
     */
     public IVecI nml(IVecI pt1, IVecI pt2);
     
+    
+    public boolean isValid();
 }
