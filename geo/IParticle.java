@@ -24,6 +24,8 @@ package igeo.geo;
 
 import java.awt.Color;
 
+import java.util.ArrayList;
+
 import igeo.core.*;
 import igeo.gui.*;
 
@@ -35,7 +37,7 @@ import igeo.gui.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IParticle extends IDynamicObject{
+public class IParticle extends IDynamicObjectBase{
     
     static double defaultFriction = 0.0;
     
@@ -67,28 +69,42 @@ public class IParticle extends IDynamicObject{
     synchronized public double mass(){ return mass; }
     synchronized public IParticle mass(double mass){ this.mass=mass; return this; }
     
-    synchronized public IVec position(){ return pos; }
-    synchronized public IParticle position(IVec v){ pos.set(v); return this; }
+    synchronized public IVec position(){ return pos(); }
+    synchronized public IParticle position(IVec v){ pos(v); return this; }
     
-    synchronized public IVec velocity(){ return vel; }
-    synchronized public IParticle velocity(IVec v){ vel.set(v); return this; }
+    synchronized public IVec pos(){ return pos; }
+    synchronized public IParticle pos(IVec v){ pos.set(v); return this; }
     
-    synchronized public IVec acceleration(){ return acc; }
-    synchronized public IParticle acceleration(IVec v){ acc.set(v); return this; }
+    synchronized public IVec velocity(){ return vel(); }
+    synchronized public IParticle velocity(IVec v){ vel(v); return this; }
     
-    synchronized public IVec force(){ return frc; }
-    synchronized public IParticle force(IVec v){ frc.set(v); return this; }
+    synchronized public IVec vel(){ return vel; }
+    synchronized public IParticle vel(IVec v){ vel.set(v); return this; }
+    
+    synchronized public IVec acceleration(){ return acc(); }
+    synchronized public IParticle acceleration(IVec v){ acc(v); return this; }
+    
+    synchronized public IVec acc(){ return acc; }
+    synchronized public IParticle acc(IVec v){ acc.set(v); return this; }
+    
+    synchronized public IVec force(){ return frc(); }
+    synchronized public IParticle force(IVec v){ frc(v); return this; }
 
-    synchronized public double friction(){ return friction; }
-    synchronized public IParticle friction(double friction){ this.friction=friction; return this; }
+    synchronized public IVec frc(){ return frc; }
+    synchronized public IParticle frc(IVec v){ frc.set(v); return this; }
+
+    synchronized public double friction(){ return fric(); }
+    synchronized public IParticle friction(double friction){ fric(friction); return this; }
+    
+    synchronized public double fric(){ return friction; }
+    synchronized public IParticle fric(double friction){ this.friction=friction; return this; }
     
     synchronized public IParticle addForce(IVec f){ frc.add(f); return this; }
     
     synchronized public IParticle resetForce(){ frc.set(0,0,0); return this; }
     
-    synchronized public void interact(IDynamicObject obj){
-	
-    }
+    synchronized public void interact(ArrayList<IDynamicObject> dynamics){}
+    
     synchronized public void update(){
 	if(fixed) return;
 	pos.add(vel.add(frc.mul((mass*IConfig.dynamicsUpdateSpeed)/1000)).mul(1.0-friction));

@@ -23,6 +23,7 @@
 package igeo.geo;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import igeo.core.*;
 import igeo.gui.*;
@@ -48,7 +49,7 @@ public class IParticleOnCurve extends IParticle{
     public IParticleOnCurve(ICurveI curve){ this(curve,0); }
     public IParticleOnCurve(ICurveI curve, double u){ super(curve.pt(u).get()); upos=u; this.curve=curve; }
     
-    synchronized public void interact(IDynamicObject obj){
+    synchronized public void interact(ArrayList<IDynamicObject> dynamics){
 	
     }
     synchronized public void update(){

@@ -66,95 +66,100 @@ public class IBoundingBox{
 	//boolean first = true;
 	initBox();
 	
-	for(IObject e:objects){
+	synchronized(objects){
 	    
-	    if(e.visible()){
-		if(e instanceof IPoint){
-		    IPoint p = (IPoint)e;
-		    compare(p.get());
-		    //if(first){ init(p.get()); first=false; }
-		    //else compare(p.get());
-		}
-		else if(e instanceof IPointR){
-		    IPointR p = (IPointR)e;
-		    compare(p.get());
-		    //if(first){ init(p.get()); first=false; }
-		    //else compare(p.get());
-		}
-		else if(e instanceof ICurve){
-		    ICurve c = (ICurve)e;
-		    for(int i=0; i<c.num(); i++)
-			compare(c.cp(i).get());
+	    //for(IObject e:objects){
+	    for(int n=0; n<objects.size(); n++){
+		IObject e = objects.get(n);
+		
+		if(e.visible()){
+		    if(e instanceof IPoint){
+			IPoint p = (IPoint)e;
+			compare(p.get());
+			//if(first){ init(p.get()); first=false; }
+			//else compare(p.get());
+		    }
+		    else if(e instanceof IPointR){
+			IPointR p = (IPointR)e;
+			compare(p.get());
+			//if(first){ init(p.get()); first=false; }
+			//else compare(p.get());
+		    }
+		    else if(e instanceof ICurve){
+			ICurve c = (ICurve)e;
+			for(int i=0; i<c.num(); i++)
+			    compare(c.cp(i).get());
 			//if(first){ init(c.cp(i).get()); first=false; }
 			//else compare(c.cp(i).get());
-		}
-		else if(e instanceof ICurveR){
-		    ICurveR c = (ICurveR)e;
-		    for(int i=0; i<c.num(); i++)
-			compare(c.cp(i).get());
+		    }
+		    else if(e instanceof ICurveR){
+			ICurveR c = (ICurveR)e;
+			for(int i=0; i<c.num(); i++)
+			    compare(c.cp(i).get());
 			//if(first){ init(c.cp(i).get()); first=false; }
 			//else compare(c.cp(i).get());
-		}
-		else if(e instanceof ISurface){
-		    ISurface s = (ISurface)e;
-		    for(int i=0; i<s.unum(); i++){
-			for(int j=0; j<s.vnum(); j++){
-			    compare(s.cp(i,j).get());
-			    //if(first){ init(s.cp(i,j).get()); first=false; }
-			    //else compare(s.cp(i,j).get());
-			}
 		    }
-		}
-		else if(e instanceof ISurfaceR){
-		    ISurfaceR s = (ISurfaceR)e;
-		    for(int i=0; i<s.unum(); i++){
-			for(int j=0; j<s.vnum(); j++){
-			    compare(s.cp(i,j).get());
-			    //if(first){ init(s.cp(i,j).get()); first=false; }
-			    //else compare(s.cp(i,j).get());
-			}
-		    }
-		}
-		else if(e instanceof IMesh){
-		    IMesh m = (IMesh)e;
-		    for(int i=0; i<m.vertexNum(); i++){
-			compare(m.vertex(i).get()); 
-			//if(first){ init(m.vertex(i).get()); first=false; }
-			//else compare(m.vertex(i).get()); 
-		    }
-		}
-		else if(e instanceof IMeshR){
-		    IMeshR m = (IMeshR)e;
-		    for(int i=0; i<m.vertexNum(); i++){
-			compare(m.vertex(i).get()); 
-			//if(first){ init(m.vertex(i).get()); first=false; }
-			//else compare(m.vertex(i).get()); 
-		    }
-		}
-		else if(e instanceof IBrep){
-		    IBrep b = (IBrep)e;
-		    for(int i=0; i<b.surfaces.length; i++){
-			for(int j=0; j<b.surfaces[i].unum(); j++){
-			    for(int k=0; k<b.surfaces[i].vnum(); k++){
-				compare(b.surfaces[i].cp(j,k).get());
+		    else if(e instanceof ISurface){
+			ISurface s = (ISurface)e;
+			for(int i=0; i<s.unum(); i++){
+			    for(int j=0; j<s.vnum(); j++){
+				compare(s.cp(i,j).get());
 				//if(first){ init(s.cp(i,j).get()); first=false; }
 				//else compare(s.cp(i,j).get());
 			    }
 			}
 		    }
-		}
-		else if(e instanceof IVectorObject){
-		    IVectorObject vobj = (IVectorObject)e;
-		    compare(vobj.vec.get());
-		    compare(vobj.root.get());
-		    //if(first){
-		    //	init(vobj.vec.get()); first=false;
-		    //	compare(vobj.root.get());
-		    //}
-		    //else{
-		    //	compare(vobj.vec.get());
-		    //	compare(vobj.root.get());
-		    //}
+		    else if(e instanceof ISurfaceR){
+			ISurfaceR s = (ISurfaceR)e;
+			for(int i=0; i<s.unum(); i++){
+			    for(int j=0; j<s.vnum(); j++){
+				compare(s.cp(i,j).get());
+				//if(first){ init(s.cp(i,j).get()); first=false; }
+				//else compare(s.cp(i,j).get());
+			    }
+			}
+		    }
+		    else if(e instanceof IMesh){
+			IMesh m = (IMesh)e;
+			for(int i=0; i<m.vertexNum(); i++){
+			    compare(m.vertex(i).get()); 
+			    //if(first){ init(m.vertex(i).get()); first=false; }
+			    //else compare(m.vertex(i).get()); 
+			}
+		    }
+		    else if(e instanceof IMeshR){
+			IMeshR m = (IMeshR)e;
+			for(int i=0; i<m.vertexNum(); i++){
+			    compare(m.vertex(i).get()); 
+			    //if(first){ init(m.vertex(i).get()); first=false; }
+			    //else compare(m.vertex(i).get()); 
+			}
+		    }
+		    else if(e instanceof IBrep){
+			IBrep b = (IBrep)e;
+			for(int i=0; i<b.surfaces.length; i++){
+			    for(int j=0; j<b.surfaces[i].unum(); j++){
+				for(int k=0; k<b.surfaces[i].vnum(); k++){
+				    compare(b.surfaces[i].cp(j,k).get());
+				    //if(first){ init(s.cp(i,j).get()); first=false; }
+				    //else compare(s.cp(i,j).get());
+				}
+			    }
+			}
+		    }
+		    else if(e instanceof IVectorObject){
+			IVectorObject vobj = (IVectorObject)e;
+			compare(vobj.vec.get());
+			compare(vobj.root.get());
+			//if(first){
+			//	init(vobj.vec.get()); first=false;
+			//	compare(vobj.root.get());
+			//}
+			//else{
+			//	compare(vobj.vec.get());
+			//	compare(vobj.root.get());
+			//}
+		    }
 		}
 	    }
 	}

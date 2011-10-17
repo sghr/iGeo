@@ -51,7 +51,7 @@ public class IObject{
     //IGraphicObject graphic;
     //IDynamicObject dynamic;
     public ArrayList<IGraphicObject> graphics;
-    public ArrayList<IDynamicObjectI> dynamics;
+    public ArrayList<IDynamicObject> dynamics;
     
     //public ILayer layer;
     
@@ -157,8 +157,8 @@ public class IObject{
     }
     */
     
-    public void addDynamics(IDynamicObjectI dyna){
-	if(dynamics==null) dynamics = new ArrayList<IDynamicObjectI>();
+    public void addDynamics(IDynamicObject dyna){
+	if(dynamics==null) dynamics = new ArrayList<IDynamicObject>();
 	if(!dynamics.contains(dyna)) dynamics.add(dyna);
 	if(server!=null) server.add(dyna);
     }
@@ -168,7 +168,7 @@ public class IObject{
 	if(graphics==null) return null;
 	return graphics.get(i);
     }
-    public IDynamicObjectI getDynamics(int i){
+    public IDynamicObject getDynamics(int i){
 	if(dynamics==null) return null;
 	return dynamics.get(i);
     }

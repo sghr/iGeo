@@ -364,9 +364,7 @@ public class IPoint extends IObject implements IVecI{
     public String toString(){ return pos.toString(); }
     
     
-    /**
-       set size of dot in graphic 
-    */
+    /** set size of dot in graphic */
     public IPoint setSize(double sz){ return size(sz); }
     public IPoint size(double sz){
 	for(int i=0; graphics!=null && i<graphics.size(); i++)

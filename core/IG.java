@@ -408,6 +408,7 @@ public class IG implements IServerI{
     }
     
     public IServer server(){ return server; }
+    public IDynamicServer dynamicServer(){ return server.dynamicServer(); }
     
     //public void draw(IGraphics g){ server.draw(g); }
     

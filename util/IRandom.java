@@ -28,7 +28,6 @@ import java.util.Random;
 
 import igeo.geo.*;
 
-
 /**
    A class to provide random number function.
    
@@ -56,6 +55,8 @@ public class IRandom{
 	return random.nextDouble();
     }
     
+    static public double getDouble(double min, double max){ return get(min,max); }
+    static public double getDouble(double max){ return get(max); }
     static public double getDouble(){ return get(); }
     
     static public double get(double min, double max){
@@ -63,43 +64,102 @@ public class IRandom{
 	return random.nextDouble()*(max-min)+min;
     }
     
+    static public double get(double max){
+	if(random==null){ init(); }
+	return random.nextDouble()*max;
+    }
+
     static public float getf(){
 	if(random==null){ init(); }
 	return random.nextFloat();
     }
+    static public float getf(float min, float max){
+	if(random==null){ init(); }
+	return random.nextFloat()*(max-min)+min;
+    }
+    static public float getf(float max){
+	if(random==null){ init(); }
+	return random.nextFloat()*max;
+    }
     
     static public float getFloat(){ return getf(); }
+    static public float getFloat(float min, float max){ return getf(min,max); }
+    static public float getFloat(float max){ return getf(max); }
+    
     
     static public int geti(int min, int max){
 	int r = (int)get(min, max+1);
 	if(r>max){ r=max; }
 	return r;
     }
+    static public int geti(int max){
+	int r = (int)get(0, max+1);
+	if(r>max){ r=max; }
+	return r;
+    }
+    /** returns 0 or 1 */
+    static public int geti(){
+	int r = (int)get(0, 2);
+	if(r>1){ r=1; }
+	return r;
+    }
     static public int getInt(int min, int max){ return geti(min,max); }
+    static public int getInt(int max){ return geti(max); }
+    static public int getInt(){ return geti(); }
     static public int getInteger(int min, int max){ return geti(min,max); }
+    static public int getInteger(int max){ return geti(max); }
+    static public int getInteger(){ return geti(); }
+    
     
     static public IVec pt(IVec min, IVec max){
 	return new IVec(get(min.x,max.x),get(min.y,max.y),get(min.z,max.z));
     }
-    
     static public IVec point(IVec min, IVec max){ return pt(min,max); }
-    
     static public IVec getPoint(IVec min, IVec max){ return pt(min,max); }
+
+    static public IVec pt(IVec max){
+	return new IVec(get(max.x),get(max.y),get(max.z));
+    }
+    static public IVec point(IVec max){ return pt(max); }
+    static public IVec getPoint(IVec max){ return pt(max); }
     
     static public IVec pt(double minx, double miny, double minz,
 			  double maxx, double maxy, double maxz){
 	return new IVec(get(minx,maxx),get(miny,maxy),get(minz,maxz));
     }
+    static public IVec pt(double maxx, double maxy, double maxz){
+	return new IVec(get(maxx),get(maxy),get(maxz));
+    }
+    static public IVec pt(double min, double max){
+	return new IVec(get(min,max),get(min,max),get(min,max));
+    }
+    static public IVec pt(double max){
+	return new IVec(get(0,max),get(0,max),get(0,max));
+    }
+    static public IVec pt(){ return new IVec(get(),get(),get()); }
     
     static public IVec point(double minx, double miny, double minz,
 			     double maxx, double maxy, double maxz){
 	return pt(minx,miny,minz,maxx,maxy,maxz);
     }
+    static public IVec point(double maxx, double maxy, double maxz){
+	return pt(maxx,maxy,maxz);
+    }
+    static public IVec point(double min, double max){ return pt(min,max); }
+    static public IVec point(double max){ return pt(max); }
+    static public IVec point(){ return pt(); }
     
     static public IVec getPoint(double minx, double miny, double minz,
 				double maxx, double maxy, double maxz){
 	return pt(minx,miny,minz,maxx,maxy,maxz);
     }
+    static public IVec getPoint(double maxx, double maxy, double maxz){
+	return pt(maxx,maxy,maxz);
+    }
+    static public IVec getPoint(double min, double max){ return pt(min,max); }
+    static public IVec getPoint(double max){ return pt(max); }
+    static public IVec getPoint(){ return pt(); }
+    
     
     static public boolean getPercent(double percent){
 	return percent(percent);

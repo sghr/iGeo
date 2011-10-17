@@ -77,6 +77,7 @@ public class IServer implements IServerI{
     }
     
     public IServer server(){ return this; }
+    public IDynamicServer dynamicServer(){ return dynamicServer; }
     
     public IGraphicServer graphicServer(){ return graphicServer; }
     
@@ -97,7 +98,7 @@ public class IServer implements IServerI{
     }
     */
     
-    public void add(IDynamicObjectI e){
+    public void add(IDynamicObject e){
 	synchronized(IG.lock){
 	    //dynamics.add(e);
 	    //update();

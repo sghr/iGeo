@@ -22,26 +22,26 @@
 
 package igeo.core;
 
+import java.util.ArrayList;
+
 /**
-   A subobject of IObject to control dynamic behavior of IObject.
+   Interface of a subobject of IObject to control dynamic behavior of IObject.
    
    @author Satoru Sugihara
    @version 0.7.0.0
 */
-public class IDynamicObject implements IDynamicObjectI{
-    
-    public IObject parent=null;
-    // implementation of IDynamicObjectI
-    
-    public IObject parent(){ return parent; }
-    public ISubobject parent(IObject parent){ this.parent=parent; return this; }    
+public /*class*/interface IDynamicObject extends ISubobject{
+    /* behavior definition of interaction with other dynamic objects.
+       interaction happens between every two dynamic objects in a server.
+       interact() is called for every combination of two but
+       when A.interact(B) happens, B.interact(A) doesn't happen.
+       Just once for each combination */
+    //public void interact(IDynamicObject obj);
     
     /** behavior definition of interaction with other dynamic objects.
-	interaction happens between every two dynamic objects in a server.
-	interact() is called for every combination of two but
-	when A.interact(B) happens, B.interact(A) doesn't happen.
-	Just once for each combination */
-    public void interact(IDynamicObjectI obj){}
+	The server puts all dynamic objects including itself.
+    */
+    public void interact(ArrayList<IDynamicObject> dynamics);
     /** behavior definition of updating dynamics in each time frame */
-    public void update(){}
+    public void update();
 }
