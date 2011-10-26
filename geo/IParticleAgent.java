@@ -34,18 +34,23 @@ import igeo.util.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IParticleAgent extends IPointAgent{
-
+public class IParticleAgent extends IPointAgent implements IParticleI{
+    
     public IParticle particle;
     
     public IParticleAgent(){ super(); initParticleAgent(); }
     public IParticleAgent(double x, double y, double z){ super(x,y,z); initParticleAgent(); }
     public IParticleAgent(IVec p){ super(p); initParticleAgent(); }
     public IParticleAgent(IVecI p){ super(p); initParticleAgent(); }
+    public IParticleAgent(IParticle ptcl){ super(ptcl.pos); initParticleAgent(ptcl); }
     public IParticleAgent(IParticleAgent p){ super((IPointAgent)p); initParticleAgent(); }    
     
     public void initParticleAgent(){
 	particle = new IParticle(pos);
+	addDynamics(particle);
+    }
+    public void initParticleAgent(IParticle ptcl){
+	particle = ptcl;
 	addDynamics(particle);
     }
     
@@ -67,11 +72,10 @@ public class IParticleAgent extends IPointAgent{
     synchronized public IVec vel(){ return particle.vel(); }
     synchronized public IParticleAgent vel(IVec v){ particle.vel(v); return this; }
     
-    synchronized public IVec acceleration(){ return particle.acceleration(); }
-    synchronized public IParticleAgent acceleration(IVec v){ particle.acceleration(v); return this; }
-    
-    synchronized public IVec acc(){ return particle.acc(); }
-    synchronized public IParticleAgent acc(IVec v){ particle.acc(v); return this; }
+    //synchronized public IVec acceleration(){ return particle.acceleration(); }
+    //synchronized public IParticleAgent acceleration(IVec v){ particle.acceleration(v); return this; }
+    //synchronized public IVec acc(){ return particle.acc(); }
+    //synchronized public IParticleAgent acc(IVec v){ particle.acc(v); return this; }
     
     synchronized public IVec force(){ return particle.force(); }
     synchronized public IParticleAgent force(IVec v){ particle.force(v); return this; }

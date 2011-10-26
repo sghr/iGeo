@@ -50,6 +50,9 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     
     public IObject parent;
     
+    public boolean update=false;
+    
+    
     public IGraphicObject(IObject p){
 	parent = p;
 	//parent.server.add(this);
@@ -77,6 +80,9 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
 	// mainly to update focus bounding box
 	if(parent!=null&&parent.server!=null) parent.server.update();
     }
+    
+    /** updating graphic when geometry change. actual update happens when it's drawn.*/
+    public void update(){ update=true; }
     
     
     public void setColor(Color c){ color=c; }

@@ -24,7 +24,7 @@ package igeo.core;
 
 import java.util.ArrayList;
 import java.awt.Color;
-import igeo.gui.*;
+import igeo.geo.*;
 
 /**
    A class of a layer to contain and organize objects. Layers are managed by IServer.
@@ -71,6 +71,79 @@ public class ILayer extends IObject{
     public ILayer remove(IObject e){ objects.remove(e); return this; }
     
     public boolean contains(IObject e){ return objects.contains(e); }
+    
+    
+    
+    /***********************************************************************
+     * Object Selection
+     **********************************************************************/
+    
+    /** Returns all point objects contained in a layer.
+        IPointR objects are not included.
+     */
+    public IPoint[] points(){
+        ArrayList<IPoint> points = new ArrayList<IPoint>();
+        synchronized(server){
+            for(int i=0; i<objects.size(); i++)
+                if(objects.get(i) instanceof IPoint)
+                    points.add((IPoint)objects.get(i));
+        }
+        return points.toArray(new IPoint[points.size()]);
+    }
+    /** Returns all curve objects contained in a layer.
+        ICurveR objects are not included.
+    */
+    public ICurve[] curves(){
+        ArrayList<ICurve> curves = new ArrayList<ICurve>();
+        synchronized(server){
+            for(int i=0; i<objects.size(); i++)
+                if(objects.get(i) instanceof ICurve)
+                    curves.add((ICurve)objects.get(i));
+        }
+        return curves.toArray(new ICurve[curves.size()]);
+    }
+    /** Returns all surface objects contained in a layer.
+        ISurfaceR objects are not included.
+    */
+    public ISurface[] surfaces(){
+        ArrayList<ISurface> surfaces = new ArrayList<ISurface>();
+        synchronized(server){
+            for(int i=0; i<objects.size(); i++)
+                if(objects.get(i) instanceof ISurface)
+                    surfaces.add((ISurface)objects.get(i));
+        }
+        return surfaces.toArray(new ISurface[surfaces.size()]);
+    }
+    
+    /** Returns all meshe objects contained in a layer.
+        IMeshR objects are not included.
+    */
+    public IMesh[] getMeshes(){
+        ArrayList<IMesh> meshes = new ArrayList<IMesh>();
+        synchronized(server){
+            for(int i=0; i<objects.size(); i++)
+                if(objects.get(i) instanceof IMesh)
+                    meshes.add((IMesh)objects.get(i));
+        }
+        return meshes.toArray(new IMesh[meshes.size()]);
+    }
+    /** Returns all objects of specified class contained in a layer.
+     */
+    public IObject[] objects(Class cls){
+        ArrayList<IObject> objs = new ArrayList<IObject>();
+        synchronized(server){
+            for(int i=0; i<objs.size(); i++)
+                if(cls.isInstance(objects.get(i))) objs.add(objects.get(i));
+        }
+        return objs.toArray(new IObject[objs.size()]);
+    }
+    /** Returns all objects contained in a layer.
+     */
+    public IObject[] objects(){
+	return objects.toArray(new IObject[objects.size()]);
+    }
+    
+    
     
     public ILayer name(String layerName){ attribute.name = layerName; return this; }
     

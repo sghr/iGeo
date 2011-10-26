@@ -32,10 +32,10 @@ import igeo.geo.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IXComparator implements IComparator<IVec>{
-    public int compare(IVec v1, IVec v2){ // return >0, <0, ==0
-	if(v1.x < v2.x) return -1;
-	if(v1.x > v2.x) return 1;
+public class IXComparator implements IComparator<IVecI>{
+    public int compare(IVecI v1, IVecI v2){ // return >0, <0, ==0
+	if(v1.x() < v2.x()) return -1;
+	if(v1.x() > v2.x()) return 1;
 	return 0;
     }
 }

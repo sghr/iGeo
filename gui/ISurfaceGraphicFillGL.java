@@ -51,6 +51,10 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     public IGLQuadMatrix quadMatrix=null;
     public IGLTriangles triangles=null;
     
+    // cache to update surface 
+    public double[] uvalCache, vvalCache;
+    public IVec2[][] triangles2DCache;
+    
     public boolean initialized=false;
     
     
@@ -194,6 +198,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	}
 	
 	quadMatrix = new IGLQuadMatrix(pts,nrm);
+	
+	uvalCache=uval;
+	vvalCache=vval;
     }
     
     public void initWithTrim(){
@@ -360,13 +367,80 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	
 	triangles = new IGLTriangles(triangles3D,trianglesNormal);
 	
+	triangles2DCache = triangles2D;
     }
+    
+    public void updateWithoutTrim(){
+	if(uvalCache==null || vvalCache==null){
+	    IOut.err("cache is null. not updated.");
+	    return;
+	}
+	
+	if(quadMatrix!=null &&
+	   quadMatrix.width() == uvalCache.length &&
+	   quadMatrix.height() == vvalCache.length){
+	    for(int i=0; i<uvalCache.length; i++){
+		for(int j=0; j<vvalCache.length; j++){
+		    IVec pt = surface.pt(uvalCache[i], vvalCache[j]).get();
+		    IVec n = surface.normal(uvalCache[i], vvalCache[j]).get().unit();
+		    quadMatrix.setPoint(i,j,pt,n);
+		}
+	    }
+	}
+	else{
+	    IVec[][] pts = new IVec[uvalCache.length][vvalCache.length];
+	    IVec[][] nrm = new IVec[uvalCache.length][vvalCache.length];
+	    for(int i=0; i<uvalCache.length; i++){
+		for(int j=0; j<vvalCache.length; j++){
+		    pts[i][j] = surface.pt(uvalCache[i], vvalCache[j]).get();
+		    nrm[i][j] = surface.normal(uvalCache[i], vvalCache[j]).get().unit();
+		}
+	    }
+	    quadMatrix = new IGLQuadMatrix(pts,nrm);
+	}
+    }
+    
+    public void updateWithTrim(){
+	
+	if(triangles2DCache==null){
+	    IOut.err("cache is null. not updated.");
+	    return;
+	}
+	
+	if(triangles2DCache.length == triangles.triangleNum()){
+	    for(int i=0; i<triangles2DCache.length; i++){
+		for(int j=0; j<triangles2DCache[i].length; j++){
+		    IVec pt = surface.pt(triangles2DCache[i][j]).get();
+		    IVec n = surface.normal(triangles2DCache[i][j]).get().unit();
+		    triangles.setPoint(i,j,pt,n);
+		}
+	    }
+	}
+	else{
+	    IVec[][] triangles3D = new IVec[triangles2DCache.length][3];
+	    IVec[][] trianglesNormal = new IVec[triangles2DCache.length][3];
+	    for(int i=0; i<triangles2DCache.length; i++){
+		for(int j=0; j<triangles2DCache[i].length; j++){
+		    triangles3D[i][j] = surface.pt(triangles2DCache[i][j]).get();
+		    trianglesNormal[i][j] = surface.normal(triangles2DCache[i][j]).get().unit();
+		}
+	    }
+	    triangles = new IGLTriangles(triangles3D,trianglesNormal);
+	}
+    }
+    
+    public void updateSurface(){
+	if(quadMatrix!=null) updateWithoutTrim();
+	if(triangles!=null) updateWithTrim();
+    }
+    
     
     public boolean isDrawable(IGraphicMode m){ return m.isGL()&&m.isFill(); }
     
     public void draw(IGraphics g){
 	//if(surface==null) initSurface(); // not initizlized at the constructor // shouldn't it?
 	if(!initialized) initSurface();
+	else if(update){ updateSurface(); update=false; }
 	
 	GL gl = g.getGL();
 	if(gl!=null){

@@ -38,47 +38,136 @@ public class IAgent extends IObject implements IDynamicObject{
     
     public IObject parent=null;
     
+    /** target objects to be updated by dynamic object */
+    public ArrayList<IObject> targets;
+    
     public ArrayList<IDynamicObject> localDynamics;
     
     public int time=0;
-    public int lifetime=-1;
+    public int duration=-1; //lifetime=-1;
     public boolean alive=true;
     
     public IAgent(){ super(); initAgent(); }
     
+    public IAgent(IObject parent){ super(); this.parent=parent; initAgent(); }
+    
     public void initAgent(){ super.addDynamics(this); }
+    
     
     /** override IObject.addDynamics to manage dynamics locally.
 	Only IAgent is added at IObject */
-    public void addDynamics(IDynamicObject dyna){
+    @Override public void addDynamics(IDynamicObject dyna){
         if(localDynamics==null) localDynamics = new ArrayList<IDynamicObject>();
-        if(!localDynamics.contains(dyna))localDynamics.add(dyna);
+        if(!localDynamics.contains(dyna)){
+	    localDynamics.add(dyna);
+	    if(dyna.parent()!=this) dyna.parent(this);
+	}
     }
+    @Override public IDynamicObject getDynamics(int i){
+        if(localDynamics==null) return null;
+        return localDynamics.get(i);
+    }
+    @Override public int dynamicsNum(){
+	if(localDynamics==null) return 0; return localDynamics.size();
+    }
+    
+    @Override public void deleteDynamics(){
+        if(server!=null && server.dynamicServer!=null){
+            for(IDynamicObject dyn:localDynamics) server.dynamicServer.remove(dyn);
+        }
+    }
+    @Override public void deletDynamics(int index){
+        if(index<0||index>=localDynamics.size()) return;
+        if(server!=null && server.dynamicServer!=null)
+            server.dynamicServer.remove(localDynamics.get(index));
+        localDynamics.remove(index);
+    }
+    @Override public void deleteDynamics(IDynamicObject dyn){
+        if(!localDynamics.contains(dyn)) return;
+        if(server!=null && server.dynamicServer!=null) server.dynamicServer.remove(dyn);
+        localDynamics.remove(dyn);
+    }
+    @Override public void del(){
+	this.deleteDynamics();
+	super.del();
+    }
+    
+    @Override public void updateGraphic(){
+	if(parent!=null) parent.updateGraphic();
+    }
+    
     
     // implementation of IDynamicObject
     public IObject parent(){ return parent; }
-    public ISubobject parent(IObject parent){ this.parent=parent; return this; }
+    public ISubobject parent(IObject par){
+	//this.parent=parent; return this;
+	if(this.parent!=null){// necessary?
+	    this.parent.deleteDynamics(this);
+	    removeTarget(this.parent); // removing from target too.
+	}
+	
+	this.parent=par;
+	if(this.parent!=null){
+	    this.parent.addDynamics(this);
+	    target(this.parent); // adding to target too.
+	}
+	return this;
+    }
+    
+    
+    /** add terget object to be updated by this dynamic object. */
+    public IAgent target(IObject targetObj){
+	if(targets==null) targets = new ArrayList<IObject>();
+	targets.add(targetObj);
+	return this;
+    }
+    /** get total target number. */
+    public int targetNum(){ return targets==null?0:targets.size(); }
+    /** get target object. */
+    public IObject target(int i){ if(i<0||i>=targets.size()) return null; return targets.get(i); }
+    /** get all target objects. */
+    public ArrayList<IObject> targets(){ return targets; }
+    /** remove target object. */
+    public IAgent removeTarget(int i){
+	if(i<0||i>=targets.size()) return null;
+	targets.remove(i);
+	return this;
+    }
+    /** remove target object. */
+    public IAgent removeTarget(IObject obj){ targets.remove(obj); return this; }
+    
+    /** update all terget objects (should be called when the dynamic object is updated). */
+    public void updateTarget(){
+	if(targets!=null)
+	    for(int i=0; i<targets.size(); i++)
+		if(targets.get(i).server()!=null)
+		    targets.get(i).updateGraphic();
+    }
+    
+    
     
     public boolean alive(){ return alive; }
     
     synchronized public void interact(ArrayList<IDynamicObject> dynamics){
-	if(localDynamics!=null) for(IDynamicObject d:localDynamics) d.interact(dynamics); 
-    }
+	if(localDynamics!=null) for(IDynamicObject d:localDynamics) d.interact(dynamics);     }
     
     synchronized public void update(){
 	if(localDynamics!=null) for(IDynamicObject d:localDynamics) d.update();
 	
 	time++;
-	if(lifetime>0&&time>=lifetime){
+	if( duration>0 && time>=duration ){
 	    alive=false;
 	    del();
 	}
-
+	
 	//
 	server.update();
+	
+	// localDynamics will update parent directly. So no need to update parent here.
+	//if(parent!=null) parent.updateGraphic(); // did anything change?
     }
     
-
+    
     /**************************************
      * methods of IObject
      *************************************/

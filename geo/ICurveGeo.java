@@ -403,7 +403,31 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public IBool isRational(ISwitchR r){ return new IBool(isRational()); }
     
     
-    public double len(){ return 0; } // not implemented yet
+    public double len(double resolutionPerEP){
+	double ln = 0;
+	if(degree==1){
+	    for(int i=0; i<num()-1; i++) ln += cp(i+1).dist(cp(i));
+	    return ln;
+	}
+	int epnum = epNum();
+	int rnum = (int)(1.0/resolutionPerEP);
+	if(rnum<1) rnum=1;
+	IVec p1=null, p2=null;
+	for(int i=0; i<epnum; i++){
+	    for(int j=0; j<rnum && i<epnum-1 || j<=0; j++){
+		p2 = pt(u(i,(double)j/rnum));
+		if(p1!=null) ln += p2.dist(p1);
+		p1 = p2;
+	    }
+	}
+	return ln;
+    }
+    
+    public double len(){
+	// default resolution. not refined. ; should it be IConfig.parameterResolution? Is it too small?
+	final double defaultResolution = 0.01; // 1/100
+	return len(defaultResolution);
+    }
     //public IDouble lenR(){ return null; }
     public double len(ISwitchE e){ return len(); }
     public IDouble len(ISwitchR r){ return new IDouble(len()); }

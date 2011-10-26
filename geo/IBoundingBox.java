@@ -43,6 +43,7 @@ public class IBoundingBox{
     public void setObjects(IServer server){ setObjects(server.getObjects()); }
     
     public void compare(IVec p){
+	if(!p.isValid()) return;
 	if(min==null||max==null){ init(p); return; }
 	if(p.x < min.x) min.x=p.x;
 	else if(p.x > max.x) max.x=p.x;
@@ -173,7 +174,6 @@ public class IBoundingBox{
 	    max.set(min).add(sz);
 	    min.sub(sz);
 	}
-	
 	
 	if(objects.size()>1000) IOut.debug(10, "calculation of bounding box completed");
 	IOut.debug(100, this);

@@ -23,6 +23,7 @@
 package igeo.core;
 
 import java.util.ArrayList;
+import java.awt.Color;
 import igeo.gui.*;
 import igeo.geo.*;
 
@@ -92,20 +93,23 @@ public class IServer implements IServerI{
 	    update();
 	}
     }
+    
     /*
     public void add(IGraphicObject e){
 	synchronized(IG.lock){ graphics.add(e); }
     }
     */
-    
+
+    /*
     public void add(IDynamicObject e){
-	synchronized(IG.lock){
+	synchronized(ig){
 	    //dynamics.add(e);
 	    //update();
 	    dynamicServer.add(e);
-	    update();
+	    //update(); // adding IObject matters but not IDynamicObject?
 	}
     }
+    */
     
     //public IPanel getPanel(){ return panel; }
     
@@ -116,6 +120,13 @@ public class IServer implements IServerI{
 	else{ IOut.err("graphicServer is null"); }
     }
     
+    public void bg(Color c1, Color c2, Color c3, Color c4){
+	if(graphicServer!=null) graphicServer.background(c1,c2,c3,c4);
+	else{ IOut.err("graphicServer is null"); }
+    }
+    public void background(Color c1, Color c2, Color c3, Color c4){ bg(c1,c2,c3,c4); }
+    
+        
     public ArrayList<IObject> getObjects(){ return objects(); }
     public ArrayList<IObject> objects(){ return objects; }
     
@@ -226,10 +237,9 @@ public class IServer implements IServerI{
     
     /** Returns all point objects contained in objects.
 	IPointR objects are not included.
-     */
+    */
     public IPoint[] getPoints(){
 	ArrayList<IPoint> points = new ArrayList<IPoint>();
-	//synchronized(IG.lock){
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(objects.get(i) instanceof IPoint)
@@ -240,10 +250,9 @@ public class IServer implements IServerI{
     
     /** Returns all curve objects contained in objects.
 	ICurveR objects are not included.
-     */
+    */
     public ICurve[] getCurves(){
 	ArrayList<ICurve> curves = new ArrayList<ICurve>();
-	//synchronized(IG.lock){
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(objects.get(i) instanceof ICurve)
@@ -254,10 +263,9 @@ public class IServer implements IServerI{
     
     /** Returns all surface objects contained in objects.
 	ISurfaceR objects are not included.
-     */
+    */
     public ISurface[] getSurfaces(){
 	ArrayList<ISurface> surfaces = new ArrayList<ISurface>();
-	//synchronized(IG.lock){
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(objects.get(i) instanceof ISurface)
@@ -268,10 +276,9 @@ public class IServer implements IServerI{
     
     /** Returns all meshe objects contained in objects.
 	IMeshR objects are not included.
-     */
+    */
     public IMesh[] getMeshes(){
 	ArrayList<IMesh> meshes = new ArrayList<IMesh>();
-	//synchronized(IG.lock){
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
 		if(objects.get(i) instanceof IMesh)
@@ -281,15 +288,20 @@ public class IServer implements IServerI{
     }
     
     
+    /** Returns all objects of specified class contained in objects.
+     */
     public IObject[] getObjects(Class cls){
-	ArrayList<IObject> objects = new ArrayList<IObject>();
-	//synchronized(IG.lock){
+	ArrayList<IObject> objs = new ArrayList<IObject>();
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
-		if(cls.isInstance(objects.get(i))) objects.add(objects.get(i));
+		if(cls.isInstance(objects.get(i))) objs.add(objects.get(i));
 	}
-	return objects.toArray(new IObject[objects.size()]);
+	return objs.toArray(new IObject[objs.size()]);
     }
+
+    /** Returns all objects contained in objects.
+     */
+    public IObject[] getAllObjects(){ return objects.toArray(new IObject[objects.size()]); }
     
     
     public int layerNum(){ return layers.size(); }

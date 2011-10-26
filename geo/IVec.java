@@ -702,11 +702,21 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return Math.abs(diff(planePt).dot(planeDir)/planeDir.len());
     }
     
-    
+    /**
+       create a new vector from this point to the line in parpendicular direction.
+    */
     public IVec perpendicularVectorToLine(IVecI lineDir, IVecI linePt){
 	IVec ldir = lineDir.get().dup();
 	IVec diff = linePt.diff(this).get();
 	return ldir.mul(-ldir.dot(diff)/ldir.len2()).add(diff);
+    }
+    
+    /**
+       create a new vector from line to this point perpendicular to the axis
+    */
+    public IVec perpendicularVectorToVector(IVecI axisDir){
+	IVec ldir = axisDir.get().dup();
+	return ldir.mul(-ldir.dot(this)/ldir.len2()).add(this);
     }
     
     

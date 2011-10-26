@@ -42,7 +42,7 @@ public class IIsoparmGraphic{
     //public boolean uOrV=true; //true:U, false:V
     //public double param;
     
-    //public IPolyline2D[] polyline2;
+    public IPolyline2D[] polyline2;
     public IPolyline[] polyline=null; // this can be null if the whole line is outisde the trim loop
     
     public IIsoparmGraphic(ISurfaceI surf, double param, boolean uOrV){
@@ -68,35 +68,58 @@ public class IIsoparmGraphic{
 	    IConfig.surfaceWireframeResolution;
 		
 	// polyline2 is not created
+	polyline2 = new IPolyline2D[1];
 	polyline = new IPolyline[1];
 	if(uOrV){
 	    // u
 	    int epnum = surface.uepNum();
 	    if(surface.udeg()==1){
+		polyline2[0] = new IPolyline2D(epnum);
 		polyline[0] = new IPolyline(epnum);
-		for(int i=0; i<epnum; i++)
-		    polyline[0].set(i,surface.pt(surface.u(i,0),param));
+		for(int i=0; i<epnum; i++){
+		    IVec2 pt2 = new IVec2(surface.u(i,0),param);
+		    polyline2[0].set(i,pt2);
+		    polyline[0].set(i,surface.pt(pt2));
+		    //polyline[0].set(i,surface.pt(surface.u(i,0),param));
+		}
 	    }
 	    else{
+		polyline2[0] = new IPolyline2D((epnum-1)*reso+1);
 		polyline[0] = new IPolyline((epnum-1)*reso+1);
-		for(int i=0; i<epnum; i++)
-		    for(int j=0; j<reso&&(i<epnum-1) || j==0; j++)
-			polyline[0].set(i*reso+j,surface.pt(surface.u(i,(double)j/reso),param));
+		for(int i=0; i<epnum; i++){
+		    for(int j=0; j<reso&&(i<epnum-1) || j==0; j++){
+			IVec2 pt2 = new IVec2(surface.u(i,(double)j/reso),param);
+			polyline2[0].set(i*reso+j,pt2);
+			polyline[0].set(i*reso+j,surface.pt(pt2));
+			//polyline[0].set(i*reso+j,surface.pt(surface.u(i,(double)j/reso),param));
+		    }
+		}
 	    }
 	}
 	else{
 	    // v
 	    int epnum = surface.vepNum();
 	    if(surface.vdeg()==1){
+		polyline2[0] = new IPolyline2D(epnum);
 		polyline[0] = new IPolyline(epnum);
-		for(int i=0; i<epnum; i++)
-		    polyline[0].set(i,surface.pt(param,surface.v(i,0)));
+		for(int i=0; i<epnum; i++){
+		    IVec2 pt2 = new IVec2(param,surface.v(i,0));
+		    polyline2[0].set(i,pt2);
+		    polyline[0].set(i,surface.pt(pt2));
+		    //polyline[0].set(i,surface.pt(param,surface.v(i,0)));
+		}
 	    }
 	    else{
+		polyline2[0] = new IPolyline2D((epnum-1)*reso+1);
 		polyline[0] = new IPolyline((epnum-1)*reso+1);
-		for(int i=0; i<epnum; i++)
-		    for(int j=0; j<reso&&(i<epnum-1) || j==0; j++)
-			polyline[0].set(i*reso+j,surface.pt(param,surface.v(i,(double)j/reso)));
+		for(int i=0; i<epnum; i++){
+		    for(int j=0; j<reso&&(i<epnum-1) || j==0; j++){
+			IVec2 pt2 = new IVec2(param,surface.v(i,(double)j/reso));
+			polyline2[0].set(i*reso+j, pt2);
+			polyline[0].set(i*reso+j,surface.pt(pt2));
+			//polyline[0].set(i*reso+j,surface.pt(param,surface.v(i,(double)j/reso)));
+		    }
+		}
 	    }
 	}
     }
@@ -191,6 +214,8 @@ public class IIsoparmGraphic{
 	    }
 	}
 	
+	polyline2 = lines; // added 2011/10/18
+	
 	polyline = new IPolyline[lines.length];
 		
 	for(int i=0; i<lines.length; i++){
@@ -230,5 +255,8 @@ public class IIsoparmGraphic{
     public int num(){ if(polyline==null) return 0; return polyline.length; }
     
     public IPolyline getLine(int i){ return polyline[i]; }
+    
+    public IPolyline2D getLine2D(int i){ return polyline2[i]; }
+    public IPolyline2D[] getLine2D(){ return polyline2; }
     
 }

@@ -55,7 +55,8 @@ public abstract class IGLElement{
     public void setPoint(int i, IVec pt){ pts[i] = pt; }
     public void setNormal(int i, IVec n){ normal[i] = n; }
     
-    public int getNum(){
+    public int getNum(){ return num(); }
+    public int num(){
 	if(pts!=null) return pts.length;
 	if(tmpPts!=null) return tmpPts.size();
 	return 0;

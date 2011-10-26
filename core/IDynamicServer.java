@@ -33,7 +33,8 @@ import java.util.ArrayList;
 public class IDynamicServer implements Runnable{
     
     public Thread thread;
-    public int speed = IConfig.dynamicsUpdateSpeed; // in millisecond
+    //public int speed = IConfig.dynamicsUpdateSpeed; // in millisecond
+    public int speed = (int)(IConfig.dynamicsSpeed*1000); // in millisecond
     
     public IServer server;
     

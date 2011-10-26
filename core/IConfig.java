@@ -87,7 +87,10 @@ public /*interface*/ class IConfig{
      *****************************/
     
     /** update speed of dynamics thread in millisecond */
-    public static int dynamicsUpdateSpeed = 30; 
+    //public static int dynamicsUpdateSpeed = 30; 
+    
+    /** update speed of dynamics thread in seccond */
+    public static double dynamicsSpeed = 30.0/1000; 
     
     /*****************************
      * mouse properties in INavigator

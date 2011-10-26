@@ -44,7 +44,6 @@ public class IObject{
     
     //public int id; // or use String UUID or use object instance's hash code?
     //public String name;
-    
     public IServer server;
     
     /*protected*/ public IParameterObject parameter;
@@ -54,42 +53,35 @@ public class IObject{
     public ArrayList<IDynamicObject> dynamics;
     
     //public ILayer layer;
-    
     public IAttribute attribute;
     
-    /**
-       IObject is stored in default IServer (through current static IG instance)
-    */
+    /** IObject is stored in default IServer (through current static IG instance) */
     public IObject(){ initObject(null); }
     
-    /**
-       IObject is stored in the IServer via holder
-    */
-    public IObject(IServerI holder){
-	initObject(holder);
-    }
+    /** IObject is stored in the IServer via holder */
+    public IObject(IServerI holder){ initObject(holder); }
     
     public IObject(IObject e){
 	initObject(e.server);
-	
 	// geometry might not be ready in subclass
 	//if(graphics!=null){ initGraphic(e.server); setColor(e.getColor()); }
     }
     
     public IObject(IServerI holder, IObject e){
 	initObject(holder);
-	
 	// geometry might not be ready in subclass
 	//if(graphics!=null){ initGraphic(holder); setColor(e.getColor()); }
     }
-    
+    /** duplicate object */
     public IObject dup(){ return new IObject(this); }
     
+    /** alias of dup() */
+    public IObject cp(){ return dup(); }
     
     public void initObject(IServerI holder){
 	/*IServer*/ server = null;
 	if(holder==null){
-	    IG ig = IG.current();
+	    IG ig = IG.cur();
 	    if(ig==null){
 		IOut.err("no IG is found. IObject is not stored in a server.");
                 return;
@@ -98,9 +90,9 @@ public class IObject{
         }
         else server = holder.server();
 	
-	synchronized(IG.lock){
-	    server.add(this);
-	}
+	//synchronized(IG.lock){ // already synchronized in add
+	server.add(this);
+	//}
     }
     
     
@@ -116,14 +108,15 @@ public class IObject{
         }
         else server = holder.server();
         if(server.isGraphicMode())
-	    synchronized(IG.lock){
+	    //synchronized(IG.lock){
+	    synchronized(server.server().ig){
 		server.graphicServer().add(this);
 	    }
     }
     
     public void del(){
-	if(server!=null) server.remove(this);
-	else if(IG.current()!=null) IG.current().server().remove(this);
+	if(server!=null){ server.remove(this); server=null; }
+	else if(IG.current()!=null) IG.current().server().remove(this); // necessary?
     }
     
     
@@ -160,7 +153,7 @@ public class IObject{
     public void addDynamics(IDynamicObject dyna){
 	if(dynamics==null) dynamics = new ArrayList<IDynamicObject>();
 	if(!dynamics.contains(dyna)) dynamics.add(dyna);
-	if(server!=null) server.add(dyna);
+	if(server!=null&&server.dynamicServer()!=null) server.dynamicServer().add(dyna);
     }
     
     public IParameterObject getParameter(){ return parameter; }
@@ -178,6 +171,28 @@ public class IObject{
     
     public void clearGraphics(){ if(graphics!=null) graphics.clear(); }
     public void clearDynamics(){ if(dynamics!=null) dynamics.clear(); }
+    
+    
+    public void deletDynamics(int index){
+	if(index<0||index>=dynamics.size()) return;
+	if(server!=null && server.dynamicServer!=null)
+	    server.dynamicServer.remove(dynamics.get(index));
+	dynamics.remove(index);
+    }
+    public void deleteDynamics(IDynamicObject dyn){
+	if(!dynamics.contains(dyn)) return;
+	if(server!=null && server.dynamicServer!=null) server.dynamicServer.remove(dyn);
+	dynamics.remove(dyn);
+    }
+    
+    
+    public void deleteDynamics(){
+	if(server!=null && server.dynamicServer!=null){
+	    for(IDynamicObject dyn:dynamics)
+		server.dynamicServer.remove(dyn);
+	}
+    }
+    
     
     //public void setGraphicMode(IGraphicMode m){} //create graphics if necessary
     
@@ -199,20 +214,41 @@ public class IObject{
 	return null;
     }
     
-    // delete all graphics
+    /** delete all graphics */
     public void deleteGraphic(){
 	if(server!=null && server.graphicServer!=null){
-	    for(IGraphicObject gr:graphics)
-		server.graphicServer.remove(gr);
+	    //for(IGraphicObject gr:graphics)
+	    for(int i=0; i<graphics.size(); i++)
+		server.graphicServer.remove(graphics.get(i));
 	}
     }
-    
+
+    /**
+       update graphic when control point location changes or some minor change.
+    */
     public void updateGraphic(){
+	/*
 	deleteGraphic();
 	if(server!=null && server.graphicServer!=null)
 	    synchronized(IG.lock){ server.graphicServer().add(this); }
+	*/
+	//for(IGraphicObject gr:graphics) gr.update();
+	for(int i=0; i<graphics.size(); i++) graphics.get(i).update();
     }
     
+    /**
+       update whole graphic by deleting current one when there is major change.
+    */
+    public void resetGraphic(){
+	deleteGraphic();
+	if(server!=null && server.graphicServer!=null)
+	    //synchronized(IG.lock){
+	    synchronized(server.server().ig){
+		server.graphicServer().add(this);
+	    }
+    }
+
+    public IServer server(){ return server; }
     
     public String name(){
 	if(attribute!=null) return attribute.name;

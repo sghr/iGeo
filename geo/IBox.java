@@ -43,12 +43,14 @@ public class IBox extends IBrep{
     public static ISurfaceGeo[] getBoxFaces(IVecI[][][] corners){
 	ISurfaceGeo[] faces = new ISurfaceGeo[6];
 	for(int i=0; i<2; i++){
-	    faces[i] = new ISurfaceGeo(corners[0][0][i],corners[1-i][i][i],
-				       corners[1][1][i],corners[i][1-i][i]);
-	    faces[2+i] = new ISurfaceGeo(corners[i][0][0],corners[i][1-i][i],
-					 corners[i][1][1],corners[i][i][1-i]);
-	    faces[4+i] = new ISurfaceGeo(corners[0][i][0],corners[i][i][1-i],
-					 corners[1][i][1],corners[1-i][i][i]);
+	    
+	    // necessary to duplicate points to transform each surfaces. points cannot be shared.
+	    faces[i] = new ISurfaceGeo(corners[0][0][i].dup(),corners[1-i][i][i].dup(),
+				       corners[1][1][i].dup(),corners[i][1-i][i].dup());
+	    faces[2+i] = new ISurfaceGeo(corners[i][0][0].dup(),corners[i][1-i][i].dup(),
+					 corners[i][1][1].dup(),corners[i][i][1-i].dup());
+	    faces[4+i] = new ISurfaceGeo(corners[0][i][0].dup(),corners[i][i][1-i].dup(),
+					 corners[1][i][1].dup(),corners[1-i][i][i].dup());
 	}
 	return faces;
     }
@@ -81,6 +83,9 @@ public class IBox extends IBrep{
     public IBox(double x, double y, double z, double w, double h, double d){
 	this(null,x,y,z,w,h,d);
     }
+    public IBox(IVecI origin, double size){
+	this(null, origin, size);
+    }
     public IBox(IVecI origin, double width, double height, double depth){
 	this(null, origin, width, height, depth);
     }
@@ -97,12 +102,17 @@ public class IBox extends IBrep{
 		 new IVecI[][]{ new IVecI[]{ pt2, pt6 }, new IVecI[]{ pt3, pt7 }}});
     }
     public IBox(IVecI[][][] corners){ this(null, corners); }
+    
     public IBox(IServerI s, double x, double y, double z, double size){
 	this(s, new IVec(x,y,z), new IVec(size,0,0), new IVec(0,size,0), new IVec(0,0,size));
     }
     
     public IBox(IServerI s, double x, double y, double z, double w, double h, double d){
 	this(s, new IVec(x,y,z), new IVec(w,0,0), new IVec(0,h,0), new IVec(0,0,d));
+    }
+    
+    public IBox(IServerI s, IVecI origin, double size){
+	this(s, origin, new IVec(size,0,0), new IVec(0,size,0), new IVec(0,0,size));
     }
     
     public IBox(IServerI s, IVecI origin, double width, double height, double depth){
@@ -187,4 +197,114 @@ public class IBox extends IBrep{
     public IBox setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IBox setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    
+    /*******************************************************************************
+     * implementation of ITransformable interface
+     ******************************************************************************/
+        
+    public IBox add(double x, double y, double z){ super.add(x,y,z);  return this; }
+    public IBox add(IDoubleI x, IDoubleI y, IDoubleI z){ super.add(x,y,z); return this; }
+    public IBox add(IVecI v){ super.add(v); return this; }
+    public IBox sub(double x, double y, double z){ super.sub(x,y,z); return this; }
+    public IBox sub(IDoubleI x, IDoubleI y, IDoubleI z){ super.sub(x,y,z); return this; }
+    public IBox sub(IVecI v){ super.sub(v); return this; }
+    public IBox mul(IDoubleI v){ super.mul(v); return this; }
+    public IBox mul(double v){ super.mul(v); return this; }
+    public IBox div(IDoubleI v){ super.div(v); return this; }
+    public IBox div(double v){ super.div(v); return this; }
+    
+    public IBox neg(){ super.neg(); return this; }
+    /** alias of neg */
+    //public IBox rev(); // rev is used in curve to revrse u parameter
+    /** alias of neg */
+    public IBox flip(){ super.flip(); return this; }
+    
+    
+    /** scale add */
+    public IBox add(IVecI v, double f){ super.add(v,f); return this; }
+    public IBox add(IVecI v, IDoubleI f){ super.add(v,f); return this; }
+    
+    public IBox rot(IVecI axis, IDoubleI angle){ super.rot(axis,angle); return this; }
+    public IBox rot(IVecI axis, double angle){ super.rot(axis,angle); return this; }
+    
+    public IBox rot(IVecI center, IVecI axis, IDoubleI angle){ super.rot(center,axis,angle); return this; }
+    public IBox rot(IVecI center, IVecI axis, double angle){ super.rot(center,axis,angle); return this; }
+    
+    /** rotate to destination direction vector */
+    public IBox rot(IVecI axis, IVecI destDir){ super.rot(axis,destDir); return this; }
+    /** rotate to destination point location */    
+    public IBox rot(IVecI center, IVecI axis, IVecI destPt){ super.rot(center,axis,destPt); return this; }
+    
+    
+    /** alias of mul */
+    public IBox scale(IDoubleI f){ super.scale(f); return this; }
+    public IBox scale(double f){ super.scale(f); return this; }
+    public IBox scale(IVecI center, IDoubleI f){ super.scale(center,f); return this; }
+    public IBox scale(IVecI center, double f){ super.scale(center,f); return this; }
+    
+    /** scale only in 1 direction */
+    public IBox scale1d(IVecI axis, double f){ super.scale1d(axis,f); return this; }
+    public IBox scale1d(IVecI axis, IDoubleI f){ super.scale1d(axis,f); return this; }
+    public IBox scale1d(IVecI center, IVecI axis, double f){ super.scale1d(center,axis,f); return this; }
+    public IBox scale1d(IVecI center, IVecI axis, IDoubleI f){ super.scale1d(center,axis,f); return this; }
+    
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public IBox ref(IVecI planeDir){ super.ref(planeDir); return this; }
+    public IBox ref(IVecI center, IVecI planeDir){ super.ref(center,planeDir); return this; }
+    /** mirror is alias of ref */
+    public IBox mirror(IVecI planeDir){ super.mirror(planeDir); return this; }
+    public IBox mirror(IVecI center, IVecI planeDir){ super.mirror(center,planeDir); return this; }
+    
+    /** shear operation */
+    public IBox shear(double sxy, double syx, double syz,
+		      double szy, double szx, double sxz){ super.shear(sxy,syx,syz,szy,szx,sxz); return this; }
+    public IBox shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+		      IDoubleI szy, IDoubleI szx, IDoubleI sxz){ super.shear(sxy,syx,syz,szy,szx,sxz); return this; }
+    public IBox shear(IVecI center, double sxy, double syx, double syz,
+		      double szy, double szx, double sxz){ super.shear(center,sxy,syx,syz,szy,szx,sxz); return this; }
+    public IBox shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+		      IDoubleI szy, IDoubleI szx, IDoubleI sxz){ super.shear(center,sxy,syx,syz,szy,szx,sxz); return this; }
+    
+    public IBox shearXY(double sxy, double syx){ super.shearXY(sxy,syx); return this; }
+    public IBox shearXY(IDoubleI sxy, IDoubleI syx){ super.shearXY(sxy,syx); return this; }
+    public IBox shearXY(IVecI center, double sxy, double syx){ super.shearXY(center,sxy,syx); return this; }
+    public IBox shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){ super.shearXY(center,sxy,syx); return this; }
+    
+    public IBox shearYZ(double syz, double szy){ super.shearYZ(syz,szy); return this; }
+    public IBox shearYZ(IDoubleI syz, IDoubleI szy){ super.shearYZ(syz,szy); return this; }
+    public IBox shearYZ(IVecI center, double syz, double szy){ super.shearYZ(center,syz,szy); return this; }
+    public IBox shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){ super.shearYZ(center,syz,szy); return this; }
+    
+    public IBox shearZX(double szx, double sxz){ super.shearZX(szx,sxz); return this; }
+    public IBox shearZX(IDoubleI szx, IDoubleI sxz){ super.shearZX(szx,sxz); return this; }
+    public IBox shearZX(IVecI center, double szx, double sxz){ super.shearZX(center,szx,sxz); return this; }
+    public IBox shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){ super.shearZX(center,szx,sxz); return this; }
+    
+    /** mv() is alias of add() */
+    public IBox mv(double x, double y, double z){ super.mv(x,y,z); return this; }
+    public IBox mv(IDoubleI x, IDoubleI y, IDoubleI z){ super.mv(x,y,z); return this; }
+    public IBox mv(IVecI v){ super.mv(v); return this; }
+    
+    /** cp() is alias of dup() */ 
+    public IBox cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IBox cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public IBox cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IBox cp(IVecI v){ return dup().add(v); }
+    
+    /** translate() is alias of add() */
+    public IBox translate(double x, double y, double z){ return add(x,y,z); }
+    public IBox translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IBox translate(IVecI v){ return add(v); }
+    
+    
+    public IBox transform(IMatrix3I mat){ super.transform(mat); return this; }
+    public IBox transform(IMatrix4I mat){ super.transform(mat); return this; }
+    public IBox transform(IVecI xvec, IVecI yvec, IVecI zvec){ super.transform(xvec,yvec,zvec); return this; }
+    public IBox transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
+	super.transform(xvec,yvec,zvec,translate);
+	return this;
+    }
 }

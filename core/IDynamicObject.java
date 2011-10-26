@@ -31,6 +31,24 @@ import java.util.ArrayList;
    @version 0.7.0.0
 */
 public /*class*/interface IDynamicObject extends ISubobject{
+    
+    
+    /** add terget object to be updated by this dynamic object. */
+    public IDynamicObject target(IObject targetObj);
+    /** get total target number. */
+    public int targetNum();
+    /** get target object. */
+    public IObject target(int i);
+    /** get all target objects. */
+    public ArrayList<IObject> targets();
+    /** remove target object. */
+    public IDynamicObject removeTarget(int i);
+    /** remove target object. */
+    public IDynamicObject removeTarget(IObject obj);
+    /** update all terget objects (should be called when the dynamic object is updated). */
+    public void updateTarget();
+    
+    
     /* behavior definition of interaction with other dynamic objects.
        interaction happens between every two dynamic objects in a server.
        interact() is called for every combination of two but

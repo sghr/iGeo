@@ -24,6 +24,7 @@ package igeo.core;
 
 import java.awt.Container;
 import java.awt.Component;
+import java.awt.Color;
 import java.util.*;
 import java.io.*;
 
@@ -50,9 +51,9 @@ public class IG implements IServerI{
     
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 7; }
-    public static int buildVersion(){ return 2; }
-    public static int revisionVersion(){ return 8; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2011, 10, 15); }
+    public static int buildVersion(){ return 3; }
+    public static int revisionVersion(){ return 1; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2011, 10, 24); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -143,9 +144,8 @@ public class IG implements IServerI{
 	return ig;
     }
     
-    /**
-       Initialize whole IG system in graphic mode.
-       Please instantiate IPanel beforehand.
+    /** Initialize whole IG system in graphic mode.
+	Please instantiate IPanel beforehand.
     */
     public static IG init(IPanel owner){
 	if(iglist==null) iglist = new ArrayList<IG>();
@@ -156,14 +156,23 @@ public class IG implements IServerI{
     }
     
     
-    /**
-       Find the IG instance which is likely to be the current.
-    */
+    /** alias of cur() */
+    public static IG current(){ return cur(); }
     
-    public static IG current(){
+    /** Find the IG instance which is likely to be the current. */
+    public static IG cur(){
 	if(iglist==null || currentId<0 || currentId>=iglist.size()) return null;
 	return iglist.get(currentId);
     }
+
+    /** object to be used to lock in "synchronized" statement */
+    public static IG defaultThread(){ return cur(); }
+    
+    /** object to be used to lock in "synchronized" statement */
+    public static IDynamicServer dynamicThread(){
+	IG ig = cur(); if(ig==null) return null; return ig.dynamicServer();
+    }
+    
     
     public static void setCurrent(IG ig){
 	int idx = iglist.indexOf(ig);
@@ -194,83 +203,82 @@ public class IG implements IServerI{
     }
     
     
-    /**
-       Find IG instance linked with the specified IPanel instance.
-    */
+    /** Find IG instance linked with the specified IPanel instance. */
     public static IG getIG(IPanel owner){
 	for(IG ig : iglist) if(ig.panel == owner) return ig;
 	return null;
     }
     
-    
     public static boolean open(String file){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null) return false;
 	return ig.openFile(file);
     }
     
     public static boolean save(String file){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null) return false;
 	return ig.saveFile(file);
     }
     
-    /** to set the name first and save later (likely by key event)
-     */
+    /** to set the name first and save later (likely by key event) */
     public static void outputFile(String filename){
-	IG ig = current();
+	IG ig = cur();
 	if(ig!=null) ig.setOutputFile(filename);
     }
     public static String outputFile(){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null) return null;
 	return ig.getOutputFile();
     }
     public static void inputFile(String filename){
-	IG ig = current();
+	IG ig = cur();
 	if(ig!=null) ig.setInputFile(filename);
     }
     public static String inputFile(){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null) return null;
 	return ig.getInputFile();
     }
     
     public static IPoint[] points(){
-	IG ig = current(); if(ig==null) return null; return ig.getPoints();
+	IG ig = cur(); if(ig==null) return null; return ig.getPoints();
     }
     public static ICurve[] curves(){
-	IG ig = current(); if(ig==null) return null; return ig.getCurves();
+	IG ig = cur(); if(ig==null) return null; return ig.getCurves();
     }
     public static ISurface[] surfaces(){
-	IG ig = current(); if(ig==null) return null; return ig.getSurfaces();
+	IG ig = cur(); if(ig==null) return null; return ig.getSurfaces();
     }
     public static IMesh[] meshes(){
-	IG ig = current(); if(ig==null) return null; return ig.getMeshes();
+	IG ig = cur(); if(ig==null) return null; return ig.getMeshes();
     }
     public static IObject[] objects(Class cls){
-	IG ig = current(); if(ig==null) return null; return ig.getObjects(cls);
+	IG ig = cur(); if(ig==null) return null; return ig.getObjects(cls);
+    }
+    public static IObject[] objects(){
+	IG ig = cur(); if(ig==null) return null; return ig.getAllObjects();
     }
     
     
     public static ILayer layer(String layerName){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null) return null;
 	return ig.getLayer(layerName);
     }
     public static ILayer[] layers(){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null) return null;
 	return ig.getAllLayers();
     }
     public static void delLayer(String layerName){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null) return;
 	ig.removeLayer(layerName);
     }
     
     public static void focus(){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null) return;
 	ig.focusView();
     }
@@ -278,7 +286,7 @@ public class IG implements IServerI{
     
     
     public static boolean isGL(){
-	IG ig = current();
+	IG ig = cur();
 	if(ig==null){
 	    IOut.err("no IG found");
 	    return true; // GL is default
@@ -290,7 +298,7 @@ public class IG implements IServerI{
 	return ig.server().graphicServer().isGL();
     }
     public static void graphicMode(IGraphicMode mode){
-	IG ig = current(); if(ig==null) return;
+	IG ig = cur(); if(ig==null) return;
 	ig.server().setGraphicMode(mode);
     }
     public static void wireframe(){
@@ -318,11 +326,123 @@ public class IG implements IServerI{
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,true,true));
     }
-        
+    
     //public static void setBG(Color c){}
     //public static void setBG(Color c1, Color c2){}
     //public static void setBG(Color c1, Color c2, Color c3, Color c4){}
     //public static void setBG(Image img){}
+    
+    public static void bg(Color c1, Color c2, Color c3, Color c4){
+	IG ig = cur(); if(ig==null) return;
+	ig.server().bg(c1,c2,c3,c4);
+    }
+    
+    public static void background(Color c1, Color c2, Color c3, Color c4){ bg(c1,c2,c3,c4); }
+    
+    public static void bg(Color c){ bg(c,c,c,c); }
+    public static void background(Color c){ bg(c); }
+    
+    public static void bg(int r1, int g1, int b1,
+			  int r2, int g2, int b2,
+			  int r3, int g3, int b3,
+			  int r4, int g4, int b4){
+	bg(IGraphicObject.getColor(r1,g1,b1), IGraphicObject.getColor(r2,g2,b2),
+	   IGraphicObject.getColor(r3,g3,b3), IGraphicObject.getColor(r4,g4,b4));
+    }
+    public static void background(int r1, int g1, int b1,
+				  int r2, int g2, int b2,
+				  int r3, int g3, int b3,
+				  int r4, int g4, int b4){
+	bg(r1,g1,b1,r2,g2,b2,r3,g3,b3,r4,b4,g4);
+    }
+    
+    public static void bg(int r, int g, int b){
+	bg(IGraphicObject.getColor(r,g,b));
+    }
+    public static void background(int r, int g, int b){ bg(r,g,b); }
+    
+    public static void bg(int gray1, int gray2, int gray3, int gray4){
+	bg(IGraphicObject.getColor(gray1), IGraphicObject.getColor(gray2),
+	   IGraphicObject.getColor(gray3), IGraphicObject.getColor(gray4));
+    }
+    public static void background(int gray1, int gray2, int gray3, int gray4){
+	bg(gray1,gray2,gray3,gray4);
+    }
+    
+    public static void bg(int gray){ bg(IGraphicObject.getColor(gray)); }
+    
+    public static void background(int gray){ bg(gray); }
+    
+    
+    
+    public static void bg(float r1, float g1, float b1,
+			  float r2, float g2, float b2,
+			  float r3, float g3, float b3,
+			  float r4, float g4, float b4){
+	bg(IGraphicObject.getColor(r1,g1,b1), IGraphicObject.getColor(r2,g2,b2),
+	   IGraphicObject.getColor(r3,g3,b3), IGraphicObject.getColor(r4,g4,b4));
+    }
+    public static void background(float r1, float g1, float b1,
+				  float r2, float g2, float b2,
+				  float r3, float g3, float b3,
+				  float r4, float g4, float b4){
+	bg(r1,g1,b1,r2,g2,b2,r3,g3,b3,r4,b4,g4);
+    }
+    
+    public static void bg(float r, float g, float b){
+	bg(IGraphicObject.getColor(r,g,b));
+    }
+    
+    public static void background(float r, float g, float b){ bg(r,g,b); }
+    
+    public static void bg(float gray1, float gray2, float gray3, float gray4){
+	bg(IGraphicObject.getColor(gray1), IGraphicObject.getColor(gray2),
+	   IGraphicObject.getColor(gray3), IGraphicObject.getColor(gray4));
+    }
+    public static void background(float gray1, float gray2, float gray3, float gray4){
+	bg(gray1,gray2,gray3,gray4);
+    }
+    
+    public static void bg(float gray){ bg(IGraphicObject.getColor(gray)); }
+    
+    public static void background(float gray){ bg(gray); }
+    
+    
+    
+    public static void bg(double r1, double g1, double b1,
+			  double r2, double g2, double b2,
+			  double r3, double g3, double b3,
+			  double r4, double g4, double b4){
+	bg(IGraphicObject.getColor((float)r1,(float)g1,(float)b1),
+	   IGraphicObject.getColor((float)r2,(float)g2,(float)b2),
+	   IGraphicObject.getColor((float)r3,(float)g3,(float)b3),
+	   IGraphicObject.getColor((float)r4,(float)g4,(float)b4));
+    }
+    public static void background(double r1, double g1, double b1,
+				  double r2, double g2, double b2,
+				  double r3, double g3, double b3,
+				  double r4, double g4, double b4){
+	bg(r1,g1,b1,r2,g2,b2,r3,g3,b3,r4,b4,g4);
+    }
+    
+    public static void bg(double r, double g, double b){
+	bg(IGraphicObject.getColor((float)r,(float)g,(float)b));
+    }
+    
+    public static void background(double r, double g, double b){ bg(r,g,b); }
+    
+    public static void bg(double gray1, double gray2, double gray3, double gray4){
+	bg(IGraphicObject.getColor((float)gray1), IGraphicObject.getColor((float)gray2),
+	   IGraphicObject.getColor((float)gray3), IGraphicObject.getColor((float)gray4));
+    }
+    public static void background(double gray1, double gray2, double gray3, double gray4){
+	bg(gray1,gray2,gray3,gray4);
+    }
+    
+    public static void bg(double gray){ bg(IGraphicObject.getColor((float)gray)); }
+    public static void background(double gray){ bg(gray); }
+    
+    
     
     /** Print method.
 	This is a wrapper of IOut.p(), which is 
@@ -401,7 +521,7 @@ public class IG implements IServerI{
     public ISurface[] getSurfaces(){ return server.getSurfaces(); }
     public IMesh[] getMeshes(){ return server.getMeshes(); }
     public IObject[] getObjects(Class cls){ return server.getObjects(cls); }
-
+    public IObject[] getAllObjects(){ return server.getAllObjects(); }
     
     public void focusView(){
 	if(panel!=null) panel.focus(); // focus on all pane
@@ -409,6 +529,9 @@ public class IG implements IServerI{
     
     public IServer server(){ return server; }
     public IDynamicServer dynamicServer(){ return server.dynamicServer(); }
+    
+    
+    
     
     //public void draw(IGraphics g){ server.draw(g); }
     
@@ -1337,7 +1460,7 @@ public class IG implements IServerI{
     public static ISurface loftZ(ICurveI[] curves, int deg, boolean close){
 	return ISurfaceCreator.loftZ(curves,deg,close);
     }
-
+    
     /*********************************************************
      * flattening
      ********************************************************/
@@ -1385,6 +1508,8 @@ public class IG implements IServerI{
     public static IVec vec(IDoubleI x, IDoubleI y, IDouble z){ return vector(x,y,z); }
     public static IVec vec(IVec2I v){ return vector(v); }
     
+    
+    // vector array?
     
     
 }

@@ -46,7 +46,13 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     
     public IGLLineStrip[] uline, vline;
     public IGLLineLoop[] inTrim=null, outTrim=null;
+    
+    public IPolyline2D[] uline2, vline2;
+    public IPolyline2D[] inTrim2=null, outTrim2=null;
 
+    /** true when unum==2 && vnum==2 and flat */
+    public boolean simpleFlat=false; 
+    
     public boolean initialized=false;
     
     public ISurfaceGraphicWireframeGL(ISurface srf){
@@ -168,8 +174,9 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     }
     
     /**
-       @return u lines for graphics; number depends on how it intersects with trim lines.
-    */
+     //@return u lines for graphics; number depends on how it intersects with trim lines.
+    **/
+    /*
     public ArrayList<IGLLineStrip> getULine(double v, IVec2[][] outTrimUV, IVec2[][] inTrimUV){
 	int uepnum = surface.uepNum();
 	int udeg = surface.udeg();
@@ -194,10 +201,11 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	
 	return getLineInsideTrim(upts, outTrimUV, inTrimUV);
     }
-    
-    /**
-       @return u lines for graphics; number depends on how it intersects with trim lines.
     */
+    /**
+       //@return u lines for graphics; number depends on how it intersects with trim lines.
+    **/
+    /*
     public ArrayList<IGLLineStrip> getVLine(double u, IVec2[][] outTrimUV, IVec2[][] inTrimUV){
 	int vepnum = surface.vepNum();
 	int vdeg = surface.vdeg();
@@ -223,7 +231,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	
 	return getLineInsideTrim(vpts, outTrimUV, inTrimUV);
     }
-    
+    */
     
     public void initSurface(){
 	//if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
@@ -241,29 +249,35 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	if(surface.hasOuterTrim()){
 	    outtrims = new ITrimLoopGraphic[surface.outerTrimLoopNum()];
 	    outTrim = new IGLLineLoop[surface.outerTrimLoopNum()];
+	    outTrim2 = new IPolyline2D[surface.outerTrimLoopNum()];
 	    
 	    for(int i=0; i<surface.outerTrimLoopNum(); i++){
 		outtrims[i] = new ITrimLoopGraphic(surface.outerTrimLoop(i),
 						   true,
 						   IConfig.surfaceWireframeResolution);
 		outTrim[i] = new IGLLineLoop(outtrims[i].getPolyline());
+		outTrim2[i] = outtrims[i].getPolyline2D();
 	    }
 	}
 	else{
 	    outtrims = new ITrimLoopGraphic[1];
 	    outTrim = new IGLLineLoop[1];
+	    outTrim2 = new IPolyline2D[1];
 	    outtrims[0] = new ITrimLoopGraphic(surface);
 	    outTrim[0] = new IGLLineLoop(outtrims[0].getPolyline());
+	    outTrim2[0] = outtrims[0].getPolyline2D();
 	}
 	
 	if(surface.hasInnerTrim()){
 	    intrims = new ITrimLoopGraphic[surface.innerTrimLoopNum()];
 	    inTrim = new IGLLineLoop[surface.innerTrimLoopNum()];
+	    inTrim2 = new IPolyline2D[surface.innerTrimLoopNum()];
 	    for(int i=0; i<surface.innerTrimLoopNum(); i++){
 		intrims[i] = new ITrimLoopGraphic(surface.innerTrimLoop(i),
 						  false,
 						  IConfig.surfaceWireframeResolution);
 		inTrim[i] = new IGLLineLoop(intrims[i].getPolyline());
+		inTrim2[i] = intrims[i].getPolyline2D();
 	    }
 	}
 	
@@ -271,43 +285,136 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	// u isoparms
 	if(isoparmNumU>2){
 	    ArrayList<IGLLineStrip> ul = new ArrayList<IGLLineStrip>();
+	    ArrayList<IPolyline2D> ul2 = new ArrayList<IPolyline2D>();
 	    for(int vidx=0; vidx<vepnum-1; vidx++){
 		for(int v=0; v<isoparmNumRatio; v++){
 		    double vfrc = (double)v/isoparmNumRatio;
 		    if(vidx>0||v>0){
 			IIsoparmGraphic isoparm =
 			    new IIsoparmGraphic(surface, surface.v(vidx,vfrc),
-						 true, outtrims, intrims);
-			for(int i=0; i<isoparm.num(); i++)
+						true, outtrims, intrims);
+			for(int i=0; i<isoparm.num(); i++){
 			    ul.add(new IGLLineStrip(isoparm.getLine(i)));
+			    ul2.add(isoparm.getLine2D(i));
+			}
 		    }
 		}
 	    }
 	    uline = ul.toArray(new IGLLineStrip[ul.size()]);
+	    uline2 = ul2.toArray(new IPolyline2D[ul2.size()]);
 	}
 	
 	
 	// v isoparms
 	if(isoparmNumV>2){
 	    ArrayList<IGLLineStrip> vl = new ArrayList<IGLLineStrip>();
+	    ArrayList<IPolyline2D> vl2 = new ArrayList<IPolyline2D>();	    
 	    for(int uidx=0; uidx<uepnum-1; uidx++){
 		for(int u=0; u<isoparmNumRatio; u++){
 		    double ufrc = (double)u/isoparmNumRatio;
 		    if(uidx>0||u>0){
 			IIsoparmGraphic isoparm =
 			    new IIsoparmGraphic(surface, surface.u(uidx,ufrc),
-						 false, outtrims, intrims);
-			for(int i=0; i<isoparm.num(); i++)
+						false, outtrims, intrims);
+			for(int i=0; i<isoparm.num(); i++){
 			    vl.add(new IGLLineStrip(isoparm.getLine(i)));
+			    vl2.add(isoparm.getLine2D(i));
+			}
 		    }
 		}
 	    }
 	    vline = vl.toArray(new IGLLineStrip[vl.size()]);
+	    vline2 = vl2.toArray(new IPolyline2D[vl2.size()]);
 	}
-		
+	
 	initialized=true;
+	
+	if(surface!=null && surface.unum()==2 && surface.vnum()==2 &&
+	   surface.isFlat()){ simpleFlat=true; }
+	else{ simpleFlat=false; }
     }
     
+    
+    public void updateSurface(){
+	
+	if(simpleFlat && !surface.isFlat()){
+	    // if not flat anymore, rebuild whole points
+	    simpleFlat=false;
+	    initSurface();
+	    return;
+	}
+	
+	/*
+	if( uline2==null && vline2==null && inTrim2==null && outTrim2==null){
+	    initSurface();
+	    return;
+	}
+	*/
+	
+	// uline
+	if(uline!=null){
+	    if(uline.length!=uline2.length){ uline = new IGLLineStrip[uline2.length]; }
+	    for(int i=0; i<uline2.length; i++){
+		if(uline[i]==null || uline[i].num()!=uline2[i].num()){
+		    uline[i] = new IGLLineStrip(uline2[i].num());
+		}
+		for(int j=0; j<uline2[i].num(); j++){
+		    IVec2 pt2 = uline2[i].get(j);
+		    uline[i].setPoint(j,surface.pt(pt2).get());
+		}
+	    }
+	}
+	
+	// vline
+	if(vline!=null){
+	    if(vline.length!=vline2.length){ vline = new IGLLineStrip[vline2.length]; }
+	    for(int i=0; i<vline2.length; i++){
+		if(vline[i]==null || vline[i].num()!=vline2[i].num()){
+		    vline[i] = new IGLLineStrip(vline2[i].num());
+		}
+		for(int j=0; j<vline2[i].num(); j++){
+		    IVec2 pt2 = vline2[i].get(j);
+		    vline[i].setPoint(j,surface.pt(pt2).get());
+		}
+	    }
+	}
+	
+	// intrim
+	if(inTrim!=null){
+	    if(inTrim.length!=inTrim2.length){ inTrim = new IGLLineLoop[inTrim2.length]; }
+	    for(int i=0; i<inTrim2.length; i++){
+		if(inTrim[i]==null || inTrim[i].num()!=inTrim2[i].num()){
+		    inTrim[i] = new IGLLineLoop(inTrim2[i].num());
+		}
+		for(int j=0; j<inTrim2[i].num(); j++){
+		    IVec2 pt2 = inTrim2[i].get(j);
+		    inTrim[i].setPoint(j,surface.pt(pt2).get());
+		}
+	    }
+	}
+	
+	// outtrim
+	if(outTrim!=null){
+	    if(outTrim.length!=outTrim2.length){ outTrim = new IGLLineLoop[outTrim2.length]; }
+	    for(int i=0; i<outTrim2.length; i++){
+		if(outTrim[i]==null || outTrim[i].num()!=outTrim2[i].num()){
+		    outTrim[i] = new IGLLineLoop(outTrim2[i].num());
+		}
+		for(int j=0; j<outTrim2[i].num(); j++){
+		    IVec2 pt2 = outTrim2[i].get(j);
+		    outTrim[i].setPoint(j,surface.pt(pt2).get());
+		}
+	    }
+	}
+	
+	/*
+	public IGLLineStrip[] uline, vline;
+	public IGLLineLoop[] inTrim=null, outTrim=null;
+	
+	public IPolyline2D[] uline2, vline2;
+	public IPolyline2D[] inTrim2=null, outTrim2=null;
+	*/
+    }
     
     public boolean isDrawable(IGraphicMode m){ return m.isGL()&&m.isWireframe(); }
     
@@ -316,7 +423,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	
 	//if(surface==null) initSurface();
 	if(!initialized) initSurface();
-	
+	else if(update){ updateSurface(); update=false; }
 	
 	GL gl = g.getGL();
 	if(gl==null) return;

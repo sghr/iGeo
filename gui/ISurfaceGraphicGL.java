@@ -74,6 +74,11 @@ public class ISurfaceGraphicGL extends IGraphicObject{
 	if(fill!=null) fill.setColor(c);
 	if(wireframe!=null) wireframe.setColor(c);
     }
+
+    @Override public void update(){
+	if(fill!=null) fill.update();
+	if(wireframe!=null) wireframe.update();
+    }
     
     public boolean isDrawable(IGraphicMode m){ return m.isGL(); }
     

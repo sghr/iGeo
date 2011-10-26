@@ -45,7 +45,7 @@ public class ITrimLoopGraphic{
     public IPolyline polyline=null;
 
     public int resolution;
-
+    
     public boolean isOuterTrim=true;
     
     public boolean reversed=false;
@@ -96,7 +96,7 @@ public class ITrimLoopGraphic{
 	// making default rectangular border
 	if(curves==null && surface!=null){
 	    polyline2 = new IPolyline2D(4);
-	    double umin=0, umax=1, vmin=0, vmax=1;
+	    double umin=0., umax=1., vmin=0., vmax=1.;
 	    /*
 	    if(!IConfig.normalizeKnots){
 		umin = surface.ustart(); umax = surface.uend();
@@ -159,16 +159,17 @@ public class ITrimLoopGraphic{
 	    */
 	    ITrimCurveGraphic uline1 =
 		new ITrimCurveGraphic(surface, new IPolyline2D(new IVec2(umin,vmin),
-								 new IVec2(umax,vmin)));
+							       new IVec2(umax,vmin)));
 	    ITrimCurveGraphic vline1 =
 		new ITrimCurveGraphic(surface, new IPolyline2D(new IVec2(umax,vmin),
-								 new IVec2(umax,vmax)));
+							       new IVec2(umax,vmax)));
 	    ITrimCurveGraphic uline2 =
 		new ITrimCurveGraphic(surface, new IPolyline2D(new IVec2(umax,vmax),
-								 new IVec2(umin,vmax)));
+							       new IVec2(umin,vmax)));
 	    ITrimCurveGraphic vline2 =
 		new ITrimCurveGraphic(surface, new IPolyline2D(new IVec2(umin,vmax),
-								 new IVec2(umin,vmin)));
+							       new IVec2(umin,vmin)));
+	    
 	    polyline = new IPolyline();
 	    polyline.append(uline1.getPolyline(1)); 
 	    polyline.append(vline1.getPolyline(1));
@@ -176,6 +177,16 @@ public class ITrimLoopGraphic{
 	    polyline.append(vline2.getPolyline(1));
 	    polyline.close();
 	    // resolution is 1 because it's line and actually, doesn't matter
+
+	    
+	    // polyline2 is updated after execution of getPolyline() inside uline and vline
+	    polyline2 = new IPolyline2D();
+	    polyline2.append(uline1.getPolyline2D()); 
+	    polyline2.append(vline1.getPolyline2D());
+	    polyline2.append(uline2.getPolyline2D());
+	    polyline2.append(vline2.getPolyline2D());
+	    polyline2.close();
+	    
 	    return;
 	    
 	    /*
@@ -239,20 +250,25 @@ public class ITrimLoopGraphic{
 		polyline.set(i, surface.pt(polyline2.get(i)));
 	}
 	else{
-	    
+	    polyline2 = new IPolyline2D(); // added 2011/10/18
 	    polyline = new IPolyline();
 	    for(int i=0; i<curves.length; i++){
 		ITrimCurveGraphic curvg = new ITrimCurveGraphic(curves[i]);
 		curvg.setup3D(resolution);
-		
 		if(i==0 ||
 		   polyline.get(polyline.num()-1).dist(curvg.polyline.get(0)) <
-		   polyline.get(polyline.num()-1).dist(curvg.polyline.get(curvg.polyline.num()-1)))
+		   polyline.get(polyline.num()-1).dist(curvg.polyline.get(curvg.polyline.num()-1))){
 		    polyline.append(curvg.polyline);
-		else polyline.append(curvg.polyline,true); // reverse
+		    polyline2.append(curvg.getPolyline2D());
+		}
+		else{
+		    polyline.append(curvg.polyline,true); // reverse
+		    polyline2.append(curvg.getPolyline2D(),true);
+		}
 	    }
 	    
 	    polyline.close();
+	    polyline2.close(); //
 	    
 	    /*
 	    boolean anyDeg1=false;
@@ -282,6 +298,8 @@ public class ITrimLoopGraphic{
 	    
 	}
 	polyline.close();
+	
+	if(polyline2!=null && !polyline2.isClosed()) polyline2.close(); //
     }
     
     

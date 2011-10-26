@@ -20,23 +20,29 @@
 
 ---*/
 
-package igeo.util;
+package igeo.geo;
 
-import igeo.geo.*;
+import igeo.core.*;
+import igeo.gui.*;
 
 /**
-   A class to define order of IVec in Y to be used in sorting with ISort.
-   
-   @see ISort
+   Class of an implementation of IDynamicObject to have physical attributes of point.
+   It has attributes of position, velocity, acceleration, force, and mass.
+   Position is provided from outside to be linked.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IYComparator implements IComparator<IVecI>{
-    public int compare(IVecI v1, IVecI v2){ // return >0, <0, ==0
-	if(v1.y() < v2.y()) return -1;
-	if(v1.y() > v2.y()) return 1;
-	return 0;
-    }
+public interface IParticleI{
+    
+    public double mass();
+   
+    public IVec position();
+    public IVec pos();
+    
+    public IVec velocity();
+    public IVec vel();
+    
+    public IParticleI addForce(IVec f);
+    public IParticleI resetForce();
 }
-

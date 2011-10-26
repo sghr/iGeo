@@ -20,23 +20,8 @@
 
 ---*/
 
-package igeo.util;
-
-import igeo.geo.*;
 
 /**
-   A class to define order of IVec in Y to be used in sorting with ISort.
-   
-   @see ISort
-   
-   @author Satoru Sugihara
-   @version 0.7.0.0;
+   Complex geometry toolkit package of iGeo library.
 */
-public class IYComparator implements IComparator<IVecI>{
-    public int compare(IVecI v1, IVecI v2){ // return >0, <0, ==0
-	if(v1.y() < v2.y()) return -1;
-	if(v1.y() > v2.y()) return 1;
-	return 0;
-    }
-}
-
+package igeo.tool;

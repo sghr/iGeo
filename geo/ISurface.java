@@ -489,45 +489,45 @@ public class ISurface extends IObject implements ISurfaceI{
     public IBool hasDefaultTrim(ISwitchR r){ return new IBool(hasDefaultTrim()); }
     
     public ISurface addInnerTrimLoop(ITrimCurveI trim){
-	surface.addInnerTrimLoop(trim); updateGraphic(); return this; 
+	surface.addInnerTrimLoop(trim); resetGraphic(); return this; 
     }
     public ISurface addOuterTrimLoop(ITrimCurveI trim){
-	surface.addOuterTrimLoop(trim); updateGraphic(); return this;
+	surface.addOuterTrimLoop(trim); resetGraphic(); return this;
     }
     
     public ISurface addInnerTrimLoop(ITrimCurveI[] trim){
-	surface.addInnerTrimLoop(trim); updateGraphic(); return this; 
+	surface.addInnerTrimLoop(trim); resetGraphic(); return this; 
     }
     public ISurface addOuterTrimLoop(ITrimCurveI[] trim){
-	surface.addOuterTrimLoop(trim); updateGraphic(); return this;
+	surface.addOuterTrimLoop(trim); resetGraphic(); return this;
     }
     
     public ISurface addInnerTrimLoop(ICurveI trim){
-	surface.addInnerTrimLoop(trim); updateGraphic(); return this;
+	surface.addInnerTrimLoop(trim); resetGraphic(); return this;
     }
     public ISurface addOuterTrimLoop(ICurveI trim){
-	surface.addOuterTrimLoop(trim); updateGraphic(); return this;
+	surface.addOuterTrimLoop(trim); resetGraphic(); return this;
     }
     
     public ISurface addInnerTrimLoop(ICurveI trim, boolean deleteInput){
-	surface.addInnerTrimLoop(trim,deleteInput); updateGraphic(); return this;
+	surface.addInnerTrimLoop(trim,deleteInput); resetGraphic(); return this;
     }
     public ISurface addOuterTrimLoop(ICurveI trim, boolean deleteInput){
-	surface.addOuterTrimLoop(trim,deleteInput); updateGraphic(); return this;
+	surface.addOuterTrimLoop(trim,deleteInput); resetGraphic(); return this;
     }
     
     public ISurface addInnerTrimLoop(ICurveI[] trim){
-	surface.addInnerTrimLoop(trim); updateGraphic(); return this;
+	surface.addInnerTrimLoop(trim); resetGraphic(); return this;
     }
     public ISurface addOuterTrimLoop(ICurveI[] trim){
-	surface.addOuterTrimLoop(trim); updateGraphic(); return this;
+	surface.addOuterTrimLoop(trim); resetGraphic(); return this;
     }
     
     public ISurface addInnerTrimLoop(ICurveI[] trim, boolean deleteInput){
-	surface.addInnerTrimLoop(trim,deleteInput); updateGraphic(); return this;
+	surface.addInnerTrimLoop(trim,deleteInput); resetGraphic(); return this;
     }
     public ISurface addOuterTrimLoop(ICurveI[] trim, boolean deleteInput){
-	surface.addOuterTrimLoop(trim,deleteInput); updateGraphic(); return this;
+	surface.addOuterTrimLoop(trim,deleteInput); resetGraphic(); return this;
     }
     
     

@@ -193,6 +193,10 @@ public class IView{
 	}
 	else{ javaBGColor1 = c1; javaBGColor2 = c2; }
     }
+
+    public void setBGColor(Color c1, Color c2, Color c3, Color c4){
+	setBGColor(new Color[][]{ new Color[]{ c1, c4 }, new Color[]{ c2, c3 } });
+    }
     
     public void setBGColor(Color[][] c){
 	if(useGL){

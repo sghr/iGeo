@@ -31,12 +31,73 @@ import java.util.ArrayList;
    @version 0.7.0.0
 */
 public class IDynamicObjectBase implements IDynamicObject{
-    
+    /** parent */
     public IObject parent=null;
-    // implementation of IDynamicObject
+    
+    /** target objects to be updated by dynamic object */
+    public ArrayList<IObject> targets;
+    
+    /** automatically registered in default IDynamicServer */
+    public IDynamicObjectBase(){ initDynamicObjectBase(); }
+    
+    /** registered in specified IDynamicServer. not registered if the server is null. */
+    public IDynamicObjectBase(IServerI server){ initDynamicObjectBase(server); }
+    
+    public IDynamicObjectBase(IObject parent){ parent(parent); }
+    
+    public void initDynamicObjectBase(){
+	// default server
+	initDynamicObjectBase(IG.cur());
+    }
+    
+    public void initDynamicObjectBase(IServerI server){
+	if(server!=null) server.server().dynamicServer().add(this);
+    }
     
     public IObject parent(){ return parent; }
-    public IDynamicObjectBase parent(IObject parent){ this.parent=parent; return this; }    
+    public IDynamicObjectBase parent(IObject par){
+	if(this.parent!=null){// necessary?
+	    this.parent.deleteDynamics(this);
+	    removeTarget(this.parent); // removing from target too.
+	}
+	
+	this.parent=par;
+	if(this.parent!=null){
+	    this.parent.addDynamics(this);
+	    target(this.parent); // adding to target too.
+	}
+	return this;
+    }
+    
+    /** add terget object to be updated by this dynamic object. */
+    public IDynamicObjectBase target(IObject targetObj){
+	if(targets==null) targets = new ArrayList<IObject>();
+	targets.add(targetObj);
+	return this;
+    }
+    /** get total target number. */
+    public int targetNum(){ return targets==null?0:targets.size(); }
+    /** get target object. */
+    public IObject target(int i){ if(i<0||i>=targets.size()) return null; return targets.get(i); }
+    /** get all target objects. */
+    public ArrayList<IObject> targets(){ return targets; }
+    /** remove target object. */
+    public IDynamicObjectBase removeTarget(int i){
+	if(i<0||i>=targets.size()) return null;
+	targets.remove(i);
+	return this;
+    }
+    /** remove target object. */
+    public IDynamicObjectBase removeTarget(IObject obj){ targets.remove(obj); return this; }
+    
+    /** update all terget objects (should be called when the dynamic object is updated). */
+    public void updateTarget(){
+	if(targets!=null)
+	    for(int i=0; i<targets.size(); i++)
+		if(targets.get(i).server()!=null)
+		    targets.get(i).updateGraphic();
+    }
+    
     
     /* behavior definition of interaction with other dynamic objects.
        interaction happens between every two dynamic objects in a server.
@@ -51,4 +112,5 @@ public class IDynamicObjectBase implements IDynamicObject{
     public void interact(ArrayList<IDynamicObject> dynamics){}
     /** behavior definition of updating dynamics in each time frame */
     public void update(){}
+    
 }

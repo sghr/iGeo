@@ -54,20 +54,29 @@ public class ICurveGraphicGL extends IGraphicObject{
     }
     
     public void initCurve(){
-	if(parent instanceof ICurve){ curve = ((ICurve)parent).curve; }
-	else if(parent instanceof ICurveR){ curve = ((ICurveR)parent).curve; }
+	if(curve==null){ // added in 2011/10/18
+	    if(parent instanceof ICurve){ curve = ((ICurve)parent).curve; }
+	    else if(parent instanceof ICurveR){ curve = ((ICurveR)parent).curve; }
+	}
 	
 	IVec[] pts=null;
+	
 	if(curve.deg()==1){
 	    int num = curve.num();
-	    pts = new IVec[num];
+	    if(polyline!=null && polyline.pts!=null && polyline.pts.length==num){
+		pts = polyline.pts;
+	    }
+	    else{ pts = new IVec[num]; }
 	    for(int i=0; i<num; i++) pts[i] = curve.cp(i).get();
 	}
 	else{
 	    int reso = IConfig.curveGraphicResolution;
 	    int epnum = curve.epNum() ;
 	    int num = (epnum-1)*reso+1;
-	    pts = new IVec[num];
+	    if(polyline!=null && polyline.pts!=null && polyline.pts.length==num){
+		pts = polyline.pts;
+	    }
+	    else{ pts = new IVec[num]; }
 	    for(int i=0; i<epnum; i++){
 		for(int j=0; j<reso; j++){
 		    if(i<epnum-1 || j==0){
@@ -76,14 +85,18 @@ public class ICurveGraphicGL extends IGraphicObject{
 		}
 	    }
 	}
-	polyline = new IGLLineStrip(pts);
+	
+	if(polyline==null || polyline.pts != pts){ polyline = new IGLLineStrip(pts); }
+	
+	if(update) update=false;
     }
     
     public boolean isDrawable(IGraphicMode m){ return m.isGL(); }
     
     public void draw(IGraphics g){
 	
-	if(curve==null) initCurve(); // not initizlized at the constructor // shouldn't it?
+	if(curve==null || update && curve.deg()>1 )
+	    initCurve(); // not initizlized at the constructor // shouldn't it?
 	
 	GL gl = g.getGL();
 	if(gl!=null){

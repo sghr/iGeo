@@ -24,6 +24,7 @@ package igeo.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.awt.Color;
 
 import igeo.gui.*;
 
@@ -90,10 +91,17 @@ public class IGraphicServer{
     public void setMode(IGraphicMode m){
 	if(views!=null) for(IView v:views) v.setMode(new IGraphicMode(m));
     }
-
+    
     public void enableGL(){ useGL=true; }
     public void disableGL(){ useGL=false; }
     public boolean isGL(){ return useGL; }
+    
+    
+    public void bg(Color c1, Color c2, Color c3, Color c4){
+	if(views!=null) for(IView v:views) v.setBGColor(c1,c2,c3,c4);
+    }
+    public void background(Color c1, Color c2, Color c3, Color c4){ bg(c1,c2,c3,c4); }
+    
     
     public void add(IObject e){
 	boolean isGL=false;

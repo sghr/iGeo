@@ -61,12 +61,12 @@ public class ITrimCurveGraphic{
 	polyline2 = poly2;
     }
     
-    /*
+    
     public IPolyline2D getPolyline2D(){
-	if(polyline2==null) setup2D();
+	//if(polyline2==null) setup2D();
 	return polyline2;
     }
-    */
+    
     
     public IPolyline getPolyline(int reso){
 	if(polyline==null) setup3D(reso);
@@ -131,9 +131,11 @@ public class ITrimCurveGraphic{
 		if(i==polyline2.num()-2) pts2.add(polyline2.get(i+1));
 	    }
 	    
+	    // update polyline2
+	    polyline2 = new IPolyline2D(pts2.toArray(new IVec2[pts2.size()]));
+	    
 	    polyline = new IPolyline(pts2.size());
-	    for(int i=0; i<pts2.size(); i++)
-		polyline.set(i, surface.pt(pts2.get(i)));
+	    for(int i=0; i<pts2.size(); i++) polyline.set(i, surface.pt(pts2.get(i)));
 	    
 	    /*
 	    int reso = IConfig.surfaceTrimEdgeResolution;
@@ -247,17 +249,8 @@ public class ITrimCurveGraphic{
 	
 	if(idx<0) idx=0; //?
 	
-	//IOut.p("min="+min+", max="+max); //
-	//IOut.p("idx="+idx+", surf.vepNum()="+surf.vepNum()); //
-	
-	if(idx>=surf.vepNum()-1){
-	    //IOut.p("idx>=surf.vepNum()-1; return;"); //
-	    return null; // nothing to fill
-	}
-	if(!(surf.v(idx,0)<=min && surf.v(idx+1,0)>=min) ){
-	    //IOut.p("!(surf.v(idx,0)<min && surf.v(idx+1,0)>min); return;"); //
-	    return null;
-	}
+	if(idx>=surf.vepNum()-1){ return null; } // nothing to fill
+	if(!(surf.v(idx,0)<=min && surf.v(idx+1,0)>=min) ){ return null; }
 	
 	int reso = IConfig.surfaceIsoparmResolution*
 	    IConfig.surfaceWireframeResolution;

@@ -58,6 +58,16 @@ public class IGLTriangles extends IGLElement{
 	}
     }
     
+    public int triangleNum(){ if(pts==null) return 0; return pts.length/3; }
+    
+    public void setPoint(int triangleIdx, int vertexIdx, IVec pt){
+	pts[triangleIdx*3 + vertexIdx] = pt;
+    }
+    public void setPoint(int triangleIdx, int vertexIdx, IVec pt, IVec nml){
+	pts[triangleIdx*3 + vertexIdx] = pt;
+	normal[triangleIdx*3 + vertexIdx] = nml;
+    }
+    
     public void draw(GL gl){
 	gl.glBegin(GL.GL_TRIANGLES);
 	drawPoints(gl);
