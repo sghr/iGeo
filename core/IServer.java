@@ -51,7 +51,7 @@ public class IServer implements IServerI{
     //IPanel panel; // non null in graphic mode
     
     // for updating logic of other object referring IServer
-    public int statusCount=0; // incremented when any change happens in the state
+    public int stateCount=0; // incremented when any change happens in the state
     
     
     // non graphic mode
@@ -90,7 +90,7 @@ public class IServer implements IServerI{
 	    if(e instanceof ILayer){ layers.add((ILayer)e); }
 	    //if(isGraphicMode()) graphicServer.add(e);
 	    if(e.dynamicsNum()>0){ dynamicServer.add(e); }
-	    update();
+	    updateState();
 	}
     }
     
@@ -104,9 +104,9 @@ public class IServer implements IServerI{
     public void add(IDynamicObject e){
 	synchronized(ig){
 	    //dynamics.add(e);
-	    //update();
+	    //updateState();
 	    dynamicServer.add(e);
-	    //update(); // adding IObject matters but not IDynamicObject?
+	    //updateState(); // adding IObject matters but not IDynamicObject?
 	}
     }
     */
@@ -126,9 +126,9 @@ public class IServer implements IServerI{
     }
     public void background(Color c1, Color c2, Color c3, Color c4){ bg(c1,c2,c3,c4); }
     
-        
-    public ArrayList<IObject> getObjects(){ return objects(); }
-    public ArrayList<IObject> objects(){ return objects; }
+    
+    public ArrayList<IObject> getAllObjects(){ return allObjects(); }
+    public ArrayList<IObject> allObjects(){ return objects; }
     
     //public IObject getObject(int i){ return objects.get(i); }
     public IObject getObject(int i){ return object(i); }
@@ -142,9 +142,10 @@ public class IServer implements IServerI{
     //public IDynamicObject dynamicObject(int i){ if(i<0||i>=dynamics.size()){ return null; } return dynamics.get(i); }
     
     public int objectNum(){ return objects.size(); }
+    /** alias of objectNum() */
+    public int getObjectNum(){ return objectNum(); }
     //public int graphicObjectNum(){ return graphics.size(); }
     //public int dynamicObjectNum(){ return dynamics.size(); }
-    
     
     
     
@@ -161,7 +162,7 @@ public class IServer implements IServerI{
 		for(int j=0; j<e.dynamics.size(); j++) dynamicServer.remove(e.dynamics.get(j)); //removeDynamicObject(e.dynamics.get(j));
 	    }
 	    objects.remove(i);
-	    update();
+	    updateState();
 	}
     }
     
@@ -176,7 +177,7 @@ public class IServer implements IServerI{
 	    }
 	    objects.remove(e);
 	    if(e instanceof ILayer){ layers.remove(e); }
-	    update();
+	    updateState();
 	}
     }
     
@@ -191,11 +192,11 @@ public class IServer implements IServerI{
     /*
     public void removeDynamicObject(int i){
 	dynamics.remove(i);
-	update();
+	updateState();
     }
     public void removeDynamicObject(IDynamicObject d){
 	dynamics.remove(d);
-	update();
+	updateState();
     }
     */
     
@@ -208,11 +209,11 @@ public class IServer implements IServerI{
 	if(graphicServer!=null) graphicServer.clearObjects();
 	if(dynamicServer!=null) dynamicServer.clear();
 	layers.clear();
-	update(); // not clearing the number
+	updateState(); // not clearing the number
     }
     
-    public int statusCount(){ return statusCount; }
-    public void update(){ statusCount++; }
+    public int stateCount(){ return stateCount; }
+    public void updateState(){ stateCount++; }
     
     /*
     public void setGraphicMode(IGraphicMode mode){
@@ -229,6 +230,17 @@ public class IServer implements IServerI{
     */
     
     
+    public void duration(int dur){ dynamicServer.duration(dur); }
+    public int duration(){ return dynamicServer.duration(); }
+    
+    public void time(int tm){ dynamicServer.time(tm); }
+    public int time(){ return dynamicServer.time(); }
+    
+    public void pause(){ dynamicServer.pause(); }
+    public void resume(){ dynamicServer.resume(); }
+    
+    public void start(){ dynamicServer.start(); }
+    public void stop(){ dynamicServer.stop(); }
     
     
     /***********************************************************************
@@ -238,7 +250,7 @@ public class IServer implements IServerI{
     /** Returns all point objects contained in objects.
 	IPointR objects are not included.
     */
-    public IPoint[] getPoints(){
+    public IPoint[] points(){
 	ArrayList<IPoint> points = new ArrayList<IPoint>();
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
@@ -247,11 +259,13 @@ public class IServer implements IServerI{
 	}
 	return points.toArray(new IPoint[points.size()]);
     }
+    /** alias of points() */
+    public IPoint[] getPoints(){ return points(); }
     
     /** Returns all curve objects contained in objects.
 	ICurveR objects are not included.
     */
-    public ICurve[] getCurves(){
+    public ICurve[] curves(){
 	ArrayList<ICurve> curves = new ArrayList<ICurve>();
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
@@ -260,11 +274,13 @@ public class IServer implements IServerI{
 	}
 	return curves.toArray(new ICurve[curves.size()]);
     }
+    /** alias of curves() */
+    public ICurve[] getCurves(){ return curves(); }
     
     /** Returns all surface objects contained in objects.
 	ISurfaceR objects are not included.
     */
-    public ISurface[] getSurfaces(){
+    public ISurface[] surfaces(){
 	ArrayList<ISurface> surfaces = new ArrayList<ISurface>();
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
@@ -273,11 +289,13 @@ public class IServer implements IServerI{
 	}
 	return surfaces.toArray(new ISurface[surfaces.size()]);
     }
+    /** alias of surfaces() */
+    public ISurface[] getSurfaces(){ return surfaces(); }
     
     /** Returns all meshe objects contained in objects.
 	IMeshR objects are not included.
     */
-    public IMesh[] getMeshes(){
+    public IMesh[] meshes(){
 	ArrayList<IMesh> meshes = new ArrayList<IMesh>();
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
@@ -286,11 +304,27 @@ public class IServer implements IServerI{
 	}
 	return meshes.toArray(new IMesh[meshes.size()]);
     }
+    /** alias of meshes() */
+    public IMesh[] getMeshes(){ return meshes(); }
     
+    /** Returns all meshe objects contained in objects.
+	IMeshR objects are not included.
+    */
+    public IBrep[] breps(){
+	ArrayList<IBrep> breps = new ArrayList<IBrep>();
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IBrep)
+		    breps.add((IBrep)objects.get(i));
+	}
+	return breps.toArray(new IBrep[breps.size()]);
+    }
+    /** alias of breps */
+    public IBrep[] getBreps(){ return breps(); }
     
     /** Returns all objects of specified class contained in objects.
      */
-    public IObject[] getObjects(Class cls){
+    public IObject[] objects(Class cls){
 	ArrayList<IObject> objs = new ArrayList<IObject>();
 	synchronized(ig){
 	    for(int i=0; i<objects.size(); i++)
@@ -298,10 +332,182 @@ public class IServer implements IServerI{
 	}
 	return objs.toArray(new IObject[objs.size()]);
     }
-
+    /** alias of objects(Class) */
+    public IObject[] getObjects(Class cls){ return objects(cls); }
+    
     /** Returns all objects contained in objects.
      */
-    public IObject[] getAllObjects(){ return objects.toArray(new IObject[objects.size()]); }
+    public IObject[] objects(){ return objects.toArray(new IObject[objects.size()]); }
+    public IObject[] getObjects(){ return objects(); }
+    
+    
+    /** Returns i-th IPoint object contained in objects or null if not found.
+	IPointR objects are not included.
+    */
+    public IPoint point(int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(objects.get(j) instanceof IPoint)
+		    if(i==curIdx++) return (IPoint)objects.get(j);
+	}
+	return null;
+    }
+    /** alias of point(int) */
+    public IPoint getPoint(int i){ return point(i); }
+    
+    
+    /** Returns i-th ICurve object contained in objects or null if not found.
+	ICurveR objects are not included.
+    */
+    public ICurve curve(int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(objects.get(j) instanceof ICurve)
+		    if(i==curIdx++) return (ICurve)objects.get(j);
+	}
+	return null;
+    }
+    /** alias of curve(int) */
+    public ICurve getCurve(int i){ return curve(i); }
+    
+    
+    /** Returns i-th ISurface object contained in objects or null if not found.
+	ISurfaceR objects are not included.
+    */
+    public ISurface surface(int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(objects.get(j) instanceof ISurface)
+		    if(i==curIdx++) return (ISurface)objects.get(j);
+	}
+	return null;
+    }
+    /** alias of surface(int) */
+    public ISurface getSurface(int i){ return surface(i); }
+    
+    
+    /** Returns i-th IMesh object contained in objects or null if not found.
+	IMeshR objects are not included.
+    */
+    public IMesh mesh(int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(objects.get(j) instanceof IMesh)
+		    if(i==curIdx++) return (IMesh)objects.get(j);
+	}
+	return null;
+    }
+    /** alias of mesh(int) */
+    public IMesh getMesh(int i){ return mesh(i); }
+    
+    /** Returns i-th IBrep object contained in objects or null if not found.
+    */
+    public IBrep brep(int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(objects.get(j) instanceof IBrep)
+		    if(i==curIdx++) return (IBrep)objects.get(j);
+	}
+	return null;
+    }
+    /** alias of brep(int) */
+    public IBrep getBrep(int i){ return brep(i); }
+    
+    /** Returns i-th IBrep object contained in objects or null if not found.
+    */
+    public IObject object(Class cls, int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(cls.isInstance(objects.get(j))) 
+		    if(i==curIdx++) return objects.get(j);
+	}
+	return null;
+    }
+    /** alias of object(Class,int) */
+    public IObject getObject(Class cls, int i){ return object(cls,i); }
+    
+    
+    
+    /** number of IPoint in objects */
+    public int pointNum(){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IPoint) num++;
+	}
+	return num;
+    }
+    /** alias of pointsNum() */
+    public int getPointNum(){ return pointNum(); }
+    
+    /** number of ICurve in objects */
+    public int curveNum(){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof ICurve) num++;
+	}
+	return num;
+    }
+    /** alias of curveNum() */
+    public int getCurveNum(){ return curveNum(); }
+    
+    /** number of ISurface in objects */
+    public int surfaceNum(){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof ISurface) num++;
+	}
+	return num;
+    }
+    /** alias of surfaceNum() */
+    public int getSurfaceNum(){ return surfaceNum(); }
+    
+    
+    /** number of IMesh in objects */
+    public int meshNum(){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IMesh) num++;
+	}
+	return num;
+    }
+    /** alias of meshNum() */
+    public int getMeshNum(){ return meshNum(); }
+    
+    
+    /** number of IBrep in objects */
+    public int brepNum(){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IBrep) num++;
+	}
+	return num;
+    }
+    /** alias of brepNum() */
+    public int getBrepNum(){ return brepNum(); }
+    
+    /** number of the specified class in objects */
+    public int objectNum(Class cls){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(cls.isInstance(objects.get(i))) num++;
+	}
+	return num;
+    }
+    /** alias of objectNum(Class) */
+    public int getObjectNum(Class cls){ return objectNum(cls); }
+    
     
     
     public int layerNum(){ return layers.size(); }
@@ -317,7 +523,7 @@ public class IServer implements IServerI{
 	for(ILayer l:layers) if(l.name().equals(layerName)) return l;
 	//return null;
 	// if not found, create a new one.
-	//update();
+	//updateState();
 	return new ILayer(this, layerName);
 	//add(l); // layer is added in constractor of IObject
     }

@@ -73,12 +73,12 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     public void hide(){
 	visible=false;
 	// mainly to update focus bounding box
-	if(parent!=null&&parent.server!=null) parent.server.update();
+	if(parent!=null&&parent.server!=null) parent.server.updateState();
     }
     public void show(){
 	visible=true;
 	// mainly to update focus bounding box
-	if(parent!=null&&parent.server!=null) parent.server.update();
+	if(parent!=null&&parent.server!=null) parent.server.updateState();
     }
     
     /** updating graphic when geometry change. actual update happens when it's drawn.*/
@@ -89,6 +89,7 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     
     public Color getColor(){ return color; }
     
+    public void setColor(Color c, int alpha){ setColor(getColor(c,alpha)); }
     public void setColor(int gray){ setColor(getColor(gray)); }
     public void setColor(float fgray){ setColor(getColor(fgray)); }
     public void setColor(int gray, int alpha){ setColor(getColor(gray,alpha)); }
@@ -100,6 +101,10 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     public void setHSBColor(float h, float s, float b, float a){ setColor(getHSBColor(h,s,b,a)); }
     public void setHSBColor(float h, float s, float b){ setColor(getHSBColor(h,s,b)); }
     
+    
+    public static Color getColor(Color c, int alpha){
+	return new Color(c.getRed(),c.getGreen(),c.getBlue(),alpha<0?0:alpha>255?255:alpha);
+    }
     
     public static Color getColor(int gray){
 	if(colorRange1i==255){

@@ -20,17 +20,19 @@
 
 ---*/
 
-package igeo.core;
+package igeo.geo;
+
+import igeo.core.*;
 
 import java.util.ArrayList;
 
 /**
-   Implementation of IDynamicObject. Only management of parent IObject.
+   Implementation of IDynamics. It provides management of parent IObject and targets to be updated.
    
    @author Satoru Sugihara
    @version 0.7.0.0
 */
-public class IDynamicObjectBase implements IDynamicObject{
+public class IDynamicsBase implements IDynamics{
     /** parent */
     public IObject parent=null;
     
@@ -38,24 +40,30 @@ public class IDynamicObjectBase implements IDynamicObject{
     public ArrayList<IObject> targets;
     
     /** automatically registered in default IDynamicServer */
-    public IDynamicObjectBase(){ initDynamicObjectBase(); }
+    public IDynamicsBase(){ initDynamicsBase(); }
     
     /** registered in specified IDynamicServer. not registered if the server is null. */
-    public IDynamicObjectBase(IServerI server){ initDynamicObjectBase(server); }
+    public IDynamicsBase(IServerI server){ initDynamicsBase(server); }
     
-    public IDynamicObjectBase(IObject parent){ parent(parent); }
+    public IDynamicsBase(IObject parent){ parent(parent); }
     
-    public void initDynamicObjectBase(){
-	// default server
-	initDynamicObjectBase(IG.cur());
+    public IDynamicsBase(IDynamicsBase d){
+	if(d.parent!=null){ parent(d.parent); }
+	else{ initDynamicsBase(); }
+	for(int i=0; i<d.targetNum(); i++){ target(d.target(i)); }
     }
     
-    public void initDynamicObjectBase(IServerI server){
+    public void initDynamicsBase(){
+	// default server
+	initDynamicsBase(IG.cur());
+    }
+    
+    public void initDynamicsBase(IServerI server){
 	if(server!=null) server.server().dynamicServer().add(this);
     }
     
     public IObject parent(){ return parent; }
-    public IDynamicObjectBase parent(IObject par){
+    public IDynamicsBase parent(IObject par){
 	if(this.parent!=null){// necessary?
 	    this.parent.deleteDynamics(this);
 	    removeTarget(this.parent); // removing from target too.
@@ -70,7 +78,7 @@ public class IDynamicObjectBase implements IDynamicObject{
     }
     
     /** add terget object to be updated by this dynamic object. */
-    public IDynamicObjectBase target(IObject targetObj){
+    public IDynamicsBase target(IObject targetObj){
 	if(targets==null) targets = new ArrayList<IObject>();
 	targets.add(targetObj);
 	return this;
@@ -78,17 +86,17 @@ public class IDynamicObjectBase implements IDynamicObject{
     /** get total target number. */
     public int targetNum(){ return targets==null?0:targets.size(); }
     /** get target object. */
-    public IObject target(int i){ if(i<0||i>=targets.size()) return null; return targets.get(i); }
+    public IObject target(int i){ if(targets==null||i<0||i>=targets.size()) return null; return targets.get(i); }
     /** get all target objects. */
     public ArrayList<IObject> targets(){ return targets; }
     /** remove target object. */
-    public IDynamicObjectBase removeTarget(int i){
+    public IDynamicsBase removeTarget(int i){
 	if(i<0||i>=targets.size()) return null;
 	targets.remove(i);
 	return this;
     }
     /** remove target object. */
-    public IDynamicObjectBase removeTarget(IObject obj){ targets.remove(obj); return this; }
+    public IDynamicsBase removeTarget(IObject obj){ targets.remove(obj); return this; }
     
     /** update all terget objects (should be called when the dynamic object is updated). */
     public void updateTarget(){
@@ -104,12 +112,12 @@ public class IDynamicObjectBase implements IDynamicObject{
        interact() is called for every combination of two but
        when A.interact(B) happens, B.interact(A) doesn't happen.
        Just once for each combination */
-    //public void interact(IDynamicObject obj){}
+    //public void interact(IDynamics obj){}
     
     /** behavior definition of interaction with other dynamic objects.
 	The server puts all dynamic objects including itself.
     */
-    public void interact(ArrayList<IDynamicObject> dynamics){}
+    public void interact(ArrayList<IDynamics> dynamics){}
     /** behavior definition of updating dynamics in each time frame */
     public void update(){}
     

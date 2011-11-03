@@ -27,12 +27,12 @@ import igeo.core.*;
 import igeo.util.*;
 
 /**
-   Class of IDynamicObject to simulate tension force between two particles.
+   Class of IDynamics to simulate tension force between two particles.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ITension extends IDynamicObjectBase{
+public class ITension extends IDynamicsBase{
     public static double defaultTension=1.0;
     
     public IParticleI pt1, pt2;
@@ -89,7 +89,7 @@ public class ITension extends IDynamicObjectBase{
     public ITension removeTarget(IObject obj){ super.removeTarget(obj); return this; }
     
         
-    synchronized public void interact(ArrayList<IDynamicObject> dynamics){
+    synchronized public void interact(ArrayList<IDynamics> dynamics){
 	IVec diff = pt2.pos().diff(pt1.pos());
 	diff.mul(tension);
 	pt1.addForce(diff);

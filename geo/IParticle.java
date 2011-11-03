@@ -22,22 +22,20 @@
 
 package igeo.geo;
 
-import java.awt.Color;
-
 import java.util.ArrayList;
 
 import igeo.core.*;
 import igeo.gui.*;
 
 /**
-   Class of an implementation of IDynamicObject to have physical attributes of point.
+   Class of an implementation of IDynamics to have physical attributes of point.
    It has attributes of position, velocity, acceleration, force, and mass.
    Position is provided from outside to be linked.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IParticle extends IDynamicObjectBase implements IParticleI, IVecI{
+public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     
     static double defaultFriction = 0.0;
     
@@ -86,7 +84,7 @@ public class IParticle extends IDynamicObjectBase implements IParticleI, IVecI{
     //public IParticle dup(){ return this; }
     
     
-    // implementation of IDynamicObject
+    // implementation of IDynamics
     //public IObject parent(){ return parent; }
     //public ISubobject parent(IObject parent){ this.parent=parent; return this; }
     
@@ -129,12 +127,12 @@ public class IParticle extends IDynamicObjectBase implements IParticleI, IVecI{
     
     synchronized public IParticle resetForce(){ frc.set(0,0,0); return this; }
     
-    synchronized public void interact(ArrayList<IDynamicObject> dynamics){}
+    synchronized public void interact(ArrayList<IDynamics> dynamics){}
     
     synchronized public void update(){
 	if(fixed) return;
-	vel.add(frc.mul(IConfig.dynamicsSpeed/mass)).mul(1.0-friction);
-	pos.add(vel.dup().mul(IConfig.dynamicsSpeed));
+	vel.add(frc.mul(IConfig.updateRate/mass)).mul(1.0-friction);
+	pos.add(vel.dup().mul(IConfig.updateRate));
 	frc.set(0,0,0);
 	//if(parent!=null) parent.updateGraphic(); // graphic update
 	//super.update();

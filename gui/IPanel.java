@@ -24,8 +24,9 @@ package igeo.gui;
 
 import java.util.ArrayList;
 import java.awt.event.*;
-
+import java.io.*;
 import javax.media.opengl.*;
+import javax.swing.*;
 
 import igeo.core.*;
 import igeo.geo.IBoundingBox;
@@ -49,12 +50,14 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     //public int fullPaneOrigX, fullPaneOrigY, fullPaneOrigWidth, fullPaneOrigHeight;
     
     public IBoundingBox boundingBox;
-    public int serverStatusCount=-1;
+    public int serverStateCount=-1;
+    
+    public boolean firstDraw=true;
     
     public IPanel(int x, int y, int width, int height){
 	super(x,y,width,height);
 	panes = new ArrayList<IPane>();
-	this.ig = ig;
+	//this.ig = ig;
     }
     
     public void setIG(IG ig){
@@ -104,6 +107,17 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     
     
     public void draw(IGraphics g){
+	
+	// some initialization process
+	if(firstDraw){
+	    // here is a point to start dynamicServer
+	    if(ig!=null &&ig.dynamicServer()!=null &&
+	       (ig.dynamicServer().num()>0 || ig.dynamicServer().addingNum()>0)){
+		ig.dynamicServer().start();
+		firstDraw=false;
+	    }
+	}
+	
 	for(int i=0; i<panes.size(); i++){
 	    synchronized(IG.lock){
 		if(panes.get(i).isVisible()){ panes.get(i).draw(g); }
@@ -253,7 +267,42 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    System.exit(0); // temporary.
 	}
 	else if(key==KeyEvent.VK_S && control&& !shift){
-	    ig.save();
+	    
+	    // create folder of the base path if not existing
+	    if(ig.basePath!=null){
+		File baseDir = new File(ig.basePath);
+		if(!baseDir.isDirectory()){
+		    IOut.debug(20, "creating directory"+baseDir.toString());
+		    if(!baseDir.mkdir()){
+			IOut.err("failed to create directory: "+baseDir.toString());
+		    }
+		}
+	    }
+	    
+	    File file = chooseFile(new String[][]{ new String[]{ "3dm", "3DM" },
+						   new String[]{ "obj", "Obj", "OBJ" } },
+				   new String[]{ "Rhinoceros 3D file v4 (.3dm)",
+						 "Wavefront OBJ file (.obj)" },
+				   "Save",
+				   true,
+				   ig.basePath,
+				   null);
+	    
+	    if(file!=null) ig.saveFile(file.getAbsolutePath());
+	    
+	    /*
+	    boolean canceled = false;
+	    do{
+		JFileChooser jfc = new JFileChooser(ig.basePath);
+		int retval = jfc.showSaveDialog(null);
+		
+		if(retval==JFileChooser.APPROVE_OPTION){
+		    File file = jfc.getSelectedFile();
+		    ig.saveFile(file.getAbsolutePath());
+		}
+	    }while(canceled);
+	    */
+	    
 	}
 	
 	if(currentMousePane!=null){ currentMousePane.keyPressed(e); }
@@ -287,11 +336,238 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     
     public void setBoundingBox(){
 	if(boundingBox==null) boundingBox = new IBoundingBox();
-	if(ig.server().statusCount!=serverStatusCount){
+	if(ig.server().stateCount()!=serverStateCount){
 	    boundingBox.setObjects(ig.server());
-	    serverStatusCount = ig.server().statusCount();
+	    serverStateCount = ig.server().stateCount();
 	    //IOut.err("boundingBox Updated: "+boundingBox); //
 	}
     }
+    
+    
+    // file chooser dialog
+    public File chooseFile(String acceptableExtension,
+			   String extensionDescription,
+                           String approveButtonText,
+			   boolean writing,
+			   String defaultPath,
+			   File defaultFile){
+        return chooseFile(IFileFilter.createCaseVariation(acceptableExtension),
+                          extensionDescription, approveButtonText,writing,
+			  defaultPath, defaultFile);
+    }
+    
+    public File chooseFile(String[] acceptableExtensions, String extensionDescription,
+                           String approveButtonText, boolean writing,
+			   String defaultPath, File defaultFile){
+	String[][] extensions = new String[1][];
+	extensions[0] = acceptableExtensions;
+	String[] description = new String[1];
+	description[0] = extensionDescription;
+
+	return chooseFile(extensions, description, approveButtonText, writing, defaultPath, defaultFile);
+	
+	/*
+        File file=null;
+        boolean canceled=false;
+	
+	if(defaultPath==null) defaultPath=".";
+        file = defaultFile;
+	
+        for(int i=0; i<acceptableExtensions.length; i++){
+            if(!acceptableExtensions[i].startsWith(".")){
+                acceptableExtensions[i] = "." + acceptableExtensions[i];
+            }
+        }    
+        do{
+            canceled=false; // in the case once canceled
+            JFileChooser chooser = new JFileChooser(defaultPath);
+            chooser.addChoosableFileFilter(new IFileFilter(acceptableExtensions,
+							   extensionDescription));
+            
+            if(file!=null){
+                chooser.setCurrentDirectory(new File(file.getParent()));
+                chooser.setSelectedFile(file);
+            }
+            
+            int result = chooser.showDialog(null, approveButtonText);
+            
+            if(result==JFileChooser.APPROVE_OPTION){
+                file = chooser.getSelectedFile();
+                String filename = file.toString();
+                boolean endWithExtension=false;
+                for(int i=0; (i<acceptableExtensions.length)&&!endWithExtension; i++){
+                    if(filename.endsWith(acceptableExtensions[i])) endWithExtension=true;
+                }
+                if( ! endWithExtension ){
+		    // should it be changed?
+                    IOut.err("extension of file is invalid: "+filename);
+                    filename = filename.concat(acceptableExtensions[0]);
+                    file = new File(filename);
+                    //IOut.err("renamed to "+ file.toString());
+                }
+                if(writing){
+                    if(file.exists()){
+                        IOut.err("overwiting file?: "+file.toString());
+                        String message =
+                            "file is existing\ndo you want to overwrite it?";
+                        // Modal dialog with yes/no button
+                        int answer = JOptionPane.showConfirmDialog(null, message);
+                        if (answer == JOptionPane.YES_OPTION);
+                        else if (answer == JOptionPane.NO_OPTION) return null;
+                        else if (answer == JOptionPane.CANCEL_OPTION) canceled=true;
+                        else return null;
+                    }
+                }
+                else{
+                    if(!file.exists()){
+                        IOut.err("file doesn't exist "+file.toString());
+                        String message = "file doesn't exist: "+file.toString();
+                        // Modal dialog with yes/no button
+                        JOptionPane.showMessageDialog(null, message);
+                        canceled=true;
+                    }
+                }
+                
+            }
+            else{ file=null; }
+        }while(canceled);
+        return file;
+	*/
+    }
+    
+    public File chooseFile(String[][] acceptableExtensions,
+			   String[] extensionDescriptions,
+                           String approveButtonText, boolean writing,
+			   String defaultPath, File defaultFile){
+        File file=null;
+        boolean canceled=false;
+	
+	if(defaultPath==null) defaultPath=".";
+        file = defaultFile;
+	
+	IFileFilter[] filters = new IFileFilter[acceptableExtensions.length];
+        for(int i=0; i<acceptableExtensions.length; i++){
+	    for(int j=0; j<acceptableExtensions[i].length; j++){
+		if(!acceptableExtensions[i][j].startsWith(".")){
+		    acceptableExtensions[i][j] = "." + acceptableExtensions[i][j];
+		}
+	    }
+	    String description = "";
+	    if(extensionDescriptions!=null && extensionDescriptions.length > i &&
+	       extensionDescriptions[i] != null){
+		description = extensionDescriptions[i];
+	    }
+	    filters[i] = new IFileFilter(acceptableExtensions[i], description);
+        }
+	
+        do{
+            canceled=false; // in the case once canceled
+            JFileChooser chooser = new JFileChooser(defaultPath);
+	    //for(int i=0; i<filters.length; i++){
+	    for(int i=filters.length-1; i>=0; i--){ // opposite order
+		chooser.addChoosableFileFilter(filters[i]);
+	    }
+	    
+            if(file!=null){
+                chooser.setCurrentDirectory(new File(file.getParent()));
+                chooser.setSelectedFile(file);
+            }
+            
+            int result = chooser.showDialog(null, approveButtonText);
+            
+            if(result==JFileChooser.APPROVE_OPTION){
+                file = chooser.getSelectedFile();
+                String filename = file.toString();
+                boolean endWithExtension=false;
+		
+		javax.swing.filechooser.FileFilter currentFilter = chooser.getFileFilter();
+		int currentFilterIndex = -1;
+		for(int i=0; i<filters.length && currentFilterIndex<0; i++){
+		    if(currentFilter==filters[i]) currentFilterIndex=i;
+		}
+		
+		for(int i=0; currentFilterIndex>=0 &&
+			(i<acceptableExtensions[currentFilterIndex].length) &&
+			!endWithExtension; i++){
+                    if(filename.endsWith(acceptableExtensions[currentFilterIndex][i])) endWithExtension=true;
+                }
+		
+		if(currentFilterIndex>=0 && ! endWithExtension ){
+		    // should it be changed?
+                    //IOut.err("extension of file is invalid: "+filename);
+                    filename = filename.concat(acceptableExtensions[currentFilterIndex][0]);
+                    file = new File(filename);
+                    //IOut.err("renamed to "+ file.toString());
+                }
+		
+                if(writing){
+                    if(file.exists()){
+                        //IOut.err("overwiting file?: "+file.toString());
+                        String message =
+                            "file is existing\ndo you want to overwrite it?";
+                        // Modal dialog with yes/no button
+                        int answer = JOptionPane.showConfirmDialog(null, message);
+                        if (answer == JOptionPane.YES_OPTION);
+                        else if (answer == JOptionPane.NO_OPTION) return null;
+                        else if (answer == JOptionPane.CANCEL_OPTION) canceled=true;
+                        else return null;
+                    }
+                }
+                else{
+                    if(!file.exists()){
+                        IOut.err("file doesn't exist "+file.toString());
+                        String message = "file doesn't exist: "+file.toString();
+                        // Modal dialog with yes/no button
+                        JOptionPane.showMessageDialog(null, message);
+                        canceled=true;
+                    }
+                }
+                
+            }
+            else{ file=null; }
+        }while(canceled);
+        return file;
+    }
+    
+    
+    public File[] chooseFiles(String acceptableExtension,
+                              String extensionDescription,
+			      String approveButtonText,
+			      String defaultPath){
+        return chooseFiles(IFileFilter.createCaseVariation(acceptableExtension),
+                           extensionDescription, approveButtonText, defaultPath);
+    }
+    
+    public File[] chooseFiles(String[] acceptableExtensions,
+                              String extensionDescription,
+                              String approveButtonText,
+			      String defaultPath){
+        
+        File[] files=null;
+        boolean canceled=false;
+        
+        for(int i=0; i<acceptableExtensions.length; i++){
+            if(!acceptableExtensions[i].startsWith(".")){
+                acceptableExtensions[i] = "." + acceptableExtensions[i];
+            }
+        }
+
+	if(defaultPath==null) defaultPath=".";
+        
+        canceled=false; // in the case once canceled
+        JFileChooser chooser = new JFileChooser(defaultPath);
+        chooser.addChoosableFileFilter(new IFileFilter(acceptableExtensions,
+						       extensionDescription));
+        
+        chooser.setMultiSelectionEnabled(true);
+        
+        int result = chooser.showDialog(null, approveButtonText);
+        
+        if(result==JFileChooser.APPROVE_OPTION){
+            files = chooser.getSelectedFiles();
+        }
+        else{ files=null; }
+        return files;
+    }                        
     
 }

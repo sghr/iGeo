@@ -28,14 +28,12 @@ import igeo.core.*;
 import igeo.gui.*;
 
 /**
-   Class of an implementation of IDynamicObject to have physical attributes of point.
-   It has attributes of position, velocity, acceleration, force, and mass.
-   Position is provided from outside to be linked.
+   Class of an implementation of IDynamics to limit particles to be spacified direction from a center.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IParticleDirectionLink extends IDynamicObjectBase{
+public class IParticleDirectionLink extends IDynamicsBase{
     
     public ArrayList<IParticle> particles;
     public IVecI center;
@@ -86,7 +84,6 @@ public class IParticleDirectionLink extends IDynamicObjectBase{
 	initParticleDirectionLink();
     }
     
-    
     public void initParticleDirectionLink(){
 	// to take control of location of particle;
 	for(int i=0; i<particles.size(); i++) particles.get(i).fix(); 
@@ -113,12 +110,12 @@ public class IParticleDirectionLink extends IDynamicObjectBase{
 	    moment.add(dirs[i].cross(p.frc));
 	    r2[i] = dirs[i].len2();
 	    inertia += p.mass*r2[i];
-	    if(r2[i]>IConfig.lengthResolution) angularVec.add(dirs[i].cross(p.vel).div(r2[i]));
+	    if(r2[i]>IConfig.tolerance) angularVec.add(dirs[i].cross(p.vel).div(r2[i]));
 	}
 	
 	//moment.div(inertia);
 	angularVec.div(particles.size()); // average
-	angularVec.add(moment.mul(IConfig.dynamicsSpeed/inertia));
+	angularVec.add(moment.mul(IConfig.updateRate/inertia));
 	
 	
 	IVec avrgDir=new IVec();
@@ -126,7 +123,7 @@ public class IParticleDirectionLink extends IDynamicObjectBase{
 	    IParticle p = particles.get(i);
 	    
 	    p.frc.projectToVec(dirs[i]);
-	    p.frc.mul(IConfig.dynamicsSpeed/p.mass); // only radial dir
+	    p.frc.mul(IConfig.updateRate/p.mass); // only radial dir
 	    
 	    p.vel.projectToVec(dirs[i]); // reset only to radial dir
 	    p.vel.add(p.frc);
@@ -135,12 +132,12 @@ public class IParticleDirectionLink extends IDynamicObjectBase{
 	    
 	    p.vel.mul(1.0-p.friction);
 	    
-	    p.pos.add(p.vel.dup().mul(IConfig.dynamicsSpeed));
+	    p.pos.add(p.vel.dup().mul(IConfig.updateRate));
 	    
 	    dirs[i] = p.pos.diff(center);
 	    
-	    if(avrgDir.len()<IConfig.lengthResolution){
-		if(dirs[i].len()>IConfig.lengthResolution){ avrgDir.add(dirs[i]); }
+	    if(avrgDir.len()<IConfig.tolerance){
+		if(dirs[i].len()>IConfig.tolerance){ avrgDir.add(dirs[i]); }
 	    }
 	    else{
 		if(avrgDir.dot(dirs[i]) < 0) avrgDir.add(dirs[i], -1.0);
@@ -148,7 +145,7 @@ public class IParticleDirectionLink extends IDynamicObjectBase{
 	    }
 	}
 
-	if(avrgDir.len()<IConfig.lengthResolution){ avrgDir.set(0,0,1); } // default
+	if(avrgDir.len()<IConfig.tolerance){ avrgDir.set(0,0,1); } // default
 	
 	
 	for(int i=0; i<particles.size(); i++){

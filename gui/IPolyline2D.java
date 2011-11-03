@@ -28,7 +28,7 @@ import igeo.geo.*;
 import igeo.core.*;
 import igeo.util.*;
 
-import static igeo.core.IConfig.parameterResolution;
+import static igeo.core.IConfig.parameterTolerance;
 
 /**
    2D polyline geometry to assist graphic classes of curves and surfaces.
@@ -106,7 +106,7 @@ public class IPolyline2D{
 	// not checking end point because too dengerous when the resolution is very low
 	/*
 	// check if there's duplicates in the beginning and the end
-	if(pts[0].eq(pts[pts.length-1],parameterResolution)){
+	if(pts[0].eq(pts[pts.length-1],parameterTolerance)){
 	    IVec2[] pts2 = new IVec2[pts.length-1];
 	    for(int i=0; i<pts.length-1; i++) pts2[i] = pts[i];
 	    pts = pts2;
@@ -143,8 +143,8 @@ public class IPolyline2D{
 	if(reverseDir){
 	    int startIdx=pts2.length-1;
 	    int endIdx = 0;
-	    if(pts[pts.length-1].eq(pts2[pts2.length-1],parameterResolution)) startIdx=pts2.length-2;
-	    if(pts[0].eq(pts2[0],parameterResolution)){ endIdx=1; } // remove duplicated closing pt
+	    if(pts[pts.length-1].eq(pts2[pts2.length-1],parameterTolerance)) startIdx=pts2.length-2;
+	    if(pts[0].eq(pts2[0],parameterTolerance)){ endIdx=1; } // remove duplicated closing pt
 	    
 	    IVec2[] pts3 = new IVec2[pts.length+startIdx-endIdx+1];
 	    
@@ -156,8 +156,8 @@ public class IPolyline2D{
 	else{
 	    int startIdx=0;
 	    int endIdx = pts2.length-1;
-	    if(pts[pts.length-1].eq(pts2[0],parameterResolution)) startIdx=1;
-	    if(pts[0].eq(pts2[pts2.length-1],parameterResolution)){ endIdx=pts2.length-2; } // remove duplicated closing pt
+	    if(pts[pts.length-1].eq(pts2[0],parameterTolerance)) startIdx=1;
+	    if(pts[0].eq(pts2[pts2.length-1],parameterTolerance)){ endIdx=pts2.length-2; } // remove duplicated closing pt
 	    
 	    IVec2[] pts3 = new IVec2[pts.length+endIdx-startIdx+1];
 	    
@@ -486,7 +486,7 @@ public class IPolyline2D{
 	double yi=intersectPt.y();
 	double y2=pt2.y();
 	double y3=pt3.y();
-	if(Math.abs(y2-y3)>=IConfig.lengthResolution){
+	if(Math.abs(y2-y3)>=IConfig.tolerance){
 	    IOut.err("pt2 and pt3 are not on x line");
 	    return null;
 	}
@@ -499,7 +499,7 @@ public class IPolyline2D{
 	if( pt1!=null && pt4!=null && (y1 < yi && y4 < yi ||  y1 > yi && y4 > yi) )
 	    return null; // not intersecting
 	
-	if(Math.abs(pt2.x()-pt3.x()) < IConfig.lengthResolution) return intersectPt;
+	if(Math.abs(pt2.x()-pt3.x()) < IConfig.tolerance) return intersectPt;
 	
 	IVec2I upperPt = pt2;
 	IVec2I lowerPt = pt3;
@@ -534,7 +534,7 @@ public class IPolyline2D{
 	double xi = intersectPt.x();
 	double x2=pt2.x();
 	double x3=pt3.x();
-	if(Math.abs(x2-x3)>=IConfig.lengthResolution){
+	if(Math.abs(x2-x3)>=IConfig.tolerance){
 	    IOut.err("pt2 and pt3 are not on y line");
 	    return null;
 	}
@@ -547,7 +547,7 @@ public class IPolyline2D{
 	if( pt1!=null && pt4!=null && (x1 < xi && x4 < xi ||  x1 > xi && x4 > xi) )
 	    return null; // not intersecting
 	
-	if(Math.abs(pt2.y()-pt3.y()) < IConfig.lengthResolution) return intersectPt;
+	if(Math.abs(pt2.y()-pt3.y()) < IConfig.tolerance) return intersectPt;
 	
 	IVec2I upperPt = pt2;
 	IVec2I lowerPt = pt3;
@@ -576,10 +576,10 @@ public class IPolyline2D{
 	for(int i=0; i<num-1 || closed&&i<num; i++){
 	    IVec2 isct = IVec2.intersectSegmentAndXLine(pts[i],pts[(i+1)%num],y);
 	    if(isct!=null){
-		if(isct.eqY(pts[(i+1)%num],parameterResolution)){
-		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0).eq(isct,parameterResolution)); // nothing
+		if(isct.eqY(pts[(i+1)%num],parameterTolerance)){
+		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0).eq(isct,parameterTolerance)); // nothing
 		    else if((!closed && i<num-2 || closed ) &&
-			    pts[(i+1)%num].get().eqY(pts[(i+2)%num],parameterResolution)){
+			    pts[(i+1)%num].get().eqY(pts[(i+2)%num],parameterTolerance)){
 			IVec2I pt3 = null;
 			if(!closed&&i+3<num || closed) pt3 = pts[(i+3)%num];
 			// pts[i+1] and pts[i+2] is straight in X direction
@@ -597,9 +597,9 @@ public class IPolyline2D{
 		    }
 		    else{ i++; }// skip if it's just touching at the kink
 		}
-		//else if(isct.eq(pts[i],parameterResolution)){
-		else if(isct.eqY(pts[i],parameterResolution)){
-		    if( pts[i].get().eqY(pts[(i+1)%num],parameterResolution)){
+		//else if(isct.eq(pts[i],parameterTolerance)){
+		else if(isct.eqY(pts[i],parameterTolerance)){
+		    if( pts[i].get().eqY(pts[(i+1)%num],parameterTolerance)){
 			if(!closed){
 			    IVec2I pt0 = null, pt3 = null;
 			    if(i>0) pt0 = pts[i-1];
@@ -647,11 +647,11 @@ public class IPolyline2D{
 	for(int i=0; i<num-1 || closed&&i<num; i++){
 	    IVec2 isct = IVec2.intersectSegmentAndYLine(pts[i],pts[(i+1)%num],x);
 	    if(isct!=null){
-		//if(isct.eq(pts[(i+1)%num],parameterResolution)){
-		if( isct.eqX(pts[(i+1)%num],parameterResolution) ){
-		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0).eq(isct,parameterResolution)); // do nothing
+		//if(isct.eq(pts[(i+1)%num],parameterTolerance)){
+		if( isct.eqX(pts[(i+1)%num],parameterTolerance) ){
+		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0).eq(isct,parameterTolerance)); // do nothing
 		    else if((!closed && i<num-2 || closed ) &&
-			    pts[(i+1)%num].get().eqX(pts[(i+2)%num],parameterResolution) ){
+			    pts[(i+1)%num].get().eqX(pts[(i+2)%num],parameterTolerance) ){
 			IVec2I pt3 = null;
 			if(!closed&&i+3<num || closed) pt3 = pts[(i+3)%num];
 			// pts[i+1] and pts[i+2] is straight in Y direction
@@ -669,9 +669,9 @@ public class IPolyline2D{
 		    }
 		    else{ i++; } // skip if it's just touching at the kink
 		}
-		//else if(isct.eq(pts[i],parameterResolution)){
-		else if(isct.eqX(pts[i],parameterResolution)){
-		    if( pts[i].get().eqX(pts[(i+1)%num],parameterResolution)){
+		//else if(isct.eq(pts[i],parameterTolerance)){
+		else if(isct.eqX(pts[i],parameterTolerance)){
+		    if( pts[i].get().eqX(pts[(i+1)%num],parameterTolerance)){
 			if(!closed){
 			    IVec2I pt0 = null, pt3 = null;
 			    if(i>0) pt0 = pts[i-1];
@@ -723,10 +723,10 @@ public class IPolyline2D{
 	    isct[2] = pts[(i+1)%num].get();
 	    
 	    if(isct[0]!=null){
-		if(isct[0].eqY(pts[(i+1)%num],parameterResolution)){
-		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0)[0].eq(isct[0],parameterResolution)); // nothing
+		if(isct[0].eqY(pts[(i+1)%num],parameterTolerance)){
+		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0)[0].eq(isct[0],parameterTolerance)); // nothing
 		    else if((!closed && i<num-2 || closed ) &&
-			    pts[(i+1)%num].get().eqY(pts[(i+2)%num],parameterResolution)){
+			    pts[(i+1)%num].get().eqY(pts[(i+2)%num],parameterTolerance)){
 			IVec2I pt3 = null;
 			if(!closed&&i+3<num || closed) pt3 = pts[(i+3)%num];
 			// pts[i+1] and pts[i+2] is straight in X direction
@@ -765,14 +765,14 @@ public class IPolyline2D{
 		    }
 		    else{ i++; }// skip if it's just touching at the kink
 		}
-		//else if(isct[0].eq(pts[i],parameterResolution)){
-		else if(isct[0].eqY(pts[i],parameterResolution)){
+		//else if(isct[0].eq(pts[i],parameterTolerance)){
+		else if(isct[0].eqY(pts[i],parameterTolerance)){
 		    if(i==0) isct[1] = null;
 		    else isct[1] = pts[(i-1+num)%num].get();
 		    
 		    isct[2] = pts[(i+1)%num].get();
 		    
-		    if( pts[i].get().eqY(pts[(i+1)%num],parameterResolution)){
+		    if( pts[i].get().eqY(pts[(i+1)%num],parameterTolerance)){
 			if(!closed){
 			    IVec2I pt0 = null, pt3 = null;
 			    if(i>0) pt0 = pts[i-1];
@@ -847,10 +847,10 @@ public class IPolyline2D{
 	    isct[2] = pts[(i+1)%num].get();
 	    
 	    if(isct[0]!=null){
-		if(isct[0].eqX(pts[(i+1)%num],parameterResolution)){
-		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0)[0].eq(isct[0],parameterResolution)); // nothing
+		if(isct[0].eqX(pts[(i+1)%num],parameterTolerance)){
+		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0)[0].eq(isct[0],parameterTolerance)); // nothing
 		    else if((!closed && i<num-2 || closed ) &&
-			    pts[(i+1)%num].get().eqX(pts[(i+2)%num],parameterResolution)){
+			    pts[(i+1)%num].get().eqX(pts[(i+2)%num],parameterTolerance)){
 			IVec2I pt3 = null;
 			if(!closed&&i+3<num || closed) pt3 = pts[(i+3)%num];
 			// pts[i+1] and pts[i+2] is straight in Y direction
@@ -888,14 +888,14 @@ public class IPolyline2D{
 		    }
 		    else{ i++; }// skip if it's just touching at the kink
 		}
-		//else if(isct[0].eq(pts[i],parameterResolution)){
-		else if(isct[0].eqX(pts[i],parameterResolution)){
+		//else if(isct[0].eq(pts[i],parameterTolerance)){
+		else if(isct[0].eqX(pts[i],parameterTolerance)){
 		    if(i==0) isct[1] = null;
 		    else isct[1] = pts[(i-1+num)%num].get();
 		    
 		    isct[2] = pts[(i+1)%num].get();
 		    
-		    if( pts[i].get().eqX(pts[(i+1)%num],parameterResolution)){
+		    if( pts[i].get().eqX(pts[(i+1)%num],parameterTolerance)){
 			if(!closed){
 			    IVec2I pt0 = null, pt3 = null;
 			    if(i>0) pt0 = pts[i-1];
@@ -963,9 +963,9 @@ public class IPolyline2D{
 	    if(isctPt!=null){
 		Intersection isct = new Intersection(this,isctPt,pts[i],pts[(i+1)%num]);
 		isct.setDirectionX();
-		if(isct.eqY(pts[(i+1)%num],parameterResolution)){
-		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0).eq(isct,parameterResolution)); // nothing
-		    else if((!closed && i<num-2 || closed ) && pts[(i+1)%num].eqY(pts[(i+2)%num],parameterResolution)){
+		if(isct.eqY(pts[(i+1)%num],parameterTolerance)){
+		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0).eq(isct,parameterTolerance)); // nothing
+		    else if((!closed && i<num-2 || closed ) && pts[(i+1)%num].eqY(pts[(i+2)%num],parameterTolerance)){
 			IVec2 pt3 = null;
 			if(!closed&&i+3<num || closed) pt3 = pts[(i+3)%num];
 			// pts[i+1] and pts[i+2] is straight in X direction
@@ -1004,15 +1004,15 @@ public class IPolyline2D{
 		    }
 		    else{ i++; }// skip if it's just touching at the kink
 		}
-		//else if(isct.eq(pts[i],parameterResolution)){
-		else if(isct.eqY(pts[i],parameterResolution)){
+		//else if(isct.eq(pts[i],parameterTolerance)){
+		else if(isct.eqY(pts[i],parameterTolerance)){
 		    //if(i==0) isct.adjacent1 = null;
 		    if(i==0&&!closed) isct.adjacent1 = null; // ?
 		    else isct.adjacent1 = pts[(i-1+num)%num];
 		    
 		    isct.adjacent2 = pts[(i+1)%num];
 		    
-		    if( pts[i].eqY(pts[(i+1)%num],parameterResolution)){
+		    if( pts[i].eqY(pts[(i+1)%num],parameterTolerance)){
 			if(!closed){
 			    IVec2 pt0 = null, pt3 = null;
 			    if(i>0) pt0 = pts[i-1];
@@ -1080,10 +1080,10 @@ public class IPolyline2D{
 	    if(isctPt!=null){
 		Intersection isct = new Intersection(this,isctPt,pts[i],pts[(i+1)%num]);
 		isct.setDirectionY();
-		if(isct.eqX(pts[(i+1)%num],parameterResolution)){
-		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0).eq(isct,parameterResolution)); // nothing
+		if(isct.eqX(pts[(i+1)%num],parameterTolerance)){
+		    if( closed && i==num-1 && ipts.size()>0 && ipts.get(0).eq(isct,parameterTolerance)); // nothing
 		    else if((!closed && i<num-2 || closed ) &&
-			    pts[(i+1)%num].eqX(pts[(i+2)%num],parameterResolution)){
+			    pts[(i+1)%num].eqX(pts[(i+2)%num],parameterTolerance)){
 			IVec2 pt3 = null;
 			if(!closed&&i+3<num || closed) pt3 = pts[(i+3)%num];
 			// pts[i+1] and pts[i+2] is straight in Y direction
@@ -1133,13 +1133,13 @@ public class IPolyline2D{
 		    }
 		    else{ i++; }// skip if it's just touching at the kink
 		}
-		//else if(isct[0].eq(pts[i],parameterResolution)){
-		else if(isct.eqX(pts[i],parameterResolution)){
+		//else if(isct[0].eq(pts[i],parameterTolerance)){
+		else if(isct.eqX(pts[i],parameterTolerance)){
 		    //if(i==0) isct.adjacent1 = null;
 		    if(i==0&&!closed) isct.adjacent1 = null;
 		    else isct.adjacent1 = pts[(i-1+num)%num];
 		    isct.adjacent2 = pts[(i+1)%num];
-		    if( pts[i].eqX(pts[(i+1)%num],parameterResolution)){
+		    if( pts[i].eqX(pts[(i+1)%num],parameterTolerance)){
 			if(!closed){
 			    IVec2 pt0 = null, pt3 = null;
 			    if(i>0) pt0 = pts[i-1];

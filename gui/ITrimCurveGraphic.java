@@ -164,10 +164,10 @@ public class ITrimCurveGraphic{
     */
     public static IVec2[] fillPointsBetween(ISurfaceI surf, IVec2 pt1, IVec2 pt2){
 	// check only u
-	if(Math.abs(pt1.y-pt2.y)<IConfig.lengthResolution) return fillUBetween(surf,pt1,pt2);
+	if(Math.abs(pt1.y-pt2.y)<IConfig.tolerance) return fillUBetween(surf,pt1,pt2);
 	
 	// check only v
-	if(Math.abs(pt1.x-pt2.x)<IConfig.lengthResolution) return fillVBetween(surf,pt1,pt2);
+	if(Math.abs(pt1.x-pt2.x)<IConfig.tolerance) return fillVBetween(surf,pt1,pt2);
 	
 	IVec2[] ufill = fillUBetween(surf,pt1,pt2);
 	IVec2[] vfill = fillVBetween(surf,pt1,pt2);

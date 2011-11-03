@@ -306,6 +306,7 @@ public class IPointAgent extends IAgent implements IVecI{
     
     
     public IPointAgent clr(Color c){ super.clr(c); point.clr(c); return this; }
+    public IPointAgent clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     public IPointAgent clr(int gray){ super.clr(gray); point.clr(gray); return this; }
     public IPointAgent clr(float fgray){ super.clr(fgray); point.clr(fgray); return this; }
     public IPointAgent clr(double dgray){ super.clr(dgray); point.clr(dgray); return this; }
@@ -338,6 +339,7 @@ public class IPointAgent extends IAgent implements IVecI{
     }
     
     public IPointAgent setColor(Color c){ return clr(c); }
+    public IPointAgent setColor(Color c, int alpha){ return clr(c,alpha); }
     public IPointAgent setColor(int gray){ return clr(gray); }
     public IPointAgent setColor(float fgray){ return clr(fgray); }
     public IPointAgent setColor(double dgray){ return clr(dgray); }

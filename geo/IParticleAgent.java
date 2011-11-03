@@ -254,6 +254,7 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     
     
     public IParticleAgent clr(Color c){ super.clr(c); return this; }
+    public IParticleAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IParticleAgent clr(int gray){ super.clr(gray); return this; }
     public IParticleAgent clr(float fgray){ super.clr(fgray); return this; }
     public IParticleAgent clr(double dgray){ super.clr(dgray); return this; }
@@ -272,6 +273,7 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     public IParticleAgent hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IParticleAgent setColor(Color c){ super.setColor(c); return this; }
+    public IParticleAgent setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IParticleAgent setColor(int gray){ super.setColor(gray); return this; }
     public IParticleAgent setColor(float fgray){ super.setColor(fgray); return this; }
     public IParticleAgent setColor(double dgray){ super.setColor(dgray); return this; }

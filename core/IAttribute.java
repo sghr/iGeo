@@ -59,6 +59,7 @@ public class IAttribute{
     
     public Color clr(){ return color; }
     public IAttribute clr(Color c){ color = c; return this; }
+    public IAttribute clr(Color c, int alpha){ color = IGraphicObject.getColor(c,alpha); return this; }
     public IAttribute clr(int gray){ color = IGraphicObject.getColor(gray); return this; }
     public IAttribute clr(float fgray){ color = IGraphicObject.getColor(fgray); return this; }
     public IAttribute clr(double dgray){ clr((float)dgray); return this; }

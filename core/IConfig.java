@@ -47,16 +47,19 @@ public /*interface*/ class IConfig{
     /**
        A parameter to check identical location. Length below this is ignored and seen as zero. Length is measured in whatever unit of the file
     */
-    public static double lengthResolution=0.001; //0.1; //0.01; //0.00001; //0.001; // in any unit
+    public static double tolerance=0.001; //0.1; //0.01; //0.00001; //0.001; // in any unit
+    //public static double lengthResolution=0.001; //0.1; //0.01; //0.00001; //0.001; // in any unit
     /**
        A parameter to check identical location in U-V parametric space in NURBS geometry. Length below this is ignored and seen as zero. Range of U-V parameter space should be always 0.0-1.0.
     */
-    public static double parameterResolution=0.001;
+    public static double parameterTolerance=0.001;
+    //public static double parameterResolution=0.001;
     
     /**
        A parameter to check identical direction in angle. Angle difference below this is ignored and seen as zero. The unit is radian.
     */
-    public static double angleResolution = Math.PI/1000; //Math.PI/30; //Math.PI/10000; //Math.PI/1000; // in radian
+    public static double angleTolerance = Math.PI/1000; //Math.PI/30; //Math.PI/10000; //Math.PI/1000; // in radian
+    //public static double angleResolution = Math.PI/1000; //Math.PI/30; //Math.PI/10000; //Math.PI/1000; // in radian
     
     
     /*****************************
@@ -90,7 +93,16 @@ public /*interface*/ class IConfig{
     //public static int dynamicsUpdateSpeed = 30; 
     
     /** update speed of dynamics thread in seccond */
-    public static double dynamicsSpeed = 30.0/1000; 
+    //public static double dynamicsSpeed = 30.0/1000;
+    public static double updateRate = 30.0/1000;
+
+    /******** If true, IDynamcServer thread automatically starts when the first IDynamicObject is
+	added to the server. Codes to create instances of IDynamicObject should be enclosed
+	by synchronized(IG.updateThread()) not to have the thread started before finishing
+	execution of all construcors.
+    */
+    //public static boolean autoStart = false;
+    
     
     /*****************************
      * mouse properties in INavigator

@@ -20,7 +20,9 @@
 
 ---*/
 
-package igeo.core;
+package igeo.geo;
+
+import igeo.core.*;
 
 import java.util.ArrayList;
 
@@ -30,11 +32,25 @@ import java.util.ArrayList;
    @author Satoru Sugihara
    @version 0.7.0.0
 */
-public /*class*/interface IDynamicObject extends ISubobject{
+public /*class*/interface IDynamics extends ISubobject{
+    
+    /* behavior definition of interaction with other dynamics.
+       interaction happens between every two dynamic objects in a server.
+       interact() is called for every combination of two but
+       when A.interact(B) happens, B.interact(A) doesn't happen.
+       Just once for each combination */
+    //public void interact(IDynamics obj);
+    
+    /** behavior definition of interaction with other dynamic objects.
+	The server puts all dynamic objects including itself.
+    */
+    public void interact(ArrayList<IDynamics> dynamics);
+    /** behavior definition of updating dynamics in each time frame */
+    public void update();
     
     
     /** add terget object to be updated by this dynamic object. */
-    public IDynamicObject target(IObject targetObj);
+    public IDynamics target(IObject targetObj);
     /** get total target number. */
     public int targetNum();
     /** get target object. */
@@ -42,24 +58,11 @@ public /*class*/interface IDynamicObject extends ISubobject{
     /** get all target objects. */
     public ArrayList<IObject> targets();
     /** remove target object. */
-    public IDynamicObject removeTarget(int i);
+    public IDynamics removeTarget(int i);
     /** remove target object. */
-    public IDynamicObject removeTarget(IObject obj);
+    public IDynamics removeTarget(IObject obj);
     /** update all terget objects (should be called when the dynamic object is updated). */
     public void updateTarget();
     
-    
-    /* behavior definition of interaction with other dynamic objects.
-       interaction happens between every two dynamic objects in a server.
-       interact() is called for every combination of two but
-       when A.interact(B) happens, B.interact(A) doesn't happen.
-       Just once for each combination */
-    //public void interact(IDynamicObject obj);
-    
-    /** behavior definition of interaction with other dynamic objects.
-	The server puts all dynamic objects including itself.
-    */
-    public void interact(ArrayList<IDynamicObject> dynamics);
-    /** behavior definition of updating dynamics in each time frame */
-    public void update();
+
 }

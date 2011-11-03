@@ -166,9 +166,9 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     /**
        whether location is same or not
     */
-    public boolean eq(IVec2 v){ return eq(v,IConfig.lengthResolution); }
-    public boolean eq(IVec2I v){ return eq(v.get(),IConfig.lengthResolution); }
-    //public IBool eqR(IVec2I v){ return new IBool(eq(v.get(),IConfig.lengthResolution)); }
+    public boolean eq(IVec2 v){ return eq(v,IConfig.tolerance); }
+    public boolean eq(IVec2I v){ return eq(v.get(),IConfig.tolerance); }
+    //public IBool eqR(IVec2I v){ return new IBool(eq(v.get(),IConfig.tolerance)); }
     public boolean eq(ISwitchE e, IVec2I v){ return eq(v); }
     public IBool eq(ISwitchR r, IVec2I v){ return new IBool(eq(v)); }
     
@@ -178,12 +178,12 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public boolean eq(ISwitchE e, IVec2I v, double resolution){ return eq(v,resolution); }
     public IBool eq(ISwitchR r, IVec2I v, IDoubleI resolution){ return new IBool(eq(v,resolution.x())); }    
     
-    public boolean eqX(IVec2 v){ return eqX(v,IConfig.lengthResolution); }
-    public boolean eqY(IVec2 v){ return eqY(v,IConfig.lengthResolution); }
-    public boolean eqX(IVec2I v){ return eqX(v.get(),IConfig.lengthResolution); }
-    public boolean eqY(IVec2I v){ return eqY(v.get(),IConfig.lengthResolution); }
-    //public IBool eqXR(IVec2I v){ return new IBool(eqX(v.get(),IConfig.lengthResolution)); }
-    //public IBool eqYR(IVec2I v){ return new IBool(eqY(v.get(),IConfig.lengthResolution)); }
+    public boolean eqX(IVec2 v){ return eqX(v,IConfig.tolerance); }
+    public boolean eqY(IVec2 v){ return eqY(v,IConfig.tolerance); }
+    public boolean eqX(IVec2I v){ return eqX(v.get(),IConfig.tolerance); }
+    public boolean eqY(IVec2I v){ return eqY(v.get(),IConfig.tolerance); }
+    //public IBool eqXR(IVec2I v){ return new IBool(eqX(v.get(),IConfig.tolerance)); }
+    //public IBool eqYR(IVec2I v){ return new IBool(eqY(v.get(),IConfig.tolerance)); }
     public boolean eqX(ISwitchE e, IVec2I v){ return eqX(v); }
     public boolean eqY(ISwitchE e, IVec2I v){ return eqY(v); }
     public IBool eqX(ISwitchR r, IVec2I v){ return new IBool(eqX(v)); }
@@ -344,10 +344,10 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public IVec2 sum(IVec2I v2, IDoubleI w2){ return sum(v2.get(),w2.get()); }
     
     
-    public boolean isParallel(IVec2I v){ return isParallel(v, IConfig.angleResolution); }
+    public boolean isParallel(IVec2I v){ return isParallel(v, IConfig.angleTolerance); }
     public boolean isParallel(IVec2I v, double angleReso){
-	//return dup().normalize().diff(v.get().dup().normalize()).len() < IConfig.lengthResolution;
-	//return dot(v.get())/(len()*v.get().len()) > Math.cos(IConfig.angleResolution);
+	//return dup().normalize().diff(v.get().dup().normalize()).len() < IConfig.tolerance;
+	//return dot(v.get())/(len()*v.get().len()) > Math.cos(IConfig.angleTolerance);
 	// opposite directions is regarded as parallel too
 	return Math.abs(dot(v.get())/(len()*v.get().len())) > Math.cos(angleReso);
 	
@@ -356,14 +356,14 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public boolean isStraight(IVec2I v1, IVec2I v2){
 	//return this.diff(v1).isParallel(this.diff(v2));
 	//return v1.get().diff(this).isParallel(v2.get().diff(v1));
-	return isStraight(v1,v2,IConfig.angleResolution);
+	return isStraight(v1,v2,IConfig.angleTolerance);
     }
     public boolean isStraight(IVec2I v1, IVec2I v2, double angleReso){
 	return v1.get().diff(this).isParallel(v2.get().diff(v1),angleReso);
     }
     
-    //public boolean isSameX(IVec2I v){ return Math.abs(x-v.x())<IConfig.lengthResolution; }
-    //public boolean isSameY(IVec2I v){ return Math.abs(y-v.y())<IConfig.lengthResolution; }
+    //public boolean isSameX(IVec2I v){ return Math.abs(x-v.x())<IConfig.tolerance; }
+    //public boolean isSameY(IVec2I v){ return Math.abs(y-v.y())<IConfig.tolerance; }
     
     //
     public static IVec2 intersect(IVec2I pt1, IVec2I dir1,
@@ -525,10 +525,10 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	    IVec2 v2 = pts[(i+1)%n].diff(this);
 	    
 	    double a = v1.angle(v2);
-	    if( Math.abs(a-Math.PI) < IConfig.angleResolution ||
-		Math.abs(a+Math.PI) < IConfig.angleResolution ||
-		v1.len()< IConfig.lengthResolution ||
-		v2.len()< IConfig.lengthResolution ){
+	    if( Math.abs(a-Math.PI) < IConfig.angleTolerance ||
+		Math.abs(a+Math.PI) < IConfig.angleTolerance ||
+		v1.len()< IConfig.tolerance ||
+		v2.len()< IConfig.tolerance ){
 		// point is on the edge
 		//IOut.p("true (on the edge)"); //
 		
@@ -568,7 +568,7 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     }
     
     public boolean isOnLine(IVec2 pt1, IVec2 pt2){
-	return distToLine(pt1,pt2)<IConfig.lengthResolution;
+	return distToLine(pt1,pt2)<IConfig.tolerance;
     }
     
     public boolean isBetween(IVec2I pt1, IVec2I pt2){

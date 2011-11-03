@@ -198,9 +198,9 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public IDouble dist2(ISwitchR r, IVecI v){ return new IDouble(dist2(v)); }
     
     
-    public boolean eq(IVec v){ return eq(v,IConfig.lengthResolution); }
-    public boolean eq(IVecI v){ return eq(v.get(),IConfig.lengthResolution); }
-    //public IBool eqR(IVecI v){ return new IBool(eq(v.get(),IConfig.lengthResolution)); }
+    public boolean eq(IVec v){ return eq(v,IConfig.tolerance); }
+    public boolean eq(IVecI v){ return eq(v.get(),IConfig.tolerance); }
+    //public IBool eqR(IVecI v){ return new IBool(eq(v.get(),IConfig.tolerance)); }
     public boolean eq(ISwitchE e, IVecI v){ return eq(v); }
     public IBool eq(ISwitchR r, IVecI v){ return new IBool(eq(v)); }
     
@@ -212,15 +212,15 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public boolean eq(ISwitchE e, IVecI v, double resolution){ return eq(v,resolution); }
     public IBool eq(ISwitchR r, IVecI v, IDoubleI resolution){ return new IBool(eq(v,resolution.x())); }
     
-    public boolean eqX(IVec v){ return eqX(v,IConfig.lengthResolution); }
-    public boolean eqY(IVec v){ return eqY(v,IConfig.lengthResolution); }
-    public boolean eqZ(IVec v){ return eqZ(v,IConfig.lengthResolution); }
-    public boolean eqX(IVecI v){ return eqX(v,IConfig.lengthResolution); }
-    public boolean eqY(IVecI v){ return eqY(v,IConfig.lengthResolution); }
-    public boolean eqZ(IVecI v){ return eqZ(v,IConfig.lengthResolution); }
-    //public IBool eqXR(IVecI v){ return new IBool(eqX(v,IConfig.lengthResolution)); }
-    //public IBool eqYR(IVecI v){ return new IBool(eqY(v,IConfig.lengthResolution)); }
-    //public IBool eqZR(IVecI v){ return new IBool(eqZ(v,IConfig.lengthResolution)); }
+    public boolean eqX(IVec v){ return eqX(v,IConfig.tolerance); }
+    public boolean eqY(IVec v){ return eqY(v,IConfig.tolerance); }
+    public boolean eqZ(IVec v){ return eqZ(v,IConfig.tolerance); }
+    public boolean eqX(IVecI v){ return eqX(v,IConfig.tolerance); }
+    public boolean eqY(IVecI v){ return eqY(v,IConfig.tolerance); }
+    public boolean eqZ(IVecI v){ return eqZ(v,IConfig.tolerance); }
+    //public IBool eqXR(IVecI v){ return new IBool(eqX(v,IConfig.tolerance)); }
+    //public IBool eqYR(IVecI v){ return new IBool(eqY(v,IConfig.tolerance)); }
+    //public IBool eqZR(IVecI v){ return new IBool(eqZ(v,IConfig.tolerance)); }
     public boolean eqX(ISwitchE e, IVecI v){ return eqX(v); }
     public boolean eqY(ISwitchE e, IVecI v){ return eqY(v); }
     public boolean eqZ(ISwitchE e, IVecI v){ return eqZ(v); }
@@ -555,14 +555,14 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public String toString(){ return "("+String.valueOf(x)+","+String.valueOf(y)+","+String.valueOf(z)+")"; }
     
     
-    public boolean isParallel(IVecI v){ return isParallel(v, IConfig.angleResolution); }
+    public boolean isParallel(IVecI v){ return isParallel(v, IConfig.angleTolerance); }
     public boolean isParallel(IVecI v, double angleReso){
         return Math.abs(dot(v.get())/(len()*v.get().len())) > Math.cos(angleReso);
-        
+	
     }
     
     public boolean isStraight(IVecI v1, IVecI v2){
-        return isStraight(v1,v2,IConfig.angleResolution);
+        return isStraight(v1,v2,IConfig.angleTolerance);
     }
     public boolean isStraight(IVecI v1, IVecI v2, double angleReso){
         return v1.get().diff(this).isParallel(v2.get().diff(v1),angleReso);
@@ -721,10 +721,10 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
     
     public boolean isOnPlane(IVecI planePt1, IVecI planePt2, IVecI planePt3){
-	return isOnPlane(planePt1,planePt2,planePt3,IConfig.lengthResolution);
+	return isOnPlane(planePt1,planePt2,planePt3,IConfig.tolerance);
     }
     public boolean isOnPlane(IVecI planeDir, IVecI planePt){
-	return isOnPlane(planeDir,planePt,IConfig.lengthResolution);
+	return isOnPlane(planeDir,planePt,IConfig.tolerance);
     }
     public boolean isOnPlane(IVecI planePt1, IVecI planePt2, IVecI planePt3, double resolution){
 	return isOnPlane(getNormal(planePt1,planePt2,planePt3),planePt1,resolution);
@@ -772,7 +772,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
     public static boolean isArrayEqual(IVec[] pts1, IVec[] pts2,
 				       boolean cyclic, boolean reverse){
-	return isArrayEqual(pts1,pts2,cyclic,reverse,IConfig.lengthResolution);
+	return isArrayEqual(pts1,pts2,cyclic,reverse,IConfig.tolerance);
     }
     public static boolean isArrayEqual(IVec[] pts1, IVec[] pts2,
 				       boolean cyclic, boolean reverse, double resolution){

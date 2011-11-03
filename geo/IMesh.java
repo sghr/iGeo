@@ -202,6 +202,7 @@ public class IMesh extends IObject implements IMeshI{
     public IMesh show(){ super.show(); return this; }
     
     public IMesh clr(Color c){ super.clr(c); return this; }
+    public IMesh clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IMesh clr(int gray){ super.clr(gray); return this; }
     public IMesh clr(float fgray){ super.clr(fgray); return this; }
     public IMesh clr(double dgray){ super.clr(dgray); return this; }
@@ -220,6 +221,7 @@ public class IMesh extends IObject implements IMeshI{
     public IMesh hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IMesh setColor(Color c){ super.setColor(c); return this; }
+    public IMesh setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IMesh setColor(int gray){ super.setColor(gray); return this; }
     public IMesh setColor(float fgray){ super.setColor(fgray); return this; }
     public IMesh setColor(double dgray){ super.setColor(dgray); return this; }
@@ -236,6 +238,47 @@ public class IMesh extends IObject implements IMeshI{
     public IMesh setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
     public IMesh setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IMesh setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
+    
+
+
+    /*************************************************************************************
+     * static mesh geometry operations
+     ************************************************************************************/
+
+    /**
+       extract all points and connect if it's at same location and create a new mesh.
+    */
+    public static IMesh join(IMesh[] meshes){
+	
+	ArrayList<IVertex> vertices = new ArrayList<IVertex>();
+	ArrayList<IEdge> edges = new ArrayList<IEdge>();
+	ArrayList<IFace> faces = new ArrayList<IFace>();
+	
+	for(IMesh m : meshes){
+	    for(int i=0; i<m.vertexNum(); i++) vertices.add(m.vertex(i));
+	    for(int i=0; i<m.edgeNum(); i++) edges.add(m.edge(i));
+	    for(int i=0; i<m.faceNum(); i++) faces.add(m.face(i));
+
+	    m.del(); // should it be deleted?
+	}
+	
+	for(int i=0; i<vertices.size(); i++){
+	    IVertex v1 = vertices.get(i);
+	    for(int j=i+1; j<vertices.size(); j++){
+		IVertex v2 = vertices.get(j);
+		if(v1 != v2){
+		    if(v1.eq(v2)){
+			v2.replaceVertex(v1);
+			vertices.set(j,v1);
+		    }
+		}
+	    }
+	}
+	
+	
+	
+	return new IMesh(vertices, edges, faces);
+    }
     
     
 }

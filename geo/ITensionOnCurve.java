@@ -27,12 +27,12 @@ import igeo.core.*;
 import igeo.util.*;
 
 /**
-   Class of IDynamicObject to simulate tension force between two particles on curve based on distance in u parameter space.
+   Class of IDynamics to simulate tension force between two particles on curve based on distance in u parameter space.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ITensionOnCurve extends IDynamicObjectBase{
+public class ITensionOnCurve extends IDynamicsBase{
     public static double defaultTension=1.0;
     
     public IParticleOnCurve pt1, pt2;
@@ -82,7 +82,7 @@ public class ITensionOnCurve extends IDynamicObjectBase{
     public ITensionOnCurve removeTarget(IObject obj){ super.removeTarget(obj); return this; }
     
     
-    synchronized public void interact(ArrayList<IDynamicObject> dynamics){
+    synchronized public void interact(ArrayList<IDynamics> dynamics){
 	
 	double udiff = pt2.upos - pt1.upos;
 	if(isCurveClosed){

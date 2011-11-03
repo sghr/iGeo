@@ -21,12 +21,11 @@
 ---*/
 
 
-package igeo.tool;
+package igeo.geo;
 
 import java.util.*;
 import java.awt.Color;
 
-import igeo.geo.*;
 import igeo.util.*;
 import igeo.core.*;
 
@@ -177,37 +176,37 @@ public class ITensileNet{
     public static ITensileNet create(ICurveI[] linkLines, IVecI[] fixedPoints,
 				     boolean fixOpenEndLinkPoint,
 				     boolean deleteLines){
-	return create(linkLines, fixedPoints, fixOpenEndLinkPoint,deleteLines, IConfig.lengthResolution);
+	return create(linkLines, fixedPoints, fixOpenEndLinkPoint,deleteLines, IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] linkLines, IVecI[] fixedPoints,
 				     boolean fixOpenEndLinkPoint){
-	return create(linkLines, fixedPoints, fixOpenEndLinkPoint, true, IConfig.lengthResolution);
+	return create(linkLines, fixedPoints, fixOpenEndLinkPoint, true, IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] linkLines, boolean fixOpenEndLinkPoint){
-	return create(linkLines, null, fixOpenEndLinkPoint, true, IConfig.lengthResolution);
+	return create(linkLines, null, fixOpenEndLinkPoint, true, IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] linkLines, IVecI[] fixedPoints){
-	return create(linkLines, fixedPoints, false, true, IConfig.lengthResolution);
+	return create(linkLines, fixedPoints, false, true, IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] linkLines){
-	return create(linkLines, null, true, true, IConfig.lengthResolution);
+	return create(linkLines, null, true, true, IConfig.tolerance);
     }
     
     
     
     public static ITensileNet create(ICurveI[] sectionCurves, ICurveI[] linkLines){
 	return create(sectionCurves,linkLines,null,
-		      true, false, true,true,IConfig.lengthResolution);
+		      true, false, true,true,IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] sectionCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints){
 	return create(sectionCurves,linkLines,fixedPoints,
-		      true, false, true,true,IConfig.lengthResolution);
+		      true, false, true,true,IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] sectionCurves,
@@ -217,7 +216,7 @@ public class ITensileNet{
 				     boolean deleteLines ){
 	return create(sectionCurves,linkLines,fixedPoints,
 		      true, fixOpenEndLinkPoint, fixOpenEndSectionPoint,
-		      deleteLines,IConfig.lengthResolution);
+		      deleteLines,IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] sectionCurves,
@@ -239,7 +238,7 @@ public class ITensileNet{
 				     boolean deleteLines){
 	return create(sectionCurves,linkLines,fixedPoints,
 		      tensionOnSameSection, fixOpenEndLinkPoint, fixOpenEndSectionPoint,
-		      deleteLines,IConfig.lengthResolution);
+		      deleteLines,IConfig.tolerance);
     }
     
     /**
@@ -401,8 +400,8 @@ public class ITensileNet{
 		    if(sectIdx>=0){ particleOnSection[sectIdx].add(poc); }
 		    
 		    if(fixOpenEndSectionPoint){
-			if(poc.upos()<IConfig.parameterResolution ||
-			   poc.upos()>1.0-IConfig.parameterResolution){
+			if(poc.upos()<IConfig.parameterTolerance ||
+			   poc.upos()>1.0-IConfig.parameterTolerance){
 			    poc.fix();
 			    if(pa!=null) pa.clr(1.0,1.0,0);
 			}
@@ -470,7 +469,7 @@ public class ITensileNet{
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints){
 	return create(sectionCurves,linkLines,fixedLines,fixedPoints,
-		      true,false,true,true,IConfig.lengthResolution);
+		      true,false,true,true,IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] sectionCurves,
@@ -482,7 +481,7 @@ public class ITensileNet{
 				     boolean fixOpenEndSectionPoint){
 	return create(sectionCurves,linkLines,fixedLines,fixedPoints,
 		      tensionOnSameSection,fixOpenEndLinkPoint,
-		      fixOpenEndSectionPoint,true,IConfig.lengthResolution);
+		      fixOpenEndSectionPoint,true,IConfig.tolerance);
     }
     
     public static ITensileNet create(ICurveI[] sectionCurves,
@@ -495,7 +494,7 @@ public class ITensileNet{
 				     boolean deleteLines){
 	return create(sectionCurves,linkLines,fixedLines,fixedPoints,
 		      tensionOnSameSection,fixOpenEndLinkPoint,
-		      fixOpenEndSectionPoint,deleteLines,IConfig.lengthResolution);
+		      fixOpenEndSectionPoint,deleteLines,IConfig.tolerance);
     }
     
     /**

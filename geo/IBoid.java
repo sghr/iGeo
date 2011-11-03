@@ -29,7 +29,7 @@ import igeo.core.*;
 import igeo.util.*;
 
 /**
-   Class of an agent based on one point, extending IPoint and implements IDynamicObjectI
+   Class of an agent based on one point, extending IPoint and implements IDynamics
    
    @author Satoru Sugihara
    @version 0.7.0.0;
@@ -133,11 +133,11 @@ public class IBoid extends IParticleAgent{
 	}
     }
     
-    synchronized public void interact(ArrayList<IDynamicObject> dynamics){
+    synchronized public void interact(ArrayList<IDynamics> dynamics){
 	
 	super.interact(dynamics); // for other local interaction
 	
-	for(IDynamicObject obj: dynamics){
+	for(IDynamics obj: dynamics){
 	    
 	    if(neighbors==null){ neighbors = new ArrayList<IBoid>(); }
 	    neighbors.clear();
@@ -146,9 +146,7 @@ public class IBoid extends IParticleAgent{
 		IBoid a = (IBoid)obj;
 		//double dist = a.pos.dist(this.pos);
 		double dist = a.dist(this);
-		if(dist < neighborDist){
-		    neighbors.add(a);
-		}
+		if(dist < neighborDist){ neighbors.add(a); }
 	    }
 	    
 	    flock();
@@ -379,6 +377,7 @@ public class IBoid extends IParticleAgent{
     
     
     public IBoid clr(Color c){ super.clr(c); return this; }
+    public IBoid clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IBoid clr(int gray){ super.clr(gray); return this; }
     public IBoid clr(float fgray){ super.clr(fgray); return this; }
     public IBoid clr(double dgray){ super.clr(dgray); return this; }
@@ -397,6 +396,7 @@ public class IBoid extends IParticleAgent{
     public IBoid hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IBoid setColor(Color c){ super.setColor(c); return this; }
+    public IBoid setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IBoid setColor(int gray){ super.setColor(gray); return this; }
     public IBoid setColor(float fgray){ super.setColor(fgray); return this; }
     public IBoid setColor(double dgray){ super.setColor(dgray); return this; }

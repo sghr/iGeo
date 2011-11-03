@@ -392,6 +392,7 @@ public class IPoint extends IObject implements IVecI{
     public IPoint show(){ super.show(); return this; }
     
     public IPoint clr(Color c){ super.clr(c); return this; }
+    public IPoint clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IPoint clr(int gray){ super.clr(gray); return this; }
     public IPoint clr(float fgray){ super.clr(fgray); return this; }
     public IPoint clr(double dgray){ super.clr(dgray); return this; }
@@ -410,6 +411,7 @@ public class IPoint extends IObject implements IVecI{
     public IPoint hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IPoint setColor(Color c){ super.setColor(c); return this; }
+    public IPoint setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IPoint setColor(int gray){ super.setColor(gray); return this; }
     public IPoint setColor(float fgray){ super.setColor(fgray); return this; }
     public IPoint setColor(double dgray){ super.setColor(dgray); return this; }

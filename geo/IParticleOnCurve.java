@@ -29,9 +29,7 @@ import igeo.core.*;
 import igeo.gui.*;
 
 /**
-   Class of an implementation of IDynamicObject to have physical attributes of point.
-   It has attributes of position, velocity, acceleration, force, and mass.
-   Position is provided from outside to be linked.
+   Class of an implementation of IDynamics to have physical attributes of point on a cureve.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
@@ -140,7 +138,7 @@ public class IParticleOnCurve extends IParticle{
     
     
     
-    synchronized public void interact(ArrayList<IDynamicObject> dynamics){
+    synchronized public void interact(ArrayList<IDynamics> dynamics){
 	
     }
     
@@ -155,25 +153,25 @@ public class IParticleOnCurve extends IParticle{
 	if(frc.projectToVec(utan) > 0) ufrc += frc.len()/utan.len();
 	else ufrc += -frc.len()/utan.len();
 	
-	uvel += ufrc/mass*IConfig.dynamicsSpeed;
+	uvel += ufrc/mass*IConfig.updateRate;
 	uvel *= 1.0-friction;
 	
 	// out of range of u 0.0-1.0
-	if( (upos + uvel*IConfig.dynamicsSpeed) < 0.0 ){
+	if( (upos + uvel*IConfig.updateRate) < 0.0 ){
 	    if( curve.isClosed() ){ // cyclic
-		upos += uvel*IConfig.dynamicsSpeed;
+		upos += uvel*IConfig.updateRate;
 		upos -= Math.floor(upos); // fit within 0.0 - 1.0.
 	    }
 	    else{ upos=0.0; uvel=0.0; }
 	}
-	else if( (upos + uvel*IConfig.dynamicsSpeed) > 1.0 ){
+	else if( (upos + uvel*IConfig.updateRate) > 1.0 ){
 	    if( curve.isClosed() ){ // cyclic
-		upos += uvel*IConfig.dynamicsSpeed;
+		upos += uvel*IConfig.updateRate;
 		upos -= Math.floor(upos); // fit within 0.0 - 1.0.
 	    }
 	    else{ upos=1.0; uvel=0.0; }
 	}
-	else{ upos += uvel*IConfig.dynamicsSpeed; }
+	else{ upos += uvel*IConfig.updateRate; }
 	
 	pos.set(curve.pt(upos));
 

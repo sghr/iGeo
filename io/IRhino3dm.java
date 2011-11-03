@@ -2897,7 +2897,7 @@ public class IRhino3dm{
 	    IVec center = arc.plane.origin;
 	    IVec normal = arc.plane.zaxis;
 	    
-	    if( Math.abs(arc.angle.length())<2*Math.PI-IConfig.angleResolution){
+	    if( Math.abs(arc.angle.length())<2*Math.PI-IConfig.angleTolerance){
 		// arc
 		IVec startPt = arc.plane.xaxis.dup().len(arc.radius).add(center);
 		startPt.rot(center, normal, arc.angle.v1);
@@ -2918,7 +2918,7 @@ public class IRhino3dm{
 	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){
 	    IVec center = arc.plane.origin;
 	    IVec normal = arc.plane.zaxis;
-	    if( Math.abs(arc.angle.length())<2*Math.PI-IConfig.angleResolution){
+	    if( Math.abs(arc.angle.length())<2*Math.PI-IConfig.angleTolerance){
 		// arc
 		IVec startPt = arc.plane.xaxis.dup().len(arc.radius).add(center);
 		startPt.rot(center, normal, arc.angle.v1);
@@ -2935,7 +2935,7 @@ public class IRhino3dm{
 	public ITrimCurve createTrimCurve(Rhino3dmFile context, IServerI s, ISurfaceI srf){
 	    IVec center = arc.plane.origin;
 	    IVec normal = arc.plane.zaxis;
-	    if( Math.abs(arc.angle.length())<2*Math.PI-IConfig.angleResolution){
+	    if( Math.abs(arc.angle.length())<2*Math.PI-IConfig.angleTolerance){
 		// arc
 		IVec startPt = arc.plane.xaxis.dup().len(arc.radius).add(center);
 		startPt.rot(center, normal, arc.angle.v1);
@@ -2990,7 +2990,7 @@ public class IRhino3dm{
 	    edgeIndex = new ArrayList<Integer>();
 	    tolerance = 0.; //
 	    
-	    //tolerance = IConfig.lengthResolution;
+	    //tolerance = IConfig.tolerance;
 	}
 	
 	public void addEdgeIndex(int i){ edgeIndex.add(i); }
@@ -4174,7 +4174,7 @@ public class IRhino3dm{
 	
 	
 	public boolean isEdgeTouching(ICurveGeo crv1, ICurveGeo crv2){
-	    return isEdgeTouching(crv1,crv2,IConfig.lengthResolution);
+	    return isEdgeTouching(crv1,crv2,IConfig.tolerance);
 	}
 	
 	public boolean isEdgeTouching(ICurveGeo crv1, ICurveGeo crv2, double reso){
@@ -4222,7 +4222,7 @@ public class IRhino3dm{
 	}
 	
 	public BrepVertex getSharedVertex(IVec pt){
-	    return getSharedVertex(pt, IConfig.lengthResolution);
+	    return getSharedVertex(pt, IConfig.tolerance);
 	}
 	public BrepVertex getSharedVertex(IVec pt, double reso){
 	    if(vertices==null||vertices.size()==0) return null;
@@ -5223,7 +5223,7 @@ public class IRhino3dm{
 	
 	
 	public void read(Rhino3dmFile context, InputStream is)throws IOException{
-	    IOut.err("reading start"); 
+	    //IOut.err("reading start"); 
 	    
 	    int[] version = readChunkVersion(is);
 	    int majorVersion = version[0];
@@ -5357,7 +5357,7 @@ public class IRhino3dm{
 	}
 	
 	public void read2(Rhino3dmFile context, InputStream is, int vcount)throws IOException{
-	    IOut.err();
+	    //IOut.err();
 	    
 	    Endian e = endian();
 	    
@@ -7004,7 +7004,7 @@ public class IRhino3dm{
 	    double[] vknots = null;
 	    int udeg = profile.deg();
 	    int vdeg = 1;
-	    if( Math.abs(angle.length())<2*Math.PI-IConfig.angleResolution){
+	    if( Math.abs(angle.length())<2*Math.PI-IConfig.angleTolerance){
 		// arc
 		double a = angle.v2 - angle.v1;
 		vknots = IArcGeo.arcKnots(a);

@@ -175,10 +175,10 @@ public class IVec2f extends IParameterObject implements IVec2I{
     public double dist2(ISwitchE e, IVec2I v){ return dist2(v); }
     public IDouble dist2(ISwitchR r, IVec2I v){ return new IDouble(dist2(v)); }
     
-    public boolean eq(IVec2I v){ return eq(v.get(),IConfig.lengthResolution); }
-    public boolean eq(IVec2 v){ return eq(v,IConfig.lengthResolution); }
-    public boolean eq(IVec2f v){ return eq(v,IConfig.lengthResolution); }
-    //public IBool eqR(IVec2I v){ return new IBool(eq(v.get(),IConfig.lengthResolution)); }
+    public boolean eq(IVec2I v){ return eq(v.get(),IConfig.tolerance); }
+    public boolean eq(IVec2 v){ return eq(v,IConfig.tolerance); }
+    public boolean eq(IVec2f v){ return eq(v,IConfig.tolerance); }
+    //public IBool eqR(IVec2I v){ return new IBool(eq(v.get(),IConfig.tolerance)); }
     public boolean eq(ISwitchE e, IVec2I v){ return eq(v); }
     public IBool eq(ISwitchR r, IVec2I v){ return new IBool(eq(v)); }
     
@@ -195,14 +195,14 @@ public class IVec2f extends IParameterObject implements IVec2I{
     public IBool eq(ISwitchR r, IVec2I v, IDoubleI resolution){ return new IBool(eq(v,resolution.x())); }
     
     
-    public boolean eqX(IVec2f v){ return eqX(v,IConfig.lengthResolution); }
-    public boolean eqY(IVec2f v){ return eqY(v,IConfig.lengthResolution); }
-    public boolean eqX(IVec2 v){ return eqX(v,IConfig.lengthResolution); }
-    public boolean eqY(IVec2 v){ return eqY(v,IConfig.lengthResolution); }
-    public boolean eqX(IVec2I v){ return eqX(v.get(),IConfig.lengthResolution); }
-    public boolean eqY(IVec2I v){ return eqY(v.get(),IConfig.lengthResolution); }
-    //public IBool eqXR(IVec2I v){ return new IBool(eqX(v.get(),IConfig.lengthResolution)); }
-    //public IBool eqYR(IVec2I v){ return new IBool(eqY(v.get(),IConfig.lengthResolution)); }
+    public boolean eqX(IVec2f v){ return eqX(v,IConfig.tolerance); }
+    public boolean eqY(IVec2f v){ return eqY(v,IConfig.tolerance); }
+    public boolean eqX(IVec2 v){ return eqX(v,IConfig.tolerance); }
+    public boolean eqY(IVec2 v){ return eqY(v,IConfig.tolerance); }
+    public boolean eqX(IVec2I v){ return eqX(v.get(),IConfig.tolerance); }
+    public boolean eqY(IVec2I v){ return eqY(v.get(),IConfig.tolerance); }
+    //public IBool eqXR(IVec2I v){ return new IBool(eqX(v.get(),IConfig.tolerance)); }
+    //public IBool eqYR(IVec2I v){ return new IBool(eqY(v.get(),IConfig.tolerance)); }
     public boolean eqX(ISwitchE e, IVec2I v){ return eqX(v); }
     public boolean eqY(ISwitchE e, IVec2I v){ return eqY(v); }
     public IBool eqX(ISwitchR r,IVec2I v){ return new IBool(eqX(v)); }

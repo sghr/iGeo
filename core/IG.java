@@ -60,15 +60,29 @@ public class IG implements IServerI{
     }
     
     /************************************
-     * static variables
+     * static system variables
      ************************************/
     public static final Object lock = new Object();
     
     public static final String GL = "igeo.p.PIGraphicsGL"; // for processing graphics
     //public static final String JAVA = "igeo.p.PIGraphicsJava"; // for processing graphics
     
+    /** multiple IG instances are stored in iglist and switched by IG static methods
+	in case of applet execution or other occasion but handling of multiple IG
+	instances and switching are not really tested. */
     protected static ArrayList<IG> iglist=null;
     protected static int currentId = -1;
+
+    
+    /************************************
+     * static geometry variables
+     ************************************/
+
+    public static final IVec xaxis = IVec.xaxis;
+    public static final IVec yaxis = IVec.yaxis;
+    public static final IVec zaxis = IVec.zaxis;
+    public static final IVec origin = IVec.origin;
+    
     
     /************************************
      * object variables
@@ -79,6 +93,7 @@ public class IG implements IServerI{
     /*protected*/ public String inputFile;
     /*protected*/ public String outputFile;
     
+    /** base file path for file I/O */
     public String basePath = ".";
     
     /* *
@@ -172,6 +187,8 @@ public class IG implements IServerI{
     public static IDynamicServer dynamicThread(){
 	IG ig = cur(); if(ig==null) return null; return ig.dynamicServer();
     }
+    /** alias of dynamicThread() */
+    public static IDynamicServer updateThread(){ return dynamicThread(); }
     
     
     public static void setCurrent(IG ig){
@@ -221,6 +238,35 @@ public class IG implements IServerI{
 	return ig.saveFile(file);
     }
     
+    
+    // dynamics methods
+    /** set duration of dynamics update */
+    public static void duration(int dur){ IG ig=cur(); if(ig!=null) ig.setDuration(dur); }
+    /** get duration of dynamics update */
+    public static int duration(){ IG ig=cur(); return ig==null?0:ig.getDuration(); }
+    
+    /** set current time count of dynamics update. recommeded not to chage time. */
+    public static void time(int tm){ IG ig=cur(); if(ig!=null) ig.setTime(tm); }
+    /** get current time count of dynamics update */
+    public static int time(){ IG ig=cur(); return ig==null?-1:ig.getTime(); }
+    
+    /** pause dynamics update. */
+    public static void pause(){ IG ig=cur(); if(ig!=null) ig.pauseDynamics(); }
+    /** resume dynamics update. */
+    public static void resume(){ IG ig=cur(); if(ig!=null) ig.resumeDynamics(); }
+    
+    /** start dynamics update. if IConfig.autoStart is true, this should not be used. */
+    public static void start(){ IG ig=cur(); if(ig!=null) ig.startDynamics(); }
+    /** stop dynamics update. recommended not to use this because stopping should be done by setting duration. */
+    public static void stop(){ IG ig=cur(); if(ig!=null) ig.stopDynamics(); }
+    
+    
+    /** setting update rate time interval in second */
+    public static void updateRate(double second){ IConfig.updateRate=second; }
+    /** getting update rate time interval in second */
+    public static double updateRate(){ return IConfig.updateRate; }
+    
+    
     /** to set the name first and save later (likely by key event) */
     public static void outputFile(String filename){
 	IG ig = cur();
@@ -242,22 +288,69 @@ public class IG implements IServerI{
     }
     
     public static IPoint[] points(){
-	IG ig = cur(); if(ig==null) return null; return ig.getPoints();
+	IG ig = cur(); return ig==null?null:ig.getPoints();
     }
     public static ICurve[] curves(){
-	IG ig = cur(); if(ig==null) return null; return ig.getCurves();
+	IG ig = cur(); return ig==null?null:ig.getCurves();
     }
     public static ISurface[] surfaces(){
-	IG ig = cur(); if(ig==null) return null; return ig.getSurfaces();
+	IG ig = cur(); return ig==null?null:ig.getSurfaces();
     }
     public static IMesh[] meshes(){
-	IG ig = cur(); if(ig==null) return null; return ig.getMeshes();
+	IG ig = cur(); return ig==null?null:ig.getMeshes();
+    }
+    public static IBrep[] breps(){
+	IG ig = cur(); return ig==null?null:ig.getBreps();
     }
     public static IObject[] objects(Class cls){
-	IG ig = cur(); if(ig==null) return null; return ig.getObjects(cls);
+	IG ig = cur(); return ig==null?null:ig.getObjects(cls);
     }
     public static IObject[] objects(){
-	IG ig = cur(); if(ig==null) return null; return ig.getAllObjects();
+	IG ig = cur(); return ig==null?null:ig.getObjects();
+    }
+    
+    public static IPoint point(int i){
+	IG ig = cur(); return ig==null?null:ig.getPoint(i);
+    }
+    public static ICurve curve(int i){
+	IG ig = cur(); return ig==null?null:ig.getCurve(i);
+    }
+    public static ISurface surface(int i){
+	IG ig = cur(); return ig==null?null:ig.getSurface(i);
+    }
+    public static IMesh mesh(int i){
+	IG ig = cur(); return ig==null?null:ig.getMesh(i);
+    }
+    public static IBrep brep(int i){
+	IG ig = cur(); return ig==null?null:ig.getBrep(i);
+    }
+    public static IObject object(Class cls, int i){
+	IG ig = cur(); return ig==null?null:ig.getObject(cls,i);
+    }
+    public static IObject object(int i){
+	IG ig = cur(); return ig==null?null:ig.getObject(i);
+    }
+    
+    public static int pointNum(){
+	IG ig = cur(); return ig==null?0:ig.getPointNum();
+    }
+    public static int curveNum(){
+	IG ig = cur(); return ig==null?0:ig.getCurveNum();
+    }
+    public static int surfaceNum(){
+	IG ig = cur(); return ig==null?0:ig.getSurfaceNum();
+    }
+    public static int meshNum(){
+	IG ig = cur(); return ig==null?0:ig.getMeshNum();
+    }
+    public static int brepNum(){
+	IG ig = cur(); return ig==null?0:ig.getBrepNum();
+    }
+    public static int objectNum(Class cls){
+	IG ig = cur(); return ig==null?0:ig.getObjectNum(cls);
+    }
+    public static int objectNum(){
+	IG ig = cur(); return ig==null?0:ig.getObjectNum();
     }
     
     
@@ -284,7 +377,6 @@ public class IG implements IServerI{
     }
     
     
-    
     public static boolean isGL(){
 	IG ig = cur();
 	if(ig==null){
@@ -301,27 +393,46 @@ public class IG implements IServerI{
 	IG ig = cur(); if(ig==null) return;
 	ig.server().setGraphicMode(mode);
     }
+    
+    /** set wireframe graphic mode */
     public static void wireframe(){
 	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,false,true,false));
     }
+    
+    /** set fill graphic mode */
     public static void fill(){
 	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,false,false));
     }
-    public static void fillWithWireframe(){
+    
+    /** set fill+wireframe graphic mode */
+    public static void fillWithWireframe(){ wireframeFill(); }
+    /** set fill+wireframe graphic mode */
+    public static void fillWireframe(){ wireframeFill(); }
+    /** set fill+wireframe graphic mode */
+    public static void wireframeFill(){
 	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,true,false));
     }
-    public static void transparentFill(){
+    
+    /** set transparent fill graphic mode */
+    public static void transparentFill(){ transparent(); }
+    /** set transparent fill graphic mode */
+    public static void transparent(){
 	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,false,true));
     }
-    public static void transparentFillWithWireframe(){
+    /** set transparent fill+wireframe graphic mode */
+    public static void transparentFillWithWireframe(){ wireframeTransparent(); }
+    /** set transparent fill+wireframe graphic mode */
+    public static void transparentWireframe(){ wireframeTransparent(); }
+    /** set transparent fill+wireframe graphic mode */
+    public static void wireframeTransparent(){
 	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,true,true));
@@ -474,7 +585,7 @@ public class IG implements IServerI{
 	File f = new File(file);
 	if(!f.isAbsolute() && basePath!=null) file = basePath + File.separator + file;
 	boolean retval = IIO.open(file,this);
-	server.update(); // update server status
+	server.updateState(); // update server status
 	inputFile = file;
 	focusView();
 	return retval;
@@ -516,12 +627,30 @@ public class IG implements IServerI{
     public void removeLayer(String layerName){ server.removeLayer(layerName); }
     
     
-    public IPoint[] getPoints(){ return server.getPoints(); }
-    public ICurve[] getCurves(){ return server.getCurves(); }
-    public ISurface[] getSurfaces(){ return server.getSurfaces(); }
-    public IMesh[] getMeshes(){ return server.getMeshes(); }
-    public IObject[] getObjects(Class cls){ return server.getObjects(cls); }
-    public IObject[] getAllObjects(){ return server.getAllObjects(); }
+    public IPoint[] getPoints(){ return server.points(); }
+    public ICurve[] getCurves(){ return server.curves(); }
+    public ISurface[] getSurfaces(){ return server.surfaces(); }
+    public IMesh[] getMeshes(){ return server.meshes(); }
+    public IBrep[] getBreps(){ return server.breps(); }
+    public IObject[] getObjects(Class cls){ return server.objects(cls); }
+    public IObject[] getObjects(){ return server.objects(); }
+    
+    public IPoint getPoint(int i){ return server.point(i); }
+    public ICurve getCurve(int i){ return server.curve(i); }
+    public ISurface getSurface(int i){ return server.surface(i); }
+    public IMesh getMesh(int i){ return server.mesh(i); }
+    public IBrep getBrep(int i){ return server.brep(i); }
+    public IObject getObject(Class cls,int i){ return server.object(cls,i); }
+    public IObject getObject(int i){ return server.object(i); }
+    
+    public int getPointNum(){ return server.pointNum(); }
+    public int getCurveNum(){ return server.curveNum(); }
+    public int getSurfaceNum(){ return server.surfaceNum(); }
+    public int getMeshNum(){ return server.meshNum(); }
+    public int getBrepNum(){ return server.brepNum(); }
+    public int getObjectNum(Class cls){ return server.objectNum(cls); }
+    public int getObjectNum(){ return server.objectNum(); }
+    
     
     public void focusView(){
 	if(panel!=null) panel.focus(); // focus on all pane
@@ -529,6 +658,19 @@ public class IG implements IServerI{
     
     public IServer server(){ return server; }
     public IDynamicServer dynamicServer(){ return server.dynamicServer(); }
+    
+    // dynamics
+    public void setDuration(int dur){ server.duration(dur); }
+    public int getDuration(){ return server.duration(); }
+    
+    public void setTime(int tm){ server.time(tm); }
+    public int getTime(){ return server.time(); }
+    
+    public void pauseDynamics(){ server.pause(); }
+    public void resumeDynamics(){ server.resume(); }
+    
+    public void startDynamics(){ server.start(); }
+    public void stopDynamics(){ server.stop(); }
     
     
     
@@ -540,11 +682,11 @@ public class IG implements IServerI{
     
     //public void delete(){
     public void clear(){ server.clear(); }
-
-
-
+    
+    
+    
     /*********************************************************************
-     * Geometry Operations
+     * Static Geometry Operations
      ********************************************************************/
     
     

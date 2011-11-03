@@ -697,7 +697,7 @@ public class ISurfaceCreator{
 	if(railDir!=null && !profNml.get().isParallel(railDir)){
 	    axis = profNml.get().cross(railDir);
 	    angle = profNml.angle(railDir,axis);
-	    //parallel = angle < IConfig.angleResolution;
+	    //parallel = angle < IConfig.angleTolerance;
 	}
 	
 	for(IVecI p:profile){
@@ -740,7 +740,7 @@ public class ISurfaceCreator{
 	if(railDir!=null && !profNml.get().isParallel(railDir)){
 	    axis = profNml.get().cross(railDir);
 	    angle = profNml.angle(railDir,axis);
-	    //parallel = angle < IConfig.angleResolution;
+	    //parallel = angle < IConfig.angleTolerance;
 	}
 	
 	for(IVecI p:profile) p.sub(profCenter);
@@ -782,7 +782,7 @@ public class ISurfaceCreator{
 		//b.rot(axis,bangle);
 		b.rot(axis,-bangle);
 		// scale 1d
-		if(Math.abs(bangle-Math.PI/2)>=IConfig.angleResolution){
+		if(Math.abs(bangle-Math.PI/2)>=IConfig.angleTolerance){
 		    double scale = 1.0/Math.abs(Math.cos(bangle));
 		    b.scale1d(bisectDir,scale);
 		}

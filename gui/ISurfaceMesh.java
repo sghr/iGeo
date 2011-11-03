@@ -125,8 +125,8 @@ public class ISurfaceMesh {
 		for(int k=0; outerLoops!=null && k<outerLoops.length&&inside; k++){
 		    IVec2[] epts = outerLoops[k];
 		    for(int l=0; l<epts.length && inside; l++){
-			if(l==0&&pt.eq(epts[l],IConfig.parameterResolution)||
-			   pt.eq(epts[(l+1)%epts.length],IConfig.parameterResolution)){ // omit point
+			if(l==0&&pt.eq(epts[l],IConfig.parameterTolerance)||
+			   pt.eq(epts[(l+1)%epts.length],IConfig.parameterTolerance)){ // omit point
 			    inside=false;
 			}
 			else if(pt.isStraight(epts[l], epts[(l+1)%epts.length]) &&
@@ -141,8 +141,8 @@ public class ISurfaceMesh {
 		    IVec2[] epts = innerLoops[k];
 		    for(int l=0; l<epts.length && inside; l++){
 			
-			if(l==0&&pt.eq(epts[l],IConfig.parameterResolution)||
-			   pt.eq(epts[(l+1)%epts.length],IConfig.parameterResolution)){ // omit point
+			if(l==0&&pt.eq(epts[l],IConfig.parameterTolerance)||
+			   pt.eq(epts[(l+1)%epts.length],IConfig.parameterTolerance)){ // omit point
 			    inside=false;
 			}
 			else if(pt.isStraight(epts[l], epts[(l+1)%epts.length]) &&
@@ -163,7 +163,7 @@ public class ISurfaceMesh {
 			//for(int l=0; l<outerLoops[k].length; l++) IOut.print(outerLoops[k][l]+", ");
 			//IOut.p();
 			for(int l=0; l<outerLoops[k].length; l++){
-			    if(outerLoops[k][l].eq(pt,IConfig.parameterResolution)) inside=false;
+			    if(outerLoops[k][l].eq(pt,IConfig.parameterTolerance)) inside=false;
 			}
 			
 		    }
@@ -174,7 +174,7 @@ public class ISurfaceMesh {
 		    /*
 		    else{
 			for(int l=0; l<innerLoops[k].length; l++){
-			    if(innerLoops[k][l].eq(pt,IConfig.parameterResolution)) inside=false;
+			    if(innerLoops[k][l].eq(pt,IConfig.parameterTolerance)) inside=false;
 			}
 		    }
 		    */

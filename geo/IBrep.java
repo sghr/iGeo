@@ -145,6 +145,7 @@ public class IBrep extends IObject implements ITransformable{
     public IBrep show(){ super.show(); return this; }
     
     public IBrep clr(Color c){ super.clr(c); return this; }
+    public IBrep clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IBrep clr(int gray){ super.clr(gray); return this; }
     public IBrep clr(float fgray){ super.clr(fgray); return this; }
     public IBrep clr(double dgray){ super.clr(dgray); return this; }
@@ -163,6 +164,7 @@ public class IBrep extends IObject implements ITransformable{
     public IBrep hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IBrep setColor(Color c){ super.setColor(c); return this; }
+    public IBrep setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IBrep setColor(int gray){ super.setColor(gray); return this; }
     public IBrep setColor(float fgray){ super.setColor(fgray); return this; }
     public IBrep setColor(double dgray){ super.setColor(dgray); return this; }

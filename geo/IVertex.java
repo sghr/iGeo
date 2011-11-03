@@ -499,16 +499,16 @@ public class IVertex implements IVecI{
 	public int compare(IVertex v1, IVertex v2){
 	    IVec p1 = v1.pos.get();
 	    IVec p2 = v2.pos.get();
-	    if(p1.z<p2.z-IConfig.lengthResolution) return 1;
-	    if(p1.z>p2.z+IConfig.lengthResolution) return -1;
+	    if(p1.z<p2.z-IConfig.tolerance) return 1;
+	    if(p1.z>p2.z+IConfig.tolerance) return -1;
 	    
 	    // same z
-	    if(p1.y<p2.y-IConfig.lengthResolution) return 1;
-	    if(p1.y>p2.y+IConfig.lengthResolution) return -1;
+	    if(p1.y<p2.y-IConfig.tolerance) return 1;
+	    if(p1.y>p2.y+IConfig.tolerance) return -1;
 	    
 	    // same z & y
-	    if(p1.x<p2.x-IConfig.lengthResolution) return 1;
-	    if(p1.x>p2.x+IConfig.lengthResolution) return -1;
+	    if(p1.x<p2.x-IConfig.tolerance) return 1;
+	    if(p1.x>p2.x+IConfig.tolerance) return -1;
 	    
 	    return 0;
 	}

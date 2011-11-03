@@ -709,6 +709,7 @@ public class ISurface extends IObject implements ISurfaceI{
     
     
     public ISurface clr(Color c){ super.clr(c); return this; }
+    public ISurface clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ISurface clr(int gray){ super.clr(gray); return this; }
     public ISurface clr(float fgray){ super.clr(fgray); return this; }
     public ISurface clr(double dgray){ super.clr(dgray); return this; }
@@ -727,6 +728,7 @@ public class ISurface extends IObject implements ISurfaceI{
     public ISurface hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public ISurface setColor(Color c){ super.setColor(c); return this; }
+    public ISurface setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public ISurface setColor(int gray){ super.setColor(gray); return this; }
     public ISurface setColor(float fgray){ super.setColor(fgray); return this; }
     public ISurface setColor(double dgray){ super.setColor(dgray); return this; }

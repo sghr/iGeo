@@ -374,6 +374,7 @@ public class IPointR extends IObject implements IVecI{
     public IPointR show(){ super.show(); return this; }
     
     public IPointR clr(Color c){ super.clr(c); return this; }
+    public IPointR clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IPointR clr(int gray){ super.clr(gray); return this; }
     public IPointR clr(float fgray){ super.clr(fgray); return this; }
     public IPointR clr(double dgray){ super.clr(dgray); return this; }
@@ -392,6 +393,7 @@ public class IPointR extends IObject implements IVecI{
     public IPointR hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IPointR setColor(Color c){ super.setColor(c); return this; }
+    public IPointR setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IPointR setColor(int gray){ super.setColor(gray); return this; }
     public IPointR setColor(float fgray){ super.setColor(fgray); return this; }
     public IPointR setColor(double dgray){ super.setColor(dgray); return this; }

@@ -96,7 +96,7 @@ public class IVectorGraphic extends IGraphicObject{
 	    IVec v = vec.vec.get();
 	    IVec t = null;
 	    
-	    if(v.angle(arrowHeadNormal)<IConfig.angleResolution)
+	    if(v.angle(arrowHeadNormal)<IConfig.angleTolerance)
 		t = v.cross(arrowHeadNormal2);
 	    else t = v.cross(arrowHeadNormal);
 	    t.len(size/2);

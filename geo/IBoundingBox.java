@@ -36,11 +36,11 @@ public class IBoundingBox{
     public IVec min=null, max=null;
     
     public IBoundingBox(){}
-
+    
     /**
        Calculates bounding box of all the objects in IServer
     */
-    public void setObjects(IServer server){ setObjects(server.getObjects()); }
+    public void setObjects(IServer server){ setObjects(server.getAllObjects()); }
     
     public void compare(IVec p){
 	if(!p.isValid()) return;

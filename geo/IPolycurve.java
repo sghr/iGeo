@@ -110,6 +110,11 @@ public class IPolycurve extends IObject /*implements ICurveI*/{
         for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(c);
         return this;
     }
+    public IPolycurve clr(Color c, int alpha){
+        super.clr(c,alpha);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(c,alpha);
+        return this;
+    }
     public IPolycurve clr(int gray){
         super.clr(gray);
         for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(gray);
@@ -190,6 +195,11 @@ public class IPolycurve extends IObject /*implements ICurveI*/{
     public IPolycurve setColor(Color c){
         super.setColor(c);
         for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(c);
+        return this;
+    }
+    public IPolycurve setColor(Color c, int alpha){
+        super.setColor(c,alpha);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).setColor(c,alpha);
         return this;
     }
     public IPolycurve setColor(int gray){

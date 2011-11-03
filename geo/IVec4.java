@@ -165,10 +165,10 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     
     
     
-    public boolean eqW(IVec4I v){ return eqW(v,IConfig.lengthResolution); }
+    public boolean eqW(IVec4I v){ return eqW(v,IConfig.tolerance); }
     public boolean eqW(IVec4I v, double resolution){ return Math.abs(w-v.w())<=resolution; }
     public boolean eqW(IVec4 v, double resolution){ return Math.abs(w-v.w)<=resolution; }
-    //public IBool eqWR(IVec4I v){ return new IBool(eqW(v,IConfig.lengthResolution)); }
+    //public IBool eqWR(IVec4I v){ return new IBool(eqW(v,IConfig.tolerance)); }
     //public IBool eqWR(IVec4I v, IDoubleI resolution){ return new IBool(eqW(v,resolution.x())); }
     public boolean eqW(ISwitchE e, IVec4I v){ return eqW(v); }
     public boolean eqW(ISwitchE e, IVec4I v, double resolution){ return eqW(v,resolution); }

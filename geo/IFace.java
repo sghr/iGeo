@@ -363,7 +363,7 @@ public class IFace{
     
     
     static public boolean eq(double v1, double v2){
-	if( Math.abs(v1-v2) < IConfig.lengthResolution) return true;
+	if( Math.abs(v1-v2) < IConfig.tolerance) return true;
 	return false;
     }
     

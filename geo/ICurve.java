@@ -451,6 +451,7 @@ public class ICurve extends IObject implements ICurveI{
     public ICurve show(){ super.show(); return this; }
     
     public ICurve clr(Color c){ super.clr(c); return this; }
+    public ICurve clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ICurve clr(int gray){ super.clr(gray); return this; }
     public ICurve clr(float fgray){ super.clr(fgray); return this; }
     public ICurve clr(double dgray){ super.clr(dgray); return this; }
@@ -469,6 +470,7 @@ public class ICurve extends IObject implements ICurveI{
     public ICurve hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public ICurve setColor(Color c){ super.setColor(c); return this; }
+    public ICurve setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public ICurve setColor(int gray){ super.setColor(gray); return this; }
     public ICurve setColor(float fgray){ super.setColor(fgray); return this; }
     public ICurve setColor(double dgray){ super.setColor(dgray); return this; }

@@ -320,8 +320,8 @@ public class ICurveR extends IObject implements ICurveI{
     public ICurveR show(){ super.show(); return this; }
     
     
-    
     public ICurveR clr(Color c){ super.clr(c); return this; }
+    public ICurveR clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ICurveR clr(int gray){ super.clr(gray); return this; }
     public ICurveR clr(float fgray){ super.clr(fgray); return this; }
     public ICurveR clr(double dgray){ super.clr(dgray); return this; }
@@ -340,6 +340,7 @@ public class ICurveR extends IObject implements ICurveI{
     public ICurveR hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public ICurveR setColor(Color c){ super.setColor(c); return this; }
+    public ICurveR setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public ICurveR setColor(int gray){ super.setColor(gray); return this; }
     public ICurveR setColor(float fgray){ super.setColor(fgray); return this; }
     public ICurveR setColor(double dgray){ super.setColor(dgray); return this; }

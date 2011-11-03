@@ -29,21 +29,21 @@ import igeo.core.*;
 import igeo.util.*;
 
 /**
-   Class of an agent based on one point, extending IPoint and implements IDynamicObject
+   Class of an agent based on one point, extending IPoint and implements IDynamics
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IAgent extends IObject implements IDynamicObject{
+public class IAgent extends IObject implements IDynamics{
     
     public IObject parent=null;
     
     /** target objects to be updated by dynamic object */
     public ArrayList<IObject> targets;
     
-    public ArrayList<IDynamicObject> localDynamics;
+    public ArrayList<IDynamics> localDynamics;
     
-    public int time=0;
+    public int time=-1; //0; // changed to -1 to become 0 after first update() is executed.
     public int duration=-1; //lifetime=-1;
     public boolean alive=true;
     
@@ -56,14 +56,14 @@ public class IAgent extends IObject implements IDynamicObject{
     
     /** override IObject.addDynamics to manage dynamics locally.
 	Only IAgent is added at IObject */
-    @Override public void addDynamics(IDynamicObject dyna){
-        if(localDynamics==null) localDynamics = new ArrayList<IDynamicObject>();
+    @Override public void addDynamics(IDynamics dyna){
+        if(localDynamics==null) localDynamics = new ArrayList<IDynamics>();
         if(!localDynamics.contains(dyna)){
 	    localDynamics.add(dyna);
 	    if(dyna.parent()!=this) dyna.parent(this);
 	}
     }
-    @Override public IDynamicObject getDynamics(int i){
+    @Override public IDynamics getDynamics(int i){
         if(localDynamics==null) return null;
         return localDynamics.get(i);
     }
@@ -72,22 +72,23 @@ public class IAgent extends IObject implements IDynamicObject{
     }
     
     @Override public void deleteDynamics(){
-        if(server!=null && server.dynamicServer!=null){
-            for(IDynamicObject dyn:localDynamics) server.dynamicServer.remove(dyn);
+        if(server!=null && server.dynamicServer!=null && localDynamics!=null){
+            for(IDynamics dyn:localDynamics) server.dynamicServer.remove(dyn);
         }
     }
     @Override public void deletDynamics(int index){
-        if(index<0||index>=localDynamics.size()) return;
+	if(localDynamics==null||index<0||index>=localDynamics.size()) return;
         if(server!=null && server.dynamicServer!=null)
             server.dynamicServer.remove(localDynamics.get(index));
         localDynamics.remove(index);
     }
-    @Override public void deleteDynamics(IDynamicObject dyn){
-        if(!localDynamics.contains(dyn)) return;
+    @Override public void deleteDynamics(IDynamics dyn){
+	if(localDynamics==null || !localDynamics.contains(dyn)) return;
         if(server!=null && server.dynamicServer!=null) server.dynamicServer.remove(dyn);
         localDynamics.remove(dyn);
     }
     @Override public void del(){
+	alive=false;
 	this.deleteDynamics();
 	super.del();
     }
@@ -97,7 +98,7 @@ public class IAgent extends IObject implements IDynamicObject{
     }
     
     
-    // implementation of IDynamicObject
+    // implementation of IDynamics
     public IObject parent(){ return parent; }
     public ISubobject parent(IObject par){
 	//this.parent=parent; return this;
@@ -148,20 +149,30 @@ public class IAgent extends IObject implements IDynamicObject{
     
     public boolean alive(){ return alive; }
     
-    synchronized public void interact(ArrayList<IDynamicObject> dynamics){
-	if(localDynamics!=null) for(IDynamicObject d:localDynamics) d.interact(dynamics);     }
+    public int time(){ return time; }
+    /** not recommended to use. use carefully if you use */
+    public IAgent time(int tm){ time=tm; return this; }
+
+    public int duration(){ return duration; }
+    public IAgent duration(int dur){ duration=dur; return this; }
+    
+    synchronized public void interact(ArrayList<IDynamics> dynamics){
+
+	time++; // time needs to be updated here to have same value in interact() and update()
+	
+	if(localDynamics!=null) for(IDynamics d:localDynamics) d.interact(dynamics);
+    }
     
     synchronized public void update(){
-	if(localDynamics!=null) for(IDynamicObject d:localDynamics) d.update();
+	if(localDynamics!=null) for(IDynamics d:localDynamics) d.update();
 	
-	time++;
-	if( duration>0 && time>=duration ){
-	    alive=false;
+	if( duration>=0 && time>=duration ){
+	    //alive=false; // done in del()
 	    del();
 	}
-	
-	//
-	server.update();
+	else{
+	    if(server!=null) server.updateState();
+	}
 	
 	// localDynamics will update parent directly. So no need to update parent here.
 	//if(parent!=null) parent.updateGraphic(); // did anything change?
@@ -179,6 +190,7 @@ public class IAgent extends IObject implements IDynamicObject{
     public IAgent show(){ super.show(); return this; }
     
     public IAgent clr(Color c){ super.clr(c); return this; }
+    public IAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IAgent clr(int gray){ super.clr(gray); return this; }
     public IAgent clr(float fgray){ super.clr(fgray); return this; }
     public IAgent clr(double dgray){ super.clr(dgray); return this; }
@@ -197,6 +209,7 @@ public class IAgent extends IObject implements IDynamicObject{
     public IAgent hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IAgent setColor(Color c){ super.setColor(c); return this; }
+    public IAgent setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IAgent setColor(int gray){ super.setColor(gray); return this; }
     public IAgent setColor(float fgray){ super.setColor(fgray); return this; }
     public IAgent setColor(double dgray){ super.setColor(dgray); return this; }

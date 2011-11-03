@@ -424,7 +424,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     }
     
     public double len(){
-	// default resolution. not refined. ; should it be IConfig.parameterResolution? Is it too small?
+	// default resolution per EP. not refined. ; should it be IConfig.parameterTolerance? Is it too small?
 	final double defaultResolution = 0.01; // 1/100
 	return len(defaultResolution);
     }

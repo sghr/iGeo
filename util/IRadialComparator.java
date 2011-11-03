@@ -43,8 +43,8 @@ public class IRadialComparator implements IComparator<IVec>{
     public IRadialComparator(IVec center, IVec normal){
 	this.center = center; this.normal = normal;
 	double a = startDir.angle(normal);
-	if(a < IConfig.angleResolution ||
-	   Math.abs(Math.abs(a)-Math.PI) < IConfig.angleResolution ){
+	if(a < IConfig.angleTolerance ||
+	   Math.abs(Math.abs(a)-Math.PI) < IConfig.angleTolerance ){
 	    startDir = normal.cross(new IVec(0,0,1)).cross(normal);
 	}
 	else{ startDir = normal.cross(startDir).cross(normal); }
@@ -52,7 +52,7 @@ public class IRadialComparator implements IComparator<IVec>{
     public IRadialComparator(IVec center, IVec normal, IVec startDir){
 	this.center = center; this.normal = normal; this.startDir=startDir;
 	if( Math.abs(Math.abs(startDir.angle(normal)) - Math.PI/2) >=
-	    IConfig.angleResolution){
+	    IConfig.angleTolerance){
 	    startDir = normal.cross(startDir.dup()).cross(normal); 
 	}
     }

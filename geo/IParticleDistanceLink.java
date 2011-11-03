@@ -29,14 +29,12 @@ import igeo.core.*;
 import igeo.gui.*;
 
 /**
-   Class of an implementation of IDynamicObject to have physical attributes of point.
-   It has attributes of position, velocity, acceleration, force, and mass.
-   Position is provided from outside to be linked.
+   Class of an implementation of IDynamics to limit particles to be spacified direction from a center.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IParticleDistanceLink extends IDynamicObjectBase{
+public class IParticleDistanceLink extends IDynamicsBase{
     
     public IParticle particle;
     public IVecI center;
@@ -82,19 +80,19 @@ public class IParticleDistanceLink extends IDynamicObjectBase{
 	particle.fix(); // to take control of location of particle;
     }
         
-    //synchronized public void interact(ArrayList<IDynamicObject> dynamics){}
+    //synchronized public void interact(ArrayList<IDynamics> dynamics){}
     
     synchronized public void update(){
 	
 	// taking care of the whole update of particle here.
 	IVec dir = particle.pos.diff(center);
 	particle.frc.set(particle.frc.perpendicularVectorToVector(dir)); // cancelling force along dir
-	particle.frc.mul(IConfig.dynamicsSpeed/particle.mass);
+	particle.frc.mul(IConfig.updateRate/particle.mass);
 	particle.vel.add(particle.frc).mul(1.0-particle.friction);
 	
 	particle.vel.set(particle.vel.perpendicularVectorToVector(dir)); // cancelling vel along dir
 	
-	particle.pos.add(particle.vel.dup().mul(IConfig.dynamicsSpeed));
+	particle.pos.add(particle.vel.dup().mul(IConfig.updateRate));
 	
 	dir = particle.pos.diff(center); // again
 	

@@ -23,7 +23,7 @@
 package igeo.p;
 
 /**
-   Configuration setting class for the processing interface PiGeon. 
+   Configuration setting class for the processing interface piGeon. 
    
    @author Satoru Sugihara
    @version 0.7.1.0;

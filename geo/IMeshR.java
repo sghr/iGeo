@@ -88,6 +88,7 @@ public class IMeshR extends IObject implements IMeshI{
     public IMeshR show(){ super.show(); return this; }
     
     public IMeshR clr(Color c){ super.clr(c); return this; }
+    public IMeshR clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IMeshR clr(int gray){ super.clr(gray); return this; }
     public IMeshR clr(float fgray){ super.clr(fgray); return this; }
     public IMeshR clr(double dgray){ super.clr(dgray); return this; }
@@ -106,6 +107,7 @@ public class IMeshR extends IObject implements IMeshI{
     public IMeshR hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IMeshR setColor(Color c){ super.setColor(c); return this; }
+    public IMeshR setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IMeshR setColor(int gray){ super.setColor(gray); return this; }
     public IMeshR setColor(float fgray){ super.setColor(fgray); return this; }
     public IMeshR setColor(double dgray){ super.setColor(dgray); return this; }

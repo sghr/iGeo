@@ -162,6 +162,7 @@ public class IBox extends IBrep{
     public IBox show(){ super.show(); return this; }
     
     public IBox clr(Color c){ super.clr(c); return this; }
+    public IBox clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IBox clr(int gray){ super.clr(gray); return this; }
     public IBox clr(float fgray){ super.clr(fgray); return this; }
     public IBox clr(double dgray){ super.clr(dgray); return this; }
@@ -180,6 +181,7 @@ public class IBox extends IBrep{
     public IBox hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IBox setColor(Color c){ super.setColor(c); return this; }
+    public IBox setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IBox setColor(int gray){ super.setColor(gray); return this; }
     public IBox setColor(float fgray){ super.setColor(fgray); return this; }
     public IBox setColor(double dgray){ super.setColor(dgray); return this; }

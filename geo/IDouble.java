@@ -109,10 +109,10 @@ public class IDouble extends IParameterObject implements IDoubleI, IEntityParame
     public IDouble deg(){ x=Math.toDegrees(x); return this; }
     public IDouble rad(){ x=Math.toRadians(x); return this; }
 
-    public boolean eq(double v){ return eq(v,IConfig.lengthResolution); }
-    public boolean eq(IDouble v){ return eq(v,IConfig.lengthResolution); }
-    public boolean eq(IDoubleI v){ return eq(v.get(),IConfig.lengthResolution); }
-    //public IBool eqR(IDoubleI v){ return new IBool(eq(v.get(),IConfig.lengthResolution)); }
+    public boolean eq(double v){ return eq(v,IConfig.tolerance); }
+    public boolean eq(IDouble v){ return eq(v,IConfig.tolerance); }
+    public boolean eq(IDoubleI v){ return eq(v.get(),IConfig.tolerance); }
+    //public IBool eqR(IDoubleI v){ return new IBool(eq(v.get(),IConfig.tolerance)); }
     public boolean eq(ISwitchE e, IDoubleI v){ return eq(v); }
     public IBool eq(ISwitchR r, IDoubleI v){ return new IBool(eq(v)); }
 

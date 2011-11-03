@@ -387,6 +387,7 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject show(){ super.show(); return this; }
     
     public IVectorObject clr(Color c){ super.clr(c); return this; }
+    public IVectorObject clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IVectorObject clr(int gray){ super.clr(gray); return this; }
     public IVectorObject clr(float fgray){ super.clr(fgray); return this; }
     public IVectorObject clr(double dgray){ super.clr(dgray); return this; }
@@ -405,6 +406,7 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
     public IVectorObject setColor(Color c){ super.setColor(c); return this; }
+    public IVectorObject setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
     public IVectorObject setColor(int gray){ super.setColor(gray); return this; }
     public IVectorObject setColor(float fgray){ super.setColor(fgray); return this; }
     public IVectorObject setColor(double dgray){ super.setColor(dgray); return this; }
