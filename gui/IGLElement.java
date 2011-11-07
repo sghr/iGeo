@@ -26,8 +26,7 @@ package igeo.gui;
 import javax.media.opengl.*;
 import java.util.ArrayList;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 
 /**
    Base class of OpenGL graphic vertex data collection

@@ -25,9 +25,7 @@ package igeo.gui;
 import java.util.ArrayList;
 import javax.media.opengl.*;
 
-import igeo.geo.*;
-import igeo.core.*;
-//import igeo.gl.*;
+import igeo.*;
 
 /**
    Graphic subobject class to draw wireframes of a surface object by OpenGL.

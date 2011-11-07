@@ -25,7 +25,7 @@ package igeo.gui;
 
 import javax.media.opengl.*;
 
-import igeo.geo.*;
+import igeo.*;
 
 /**
    Objectified OpenGL triangle drawing process.

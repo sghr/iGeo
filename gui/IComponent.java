@@ -22,7 +22,7 @@
 
 package igeo.gui;
 
-import igeo.core.IG;
+import igeo.IG;
 
 /**
    Base class of custom GUI components.

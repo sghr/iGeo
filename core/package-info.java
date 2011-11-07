@@ -20,7 +20,7 @@
 
 ---*/
 /**
-   Infrastructural core package of iGeo library.
-   Infrastructural classes to retain instantiated iGeo data and automatize drawing.
+   This package is to be removed. The contents are integrated into the parent
+   package igeo.
  */
 package igeo.core;

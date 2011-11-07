@@ -24,8 +24,7 @@ package igeo.gui;
 
 import java.util.ArrayList;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 
 /**
    Polyline geometry to assist graphic classes of curves and surfaces.

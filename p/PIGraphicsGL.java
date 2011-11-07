@@ -32,10 +32,8 @@ import java.awt.*;
 
 import com.sun.opengl.util.j2d.Overlay;
 
-import igeo.core.*;
+import igeo.*;
 import igeo.gui.*;
-import igeo.geo.*;
-
 
 /**
    A child class of Processing's PGraphic to draw on Processing using OpenGL.

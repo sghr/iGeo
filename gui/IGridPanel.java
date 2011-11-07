@@ -22,7 +22,7 @@
 
 package igeo.gui;
 
-import igeo.core.*;
+import igeo.*;
 
 /**
    A panel class to contain multiple IPane in grid layout with toggle function

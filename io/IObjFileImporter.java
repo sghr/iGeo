@@ -26,8 +26,7 @@ import java.io.*;
 import java.awt.*;
 import java.util.*;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 import igeo.gui.*;
 
 /**

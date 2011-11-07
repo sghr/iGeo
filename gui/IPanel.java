@@ -28,8 +28,7 @@ import java.io.*;
 import javax.media.opengl.*;
 import javax.swing.*;
 
-import igeo.core.*;
-import igeo.geo.IBoundingBox;
+import igeo.*;
 
 /**
    A root GUI object of iGeo managing all IPane instance.

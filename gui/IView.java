@@ -26,8 +26,7 @@ import java.awt.*;
 
 import javax.media.opengl.*;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 
 /**
    Class to define view by location, direction, axonometric/perspective mode and perspective angle.

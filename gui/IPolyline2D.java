@@ -24,11 +24,9 @@ package igeo.gui;
 
 import java.util.ArrayList;
 
-import igeo.geo.*;
-import igeo.core.*;
-import igeo.util.*;
+import igeo.*;
 
-import static igeo.core.IConfig.parameterTolerance;
+import static igeo.IConfig.parameterTolerance;
 
 /**
    2D polyline geometry to assist graphic classes of curves and surfaces.

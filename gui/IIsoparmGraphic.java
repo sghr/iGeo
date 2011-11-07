@@ -25,9 +25,7 @@ package igeo.gui;
 import java.util.ArrayList;
 import java.awt.Color;
 
-import igeo.geo.*;
-import igeo.core.*;
-
+import igeo.*;
 
 /**
    Class to draw isoparms of a surface.

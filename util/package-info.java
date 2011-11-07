@@ -22,7 +22,7 @@
 
 
 /**
-   Utility package of iGeo library.
-   It includes random number generator class, sorting class, 2D data mapping class and etc.
+   This package is to be removed. The contents are integrated into the parent
+   package igeo.
 */
 package igeo.util;

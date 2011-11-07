@@ -27,9 +27,7 @@ import java.awt.Color;
 
 import javax.media.opengl.*;
 
-import igeo.geo.*;
-import igeo.core.*;
-//import igeo.gl.*;
+import igeo.*;
 
 /**
    Graphic subobject class to draw filled faces of a surface object by OpenGL.

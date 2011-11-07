@@ -24,8 +24,7 @@ package igeo.gui;
 
 import javax.media.opengl.*;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 
 /**
    Graphic subobject class to draw polygon mesh object by OpenGL.

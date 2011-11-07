@@ -22,16 +22,9 @@
 
 package igeo.p;
 
-import java.awt.*;
-import java.util.ArrayList;
-
 import processing.core.*;
 
-import igeo.core.IG;
-import igeo.util.*;
-import igeo.geo.*;
-import igeo.gui.*;
-
+import igeo.IG;
 
 /**
    A child class of Processing's PApplet.

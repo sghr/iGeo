@@ -25,7 +25,7 @@ package igeo.gui;
 
 import javax.media.opengl.*;
 
-import igeo.geo.*;
+import igeo.*;
 
 /**
    Objectified OpenGL drawing process of matrix of quad geometries by quad strips.

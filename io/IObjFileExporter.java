@@ -27,10 +27,8 @@ import java.awt.*;
 import java.util.*;
 import java.text.*;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 import igeo.gui.*;
-
 
 /**
    Wavefront OBJ file exporter class.

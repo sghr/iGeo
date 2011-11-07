@@ -34,9 +34,8 @@
 
 package igeo.io;
 
-import igeo.core.*;
+import igeo.*;
 import igeo.gui.*;
-import igeo.geo.*;
 
 import java.io.*;
 import java.awt.Color;

@@ -25,8 +25,7 @@ package igeo.gui;
 import java.util.*;
 import java.awt.*;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 
 /**
    Class to generate drawable polygon mesh of NURBS surface with or without trim curves.

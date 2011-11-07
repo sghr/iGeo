@@ -24,9 +24,7 @@ package igeo.gui;
 
 import java.util.*;
 
-import igeo.geo.*;
-import igeo.core.*;
-import igeo.util.*;
+import igeo.*;
 
 /**
    Rectangular cell of a surface with or without trim curve.

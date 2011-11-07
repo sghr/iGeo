@@ -25,7 +25,7 @@ package igeo.gui;
 import java.util.ArrayList;
 import java.awt.event.*;
 
-import igeo.core.*;
+import igeo.*;
 
 /**
    A panel class to contain multiple IPane with toggle function

@@ -26,8 +26,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-import igeo.core.*;
-import igeo.geo.*;
+import igeo.*;
 
 /**
    Class to provide 3D navigation function by mouse and keyboard.

@@ -25,7 +25,7 @@ package igeo.gui;
 import javax.media.opengl.*;
 import java.awt.*;
 
-import igeo.core.IG;
+import igeo.IG;
 
 /**
    Class of Graphics like java.awt.Graphics to wrap all possible graphic mode

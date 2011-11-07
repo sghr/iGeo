@@ -27,8 +27,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-import igeo.core.*;
-import igeo.geo.*;
+import igeo.*;
 
 /**
    A pane object to provide one rectangular area to draw objects.

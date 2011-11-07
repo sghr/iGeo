@@ -24,8 +24,7 @@ package igeo.gui;
 
 import java.util.ArrayList;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 
 /**
    Class to convert loop of trim curves to IPolyline and IPolyline2D.

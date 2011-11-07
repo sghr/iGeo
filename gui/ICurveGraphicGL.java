@@ -24,9 +24,7 @@ package igeo.gui;
 
 import javax.media.opengl.*;
 
-import igeo.geo.*;
-import igeo.core.*;
-//import igeo.gl.*;
+import igeo.*;
 
 /**
    Graphic subobject class to draw a curve object by OpenGL

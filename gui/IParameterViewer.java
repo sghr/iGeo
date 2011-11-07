@@ -28,8 +28,7 @@ import java.util.ArrayList;
 import java.text.*;
 import java.lang.reflect.*;
 
-import igeo.geo.*;
-import igeo.core.*;
+import igeo.*;
 
 /**
    Viewer window to show parameters and relationship of parameters.

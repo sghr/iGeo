@@ -24,8 +24,7 @@ package igeo.io;
 
 import java.io.*;
 
-import igeo.core.*;
-import igeo.gui.*;
+import igeo.*;
 /**
    A class to provide an interface to all File I/O.
    

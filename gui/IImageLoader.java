@@ -26,7 +26,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 
-import igeo.core.*;
+import igeo.*;
 
 /**
    Class to provide function to load image from external file into Java AWT Image object.

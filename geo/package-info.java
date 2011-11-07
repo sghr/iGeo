@@ -20,8 +20,7 @@
 
 ---*/
 /**
-   Geometry package of iGeo library including vector, curve, surface and polygon mesh.
-   It includes classes of 2D/3D/4D vector math operations, NURBS curve and surafce, polygon mesh.
-   Subclasses of IObject retained by IServer and pure geometry classes are both in this package.
+   This package is to be removed. The contents are integrated into the parent
+   package igeo.
  */
 package igeo.geo;
