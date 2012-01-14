@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -139,13 +139,29 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 mul(double v){ super.mul(v); return this; }
     public IVec4 div(IDoubleI v){ super.div(v); return this; }
     public IVec4 div(double v){ super.div(v); return this; }
+    /** note that it's not negating w */
     public IVec4 neg(){ super.neg(); return this; }
-    public IVec4 rev(){ super.rev(); return this; }
-    public IVec4 flip(){ super.rev(); return this; }
+    /** note that it's not negating w */
+    public IVec4 rev(){ neg(); return this; }
+    /** note that it's not negating w */
+    public IVec4 flip(){ neg(); return this; }
+    /** note that w is not set zero */
+    public IVec4 zero(){ super.zero(); return this; }
 
+    /** scale add */
     public IVec4 add(IVec v, double f){ super.add(v,f); return this; }
+    /** scale add */
     public IVec4 add(IVecI v, double f){ super.add(v,f); return this; }
+    /** scale add */
     public IVec4 add(IVecI v, IDoubleI f){ super.add(v,f); return this; }
+
+    /** scale add alias */
+    public IVec4 add(double f, IVec v){ return add(v,f); }
+    /** scale add alias */
+    public IVec4 add(double f, IVecI v){ return add(v,f); }
+    /** scale add alias */
+    public IVec4 add(IDoubleI f, IVecI v){ return add(v,f); }
+    
     
     public IVec4 len(IDoubleI l){ super.len(l); return this; }
     public IVec4 len(double l){ super.len(l); return this; }
@@ -173,7 +189,9 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IBool eqW(ISwitchR r, IVec4I v){ return new IBool(eqW(v)); }
     public IBool eqW(ISwitchR r, IVec4I v, IDoubleI resolution){ return new IBool(eqW(v,resolution.x())); }
     
-
+    public IVec4 rot(IDoubleI angle){ super.rot(angle); return this; }
+    public IVec4 rot(double angle){ super.rot(angle); return this; }
+    
     public IVec4 rot(IVecI axis, IDoubleI angle){ super.rot(axis,angle); return this; }
     public IVec4 rot(IVecI axis, double angle){ super.rot(axis,angle); return this; }
     public IVec4 rot(IVec axis, double angle){ super.rot(axis,angle); return this; }
@@ -195,7 +213,23 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 rot(IVec center, IVec axis, IVec destPt){
 	super.rot(center,axis,destPt); return this;
     }
+    
 
+    /** alias of rot(IDoubleI) */
+    public IVec4 rot2(IDoubleI angle){ return rot(angle); }
+    /** alias of rot(double) */
+    public IVec4 rot2(double angle){ return rot(angle); }
+    
+    public IVec4 rot2(IVecI center, IDoubleI angle){ super.rot2(center,angle); return this; }
+    public IVec4 rot2(IVecI center, double angle){ super.rot2(center,angle); return this; }
+    public IVec4 rot2(IVec center, double angle){ super.rot2(center,angle); return this; }
+    
+    public IVec4 rot2(IVec destDir){ super.rot2(destDir); return this; }
+    public IVec4 rot2(IVecI destDir){ super.rot2(destDir); return this; }
+    public IVec4 rot2(IVecI center, IVecI destPt){ super.rot2(center,destPt); return this; }
+    public IVec4 rot2(IVec center, IVec destPt){ super.rot2(center,destPt); return this; }
+    
+    
     /** alias of mul */
     public IVec4 scale(IDoubleI f){ super.scale(f); return this; }
     public IVec4 scale(double f){ super.scale(f); return this; }
@@ -308,8 +342,10 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     
     // methods creating new instance
     // use these carefully. w is set to the object's w (not input or addition with input's)
-    public IVec4 diff(IVec v){ return dup().sub(v); }
-    public IVec4 diff(IVecI v){ return dup().sub(v); }
+    public IVec4 dif(IVec v){ return dup().sub(v); }
+    public IVec4 dif(IVecI v){ return dup().sub(v); }
+    public IVec4 diff(IVec v){ return dif(v); }
+    public IVec4 diff(IVecI v){ return dif(v); }
     public IVec4 mid(IVec v){ return dup().add(v).div(2); }
     public IVec4 mid(IVecI v){ return dup().add(v).div(2); }
     public IVec4 sum(IVec v){ return dup().add(v); }

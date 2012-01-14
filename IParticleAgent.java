@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -34,6 +34,7 @@ import java.util.ArrayList;
 public class IParticleAgent extends IPointAgent implements IParticleI{
     
     public IParticle particle;
+    public IVec vel, frc;
     
     public IParticleAgent(){ super(); initParticleAgent(); }
     public IParticleAgent(double x, double y, double z){ super(x,y,z); initParticleAgent(); }
@@ -42,12 +43,37 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     public IParticleAgent(IParticle ptcl){ super(ptcl.pos); initParticleAgent(ptcl); }
     public IParticleAgent(IParticleAgent p){ super((IPointAgent)p); initParticleAgent(); }    
     
+    public IParticleAgent(double x, double y, double z, double vx, double vy, double vz){ super(x,y,z); initParticleAgent(new IVec(vx,vy,vz)); }
+    public IParticleAgent(IVec p, IVec vel){ super(p); initParticleAgent(vel); }
+    public IParticleAgent(IVecI p, IVecI vel){ super(p); initParticleAgent(vel); }
+    public IParticleAgent(IParticle ptcl, IVecI vel){ super(ptcl.pos); initParticleAgent(ptcl,vel); }
+    public IParticleAgent(IParticleAgent p, IVecI vel){ super((IPointAgent)p); initParticleAgent(vel); }    
+    
     public void initParticleAgent(){
-	particle = new IParticle(pos);
+	particle = new IParticle(pos, (IObject)this);
+	vel = particle.vel;
+	frc = particle.frc;
 	addDynamics(particle);
     }
     public void initParticleAgent(IParticle ptcl){
 	particle = ptcl;
+	pos = particle.pos;
+	vel = particle.vel;
+	frc = particle.frc;
+	addDynamics(particle);
+    }
+    public void initParticleAgent(IVecI vel){
+	particle = new IParticle(pos, vel, this);
+	this.vel = particle.vel;
+	frc = particle.frc;
+	addDynamics(particle);
+    }
+    public void initParticleAgent(IParticle ptcl, IVecI vel){
+	particle = ptcl;
+	particle.vel(vel);
+	pos = particle.pos;
+	this.vel = particle.vel;
+	frc = particle.frc;
 	addDynamics(particle);
     }
     
@@ -58,39 +84,44 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     synchronized public IParticleAgent mass(double mass){ particle.mass(mass); return this; }
     
     synchronized public IVec position(){ return particle.position(); }
-    synchronized public IParticleAgent position(IVec v){ particle.position(v); return this; }
+    synchronized public IParticleAgent position(IVecI v){ particle.position(v); return this; }
     
     synchronized public IVec pos(){ return particle.pos(); }
-    synchronized public IParticleAgent pos(IVec v){ particle.pos(v); return this; }
+    synchronized public IParticleAgent pos(IVecI v){ particle.pos(v); return this; }
     
     synchronized public IVec velocity(){ return particle.velocity(); }
-    synchronized public IParticleAgent velocity(IVec v){ particle.velocity(v); return this; }
+    synchronized public IParticleAgent velocity(IVecI v){ particle.velocity(v); return this; }
     
     synchronized public IVec vel(){ return particle.vel(); }
-    synchronized public IParticleAgent vel(IVec v){ particle.vel(v); return this; }
+    synchronized public IParticleAgent vel(IVecI v){ particle.vel(v); return this; }
     
-    //synchronized public IVec acceleration(){ return particle.acceleration(); }
+    synchronized public IVec acceleration(){ return particle.acceleration(); }
     //synchronized public IParticleAgent acceleration(IVec v){ particle.acceleration(v); return this; }
-    //synchronized public IVec acc(){ return particle.acc(); }
+    synchronized public IVec acc(){ return particle.acc(); }
     //synchronized public IParticleAgent acc(IVec v){ particle.acc(v); return this; }
     
     synchronized public IVec force(){ return particle.force(); }
-    synchronized public IParticleAgent force(IVec v){ particle.force(v); return this; }
-
+    synchronized public IParticleAgent force(IVecI v){ particle.force(v); return this; }
+    
     synchronized public IVec frc(){ return particle.frc(); }
-    synchronized public IParticleAgent frc(IVec v){ particle.frc(v); return this; }
+    synchronized public IParticleAgent frc(IVecI v){ particle.frc(v); return this; }
     
     synchronized public double friction(){ return particle.friction(); }
     synchronized public IParticleAgent friction(double friction){ particle.friction(friction); return this; }
     
     synchronized public double fric(){ return particle.fric(); }
     synchronized public IParticleAgent fric(double friction){ particle.fric(friction); return this; }
+    /* alias of friction */
+    synchronized public double decay(){ return fric(); }
+    /* alias of friction */
+    synchronized public IParticleAgent decay(double d){ return fric(d); }
     
-    synchronized public IParticleAgent addForce(IVec f){ particle.addForce(f); return this; }
+    synchronized public IParticleAgent push(IVecI f){ particle.push(f); return this; }
+    synchronized public IParticleAgent pull(IVecI f){ particle.pull(f); return this; }
+    synchronized public IParticleAgent addForce(IVecI f){ particle.addForce(f); return this; }
     
+    synchronized public IParticleAgent reset(){ particle.reset(); return this; }
     synchronized public IParticleAgent resetForce(){ particle.resetForce(); return this; }
-
-
     
     
     /**************************************
@@ -120,10 +151,16 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     public IParticleAgent add(IVecI v, double f){ pos.add(v,f); return this; }
     public IParticleAgent add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
     
+    public IParticleAgent add(double f, IVecI v){ return add(v,f); }
+    public IParticleAgent add(IDoubleI f, IVecI v){ return add(v,f); }
+    
     public IParticleAgent len(IDoubleI l){ pos.len(l); return this; }
     public IParticleAgent len(double l){ pos.len(l); return this; }
     
     public IParticleAgent unit(){ pos.unit(); return this; }
+    
+    public IParticleAgent rot(IDoubleI angle){ pos.rot(angle); return this; }
+    public IParticleAgent rot(double angle){ pos.rot(angle); return this; }
     
     public IParticleAgent rot(IVecI axis, IDoubleI angle){ pos.rot(axis,angle); return this; }
     public IParticleAgent rot(IVecI axis, double angle){ pos.rot(axis,angle); return this; }
@@ -139,6 +176,13 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     public IParticleAgent rot(IVecI center, IVecI axis, IVecI destPt){
 	pos.rot(center,axis,destPt); return this;
     }
+    
+    public IParticleAgent rot2(IDoubleI angle){ return rot(angle); }
+    public IParticleAgent rot2(double angle){ return rot(angle); }
+    public IParticleAgent rot2(IVecI center, double angle){ pos.rot2(center,angle); return this; }
+    public IParticleAgent rot2(IVecI center, IDoubleI angle){ pos.rot2(center,angle); return this; }
+    public IParticleAgent rot2(IVecI destDir){ pos.rot2(destDir); return this; }
+    public IParticleAgent rot2(IVecI center, IVecI destPt){ pos.rot2(center,destPt); return this; }
     
     public IParticleAgent scale(IDoubleI f){ pos.scale(f); return this; }
     public IParticleAgent scale(double f){ pos.scale(f); return this; }

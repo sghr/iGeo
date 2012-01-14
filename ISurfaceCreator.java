@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -120,6 +120,33 @@ public class ISurfaceCreator{
     public static ISurface surface(IVecI[] trimCrvPts, int trimCrvDeg){ return new ISurface(server, trimCrvPts, trimCrvDeg); }
     public static ISurface surface(IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots){ return new ISurface(server, trimCrvPts, trimCrvDeg, trimCrvKnots); }
     
+
+    /**
+       box
+    */
+    public static IBox box(double x, double y, double z, double size){
+	return new IBox(x,y,z,size);
+    }
+    public static IBox box(double x, double y, double z, double width, double height, double depth){
+	return new IBox(x,y,z,width,height,depth);
+    }
+    public static IBox box(IVecI origin, double size){ return new IBox(origin,size); }
+    public static IBox box(IVecI origin, double width, double height, double depth){
+	return new IBox(origin,width,height,depth);
+    }
+    public static IBox box(IVecI origin, IVecI xvec, IVecI yvec, IVecI zvec){
+	return new IBox(origin,xvec,yvec,zvec);
+    }
+    public static IBox box(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4,
+			   IVecI pt5, IVecI pt6, IVecI pt7, IVecI pt8 ){
+	return new IBox(pt1,pt2,pt3,pt4,pt5,pt6,pt7,pt8);
+    }
+    public static IBox box(IVecI[][][] corners){ return new IBox(corners); }
+    
+    
+    /**
+       sphere
+    */
     
     public static ISphere sphere(double x, double y, double z, double radius){
 	return new ISphere(server, x, y, z, radius);

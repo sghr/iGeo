@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -539,8 +539,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     
     public static boolean isValidCP(IVecI[][] cpts){
+	if(cpts==null){ IOut.err("controlPoint is null"); return false; }
 	for(int i=0; i<cpts.length; i++){
+	    if(cpts[i]==null){ IOut.err("controlPoint["+i+"] is null"); return false; }
 	    for(int j=0; j<cpts[i].length; j++){
+		if(cpts[i][j]==null){
+		    IOut.err("controlPoint at "+i+","+j+" is null");
+		    return false;
+		}
 		if(!cpts[i][j].isValid()){
 		    IOut.err("controlPoint at "+i+","+j+" is invalid");
 		    return false;
@@ -1666,7 +1672,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     /** alias of neg */
     public ISurfaceGeo flip(){ return neg(); }
-        
+    
     
     /** scale add */
     public ISurfaceGeo add(IVecI v, double f){
@@ -1675,6 +1681,19 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }	
     public ISurfaceGeo add(IVecI v, IDoubleI f){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.add(v,f);
+	return this;
+    }
+    /** scale add alias */
+    public ISurfaceGeo add(double f, IVecI v){ return add(v,f); }
+    public ISurfaceGeo add(IDoubleI f, IVecI v){ return add(v,f); }
+    
+    
+    public ISurfaceGeo rot(IDoubleI angle){
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(angle);
+	return this;
+    }
+    public ISurfaceGeo rot(double angle){
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(angle);
 	return this;
     }
     
@@ -1706,6 +1725,29 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(center,axis,destPt);
 	return this;
     }
+    
+    public ISurfaceGeo rot2(IDoubleI angle){ return rot(angle); }
+    public ISurfaceGeo rot2(double angle){ return rot(angle); }
+    public ISurfaceGeo rot2(IVecI center, IDoubleI angle){
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot2(center,angle);
+	return this;
+    }
+    public ISurfaceGeo rot2(IVecI center, double angle){
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot2(center,angle);
+	return this;
+    }
+    
+    /** rotation on xy-plane to destination direction vector */
+    public ISurfaceGeo rot2(IVecI destDir){
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot2(destDir);
+	return this;
+    }
+    /** rotation on xy-plane to destination point location */    
+    public ISurfaceGeo rot2(IVecI center, IVecI destPt){
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot2(center,destPt);
+	return this;
+    }
+    
     
     /** alias of mul */
     public ISurfaceGeo scale(IDoubleI f){ return mul(f); }

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -69,6 +69,9 @@ public interface IVecI extends IVecOp, ITransformable{
     public IVecI rev();
     /** alias of neg() */
     public IVecI flip();
+    
+    /** setting all zero */
+    public IVecI zero();
     
     /**
        scale add
@@ -272,13 +275,20 @@ public interface IVecI extends IVecOp, ITransformable{
     public IVecI cp(IDoubleI x, IDoubleI y, IDoubleI z);
     public IVecI cp(IVecI v);
     
-        
+    
     // methods creating new instance
+    /** create a new instance of difference */
+    public IVecI dif(IVecI v);
+    /** alias of dif */
     public IVecI diff(IVecI v);
+    /** create a new instance of midpoint */
     public IVecI mid(IVecI v);
+    /** create a new instance of total summation */
     public IVecI sum(IVecI v);
+    /** create a new instance of total summation */
     public IVecI sum(IVecI... v);
     
+    /** create a new instance of bisector */
     public IVecI bisect(IVecI v);
     
     /**

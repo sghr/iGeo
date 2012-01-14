@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -88,15 +88,24 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public IVec2 div(IDoubleI v){ return div(v.x()); }
     
     public IVec2 neg(){ x=-x; y=-y; return this; }
-
+    /** alias of neg */
     public IVec2 rev(){ return neg(); }
-
-    /**
-       scale add
-    */
+    /** alias of neg */
+    public IVec2 flip(){ return neg(); }
+    
+    /** setting all zero */
+    public IVec2 zero(){ x=0; y=0; return this; }
+        
+    
+    /** scale add */
     public IVec2 add(IVec2 v, double f){ x+=v.x*f; y+=v.y*f; return this; }
     public IVec2 add(IVec2I v, double f){ return add(v.get(),f); }
     public IVec2 add(IVec2I v, IDoubleI f){ add(v.get(),f.x()); return this; }
+    
+    /** scale add; alias */
+    public IVec2 add(double f, IVec2 v){ return add(v,f); }
+    public IVec2 add(double f, IVec2I v){ return add(v,f); }
+    public IVec2 add(IDoubleI f, IVec2I v){ return add(v,f); }
     
     
     /**
@@ -319,7 +328,8 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     
     
     // methods creating new instance
-    public IVec2 diff(IVec2I v){ return dup().sub(v); }
+    public IVec2 dif(IVec2I v){ return dup().sub(v); }
+    public IVec2 diff(IVec2I v){ return dif(v); }
     public IVec2 mid(IVec2I v){ return dup().add(v).div(2); }
     public IVec2 sum(IVec2I v){ return dup().add(v); }
     public IVec2 sum(IVec2I... v){

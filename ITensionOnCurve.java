@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -30,11 +30,15 @@ import java.util.ArrayList;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ITensionOnCurve extends IDynamicsBase{
-    public static double defaultTension=1.0;
+public class ITensionOnCurve extends IDynamicsBase implements ITensionI{
+    //public static double defaultTension=1.0;
     
     public IParticleOnCurve pt1, pt2;
+    /** tension is a coefficient to convert distance of two points to amount of force. */
     public double tension = defaultTension;
+    /** if constantTension is true, amount of force is always constant and it's equals to tension.
+        Only direction of force changes. But if the distance is zero, force is also zero. */
+    public boolean constantTension = false;    
     
     public boolean isCurveClosed;
     
@@ -72,7 +76,11 @@ public class ITensionOnCurve extends IDynamicsBase{
     
     public double tension(){ return tension; }
     public ITensionOnCurve tension(double tension){ this.tension = tension; return this; }
-
+    
+    public boolean constant(){ return constantTension; }
+    public ITensionOnCurve constant(boolean cnst){ constantTension = cnst; return this; }
+    
+    public IParticleI pt(int i){ if(i==0) return pt1; return pt2; }
 
     public ITensionOnCurve parent(IObject par){ super.parent(par); return this; }
     public ITensionOnCurve target(IObject targetObj){ super.target(targetObj); return this; }
@@ -87,7 +95,12 @@ public class ITensionOnCurve extends IDynamicsBase{
 	    if(udiff>0.5) udiff -= 1.0; // cyclic
 	    else if(udiff<-0.5) udiff += 1.0; // cyclic
 	}
-	udiff*=tension;
+	if(constantTension){
+	    if(udiff>0) udiff=tension;
+	    else if(udiff<0) udiff=-tension;
+	}
+	else{ udiff*=tension; }
+	
 	pt1.addUForce(udiff);
 	pt2.addUForce(-udiff); // opposite
 	

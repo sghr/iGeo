@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -446,10 +446,10 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    //gl.glLineWidth(1f);
 	    //gl.glLineStipple(0,(short)0xFFFF);
 	    
-	    float red = ISurfaceGraphicGL.defaultColorRed;
-	    float green = ISurfaceGraphicGL.defaultColorGreen;
-	    float blue = ISurfaceGraphicGL.defaultColorBlue;
-	    float alpha = ISurfaceGraphicGL.defaultColorAlpha;
+	    float red = defaultRed;
+	    float green = defaultGreen;
+	    float blue = defaultBlue;
+	    float alpha = defaultAlpha;
 	    
 	    if(color!=null){
 		red = (float)color.getRed()/255;

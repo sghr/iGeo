@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -51,7 +51,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     public IBoundingBox boundingBox;
     public int serverStateCount=-1;
     
-    public boolean firstDraw=true;
+    public boolean startDynamicServer=true;
     
     public IPanel(int x, int y, int width, int height){
 	super(x,y,width,height);
@@ -105,16 +105,19 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     }
     
     
+    public void startDynamicServer(){
+	if(ig!=null &&ig.dynamicServer()!=null &&
+	   (ig.dynamicServer().num()>0 || ig.dynamicServer().addingNum()>0)){
+	    ig.dynamicServer().start();
+	    startDynamicServer=false;
+	}
+    }
+    
     public void draw(IGraphics g){
-	
 	// some initialization process
-	if(firstDraw){
+	if(startDynamicServer){
 	    // here is a point to start dynamicServer
-	    if(ig!=null &&ig.dynamicServer()!=null &&
-	       (ig.dynamicServer().num()>0 || ig.dynamicServer().addingNum()>0)){
-		ig.dynamicServer().start();
-		firstDraw=false;
-	    }
+	    startDynamicServer();
 	}
 	
 	for(int i=0; i<panes.size(); i++){
@@ -302,6 +305,11 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    }while(canceled);
 	    */
 	    
+	}
+	else if(key==KeyEvent.VK_ENTER && !control&& !shift){
+	    ig.pauseDynamics();
+	    //if(ig.isDynamicsRunning()){ ig.pauseDynamics(); }
+	    //else{ ig.resumeDynamics(); }
 	}
 	
 	if(currentMousePane!=null){ currentMousePane.keyPressed(e); }

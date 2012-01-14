@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -132,7 +132,7 @@ public class IBoid extends IParticleAgent{
     
     synchronized public void interact(ArrayList<IDynamics> dynamics){
 	
-	super.interact(dynamics); // for other local interaction
+	//super.interact(dynamics); // for other local interaction
 	
 	for(IDynamics obj: dynamics){
 	    
@@ -203,8 +203,8 @@ public class IBoid extends IParticleAgent{
     }
     
     //IVec prevPt = null;
-    synchronized public void update(){
-	super.update();
+    //synchronized public void update(){
+	//super.update();
 	/*
 	if(time%10==0){
 	    IVec curPt = pos.dup();
@@ -212,7 +212,7 @@ public class IBoid extends IParticleAgent{
 	    prevPt=curPt;
 	}
 	*/
-    }
+    //}
     
     
     

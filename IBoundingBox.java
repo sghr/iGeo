@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -41,7 +41,7 @@ public class IBoundingBox{
     public void setObjects(IServer server){ setObjects(server.getAllObjects()); }
     
     public void compare(IVec p){
-	if(!p.isValid()) return;
+	if(p==null || !p.isValid()) return;
 	if(min==null||max==null){ init(p); return; }
 	if(p.x < min.x) min.x=p.x;
 	else if(p.x > max.x) max.x=p.x;

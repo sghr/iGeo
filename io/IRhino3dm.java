@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -2671,7 +2671,7 @@ public class IRhino3dm{
 	
 	// for IPolycurve which is not child of ICurve (yet)
 	public /*ICurve*/IObject createIObject(Rhino3dmFile context, IServerI s){ return null; }
-	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){ return null; }
+	public ICurveGeo createIGeometry(Rhino3dmFile context, IServerI s){ return null; }
 	public ITrimCurve createTrimCurve(Rhino3dmFile context, IServerI s, ISurfaceI srf){ return null; }
 	
     }
@@ -2739,7 +2739,7 @@ public class IRhino3dm{
 	public Interval domain(int dir){ return new Interval(0,1); } // should be overwritten
 	
 	public ISurface createIObject(Rhino3dmFile context, IServerI s){ return null; }
-	public ISurfaceGeo createIGGeometry(Rhino3dmFile context, IServerI s){ return null; }
+	public ISurfaceGeo createIGeometry(Rhino3dmFile context, IServerI s){ return null; }
     }
     public static class LinearDimension extends Annotation{
 	public static final String uuid = "5DE6B20D-486B-11d4-8014-0010830122F0";
@@ -2914,7 +2914,7 @@ public class IRhino3dm{
 	}
 	
 	
-	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public ICurveGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    IVec center = arc.plane.origin;
 	    IVec normal = arc.plane.zaxis;
 	    if( Math.abs(arc.angle.length())<2*Math.PI-IConfig.angleTolerance){
@@ -4764,7 +4764,7 @@ public class IRhino3dm{
 		BrepFace face = faces.get(i);
 		
 		if(face.faceIndex>=0 && face.faceIndex<surfaces.size()){
-		    ISurfaceGeo surf = surfaces.get(face.faceIndex).createIGGeometry(context,s);
+		    ISurfaceGeo surf = surfaces.get(face.faceIndex).createIGeometry(context,s);
 		    if(surf != null){
 			BrepLoopArray faceLoop = getLoopsForFace(face.faceIndex);
 			for(int j=0; j<faceLoop.size(); j++){
@@ -5036,7 +5036,7 @@ public class IRhino3dm{
 	    return crv;
 	}
 	
-	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public ICurveGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    if(line==null) return null;
 	    return new ICurveGeo(line.from, line.to);
 	}
@@ -5448,10 +5448,10 @@ public class IRhino3dm{
 	
 	
 	public IMesh createIObject(Rhino3dmFile context, IServerI s){
-	    return new IMesh(s,createIGGeometry(context,s));
+	    return new IMesh(s,createIGeometry(context,s));
 	}
 	
-	public IMeshGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public IMeshGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    if(vertices==null){
 		IOut.err("mesh vertices is null");
 		return null;
@@ -6123,7 +6123,7 @@ public class IRhino3dm{
 	    //setAttributesToIObject(context,crv);
 	    return crv;
 	}
-	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public ICurveGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    double[] knot2 = getIGKnots();
 	    double ustart=0, uend=1;
 	    if(knot.length>order-2){
@@ -6459,7 +6459,7 @@ public class IRhino3dm{
 				uknot, vknot, ustart, uend, vstart, vend);
 	}
 	
-	public ISurfaceGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public ISurfaceGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    if(order==null){
 		IOut.err("order is null");
 		return null;
@@ -6569,7 +6569,7 @@ public class IRhino3dm{
 	    
 	}
 	
-	public ISurfaceGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public ISurfaceGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    if(plane==null){ IOut.err("plane is null"); return null; }
 	    if(extents==null){ IOut.err("extent is null"); return null; }
 	    IVec origin = plane.origin;
@@ -6654,7 +6654,7 @@ public class IRhino3dm{
 	    //setAttributesToIObject(context,p);
 	    return p;
 	}
-	public IVec createIGGeometry(Rhino3dmFile context, IServerI s){
+	public IVec createIGeometry(Rhino3dmFile context, IServerI s){
 	    return point.dup();
 	}
 	
@@ -6730,7 +6730,7 @@ public class IRhino3dm{
 	    if(segment.size()==0) throw new IOException("number of segemnts is zero");
 	    if(segment.size()!=segmentCount) throw new IOException("number of segemnts doesn't match with count");
 	    if(t.size()!=segmentCount+1) throw new IOException("number of domain doesn't match with number of segment");
-
+	    
 	    Interval in0=null;
 	    Interval in1 = segment.get(0).domain();
 	    double d0=0;
@@ -6832,30 +6832,96 @@ public class IRhino3dm{
 	    // temporary implementation: this should be replaced by instantiation IPolycurve
 	    
 	    ArrayList<ICurve> icrvs = new ArrayList<ICurve>();
+	    boolean curveDegree1 = true;
 	    for(int i=0; i<segment.size(); i++){
 		IObject obj = segment.get(i).createIObject(context,s);
-		if(obj instanceof ICurve) icrvs.add((ICurve)obj);
+		if(obj instanceof ICurve){
+		    ICurve crv = (ICurve)obj;
+		    icrvs.add(crv);
+		    if(crv.deg()>1) curveDegree1=false;
+		}
+	    }
+	    
+	    if(curveDegree1){
+		ArrayList<IVec> pts = new ArrayList<IVec>();
+		for(int i=0; i<icrvs.size(); i++){
+		    for(int j=0; j<icrvs.get(i).num(); j++){
+			IVec pt = icrvs.get(i).cp(j);
+			if( (j==0 && (i==0 || !pts.get(pts.size()-1).eq(pt))) || j>0 )
+			    pts.add(pt); 
+		    }
+		    icrvs.get(i).del(); // delete
+		}
+		return new ICurve(s,pts.toArray(new IVec[pts.size()]));
 	    }
 	    
 	    return new IPolycurve(icrvs);
 	    //return null;
 	}
-	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	
+	public ICurveGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    if(segment==null ||segment.size()==0) return null;
+	    
+	    
+	    ArrayList<ICurveGeo> icrvs = new ArrayList<ICurveGeo>();
+	    boolean curveDegree1 = true;
+	    for(int i=0; i<segment.size(); i++){
+		ICurveGeo crv = segment.get(i).createIGeometry(context,s);
+		icrvs.add(crv);
+		if(crv.deg()>1) curveDegree1=false;
+	    }
+	    
+	    if(curveDegree1){
+		ArrayList<IVecI> pts = new ArrayList<IVecI>();
+		for(int i=0; i<icrvs.size(); i++){
+		    for(int j=0; j<icrvs.get(i).num(); j++){
+			IVecI pt = icrvs.get(i).cp(j);
+			if( (j==0 && (i==0 || !pts.get(pts.size()-1).eq(pt))) || j>0 )
+			    pts.add(pt); 
+		    }
+		}
+		return new ICurveGeo(pts.toArray(new IVec[pts.size()]));
+	    }
+	    
 	    // return only first curve
-	    return segment.get(0).createIGGeometry(context,s);
+	    //return segment.get(0).createIGeometry(context,s);
+	    return icrvs.get(0);
 	}
 
 	/*
 	// get geometry of each segment at index i.
-	public ICurveGeo createIGGeometryOfEach(Rhino3dmFile context, IServerI s, int i){
+	public ICurveGeo createIGeometryOfEach(Rhino3dmFile context, IServerI s, int i){
 	    if(segment==null ||i>=segment.size()) return null;
-	    return segment.get(i).createIGGeometry(context,s);
+	    return segment.get(i).createIGeometry(context,s);
 	}
 	*/
 		
 	// this needs to be implemented
 	public ITrimCurve createTrimCurve(Rhino3dmFile context, IServerI s, ISurfaceI srf){
+	    
+	    if(segment==null ||segment.size()==0) return null;
+	    
+	    ArrayList<ITrimCurve> icrvs = new ArrayList<ITrimCurve>();
+	    boolean curveDegree1 = true;
+	    for(int i=0; i<segment.size(); i++){
+		ITrimCurve crv = segment.get(i).createTrimCurve(context,s,srf);
+		icrvs.add(crv);
+		if(crv.deg()>1) curveDegree1=false;
+	    }
+	    
+	    //if(curveDegree1){
+	    if(true){ // temporary until IPolycurve is fully implemented.
+		ArrayList<IVecI> pts = new ArrayList<IVecI>();
+		for(int i=0; i<icrvs.size(); i++){
+		    for(int j=0; j<icrvs.get(i).num(); j++){
+			IVecI pt = icrvs.get(i).cp(j);
+			if( (j==0 && (i==0 || !pts.get(pts.size()-1).eq(pt))) || j>0 )
+			    pts.add(pt);
+		    }
+		}
+		return new ITrimCurve(pts.toArray(new IVec[pts.size()]));
+	    }
+	    
 	    return null; // !!! 
 	}
 	
@@ -6917,7 +6983,7 @@ public class IRhino3dm{
 	    //setAttributesToIObject(context,crv);
 	    return crv;
 	}
-	public ICurveGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public ICurveGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    return new ICurveGeo(pline.toArray(new IVec[pline.size()]));
 	}
 	public ITrimCurve createTrimCurve(Rhino3dmFile context, IServerI s, ISurfaceI srf){
@@ -6977,15 +7043,15 @@ public class IRhino3dm{
 	}
 	
 	public ISurface createIObject(Rhino3dmFile context, IServerI s){
-	    ISurfaceGeo surf = createIGGeometry(context,s);
+	    ISurfaceGeo surf = createIGeometry(context,s);
 	    return new ISurface(s,surf);
 	}
 	
-	public ISurfaceGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public ISurfaceGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    IVec axisCenter = axis.from;
 	    IVec axisDir = axis.to.diff(axis.from);
 	    
-	    ICurveGeo profile = curve.createIGGeometry(context,s);
+	    ICurveGeo profile = curve.createIGeometry(context,s);
 	    if(profile == null){
 		IOut.err("no valid profile curve");
 		return null;
@@ -7097,15 +7163,15 @@ public class IRhino3dm{
 	}
 	
 	public ISurface createIObject(Rhino3dmFile context, IServerI s){
-	    ISurfaceGeo surf = createIGGeometry(context,s);
+	    ISurfaceGeo surf = createIGeometry(context,s);
 	    return new ISurface(s,surf);
 	}
 	
-	public ISurfaceGeo createIGGeometry(Rhino3dmFile context, IServerI s){
+	public ISurfaceGeo createIGeometry(Rhino3dmFile context, IServerI s){
 	    if(curve[0]==null || curve[1]==null || basepoint==null) return null;
 	    
-	    ICurveGeo crv1 = curve[0].createIGGeometry(context, s);
-	    ICurveGeo crv2 = curve[1].createIGGeometry(context, s);
+	    ICurveGeo crv1 = curve[0].createIGeometry(context, s);
+	    ICurveGeo crv2 = curve[1].createIGeometry(context, s);
 
 	    //IOut.err("curve[0] == "+curve[0]);
 	    //IOut.err("curve[1] == "+curve[1]);

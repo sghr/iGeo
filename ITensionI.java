@@ -20,30 +20,29 @@
 
 ---*/
 
-package igeo.gui;
-//package igeo.gl;
+package igeo;
 
-import javax.media.opengl.*;
-
-import igeo.*;
+import java.util.ArrayList;
 
 /**
-   Objectified OpenGL polygon drawing process.
+   Interface API of tension classes
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IGLPolygon extends IGLElement{
+public interface ITensionI{
+    public static double defaultTension=1.0;
     
-    public IGLPolygon(){}
-    //public IGLPolygon(IPolyline pl){ super(pl.get()); }
-    public IGLPolygon(IVec[] pts){ super(pts); }
+    /** tension is a coefficient to convert distance of two points to amount of force. */
+    public double tension();
+    public ITensionI tension(double tension);
     
-    public void draw(GL gl){
-	gl.glBegin(GL.GL_POLYGON);
-	drawPoints(gl);
-	gl.glEnd();
-    }
+    /** if constantTension is true, amount of force is always constant and it's equals to tension.
+        Only direction of force changes. But if the distance is zero, force is also zero. */
+    public boolean constant();
+    public ITensionI constant(boolean cnst);
     
+    /** getting end point. i==0 or i==1 */
+    public IParticleI pt(int i);
     
 }

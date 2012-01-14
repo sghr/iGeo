@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -40,12 +40,16 @@ public class IPoint extends IObject implements IVecI{
     public IPoint(IVec v){ pos = v; initPoint(null); }
     public IPoint(IVecI v){ pos = v.get(); initPoint(null); }
     public IPoint(double x, double y, double z){ pos = new IVec(x,y,z); initPoint(null); }
+    public IPoint(double x, double y){ pos = new IVec(x,y); initPoint(null); }
     
     public IPoint(IServerI s){ super(s); pos = new IVec(0,0,0); initPoint(s); }
     public IPoint(IServerI s, IVec v){ super(s); pos = v; initPoint(s); }
     public IPoint(IServerI s, IVecI v){ super(s); pos = v.get(); initPoint(s); }
     public IPoint(IServerI s, double x, double y, double z){
 	super(s); pos = new IVec(x,y,z); initPoint(s); 
+    }
+    public IPoint(IServerI s, double x, double y){
+	super(s); pos = new IVec(x,y); initPoint(s); 
     }
     
     public IPoint(IPoint p){
@@ -63,7 +67,10 @@ public class IPoint extends IObject implements IVecI{
     }
     
     protected void initPoint(IServerI s){
-	parameter = pos;
+	if(pos==null){
+	    IOut.err("null value is set in IPoint"); //
+	    return;
+	}
 	
 	// // costly to use instanceof?
 	//if(pos instanceof IVec) parameter = (IVec)pos;
@@ -82,7 +89,8 @@ public class IPoint extends IObject implements IVecI{
     public double x(){ return pos.x(); }
     public double y(){ return pos.y(); }
     public double z(){ return pos.z(); }
-    public IVec get(){ return pos.get(); }
+    //public IVec get(){ return pos.get(); } // when pos is IVecI
+    public IVec get(){ return pos; }
     
     public IPoint dup(){ return new IPoint(this); }
     
@@ -114,8 +122,14 @@ public class IPoint extends IObject implements IVecI{
     public IPoint rev(){ return neg(); }
     public IPoint flip(){ return neg(); }
     
+    public IPoint zero(){ pos.zero(); return this; }
+    
+    /** scale add */
     public IPoint add(IVecI v, double f){ pos.add(v,f); return this; }
     public IPoint add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
+    /** scale add alias */
+    public IPoint add(double f, IVecI v){ return add(v,f); }
+    public IPoint add(IDoubleI f, IVecI v){ return add(v,f); }
     
     
     public double dot(IVecI v){ return pos.dot(v); }
@@ -184,6 +198,9 @@ public class IPoint extends IObject implements IVecI{
     public double angle(ISwitchE e, IVecI v, IVecI axis){ return pos.angle(e,v,axis); }
     public IDouble angle(ISwitchR r, IVecI v, IVecI axis){ return pos.angle(r,v,axis); }
     
+    public IPoint rot(IDoubleI angle){ pos.rot(angle); return this; }
+    public IPoint rot(double angle){ pos.rot(angle); return this; }
+    
     public IPoint rot(IVecI axis, IDoubleI angle){ pos.rot(axis,angle); return this; }
     public IPoint rot(IVecI axis, double angle){ pos.rot(axis,angle); return this; }
     
@@ -194,17 +211,22 @@ public class IPoint extends IObject implements IVecI{
 	pos.rot(center, axis,angle); return this;
     }
     
-    
-    /**
-       Rotate to destination direction vector.
-    */
+    /** Rotate to destination direction vector. */
     public IPoint rot(IVecI axis, IVecI destDir){ pos.rot(axis,destDir); return this; }
-    /**
-       Rotate to destination point location.
-    */
+    /** Rotate to destination point location. */
     public IPoint rot(IVecI center, IVecI axis, IVecI destPt){
 	pos.rot(center,axis,destPt); return this;
     }
+    
+    
+    public IPoint rot2(IDoubleI angle){ pos.rot2(angle); return this; }
+    public IPoint rot2(double angle){ pos.rot2(angle); return this; }
+    public IPoint rot2(IVecI center, double angle){ pos.rot2(center, angle); return this; }
+    public IPoint rot2(IVecI center, IDoubleI angle){ pos.rot2(center, angle); return this; }
+    /** Rotate to destination direction vector. */
+    public IPoint rot2(IVecI destDir){ pos.rot2(destDir); return this; }
+    /** Rotate to destination point location. */
+    public IPoint rot2(IVecI center, IVecI destPt){ pos.rot2(center,destPt); return this; }
     
     
     /** alias of mul */
@@ -319,7 +341,8 @@ public class IPoint extends IObject implements IVecI{
     // methods creating new instance // returns IPoint?, not IVec?
     // returns IVec, not IPoint (2011/10/12)
     //public IPoint diff(IVecI v){ return dup().sub(v); }
-    public IVec diff(IVecI v){ return pos.diff(v); }
+    public IVec dif(IVecI v){ return pos.dif(v); }
+    public IVec diff(IVecI v){ return dif(v); }
     //public IPoint mid(IVecI v){ return dup().add(v).div(2); }
     public IVec mid(IVecI v){ return pos.mid(v); }
     //public IPoint sum(IVecI v){ return dup().add(v); }

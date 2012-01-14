@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -35,11 +35,11 @@ import igeo.*;
    @version 0.7.0.0;
 */
 public class ISurfaceGraphicGL extends IGraphicObject{
-    public static float defaultColorRed = .5f; //1f;
-    public static float defaultColorGreen = .5f; //1f;
-    public static float defaultColorBlue = .5f; //1f;
-    public static float defaultColorAlpha = 1f;
-
+    //public static float defaultColorRed = .5f; //1f;
+    //public static float defaultColorGreen = .5f; //1f;
+    //public static float defaultColorBlue = .5f; //1f;
+    //public static float defaultColorAlpha = 1f;
+    
     public static float defaultShininess=0.3f; //0.5f; //1f; //5f; //1f; //0.1f; //0.5f; //1f;
     
     public ISurfaceGraphicFillGL fill;

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -52,7 +52,7 @@ public class IDynamicServer implements Runnable{
     public IDynamicServer(IServerI s){
 	server = s.server();
 	dynamics = new ArrayList<IDynamics>();
-
+	
 	addingDynamics = new ArrayList<IDynamics>();
 	removingDynamics = new ArrayList<IDynamics>();
     }
@@ -72,7 +72,8 @@ public class IDynamicServer implements Runnable{
 	}
 	*/
     }
-
+    
+    
     /**************
        returns number of objects in dynamicServer but it
        includes objects to be added and excludes
@@ -112,6 +113,7 @@ public class IDynamicServer implements Runnable{
 	removingDynamics.add(d);
 	//dynamics.remove(d);
     }
+    
     
     public synchronized void clear(){
 	addingDynamics.clear();
@@ -160,28 +162,76 @@ public class IDynamicServer implements Runnable{
 			dynamics.addAll(addingDynamics);//any possible exception?
 			addingDynamics.clear();
 		    }
+		    
 		    // removing objects
 		    if(removingDynamics.size()>0){
 			dynamics.removeAll(removingDynamics);//any possible exception?
 			removingDynamics.clear();
 		    }
 		    
-		    
-		    for(int i=0; i<dynamics.size(); i++){
-			dynamics.get(i).interact(dynamics); //
-			//for(int j=i+1; j<dynamics.size(); j++) dynamics.get(i).interact(dynamics.get(j));
+		    // preinteract
+		    if(IConfig.loopPreinteract&&IConfig.enablePreinteract){
+			for(int i=0; i<dynamics.size(); i++){
+			    dynamics.get(i).preinteract(dynamics);
+			}
 		    }
 		    
-		    // if anything is removed in interact process. // any possible problem?
+		    for(int i=0; i<dynamics.size(); i++){
+			// preinteract
+			if(!IConfig.loopPreinteract&&IConfig.enablePreinteract)
+			    dynamics.get(i).preinteract(dynamics);
+			
+			// interact
+			dynamics.get(i).interact(dynamics);
+			
+			// postinteract
+			if(!IConfig.loopPostinteract&&IConfig.enablePostinteract)
+			    dynamics.get(i).postinteract(dynamics);
+			
+		    }
+		    
+		    // postinteract
+		    if(IConfig.loopPostinteract&&IConfig.enablePostinteract){
+			for(int i=0; i<dynamics.size(); i++){
+			    dynamics.get(i).postinteract(dynamics);
+			}
+		    }
+		    
+		    // if anything is removed in interact (or preinteract/postinteract) process. // can this be any possible problem?
 		    if(removingDynamics.size()>0){
 			dynamics.removeAll(removingDynamics);//any possible exception?
 			removingDynamics.clear();
 		    }
 		    
+		    
+		    // preupdate
+		    if(IConfig.loopPreupdate&&IConfig.enablePreupdate){
+			for(int i=0; i<dynamics.size(); i++){
+			    dynamics.get(i).preupdate();
+			}
+		    }
+		    
 		    //for(IDynamics d:dynamics){ d.update(); }
 		    for(int i=0; i<dynamics.size(); i++){
+			// preupdate
+			if(!IConfig.loopPreupdate&&IConfig.enablePreupdate)
+			    dynamics.get(i).preupdate();
+			
+			// update
 			dynamics.get(i).update();
+			
+			// postupdate
+			if(!IConfig.loopPostupdate&&IConfig.enablePostupdate)
+			    dynamics.get(i).postupdate();
 		    }
+		    
+		    // postupdate
+		    if(IConfig.loopPostupdate&&IConfig.enablePostupdate){
+			for(int i=0; i<dynamics.size(); i++){
+			    dynamics.get(i).postupdate();
+			}
+		    }
+		    
 		}
 		time++;
 		IOut.debug(20,"time="+time); //
@@ -193,4 +243,5 @@ public class IDynamicServer implements Runnable{
 	    }catch(InterruptedException e){}
 	}
     }
+    
 }

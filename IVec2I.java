@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -59,10 +59,21 @@ public interface IVec2I extends IVec2Op{
     public IVec2I div(IDoubleI v);
     public IVec2I div(double v);
     public IVec2I neg();
+    /** alias of neg */
     public IVec2I rev();
+    /** alias of neg */
+    public IVec2I flip();
     
+    /** setting all zero */
+    public IVec2I zero();
+
+    /** scale add */
     public IVec2I add(IVec2I v, double f);
     public IVec2I add(IVec2I v, IDoubleI f);
+    
+    /** scale add; alias */
+    public IVec2I add(double f, IVec2I v);
+    public IVec2I add(IDoubleI f, IVec2I v);
     
     public double dot(IVec2I v);
     //public IDoubleI dotR(IVec2I v);
@@ -171,6 +182,7 @@ public interface IVec2I extends IVec2Op{
     
     
     // methods creating new instance
+    public IVec2I dif(IVec2I v);
     public IVec2I diff(IVec2I v);
     public IVec2I mid(IVec2I v);
     public IVec2I sum(IVec2I v);

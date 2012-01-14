@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -34,6 +34,11 @@ import igeo.gui.*;
 abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobject, IGraphicI{
     
     // should be synchronized with color range in processing when used in processing
+    public static float defaultRed = .5f; //1f;
+    public static float defaultGreen = .5f; //1f;
+    public static float defaultBlue = .5f; //1f;
+    public static float defaultAlpha = 1f;
+    
     static int colorRange1i = 255;  
     static int colorRange2i = 255;
     static int colorRange3i = 255;

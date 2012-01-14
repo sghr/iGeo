@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -63,10 +63,11 @@ public class IVectorGraphic extends IGraphicObject{
 	    gl.glLineWidth(weight); //
 	    gl.glPointSize((float)size); //
 	    
-	    float red = ISurfaceGraphicGL.defaultColorRed;
-            float green = ISurfaceGraphicGL.defaultColorGreen;
-            float blue = ISurfaceGraphicGL.defaultColorBlue;
-            float alpha = ISurfaceGraphicGL.defaultColorAlpha;
+	    float red = defaultRed;
+            float green = defaultGreen;
+            float blue = defaultBlue;
+            float alpha = defaultAlpha;
+	    
             if(color!=null){
                 red = (float)color.getRed()/255;
                 green = (float)color.getGreen()/255;

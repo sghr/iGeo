@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -81,7 +81,7 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
     public void setParent(PApplet parent){
 	
 	super.setParent(parent);
-	
+
 	// initialize root GUI
 	panel = new IGridPanel(0,0,parent.getWidth(),parent.getHeight(),2,2);
 	panel.show();

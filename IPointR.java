@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -108,8 +108,16 @@ public class IPointR extends IObject implements IVecI{
     public IPointR rev(){ return neg(); }
     public IPointR flip(){ return neg(); }
     
+    public IPointR zero(){ pos.zero(); return this; }
+    
+    /** scale add */
     public IPointR add(IVecI v, double f){ pos.add(v,f); return this; }
+    /** scale add */
     public IPointR add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
+    /** scale add alias */
+    public IPointR add(double f, IVecI v){ return add(v,f); }
+    /** scale add alias */
+    public IPointR add(IDoubleI f, IVecI v){ return add(v,f); }
     
     
     public double dot(IVecI v){ return pos.dot(v); }
@@ -177,6 +185,9 @@ public class IPointR extends IObject implements IVecI{
     public double angle(ISwitchE e, IVecI v, IVecI axis){ return pos.angle(e,v,axis); }
     public IDoubleI angle(ISwitchR r, IVecI v, IVecI axis){ return pos.angle(r,v,axis); }
     
+    public IPointR rot(IDoubleI angle){ pos.rot(angle); return this; }
+    public IPointR rot(double angle){ pos.rot(angle); return this; }
+    
     public IPointR rot(IVecI axis, IDoubleI angle){ pos.rot(axis,angle); return this; }
     public IPointR rot(IVecI axis, double angle){ pos.rot(axis,angle); return this; }
     
@@ -187,16 +198,24 @@ public class IPointR extends IObject implements IVecI{
 	pos.rot(center, axis,angle); return this;
     }
         
-    /**
-       rotate to destination direction vector
-    */
+    /** rotate to destination direction vector */
     public IPointR rot(IVecI axis, IVecI destDir){ pos.rot(axis,destDir); return this; }
-    /**
-       rotate to destination point location
-    */
+    /** rotate to destination point location */
     public IPointR rot(IVecI center, IVecI axis, IVecI destPt){
 	pos.rot(center,axis,destPt); return this;
     }
+    
+    /** alias of rot(IDoubleI) */
+    public IPointR rot2(IDoubleI angle){ pos.rot(angle); return this; }
+    /** alias of rot(double) */
+    public IPointR rot2(double angle){ pos.rot(angle); return this; }
+    public IPointR rot2(IVecI center, double angle){ pos.rot2(center, angle); return this; }
+    public IPointR rot2(IVecI center, IDoubleI angle){ pos.rot2(center, angle); return this; }
+    /** rotation on xy-plane to destination direction vector */
+    public IPointR rot2(IVecI destDir){ pos.rot2(destDir); return this; }
+    /** rotation on xy-plane to destination point location */
+    public IPointR rot2(IVecI center, IVecI destPt){ pos.rot2(center,destPt); return this; }
+    
     
     /** alias of mul */
     public IPointR scale(IDoubleI f){ pos.scale(f); return this; }
@@ -304,7 +323,8 @@ public class IPointR extends IObject implements IVecI{
     // methods creating new instance // returns IPoint?, not IVec?
     // returns IVec (2011/10/12)
     //public IPointR diff(IVecI v){ return dup().sub(v); }
-    public IVecI diff(IVecI v){ return pos.diff(v); }
+    public IVecI dif(IVecI v){ return pos.dif(v); }
+    public IVecI diff(IVecI v){ return dif(v); }
     //public IPointR mid(IVecI v){ return dup().add(v).div(2); }
     public IVecI mid(IVecI v){ return pos.mid(v); }
     //public IPointR sum(IVecI v){ return dup().add(v); }

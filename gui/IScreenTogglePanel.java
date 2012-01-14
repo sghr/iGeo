@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -60,7 +60,9 @@ public class IScreenTogglePanel extends IPanel{
     
     public void enableFullScreen(IPane p){
 	int idx = panes.indexOf(p);
+	//IOut.err(idx);
 	if(idx>=0) enableFullScreen(idx);
+	//else{ IOut.err("no pane found"); } //
     }
     
     public void disableFullScreen(){
@@ -98,7 +100,12 @@ public class IScreenTogglePanel extends IPanel{
     }
     
     public void draw(IGraphics g){
-	if(fullScreenPane!=null) synchronized(IG.lock){ fullScreenPane.draw(g); }
+	if(fullScreenPane!=null){
+	    synchronized(IG.lock){
+		if(startDynamicServer) startDynamicServer();
+		fullScreenPane.draw(g);
+	    }
+	}
 	else super.draw(g);
     }
     
@@ -112,14 +119,18 @@ public class IScreenTogglePanel extends IPanel{
 	    else disableFullScreen();
 	}
     }
+
     
     public void keyPressed(KeyEvent e){
 	// toggle screen by space key
-	if(e.getKeyCode()==KeyEvent.VK_SPACE){
+	// shortcut for toggle of full screen is changed to shift+space (to use space for play & stop simulation) 2011/12/24
+	if(e.getKeyCode()==KeyEvent.VK_SPACE && e.isShiftDown()){
+	//if(e.getKeyCode()==KeyEvent.VK_SPACE){
 	    if(fullScreenPane!=null){ disableFullScreen(); }
 	    else if(currentMousePane!=null){ enableFullScreen(currentMousePane); }
 	}
 	super.keyPressed(e);
     }
+    
     
 }

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -20,7 +20,6 @@
 
 ---*/
 
-
 package igeo;
 
 import java.util.*;
@@ -34,9 +33,74 @@ import java.awt.Color;
 */
 public class ITensileNet{
     
-    public static double friction=0.0;
-    public static double tension=1.0;
-    public static double curveTension=1.0;
+    // physical attributes
+    /** friction of node points (of IParticleAgent) */
+    public static double friction = 0.005; //0.0; 
+    /** strength of tension (of ITensionLine) */
+    public static double tension = 1.0;
+    /** strength of tension between points on the same rail curves */
+    public static double onRailTension = 1.0;
+    /** strength of tension to straighten lines */
+    public static double straightenerTension = 1.0;
+    /** strength of tension to equalize spacing on the same rail curves */
+    public static double equalizerTension = 1.0;
+    
+    /** boolean switch to make tension (of ITensionLine) constant not depending on the distance of two points*/
+    public static boolean constantTension = false;
+    
+    
+    /** tolerance to check which points are identical and which lines are connected */
+    public static double tolerance = IConfig.tolerance;
+    
+    /** tolerance to check which points are on rail */
+    public static double railTolerance = IConfig.tolerance;
+    
+    
+    /** color of node points */
+    public static Color pointColor = new Color(255,255,255);
+    /** color of node points on rail curve */
+    public static Color railPointColor = new Color(192,192,192);
+    /** color of fixed node points */
+    public static Color fixedPointColor = new Color(255,255,0);
+    /** color of straightener curve */
+    public static Color straightenerColor = new Color(255,128,0);
+    
+    
+    public static String pointLayer = "nodes";
+    public static String fixedPointLayer = "fixedNodes";
+    public static String straightenerLayer = "straightener";
+    public static String equalizerLayer = "equalizer";
+    
+    
+    // boolean options for create() methods
+    /** boolean switch to fix open end points of lines which are not connected any other line */
+    public static boolean fixOpenLinePoint=true;
+    
+    /** boolean switch to delete input lines */
+    public static boolean deleteInputLine=true;
+    
+    /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
+    public static boolean tensionOnSameRail=true;
+    
+    /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
+    public static boolean fixPointOnRailEnd=true;
+    
+    /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
+    public static boolean fixPointNotOnRail=true;
+    
+    /** boolean switch to put straightening force on connected lines */
+    public static boolean enableStraightener=false; //true;
+    
+    /** if the connected line is less than this angle, it put straightening force on those lines */
+    public static double straightenerThresholdAngle=Math.PI/3;
+    
+    /** remove straighteners whose two points are shared and branching. */
+    public static boolean noBranchingStraightener=true;
+    
+    
+    /** boolean switch to put spacing equalizer force on the same rail curves */
+    public static boolean enableSpacingEqualizer=false; // default false
+    
     
     
     public ArrayList<ITensionLine> links;
@@ -52,13 +116,9 @@ public class ITensileNet{
        create a network of tension line.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
-       @param connectionTolerance tolerance to if two end points are connected or not
     */
-    public static ITensileNet create(ICurveI[] linkLines, IVecI[] fixedPoints,
-				     boolean fixOpenEndPoint,
-				     boolean deleteLines,
-				     double connectionTolerance ){
+    public static ITensileNet create(ICurveI[] linkLines, IVecI[] fixedPoints){
+	// boolean fixOpenEndPoint, boolean deleteLines, double connectionTolerance){
 	
 	if(linkLines==null || linkLines.length==0){
 	    IOut.err("no link line input found");
@@ -75,11 +135,14 @@ public class ITensileNet{
 	}
 	
 	Color[] lineColors = new Color[linkLines.length];
+	ILayer[] lineLayer = new ILayer[linkLines.length];
+	
 	IServer server=null;
-	if(deleteLines){
+	if(deleteInputLine){
 	    for(int i=0; i<linkLines.length; i++){
 		if(linkLines[i] instanceof IObject){
 		    lineColors[i] = ((IObject)linkLines[i]).clr();
+		    lineLayer[i] = ((IObject)linkLines[i]).layer();
 		    ((IObject)linkLines[i]).del();
 		    if(server==null) server = ((IObject)linkLines[i]).server();
 		}
@@ -91,12 +154,12 @@ public class ITensileNet{
 	// find connection and remove duplicates
 	for(int i=0; i<endPts.length; i++){
 	    IVec[] epts1 = endPts[i];
-	    if(epts1[1].eq(epts1[0], connectionTolerance)){ epts1[1] = epts1[0]; }
+	    if(epts1[1].eq(epts1[0], tolerance)){ epts1[1] = epts1[0]; }
 	    for(int j=i+1; j<endPts.length; j++){
 		IVec[] epts2 = endPts[j];
 		for(int k=0; k<2; k++){
-		    if(epts2[k].eq(epts1[0], connectionTolerance)) epts2[k] = epts1[0];
-		    else if(epts2[k].eq(epts1[1], connectionTolerance)) epts2[k] = epts1[1];
+		    if(epts2[k].eq(epts1[0], tolerance)) epts2[k] = epts1[0];
+		    else if(epts2[k].eq(epts1[1], tolerance)) epts2[k] = epts1[1];
 		}
 	    }
 	}
@@ -109,7 +172,7 @@ public class ITensileNet{
 	    }
 	}
 	
-	if(fixOpenEndPoint){
+	if(fixOpenLinePoint){
 	    // cheking naked end point
 	    ArrayList<IVecI> openPts = new ArrayList<IVecI>();
 	    for(int i=0; i<uniquePts.size(); i++){
@@ -133,15 +196,19 @@ public class ITensileNet{
 	    for(int i=0; i<uniquePts.size(); i++){
 		IParticleAgent pa = new IParticleAgent(uniquePts.get(i));
 		pa.fric(friction);
+		pa.clr(pointColor);
 		particles.add(pa);
+		if(pointLayer!=null) pa.layer(IG.layer(pointLayer).clr(pointColor));
 	    }
 	    
 	    // fixing particle
 	    if(fixedPoints!=null){
 		for(int i=0; i<fixedPoints.length; i++){
 		    for(int j=0; j<particles.size(); j++){
-			if(fixedPoints[i].eq(particles.get(j), connectionTolerance)){
+			if(fixedPoints[i].eq(particles.get(j), tolerance)){
 			    particles.get(j).fix();
+			    particles.get(j).clr(fixedPointColor);
+			    if(fixedPointLayer!=null) particles.get(j).layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
 			}
 		    }
 		}
@@ -156,20 +223,89 @@ public class ITensileNet{
 		    IParticleI pa1 = particles.get(index1);
 		    IParticleI pa2 = particles.get(index2);
 		    ITensionLine tl = new ITensionLine(pa1, pa2, tension);
+		    if(lineColors[i]!=null) tl.clr(lineColors[i]);
+		    if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
+		    
 		    tl.tension(tension);
+		    tl.constant(constantTension);
 		    tlines.add(tl);
 		}
 		else{
 		    IOut.err("end point is not found");
 		}
 	    }
+	    
+	    if(enableStraightener){
+		ArrayList<IStraightenerCurve> straighteners = new ArrayList<IStraightenerCurve>();
+		
+		for(int i=0; i<tlines.size(); i++){
+		    IParticleI p11 = tlines.get(i).pt(0);
+		    IParticleI p12 = tlines.get(i).pt(1);
+		    for(int j=i+1; j<tlines.size(); j++){
+			IParticleI p21 = tlines.get(j).pt(0);
+			IParticleI p22 = tlines.get(j).pt(1);
+			
+			IParticleI p1=null,p2=null,p3=null;
+			if(p11==p21){ p1=p12; p2=p11; p3=p22; }
+			else if(p11==p22){ p1=p12; p2=p11; p3=p21; }
+			else if(p12==p21){ p1=p11; p2=p12; p3=p22; }
+			else if(p12==p22){ p1=p11; p2=p12; p3=p21; }
+			
+			if( p1!=null && p2!=null && p3!=null && 
+			    Math.abs(p2.pos().diff(p1.pos()).angle(p3.pos().diff(p2.pos()))) <
+			    straightenerThresholdAngle){
+			    IStraightenerCurve straightener = new IStraightenerCurve(p1,p2,p3);
+			    straightener.tension(straightenerTension);
+			    straightener.clr(straightenerColor);
+			    straightener.layer(IG.layer(straightenerLayer).clr(straightenerColor));
+			    straighteners.add(straightener);
+			}
+		    }
+		}
+		
+		if(noBranchingStraightener){
+		    for(int i=0; i<straighteners.size(); i++){
+			IParticleI p11 = straighteners.get(i).pt(0);
+			IParticleI p12 = straighteners.get(i).pt(1);
+			IParticleI p13 = straighteners.get(i).pt(2);
+			boolean ideleted=false;
+			for(int j=i+1; j<straighteners.size() && !ideleted; j++){
+			    IParticleI p21 = straighteners.get(j).pt(0);
+			    IParticleI p22 = straighteners.get(j).pt(1);
+			    IParticleI p23 = straighteners.get(j).pt(2);
+			    
+			    if(p12==p22 &&
+			       (p11==p21 || p11==p23 || p13==p21 || p13==p23) ){
+				
+				double angle1=p12.pos().diff(p11.pos()).angle(p13.pos().diff(p12.pos()));
+				double angle2=p22.pos().diff(p21.pos()).angle(p23.pos().diff(p22.pos()));
+				
+				if(Math.abs(angle1) < Math.abs(angle2)){
+				    straighteners.get(j).del();
+				    straighteners.remove(j);
+				    j--;
+				}
+				else{
+				    straighteners.get(i).del();
+				    straighteners.remove(i);
+				    i--;
+				    j--;
+				    ideleted=true;
+				}
+			    }
+			}
+		    }
+		}
+		
+	    }
+	    
 	    network = new ITensileNet(tlines, particles);
 	}
 	
 	return network;
     }
     
-    
+    /*
     public static ITensileNet create(ICurveI[] linkLines, IVecI[] fixedPoints,
 				     boolean fixOpenEndLinkPoint,
 				     boolean deleteLines){
@@ -192,74 +328,136 @@ public class ITensileNet{
     public static ITensileNet create(ICurveI[] linkLines){
 	return create(linkLines, null, true, true, IConfig.tolerance);
     }
+    */
+    
+
+
     
     
-    
-    public static ITensileNet create(ICurveI[] sectionCurves, ICurveI[] linkLines){
-	return create(sectionCurves,linkLines,null,
+    /*
+    public static ITensileNet create(ICurveI[] railCurves, ICurveI[] linkLines){
+	return create(railCurves,linkLines,null,
 		      true, false, true,true,IConfig.tolerance);
     }
     
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints){
-	return create(sectionCurves,linkLines,fixedPoints,
+	return create(railCurves,linkLines,fixedPoints,
 		      true, false, true,true,IConfig.tolerance);
     }
     
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints,
 				     boolean fixOpenEndLinkPoint,
-				     boolean fixOpenEndSectionPoint,
+				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines ){
-	return create(sectionCurves,linkLines,fixedPoints,
-		      true, fixOpenEndLinkPoint, fixOpenEndSectionPoint,
+	return create(railCurves,linkLines,fixedPoints,
+		      true, fixOpenEndLinkPoint, fixOpenEndRailPoint,
 		      deleteLines,IConfig.tolerance);
     }
     
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints,
 				     boolean fixOpenEndLinkPoint,
-				     boolean fixOpenEndSectionPoint,
+				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines,
 				     double connectionTolerance ){
-	return create(sectionCurves,linkLines,fixedPoints,
-		      true, fixOpenEndLinkPoint, fixOpenEndSectionPoint,
+	return create(railCurves,linkLines,fixedPoints,
+		      true, fixOpenEndLinkPoint, fixOpenEndRailPoint,
 		      deleteLines,connectionTolerance);
     }
     
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints,
-				     boolean tensionOnSameSection,
+				     boolean tensionOnSameRail,
 				     boolean fixOpenEndLinkPoint,
-				     boolean fixOpenEndSectionPoint,
+				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines){
-	return create(sectionCurves,linkLines,fixedPoints,
-		      tensionOnSameSection, fixOpenEndLinkPoint, fixOpenEndSectionPoint,
+	return create(railCurves,linkLines,fixedPoints,
+		      tensionOnSameRail, fixOpenEndLinkPoint, fixOpenEndRailPoint,
 		      deleteLines,IConfig.tolerance);
     }
+    */
     
     /**
-       create a network of tension line on section curve.
-       @param sectionCurves curves on which all the points sit.
+       create a network of tension line on rail curve.
+       @param railCurves curves on which all the points sit.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param tensionOnSameSection when this is true, tension between points on the same curve is created.
+       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
        @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
-       @param fixOpenEndSectionPoint when this is true points on the end of section are fixed
+       @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
        @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
        @param connectionTolerance tolerance to if two end points are connected or not
     */
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    /*
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints,
-				     boolean tensionOnSameSection,
+				     boolean tensionOnSameRail,
 				     boolean fixOpenEndLinkPoint,
-				     boolean fixOpenEndSectionPoint,
+				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines,
 				     double connectionTolerance ){
-	if(sectionCurves==null || sectionCurves.length==0){
-	    IOut.err("no section curve input found");
-	    return null;
+	return create(railCurves,linkLines,fixedPoints,
+		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      true, deleteLines, connectionTolerance);
+    }
+    */
+    
+    /**
+       create a network of tension line on rail curve.
+       @param railCurves curves on which all the points sit.
+       @param linkLines lines to create tension line. if it's curve, it's simplified to line.
+       @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
+       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
+       @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
+       @param fixPointNotOnRail fix points which are not on the rail curve
+       @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
+    */
+    /*
+    public static ITensileNet create(ICurveI[] railCurves,
+				     ICurveI[] linkLines, IVecI[] fixedPoints,
+				     boolean tensionOnSameRail,
+				     boolean fixOpenEndLinkPoint,
+				     boolean fixOpenEndRailPoint,
+				     boolean fixPointNotOnRail,
+				     boolean deleteLines){
+	return create(railCurves,linkLines,fixedPoints,
+		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      fixPointNotOnRail, deleteLines, IConfig.tolerance);
+    }
+    */
+    /**
+       create a network of tension line on rail curve.
+       @param railCurves curves on which all the points sit.
+       @param linkLines lines to create tension line. if it's curve, it's simplified to line.
+       @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
+       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
+       @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
+       @param fixPointNotOnRail fix points which are not on the rail curve
+       @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
+       @param connectionTolerance tolerance to if two end points are connected or not
+    */
+    
+    
+    /**
+       create a network of tension line on rail curve.
+       @param railCurves curves on which all the points sit.
+       @param linkLines lines to create tension line. if it's curve, it's simplified to line.
+       @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed. this can be null.
+    */
+    public static ITensileNet create(ICurveI[] railCurves, ICurveI[] linkLines, IVecI[] fixedPoints){
+	//boolean tensionOnSameRail, boolean fixOpenEndLinkPoint, boolean fixOpenEndRailPoint,
+	//boolean fixPointNotOnRail, boolean deleteLines, double connectionTolerance ){
+	
+	if(railCurves==null || railCurves.length==0){
+	    //IOut.err("no rail curve input found");
+	    // use create method without railCurves
+	    return create(linkLines, fixedPoints);
 	}
+	
 	if(linkLines==null || linkLines.length==0){
 	    IOut.err("no link line input found");
 	    return null;
@@ -278,7 +476,7 @@ public class ITensileNet{
 	ILayer[] lineLayer = new ILayer[linkLines.length];
 	
 	IServer server=null;
-	if(deleteLines){
+	if(deleteInputLine){
 	    //for(ICurveI line : linkLines){
 	    for(int i=0; i<linkLines.length; i++){
 		if(linkLines[i] instanceof IObject){
@@ -295,12 +493,12 @@ public class ITensileNet{
 	// find connection and remove duplicates
 	for(int i=0; i<endPts.length; i++){
 	    IVec[] epts1 = endPts[i];
-	    if(epts1[1].eq(epts1[0], connectionTolerance)){ epts1[1] = epts1[0]; }
+	    if(epts1[1].eq(epts1[0], tolerance)){ epts1[1] = epts1[0]; }
 	    for(int j=i+1; j<endPts.length; j++){
 		IVec[] epts2 = endPts[j];
 		for(int k=0; k<2; k++){
-		    if(epts2[k].eq(epts1[0], connectionTolerance)) epts2[k] = epts1[0];
-		    else if(epts2[k].eq(epts1[1], connectionTolerance)) epts2[k] = epts1[1];
+		    if(epts2[k].eq(epts1[0], tolerance)) epts2[k] = epts1[0];
+		    else if(epts2[k].eq(epts1[1], tolerance)) epts2[k] = epts1[1];
 		}
 	    }
 	}
@@ -313,9 +511,11 @@ public class ITensileNet{
 	    }
 	}
 	
-	if(fixOpenEndLinkPoint){
+	
+	ArrayList<IVecI> openPts = null;
+	if(fixOpenLinePoint){
 	    // cheking naked end point
-	    ArrayList<IVecI> openPts = new ArrayList<IVecI>();
+	    openPts = new ArrayList<IVecI>();
 	    for(int i=0; i<uniquePts.size(); i++){
 		int count=0;
 		for(int j=0; j<endPts.length; j++){
@@ -324,10 +524,8 @@ public class ITensileNet{
 		}
 		if(count==1){ openPts.add(uniquePts.get(i)); }
 	    }
-	    if(fixedPoints!=null){
-		for(int i=0; i<fixedPoints.length; i++) openPts.add(fixedPoints[i]);
-	    }
-	    fixedPoints = openPts.toArray(new IVecI[openPts.size()]);
+	    //if(fixedPoints!=null) for(int i=0; i<fixedPoints.length; i++) openPts.add(fixedPoints[i]);
+	    //fixedPoints = openPts.toArray(new IVecI[openPts.size()]);
 	}
 	
 	boolean[] fixlist = new boolean[uniquePts.size()];
@@ -335,24 +533,24 @@ public class ITensileNet{
 	    fixlist[i] = false;
 	    if(fixedPoints!=null){
 		for(int j=0; j<fixedPoints.length && !fixlist[i]; j++){
-		    if(fixedPoints[j].eq(uniquePts.get(i), connectionTolerance)){
+		    if(fixedPoints[j].eq(uniquePts.get(i), tolerance)){
 			fixlist[i]=true;
 		    }
 		}
 	    }
 	}
 	
-	ArrayList<IParticleOnCurve>[] particleOnSection = null;
+	ArrayList<IParticleOnCurve>[] particleOnRail = null;
 	
 	
-	if(tensionOnSameSection){
+	if(tensionOnSameRail || enableSpacingEqualizer){
 	    // !!!
 	    @SuppressWarnings("unchecked")
-		ArrayList<IParticleOnCurve>[] pos = new ArrayList[sectionCurves.length];
-	    particleOnSection = pos;
+		ArrayList<IParticleOnCurve>[] pos = new ArrayList[railCurves.length];
+	    particleOnRail = pos;
 	    
-	    for(int i=0; i<particleOnSection.length; i++){
-		particleOnSection[i] = new ArrayList<IParticleOnCurve>();
+	    for(int i=0; i<particleOnRail.length; i++){
+		particleOnRail[i] = new ArrayList<IParticleOnCurve>();
 	    }
 	}
 	
@@ -362,7 +560,7 @@ public class ITensileNet{
 	    
 	    final double uCurveTolerance = 1.0/1000;
 	    
-	    // find a section curve to be on for each uniquePts
+	    // find a rail curve to be on for each uniquePts
 	    ArrayList<IParticleAgent> particles = new ArrayList<IParticleAgent>();
 	    
 	    for(int i=0; i<uniquePts.size(); i++){
@@ -370,38 +568,59 @@ public class ITensileNet{
 		    IOut.debug(0, "finding curve for point to be on ("+i+"/"+uniquePts.size()+")"); //
 		}
 		
-		IParticleOnCurve poc = createParticleOnClosestCurve(sectionCurves,
+		IParticleOnCurve poc = createParticleOnClosestCurve(railCurves,
 								    uniquePts.get(i),
-								    connectionTolerance,
+								    railTolerance, //tolerance,
 								    uCurveTolerance);
 		IParticleAgent pa=null;
 		if(poc!=null){
 		    pa = new IParticleAgent(poc);
+		    pa.clr(railPointColor);
+		    if(pointLayer!=null) pa.layer(IG.layer(pointLayer).clr(pointColor));
+		    
+		    //unfix if it's 
 		}
 		else{
 		    pa = new IParticleAgent(uniquePts.get(i));
-		    pa.fix(); // if not on the curve, fixed.
-		    pa.clr(1.0,1.0,0); // yellow if not on the curve
+		    if(fixPointNotOnRail ||
+		       fixOpenLinePoint &&openPts!=null && openPts.contains(uniquePts.get(i))){ // in case the point is open point and fixOpenLinePoint is true.
+			pa.fix(); // if not on the curve, fixed.
+			pa.clr(fixedPointColor);
+			if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+		    }
+		    else{
+			pa.clr(pointColor);
+			if(pointLayer!=null) pa.layer(IG.layer(pointLayer).clr(pointColor));
+		    }
 		}
 		
 		pa.fric(friction);
 		particles.add(pa);
 		
-		if(fixlist[i]){ pa.fix(); pa.clr(1.0,1.0,0); }
+		if(fixlist[i]){
+		    pa.fix();
+		    pa.clr(fixedPointColor);
+		    if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+		}
 		
-		if(poc!=null && tensionOnSameSection){
-		    // put particle on each list of section
-		    int sectIdx = -1;
-		    for(int j=0; j<sectionCurves.length && sectIdx<0; j++){
-			if(sectionCurves[j]==poc.curve()) sectIdx=j;
+		if(poc!=null){
+		    if(tensionOnSameRail || enableSpacingEqualizer){
+			// put particle on each list of rail
+			int sectIdx = -1;
+			for(int j=0; j<railCurves.length && sectIdx<0; j++){
+			    if(railCurves[j]==poc.curve()) sectIdx=j;
+			}
+			if(sectIdx>=0){ particleOnRail[sectIdx].add(poc); }
 		    }
-		    if(sectIdx>=0){ particleOnSection[sectIdx].add(poc); }
 		    
-		    if(fixOpenEndSectionPoint){
+		    if(fixPointOnRailEnd){
 			if(poc.upos()<IConfig.parameterTolerance ||
 			   poc.upos()>1.0-IConfig.parameterTolerance){
 			    poc.fix();
-			    if(pa!=null) pa.clr(1.0,1.0,0);
+			    if(pa!=null){
+				pa.clr(fixedPointColor);
+				if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+			    }
 			}
 		    }
 		}
@@ -421,6 +640,7 @@ public class ITensileNet{
 		    if(lineColors[i]!=null) tl.clr(lineColors[i]);
 		    if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
 		    tl.tension(tension);
+		    tl.constant(constantTension);
 		    tlines.add(tl);
 		}
 		else{
@@ -428,108 +648,252 @@ public class ITensileNet{
 		}
 	    }
 	    
-	    
-	    if(tensionOnSameSection){
-		
+	    if(tensionOnSameRail || enableSpacingEqualizer){
 		// sort particleoncurve and create tension
 		
-		for(int i=0; i<sectionCurves.length; i++){
-		    if(particleOnSection[i].size()>1){
-			ISort.sort(particleOnSection[i], new IParticleOnCurveComparator());
+		for(int i=0; i<railCurves.length; i++){
+		    if(particleOnRail[i].size()>1){
+			ISort.sort(particleOnRail[i], new IParticleOnCurveComparator());
 			
-			for(int j=0; j<particleOnSection[i].size()-1; j++){
-			    //new ITensionLineOnCurve(particleOnSection[i].get(j),particleOnSection[i].get(j+1),curveTension).clr(IRand.clr());
-			    new ITensionOnCurve(particleOnSection[i].get(j),particleOnSection[i].get(j+1),curveTension);
+			boolean closed=railCurves[i].isClosed();
+			
+			if(tensionOnSameRail){
+			    for(int j=0; !closed && j<particleOnRail[i].size()-1 ||
+				    closed && j<particleOnRail[i].size(); j++){
+				//new ITensionLineOnCurve(particleOnRail[i].get(j),particleOnRail[i].get(j+1),onRailTension).clr(IRand.clr());
+				ITensionOnCurve toc =
+				    new ITensionOnCurve(particleOnRail[i].get(j),
+							particleOnRail[i].get((j+1)%particleOnRail[i].size()),
+							onRailTension);
+				//toc.constant(constantTension); // not for tension on curves
+			    }
+			}
+			
+			if(enableSpacingEqualizer){
+			    for(int j=0; !closed && j<particleOnRail[i].size()-2 ||
+				    closed && j<particleOnRail[i].size(); j++){
+				//new ITensionLineOnCurve(particleOnRail[i].get(j),particleOnRail[i].get(j+1),onRailTension).clr(IRand.clr());
+				ISpacingEqualizer se = 
+				    new ISpacingEqualizer(particleOnRail[i].get(j),
+							  particleOnRail[i].get((j+1)%particleOnRail[i].size()),
+							  particleOnRail[i].get((j+2)%particleOnRail[i].size())).tension(equalizerTension);
+				
+				//toc.constant(constantTension); // not for tension on curves
+			    }
+			    
 			}
 		    }
 		}
+	    }
+	    
+	    if(enableStraightener){
 		
+		ArrayList<IStraightenerCurve> straighteners = new ArrayList<IStraightenerCurve>();
+		
+		for(int i=0; i<tlines.size(); i++){
+		    IParticleI p11 = tlines.get(i).pt(0);
+		    IParticleI p12 = tlines.get(i).pt(1);
+		    for(int j=i+1; j<tlines.size(); j++){
+			IParticleI p21 = tlines.get(j).pt(0);
+			IParticleI p22 = tlines.get(j).pt(1);
+			
+			IParticleI p1=null,p2=null,p3=null;
+			if(p11==p21){ p1=p12; p2=p11; p3=p22; }
+			else if(p11==p22){ p1=p12; p2=p11; p3=p21; }
+			else if(p12==p21){ p1=p11; p2=p12; p3=p22; }
+			else if(p12==p22){ p1=p11; p2=p12; p3=p21; }
+			
+			if( p1!=null && p2!=null && p3!=null && 
+			    Math.abs(p2.pos().diff(p1.pos()).angle(p3.pos().diff(p2.pos()))) <
+			    straightenerThresholdAngle){
+			    IStraightenerCurve straightener = new IStraightenerCurve(p1,p2,p3);
+			    straightener.tension(straightenerTension);
+			    straightener.clr(straightenerColor);
+			    straightener.layer(IG.layer(straightenerLayer).clr(straightenerColor));
+			    
+			    straighteners.add(straightener);
+			}
+			
+		    }
+		}
+		
+		if(noBranchingStraightener){
+		    for(int i=0; i<straighteners.size(); i++){
+			IParticleI p11 = straighteners.get(i).pt(0);
+			IParticleI p12 = straighteners.get(i).pt(1);
+			IParticleI p13 = straighteners.get(i).pt(2);
+			boolean ideleted=false;
+			for(int j=i+1; j<straighteners.size() && !ideleted; j++){
+			    IParticleI p21 = straighteners.get(j).pt(0);
+			    IParticleI p22 = straighteners.get(j).pt(1);
+			    IParticleI p23 = straighteners.get(j).pt(2);
+			    
+			    if(p12==p22 &&
+			       (p11==p21 || p11==p23 || p13==p21 || p13==p23) ){
+				
+				double angle1=p12.pos().diff(p11.pos()).angle(p13.pos().diff(p12.pos()));
+				double angle2=p22.pos().diff(p21.pos()).angle(p23.pos().diff(p22.pos()));
+				
+				if(Math.abs(angle1) < Math.abs(angle2)){
+				    straighteners.get(j).del();
+				    straighteners.remove(j);
+				    j--;
+				}
+				else{
+				    straighteners.get(i).del();
+				    straighteners.remove(i);
+				    i--;
+				    j--;
+				    ideleted=true;
+				}
+			    }
+			}
+		    }
+		}
 	    }
 	    
 	    
 	    network = new ITensileNet(tlines, particles);
 	}
-
+	
 	/*
-	//tmp hiding section
-	for(int i=0; i<sectionCurves.length; i++){
-	    if(sectionCurves[i] instanceof IObject) ((IObject)sectionCurves[i]).hide();  //
+	//tmp hiding rail
+	for(int i=0; i<railCurves.length; i++){
+	    if(railCurves[i] instanceof IObject) ((IObject)railCurves[i]).hide();  //
 	}
 	*/
 	
 	return network;
-	
     }
     
-    
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    /*
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines,
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints){
-	return create(sectionCurves,linkLines,fixedLines,fixedPoints,
+	return create(railCurves,linkLines,fixedLines,fixedPoints,
 		      true,false,true,true,IConfig.tolerance);
     }
     
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines,
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints,
-				     boolean tensionOnSameSection,
+				     boolean tensionOnSameRail,
 				     boolean fixOpenEndLinkPoint,
-				     boolean fixOpenEndSectionPoint){
-	return create(sectionCurves,linkLines,fixedLines,fixedPoints,
-		      tensionOnSameSection,fixOpenEndLinkPoint,
-		      fixOpenEndSectionPoint,true,IConfig.tolerance);
+				     boolean fixOpenEndRailPoint){
+	return create(railCurves,linkLines,fixedLines,fixedPoints,
+		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      fixOpenEndRailPoint,true,IConfig.tolerance);
     }
     
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines,
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints,
-				     boolean tensionOnSameSection,
+				     boolean tensionOnSameRail,
 				     boolean fixOpenEndLinkPoint,
-				     boolean fixOpenEndSectionPoint,
+				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines){
-	return create(sectionCurves,linkLines,fixedLines,fixedPoints,
-		      tensionOnSameSection,fixOpenEndLinkPoint,
-		      fixOpenEndSectionPoint,deleteLines,IConfig.tolerance);
+	return create(railCurves,linkLines,fixedLines,fixedPoints,
+		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      fixOpenEndRailPoint,deleteLines,IConfig.tolerance);
     }
+    */
     
     /**
-       create a network of tension line on section curve.
-       @param sectionCurves curves on which all the points sit.
+       create a network of tension line on rail curve.
+       @param railCurves curves on which all the points sit.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param tensionOnSameSection when this is true, tension between points on the same curve is created.
+       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
        @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
-       @param fixOpenEndSectionPoint when this is true points on the end of section are fixed
+       @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
        @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
        @param connectionTolerance tolerance to if two end points are connected or not
     */
-    public static ITensileNet create(ICurveI[] sectionCurves,
+    /*
+    public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines,
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints,
-				     boolean tensionOnSameSection,
+				     boolean tensionOnSameRail,
 				     boolean fixOpenEndLinkPoint,
-				     boolean fixOpenEndSectionPoint,
+				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines,
 				     double connectionTolerance ){
+	return create(railCurves,linkLines,fixedLines,fixedPoints,
+		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      fixOpenEndRailPoint,true,deleteLines,connectionTolerance);
+    }
+    */
+/**
+       create a network of tension line on rail curve.
+       @param railCurves curves on which all the points sit.
+       @param linkLines lines to create tension line. if it's curve, it's simplified to line.
+       @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
+       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
+       @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
+       @param fixPointNotOnRail fix points which are not on the rail curve
+       @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
+*/
+    /*
+    public static ITensileNet create(ICurveI[] railCurves,
+				     ICurveI[] linkLines,
+				     ICurveI[] fixedLines,
+				     IVecI[] fixedPoints,
+				     boolean tensionOnSameRail,
+				     boolean fixOpenEndLinkPoint,
+				     boolean fixOpenEndRailPoint,
+				     boolean fixPointNotOnRail,
+				     boolean deleteLines ){
 	
+	return create(railCurves,linkLines,fixedLines,fixedPoints,
+		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      fixOpenEndRailPoint,fixPointNotOnRail,deleteLines,IConfig.tolerance);
+    }
+    */
+    
+    /* ***old API
+       create a network of tension line on rail curve.
+       @param railCurves curves on which all the points sit.
+       @param linkLines lines to create tension line. if it's curve, it's simplified to line.
+       @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
+       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
+       @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
+       @param fixPointNotOnRail fix points which are not on the rail curve
+       @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
+       @param connectionTolerance tolerance to if two end points are connected or not
+    */
+    /**
+       create a network of tension line on rail curve.
+       @param railCurves curves on which all the points sit.
+       @param linkLines lines to create tension line. if it's curve, it's simplified to line.
+       @param fixedLines end points of fixedLines are added to fixedPoints.
+       @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
+    */
+    public static ITensileNet create(ICurveI[] railCurves, ICurveI[] linkLines,
+				     ICurveI[] fixedLines,IVecI[] fixedPoints){
+	// //boolean tensionOnSameRail,
+	//boolean fixOpenEndLinkPoint, boolean fixOpenEndRailPoint,
+	// boolean fixPointNotOnRail, boolean deleteLines,double  connectionTolerance ){
+		
 	ArrayList<IVecI> fixedPts = new ArrayList<IVecI>();
 	
 	for(int i=0; i<fixedLines.length; i++){
 	    IVec spt = fixedLines[i].start().get();
 	    IVec ept = fixedLines[i].end().get();
-	    if(spt.eq(ept, connectionTolerance)){ ept = null; }
+	    if(spt.eq(ept, tolerance)){ ept = null; }
 	    
 	    for(int j=0; j<fixedPts.size() && spt!=null; j++){
-		if(spt.eq(fixedPts.get(j),connectionTolerance)) spt=null;
+		if(spt.eq(fixedPts.get(j),tolerance)) spt=null;
 	    }
 	    if(spt!=null) fixedPts.add(spt);
 	    
 	    for(int j=0; j<fixedPts.size() && ept!=null; j++){
-		if(ept.eq(fixedPts.get(j), connectionTolerance)) ept=null;
+		if(ept.eq(fixedPts.get(j), tolerance)) ept=null;
 	    }
 	    if(ept!=null) fixedPts.add(ept);
 	}
@@ -538,48 +902,42 @@ public class ITensileNet{
 	    fixedPts.add(fixedPoints[i]);
 	}
 	
-	
-	return create(sectionCurves,linkLines,
-		      fixedPts.toArray(new IVecI[fixedPts.size()]),
-		      tensionOnSameSection,
-		      fixOpenEndLinkPoint,
-		      fixOpenEndSectionPoint,
-		      deleteLines,
-		      connectionTolerance);
-	
+	return create(railCurves,linkLines,fixedPts.toArray(new IVecI[fixedPts.size()]));
+	//tensionOnSameRail,fixOpenEndLinkPoint,fixOpenEndRailPoint,fixPointNotOnRail,deleteLines,
+	//connectionTolerance);
     }
     
     /**
-       find the closest curve to the point pos out of sectionsCurves.
-       @param sectionCurves target curves to search
+       find the closest curve to the point pos out of railsCurves.
+       @param railCurves target curves to search
        @param pos point to measure the distance to check how close
        @param searchResolution resolution per a curve specifying how many points per a curve to be checked
     */
-    public static ICurveI findClosestCurve(ICurveI[] sectionCurves, IVec pos, int searchResolution){
+    public static ICurveI findClosestCurve(ICurveI[] railCurves, IVec pos, int searchResolution){
 	double minDist=-1;
 	int minCurveIdx=-1;
-	for(int i=0; i<sectionCurves.length; i++){
+	for(int i=0; i<railCurves.length; i++){
 	    for(int j=0; j<=searchResolution; j++){
-		double dist = sectionCurves[i].pt((double)j/searchResolution).dist(pos);
+		double dist = railCurves[i].pt((double)j/searchResolution).dist(pos);
 		if(minCurveIdx<0 || dist<minDist){
 		    minCurveIdx = i;
 		    minDist = dist;
 		}
 	    }
 	}
-	if(minCurveIdx<0) return null; // when sectionCurves.length==0?
-	return sectionCurves[minCurveIdx];
+	if(minCurveIdx<0) return null; // when railCurves.length==0?
+	return railCurves[minCurveIdx];
     }
     
     /**
        find the closest curve to the point and put particle on the curve.
        if the curve is not close enough within closenessTolerance, particle is not created.
-       @param sectionCurves target curves to search
+       @param railCurves target curves to search
        @param pos point to measure the distance to check how close
        @param closenessTolerance tolerance to determine if the point is on the curve or not
        @param uTolerance tolerance in u parameter to specify how precise u parameter of particle shoould be
     */
-    public static IParticleOnCurve createParticleOnClosestCurve(ICurveI[] sectionCurves,
+    public static IParticleOnCurve createParticleOnClosestCurve(ICurveI[] railCurves,
 								IVec pos,
 								double closenessTolerance,
 								double uTolerance){
@@ -587,23 +945,23 @@ public class ITensileNet{
 	IParticleOnCurve particle = null;
 	do{
 	    ICurveI closestCrv = null;
-	    if(sectionCurves.length==1) closestCrv = sectionCurves[0];
-	    else closestCrv = findClosestCurve(sectionCurves, pos, roughSearchResolution);
+	    if(railCurves.length==1) closestCrv = railCurves[0];
+	    else closestCrv = findClosestCurve(railCurves, pos, roughSearchResolution);
 	    
 	    particle = createParticleOnCurve(closestCrv, pos, closenessTolerance, uTolerance);
 	    
 	    if(particle==null){
-		if(sectionCurves.length>1){
-		    ICurveI[] sectionCurves2 = new ICurveI[sectionCurves.length-1];
-		    for(int i=0, j=0; i<sectionCurves.length; i++, j++){
-			if(sectionCurves[i]!=closestCrv){ sectionCurves2[j] = sectionCurves[i]; }
+		if(railCurves.length>1){
+		    ICurveI[] railCurves2 = new ICurveI[railCurves.length-1];
+		    for(int i=0, j=0; i<railCurves.length; i++, j++){
+			if(railCurves[i]!=closestCrv){ railCurves2[j] = railCurves[i]; }
 			else{ j--; }
 		    }
-		    sectionCurves = sectionCurves2;
+		    railCurves = railCurves2;
 		}
 		else{ return null; } // after checking all curves, there is nothing close enough
 	    }
-	}while(particle == null && sectionCurves.length>1);
+	}while(particle == null && railCurves.length>1);
 	
 	return particle;
     }

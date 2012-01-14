@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -259,12 +259,14 @@ public class IObject{
 	return this;
     }
     
+    /** Get layer of the object */
     public ILayer layer(){
 	//return layer;
 	if(attribute!=null) return attribute.layer;
 	return null;
     }
-    
+
+    /** Set layer by ILayer object */
     public IObject layer(ILayer l){
 	if(l==null){
 	    if(attribute!=null){ attribute.layer = null; }
@@ -288,6 +290,12 @@ public class IObject{
 	}
 	*/
 	return this;
+    }
+    
+    /** Set layer by layer name. If the layer specified by the name is not existing in the server, a new layer is automatically created in the server */
+    public IObject layer(String layerName){
+	if(server!=null) return layer(server.layer(layerName));
+	return layer(IG.layer(layerName));
     }
     
     public IAttribute attr(){ return attribute; }
@@ -325,14 +333,30 @@ public class IObject{
     }
     
     
-    /** @return returns whatever Color of any graphics member. (first found)
-     */
+    /** @return returns whatever Color of any graphics member. (first found) */
     public Color clr(){
-	if(graphics==null && attribute==null) return null;
 	if(attribute!=null) return attribute.color;
-	for(IGraphicObject gr:graphics) if(gr.getColor()!=null) return gr.getColor();
-	return null;
+	if(graphics!=null)
+	    for(IGraphicObject gr:graphics)
+		if(gr.getColor()!=null)
+		    return gr.getColor();
+	
+	return IGraphicObject.getColor(IGraphicObject.defaultRed,
+				       IGraphicObject.defaultGreen,
+				       IGraphicObject.defaultBlue,
+				       IGraphicObject.defaultAlpha);
     }
+    
+    public int redInt(){ return clr().getRed(); }
+    public int greenInt(){ return clr().getGreen(); }
+    public int blueInt(){ return clr().getBlue(); }
+    public int alphaInt(){ return clr().getAlpha(); }
+    
+    public double red(){ return ((double)redInt()/255.); }
+    public double green(){ return ((double)greenInt()/255.); }
+    public double blue(){ return ((double)blueInt()/255.); }
+    public double alpha(){ return ((double)alphaInt()/255.); }
+    
     
     public IObject clr(Color c){
 	if(attribute==null) attribute = new IAttribute();

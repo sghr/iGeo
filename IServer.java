@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -173,6 +173,9 @@ public class IServer implements IServerI{
 	    }
 	    if(e.dynamics!=null){
 		for(int j=0; j<e.dynamics.size(); j++) dynamicServer.remove(e.dynamics.get(j)); //removeDynamicObject(e.dynamics.get(j));
+	    }
+	    if(e.attribute!=null && e.attribute.layer!=null){
+		e.attribute.layer.remove(e); // 20111217
 	    }
 	    objects.remove(e);
 	    if(e instanceof ILayer){ layers.remove(e); }

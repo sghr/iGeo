@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -565,6 +565,12 @@ public class ISurface extends IObject implements ISurfaceI{
     /** scale add */
     public ISurface add(IVecI v, double f){ surface.add(v,f); return this; }
     public ISurface add(IVecI v, IDoubleI f){ surface.add(v,f); return this; }
+    /** scale add alias */
+    public ISurface add(double f, IVecI v){ return add(v,f); }
+    public ISurface add(IDoubleI f, IVecI v){ return add(v,f); }
+    
+    public ISurface rot(IDoubleI angle){ surface.rot(angle); return this; }
+    public ISurface rot(double angle){ surface.rot(angle); return this; }
     
     public ISurface rot(IVecI axis, IDoubleI angle){ surface.rot(axis,angle); return this; }
     public ISurface rot(IVecI axis, double angle){ surface.rot(axis,angle); return this; }
@@ -576,6 +582,16 @@ public class ISurface extends IObject implements ISurfaceI{
     public ISurface rot(IVecI axis, IVecI destDir){ surface.rot(axis,destDir); return this; }
     /** rotate to destination point location */    
     public ISurface rot(IVecI center, IVecI axis, IVecI destPt){ surface.rot(center,axis,destPt); return this; }
+    
+    public ISurface rot2(IDoubleI angle){ return rot(angle); }
+    public ISurface rot2(double angle){ return rot(angle); }
+    public ISurface rot2(IVecI center, IDoubleI angle){ surface.rot2(center,angle); return this; }
+    public ISurface rot2(IVecI center, double angle){ surface.rot2(center,angle); return this; }
+    
+    /** rotation on xy-plane to destination direction vector */
+    public ISurface rot2(IVecI destDir){ surface.rot2(destDir); return this; }
+    /** rotation on xy-plane to destination point location */    
+    public ISurface rot2(IVecI center, IVecI destPt){ surface.rot2(center,destPt); return this; }
     
     
     /** alias of mul */

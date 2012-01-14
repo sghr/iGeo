@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -71,9 +71,49 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
 	initParticle();
     }
     
+    
+    
+    public IParticle(IVec pos, IVec vel){ this.pos = pos; initParticle(vel); }
+    public IParticle(IVec pos, IVec vel, IObject parent){ super(parent); this.pos = pos; initParticle(vel); }
+    
+    public IParticle(IVecI p, IVecI v){ pos = p.get(); initParticle(v); }
+    public IParticle(IVecI p, IVecI v, IObject parent){ super(parent); pos = p.get(); initParticle(v); }
+    
+    public IParticle(double x, double y, double z, double vx, double vy, double vz){
+	pos = new IVec(x,y,z); initParticle(new IVec(vx,vy,vz));
+    }
+    public IParticle(double x, double y, double z, double vx, double vy, double vz,
+		     IObject parent){
+	super(parent); pos = new IVec(x,y,z); initParticle(new IVec(vx,vy,vz));
+    }
+    
+    public IParticle(IPoint pt, IVecI v){ super(pt); pos = pt.pos; initParticle(v); }
+    public IParticle(IPointR pt, IVecI v){ super(pt); pos = pt.pos.get(); initParticle(v); }
+    
+    public IParticle(IParticle ptcl, IVecI v){
+	super(ptcl.parent);
+	pos = ptcl.pos.dup();
+	initParticle(v);
+    }
+    
+    public IParticle(IParticle ptcl, IVecI v, IObject parent){
+	super(parent);
+	pos = ptcl.pos.dup();
+	initParticle(v);
+    }
+    
+    
     synchronized public void initParticle(){
 	vel = new IVec();
 	//acc = new IVec();
+	frc = new IVec();
+    }
+    synchronized public void initParticle(IVec v){
+	vel = v;
+	frc = new IVec();
+    }
+    synchronized public void initParticle(IVecI v){
+	vel = v.get();
 	frc = new IVec();
     }
     
@@ -93,16 +133,21 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     synchronized public IParticle mass(double mass){ this.mass=mass; return this; }
     
     synchronized public IVec position(){ return pos(); }
-    synchronized public IParticle position(IVec v){ pos(v); return this; }
+    synchronized public IParticle position(IVecI v){ return pos(v); }
     
     synchronized public IVec pos(){ return pos; }
-    synchronized public IParticle pos(IVec v){ pos.set(v); return this; }
+    synchronized public IParticle pos(IVecI v){ pos.set(v); return this; }
     
     synchronized public IVec velocity(){ return vel(); }
-    synchronized public IParticle velocity(IVec v){ vel(v); return this; }
+    synchronized public IParticle velocity(IVecI v){ return vel(v); }
     
     synchronized public IVec vel(){ return vel; }
-    synchronized public IParticle vel(IVec v){ vel.set(v); return this; }
+    synchronized public IParticle vel(IVecI v){ vel.set(v); return this; }
+    
+    /** get acceleration; acceleration is calculated from frc and mass */
+    synchronized public IVec acceleration(){ return acc(); }
+    /** get acceleration; acceleration is calculated from frc and mass */
+    synchronized public IVec acc(){ return frc.dup().div(mass); } 
     
     //synchronized public IVec acceleration(){ return acc(); }
     //synchronized public IParticle acceleration(IVec v){ acc(v); return this; }
@@ -110,20 +155,32 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     //synchronized public IParticle acc(IVec v){ acc.set(v); return this; }
     
     synchronized public IVec force(){ return frc(); }
-    synchronized public IParticle force(IVec v){ frc(v); return this; }
+    synchronized public IParticle force(IVecI v){ return frc(v); }
     
     synchronized public IVec frc(){ return frc; }
-    synchronized public IParticle frc(IVec v){ frc.set(v); return this; }
+    synchronized public IParticle frc(IVecI v){ frc.set(v); return this; }
     
     synchronized public double friction(){ return fric(); }
-    synchronized public IParticle friction(double friction){ fric(friction); return this; }
+    synchronized public IParticle friction(double friction){ return fric(friction); }
     
     synchronized public double fric(){ return friction; }
     synchronized public IParticle fric(double friction){ this.friction=friction; return this; }
+    /* alias of friction */
+    public double decay(){ return fric(); }
+    /* alias of friction */
+    public IParticle decay(double d){ return fric(d); }
     
-    synchronized public IParticle addForce(IVec f){ frc.add(f); return this; }
-    
-    synchronized public IParticle resetForce(){ frc.set(0,0,0); return this; }
+    /** adding force */
+    synchronized public IParticle push(IVecI f){ frc.add(f); return this; }
+    /** adding negative force */
+    synchronized public IParticle pull(IVecI f){ frc.sub(f); return this; }
+    /** adding force (alias of push) */
+    synchronized public IParticle addForce(IVecI f){ return push(f); }
+
+    /** setting force zero */
+    synchronized public IParticle reset(){ frc.zero(); return this; }
+    /** setting force zero (alias of reset()) */
+    synchronized public IParticle resetForce(){ return reset(); }
     
     synchronized public void interact(ArrayList<IDynamics> dynamics){}
     
@@ -131,7 +188,7 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
 	if(fixed) return;
 	vel.add(frc.mul(IConfig.updateRate/mass)).mul(1.0-friction);
 	pos.add(vel.dup().mul(IConfig.updateRate));
-	frc.set(0,0,0);
+	frc.zero();
 	//if(parent!=null) parent.updateGraphic(); // graphic update
 	//super.update();
 	updateTarget();
@@ -159,7 +216,7 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     public IParticle set(IVecI v){ pos.set(v); return this; }
     public IParticle set(double x, double y, double z){ pos.set(x,y,z); return this;}
     public IParticle set(IDoubleI x, IDoubleI y, IDoubleI z){ pos.set(x,y,z); return this; }
-
+    
     public IParticle add(double x, double y, double z){ pos.add(x,y,z); return this; }
     public IParticle add(IDoubleI x, IDoubleI y, IDoubleI z){ pos.add(x,y,z); return this; }    
     public IParticle add(IVecI v){ pos.add(v); return this; }
@@ -174,9 +231,14 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     public IParticle neg(){ pos.neg(); return this; }
     public IParticle rev(){ return neg(); }
     public IParticle flip(){ return neg(); }
+
+    public IParticle zero(){ pos.zero(); return this; }
     
     public IParticle add(IVecI v, double f){ pos.add(v,f); return this; }
     public IParticle add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
+    
+    public IParticle add(double f, IVecI v){ return add(v,f); }
+    public IParticle add(IDoubleI f, IVecI v){ return add(v,f); }
     
     
     public double dot(IVecI v){ return pos.dot(v); }
@@ -245,6 +307,9 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     public double angle(ISwitchE e, IVecI v, IVecI axis){ return pos.angle(e,v,axis); }
     public IDouble angle(ISwitchR r, IVecI v, IVecI axis){ return pos.angle(r,v,axis); }
     
+    public IParticle rot(IDoubleI angle){ pos.rot(angle); return this; }
+    public IParticle rot(double angle){ pos.rot(angle); return this; }
+    
     public IParticle rot(IVecI axis, IDoubleI angle){ pos.rot(axis,angle); return this; }
     public IParticle rot(IVecI axis, double angle){ pos.rot(axis,angle); return this; }
     
@@ -254,18 +319,21 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     public IParticle rot(IVecI center, IVecI axis, IDoubleI angle){
 	pos.rot(center, axis,angle); return this;
     }
-    
-    
-    /**
-       Rotate to destination direction vector.
-    */
+    /** Rotate to destination direction vector. */
     public IParticle rot(IVecI axis, IVecI destDir){ pos.rot(axis,destDir); return this; }
-    /**
-       Rotate to destination point location.
-    */
+    /** Rotate to destination point location. */
     public IParticle rot(IVecI center, IVecI axis, IVecI destPt){
 	pos.rot(center,axis,destPt); return this;
     }
+    
+    public IParticle rot2(IDoubleI angle){ return rot(angle); }
+    public IParticle rot2(double angle){ return rot(angle); }
+    public IParticle rot2(IVecI center, double angle){ pos.rot2(center,angle); return this; }
+    public IParticle rot2(IVecI center, IDoubleI angle){ pos.rot2(center,angle); return this; }
+    /** Rotation on xy-plane to destination direction vector. */
+    public IParticle rot2(IVecI destDir){ pos.rot2(destDir); return this; }
+    /** Rotation on xy-plane to destination point location. */
+    public IParticle rot2(IVecI center, IVecI destPt){ pos.rot2(center,destPt); return this; }
     
     
     /** alias of mul */
@@ -380,7 +448,8 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     // methods creating new instance // returns IParticle?, not IVec?
     // returns IVec, not IParticle (2011/10/12)
     //public IParticle diff(IVecI v){ return dup().sub(v); }
-    public IVec diff(IVecI v){ return pos.diff(v); }
+    public IVec dif(IVecI v){ return pos.dif(v); }
+    public IVec diff(IVecI v){ return dif(v); }
     //public IParticle mid(IVecI v){ return dup().add(v).div(2); }
     public IVec mid(IVecI v){ return pos.mid(v); }
     //public IParticle sum(IVecI v){ return dup().add(v); }

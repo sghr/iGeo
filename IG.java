@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -25,6 +25,8 @@ package igeo;
 import java.awt.*;
 import java.util.*;
 import java.io.*;
+
+import java.lang.reflect.Array;
 
 import igeo.gui.*;
 import igeo.io.*;
@@ -74,11 +76,22 @@ public class IG implements IServerI{
     /************************************
      * static geometry variables
      ************************************/
-
+    /** x-axis vector. do not modify the content. */
     public static final IVec xaxis = IVec.xaxis;
+    /** y-axis vector. do not modify the content. */
     public static final IVec yaxis = IVec.yaxis;
+    /** z-axis vector. do not modify the content. */
     public static final IVec zaxis = IVec.zaxis;
+    /** origin vector. do not modify the content. */
     public static final IVec origin = IVec.origin;
+    /** alias of x-axis vector */
+    public static final IVec x = IVec.xaxis;
+    /** alias of y-axis vector */
+    public static final IVec y = IVec.yaxis;
+    /** alias of z-axis vector */
+    public static final IVec z = IVec.zaxis;
+    /** alias of origin vector */
+    public static final IVec o = IVec.origin;
     
     
     /************************************
@@ -260,8 +273,21 @@ public class IG implements IServerI{
     
     /** setting update rate time interval in second */
     public static void updateRate(double second){ IConfig.updateRate=second; }
+    /** alias of updateRate() */
+    public static void updateSpeed(double second){ updateRate(second); }
+    /** alias of updateRate() */
+    public static void rate(double second){ updateRate(second); }
+    /** alias of updateRate() */
+    public static void speed(double second){ updateRate(second); }
+    
     /** getting update rate time interval in second */
     public static double updateRate(){ return IConfig.updateRate; }
+    /** alias of updateRate() */
+    public static double updateSpeed(){ return updateRate(); }
+    /** alias of updateRate() */
+    public static double rate(){ return updateRate(); }
+    /** alias of updateRate() */
+    public static double speed(){ return updateRate(); }
     
     
     /** to set the name first and save later (likely by key event) */
@@ -283,72 +309,139 @@ public class IG implements IServerI{
 	if(ig==null) return null;
 	return ig.getInputFile();
     }
-    
+
+
+    /** get all points in the current server */
     public static IPoint[] points(){
 	IG ig = cur(); return ig==null?null:ig.getPoints();
     }
+    /** get all points in the current server; alias */
+    public static IPoint[] pts(){ return points(); }
+    
+    /** get all curves in the current server */
     public static ICurve[] curves(){
 	IG ig = cur(); return ig==null?null:ig.getCurves();
     }
+    /** get all curves in the current server; alias */
+    public static ICurve[] crvs(){ return curves(); }
+    
+    /** get all surfaces in the current server */
     public static ISurface[] surfaces(){
 	IG ig = cur(); return ig==null?null:ig.getSurfaces();
     }
+    /** get all surfaces in the current server; alias */
+    public static ISurface[] srfs(){ return surfaces(); }
+    
+    /** get all meshes in the current server */
     public static IMesh[] meshes(){
 	IG ig = cur(); return ig==null?null:ig.getMeshes();
     }
+    /** get all breps in the current server */
     public static IBrep[] breps(){
 	IG ig = cur(); return ig==null?null:ig.getBreps();
     }
+    /** get all objects of the specified class in the current server */
     public static IObject[] objects(Class cls){
 	IG ig = cur(); return ig==null?null:ig.getObjects(cls);
     }
+    /** get all objects of the specified class in the current server; alias */
+    public static IObject[] objs(Class cls){ return objects(); }
+    
+    /** get all objects in the current server */
     public static IObject[] objects(){
 	IG ig = cur(); return ig==null?null:ig.getObjects();
     }
+    /** get all objects in the current server; alias */
+    public static IObject[] objs(){ return objects(); }
     
+    /** get a point in the current server */
     public static IPoint point(int i){
 	IG ig = cur(); return ig==null?null:ig.getPoint(i);
     }
+    /** get a point in the current server; alias */
+    public static IPoint pt(int i){ return point(i); }
+    
+    /** get a curve in the current server */
     public static ICurve curve(int i){
 	IG ig = cur(); return ig==null?null:ig.getCurve(i);
     }
+    /** get a curve in the current server; alias */
+    public static ICurve crv(int i){ return curve(i); }
+    
+    /** get a surface in the current server */
     public static ISurface surface(int i){
 	IG ig = cur(); return ig==null?null:ig.getSurface(i);
     }
+    /** get a surface in the current server; alias */
+    public static ISurface srf(int i){ return surface(i); }
+    
+    /** get a mesh in the current server */
     public static IMesh mesh(int i){
 	IG ig = cur(); return ig==null?null:ig.getMesh(i);
     }
+    
+    /** get a brep in the current server */
     public static IBrep brep(int i){
 	IG ig = cur(); return ig==null?null:ig.getBrep(i);
     }
+
+    /** get a object of the specified class in the current server */
     public static IObject object(Class cls, int i){
 	IG ig = cur(); return ig==null?null:ig.getObject(cls,i);
     }
+    /** get a object of the specified class in the current server; alias */
+    public static IObject obj(Class cls, int i){ return object(cls,i); }
+    
+    /** get a object in the current server */
     public static IObject object(int i){
 	IG ig = cur(); return ig==null?null:ig.getObject(i);
     }
+    /** get a object in the current server; alias */
+    public static IObject obj(int i){ return object(i); }
     
+    /** number of points in the current server */
     public static int pointNum(){
 	IG ig = cur(); return ig==null?0:ig.getPointNum();
     }
+    /** number of points in the current server; alias */
+    public static int ptNum(){ return pointNum(); }
+    
+    /** number of curves in the current server */
     public static int curveNum(){
 	IG ig = cur(); return ig==null?0:ig.getCurveNum();
     }
+    /** number of curves in the current server; alias */
+    public static int crvNum(){ return curveNum(); }
+    
+    /** number of surfaces in the current server */
     public static int surfaceNum(){
 	IG ig = cur(); return ig==null?0:ig.getSurfaceNum();
     }
+    /** number of surfaces in the current server; alias */
+    public static int srfNum(){ return surfaceNum(); }
+    
+    /** number of meshes in the current server */
     public static int meshNum(){
 	IG ig = cur(); return ig==null?0:ig.getMeshNum();
     }
+    /** number of breps in the current server */
     public static int brepNum(){
 	IG ig = cur(); return ig==null?0:ig.getBrepNum();
     }
+    /** number of objects of the specified class in the current server */
     public static int objectNum(Class cls){
 	IG ig = cur(); return ig==null?0:ig.getObjectNum(cls);
     }
+    /** number of objects of the specified class in the current server; alias */
+    public static int objNum(Class cls){ return objectNum(cls); }
+    
+    /** number of objects in the current server */
     public static int objectNum(){
 	IG ig = cur(); return ig==null?0:ig.getObjectNum();
     }
+    /** number of objects in the current server; alias */
+    public static int objNum(){ return objectNum(); }
+    
     
     
     public static ILayer layer(String layerName){
@@ -434,6 +527,312 @@ public class IG implements IServerI{
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,true,true));
     }
+    
+    public static IView view(int paneIndex){
+	IG ig = cur(); if(ig==null) return null;
+	if(ig==null || ig.panel==null || ig.panel.panes==null ||
+	   ig.panel.panes.size() <= paneIndex || paneIndex<0 ){ return null; }
+	if(ig.panel instanceof IScreenTogglePanel){
+	    ((IScreenTogglePanel)(ig.panel)).enableFullScreen(ig.panel.panes.get(paneIndex));
+	}
+	return ig.panel.panes.get(paneIndex).getView();
+    }
+    
+    
+    /** put the specified pane on the full screen inside the window if the panel is IGridPanel with 2x2 grid */
+    public static IPane gridPane(int xindex, int yindex){
+	IG ig = cur(); if(ig==null) return null;
+	if(ig.panel!=null && ig.panel instanceof IGridPanel){
+	    IGridPanel gpanel = (IGridPanel)ig.panel;
+	    if(xindex>=0 && xindex < gpanel.gridPanes.length &&
+	       yindex>=0 && yindex < gpanel.gridPanes[xindex].length ){
+		IPane pane = gpanel.gridPanes[xindex][yindex];
+		gpanel.enableFullScreen(pane);
+		return pane;
+	    }
+	}
+	return null;
+    }
+    
+    /** put top pane on the full screen inside the window if the panel is IGridPanel */
+    public static IPane topPane(){ return gridPane(0,0); }
+    
+    /** bottom pane is identical with top pane in IGridPanel */
+    public static IPane bottomPane(){ return topPane(); }
+    
+    /** put perspective pane on the full screen inside the window if the panel is IGridPanel */
+    public static IPane perspectivePane(){ return gridPane(1,0); }
+    
+    /** axonometric pane is identical with perspective pane in IGridPanel */
+    public static IPane axonometricPane(){ return perspectivePane(); }
+    
+    /** put front pane on the full screen inside the window if the panel is IGridPanel */
+    public static IPane frontPane(){ return gridPane(0,1); }
+    
+    /** back pane is identical with front pane in IGridPanel */
+    public static IPane backPane(){ return frontPane(); }
+    
+    /** put right pane on the full screen inside the window if the panel is IGridPanel */
+    public static IPane rightPane(){ return gridPane(1,1); }
+    
+    /** left pane is identical with front pane in IGridPanel */
+    public static IPane leftPane(){ return rightPane(); }
+    
+    
+    
+    /** put top view on the full screen inside the window */
+    public static void top(){
+	IPane pane = topPane();
+	if(pane!=null){ pane.getView().setTop(); }
+    }
+    public static void top(double x, double y){
+	IPane pane = topPane();
+	if(pane!=null){ pane.getView().setTop(x,y); }
+    }
+    public static void top(double x, double y, double z){
+	IPane pane = topPane();
+	if(pane!=null){ pane.getView().setTop(x,y,z); }
+    }
+    public static void top(double x, double y, double z, double axonRatio){
+	IPane pane = topPane();
+	if(pane!=null){ pane.getView().setTop(x,y,z,axonRatio); }
+    }
+    public static void topView(){ top(); }
+    public static void topView(double x, double y){ top(x,y); }
+    public static void topView(double x, double y, double z){ top(x,y,z); }
+    public static void topView(double x, double y, double z, double axonRatio){
+	top(x,y,z,axonRatio);
+    }
+    
+    /** put bottom view on the full screen inside the window */
+    public static void bottom(){
+	IPane pane = bottomPane();
+	if(pane!=null){ pane.getView().setBottom(); }
+    }
+    public static void bottom(double x, double y){
+	IPane pane = bottomPane();
+	if(pane!=null){ pane.getView().setBottom(x,y); }
+    }
+    public static void bottom(double x, double y, double z){
+	IPane pane = bottomPane();
+	if(pane!=null){ pane.getView().setBottom(x,y,z); }
+    }
+    public static void bottom(double x, double y, double z, double axonRatio){
+	IPane pane = bottomPane();
+	if(pane!=null){ pane.getView().setBottom(x,y,z,axonRatio); }
+    }
+    public static void bottomView(){ bottom(); }
+    public static void bottomView(double x, double y){ bottom(x,y); }
+    public static void bottomView(double x, double y, double z){ bottom(x,y,z); }
+    public static void bottomView(double x, double y, double z, double axonRatio){ bottom(x,y,z,axonRatio); }
+    
+    
+    /** put perspective view on the full screen inside the window */
+    public static void perspective(){
+	IPane pane = perspectivePane();
+	if(pane!=null){ pane.getView().setPerspective(); }
+    }
+    public static void perspective(double x, double y, double z){
+	IPane pane = perspectivePane();
+	if(pane!=null){ pane.getView().setPerspective(x,y,z); }
+    }
+    public static void perspective(double x, double y, double z,
+				   double yaw, double pitch){
+	IPane pane = perspectivePane();
+	if(pane!=null){ pane.getView().setPerspective(x,y,z,yaw,pitch); }
+    }
+    public static void perspectiveView(){ perspective(); }
+    public static void perspectiveView(double x, double y, double z){ perspective(x,y,z); }
+    public static void perspectiveView(double x, double y, double z,
+				       double yaw, double pitch){ perspective(x,y,z,yaw,pitch); }
+    public static void pers(){ perspective(); }
+    public static void pers(double x, double y, double z){ perspective(x,y,z); }
+    public static void pers(double x, double y, double z, double yaw, double pitch){ perspective(x,y,z,yaw,pitch); }
+    
+    
+    /** put perspective view on the full screen inside the window */
+    public static void perspective(double perspectiveAngle){
+	IPane pane = perspectivePane();
+	if(pane!=null){
+	    pane.getView().setPerspective(perspectiveAngle);
+	}
+    }
+    public static void perspective(double x, double y, double z,
+				   double perspectiveAngle){
+	IPane pane = perspectivePane();
+	if(pane!=null){
+	    pane.getView().setPerspective(x,y,z,perspectiveAngle);
+	}
+    }
+    public static void perspective(double x, double y, double z,
+				   double yaw, double pitch,
+				   double perspectiveAngle){
+	IPane pane = perspectivePane();
+	if(pane!=null){
+	    pane.getView().setPerspective(x,y,z,yaw,pitch,perspectiveAngle);
+	}
+    }
+    public static void perspectiveView(double perspectiveAngle){ perspective(perspectiveAngle); }
+    public static void perspectiveView(double x, double y, double z,
+				       double perspectiveAngle){
+	perspective(x,y,z,perspectiveAngle);
+    }
+    public static void perspectiveView(double x, double y, double z,
+				       double yaw, double pitch,
+				       double perspectiveAngle){
+	perspective(x,y,z,yaw,pitch,perspectiveAngle);
+    }
+    public static void pers(double perspectiveAngle){ perspective(perspectiveAngle); }
+    public static void pers(double x, double y, double z, double perspectiveAngle){
+	perspective(x,y,z,perspectiveAngle);
+    }
+    public static void pers(double x, double y, double z, double yaw, double pitch, double perspectiveAngle){
+	perspective(x,y,z,yaw,pitch,perspectiveAngle);
+    }
+    
+    /** put axonometric view on the full screen inside the window */
+    public static void axonometric(){
+	IPane pane = axonometricPane();
+	if(pane!=null){ pane.getView().setAxonometric(); }
+    }
+    public static void axonometric(double x, double y, double z){
+	IPane pane = axonometricPane();
+	if(pane!=null){ pane.getView().setAxonometric(x,y,z); }
+    }
+    public static void axonometric(double x, double y, double z, double axonRatio){
+	IPane pane = axonometricPane();
+	if(pane!=null){ pane.getView().setAxonometric(x,y,z,axonRatio); }
+    }
+    public static void axonometric(double x, double y, double z, double yaw, double pitch){
+	IPane pane = axonometricPane();
+	if(pane!=null){ pane.getView().setAxonometric(x,y,z,yaw,pitch); }
+    }
+    public static void axonometric(double x, double y, double z, double yaw, double pitch, double axonRatio){
+	IPane pane = axonometricPane();
+	if(pane!=null){ pane.getView().setAxonometric(x,y,z,yaw,pitch,axonRatio); }
+    }
+    public static void axonometricView(){ axonometric(); }
+    public static void axonometricView(double x, double y, double z){
+	axonometric(x,y,z);
+    }
+    public static void axonometricView(double x, double y, double z, double axonRatio){
+	axonometric(x,y,z,axonRatio);
+    }
+    public static void axonometricView(double x, double y, double z,
+				       double yaw, double pitch){
+	axonometric(x,y,z,yaw,pitch);
+    }
+    public static void axonometricView(double x, double y, double z,
+				       double yaw, double pitch, double axonRatio){
+	axonometric(x,y,z,yaw,pitch,axonRatio);
+    }
+    public static void axon(){ axonometric(); }
+    public static void axon(double x, double y, double z){
+	axonometric(x,y,z);
+    }
+    public static void axon(double x, double y, double z, double axonRatio){
+	axonometric(x,y,z,axonRatio);
+    }
+    public static void axon(double x, double y, double z, double yaw, double pitch){
+	axonometric(x,y,z,yaw,pitch);
+    }
+    public static void axon(double x, double y, double z, double yaw, double pitch, double axonRatio){
+	axonometric(x,y,z,yaw,pitch,axonRatio);
+    }
+    
+    
+    /** put front view on the full screen inside the window */
+    public static void front(){
+	IPane pane = frontPane();
+	if(pane!=null){ pane.getView().setFront(); }
+    }
+    public static void front(double x, double z){
+	IPane pane = frontPane();
+	if(pane!=null){ pane.getView().setFront(x,z); }
+    }
+    public static void front(double x, double y, double z){
+	IPane pane = frontPane();
+	if(pane!=null){ pane.getView().setFront(x,y,z); }
+    }
+    public static void front(double x, double y, double z, double axonRatio){
+	IPane pane = frontPane();
+	if(pane!=null){ pane.getView().setFront(x,y,z,axonRatio); }
+    }
+    public static void frontView(){ front(); }
+    public static void frontView(double x, double z){ front(x,z); }
+    public static void frontView(double x, double y, double z){ front(x,y,z); }
+    public static void frontView(double x, double y, double z, double axonRatio){ front(x,y,z,axonRatio); }
+    
+    /** put back view on the full screen inside the window */
+    public static void back(){
+	IPane pane = backPane();
+	if(pane!=null){ pane.getView().setBack(); }
+    }
+    public static void back(double x, double z){
+	IPane pane = backPane();
+	if(pane!=null){ pane.getView().setBack(x,z); }
+    }
+    public static void back(double x, double y, double z){
+	IPane pane = backPane();
+	if(pane!=null){ pane.getView().setBack(x,y,z); }
+    }
+    public static void back(double x, double y, double z, double axonRatio){
+	IPane pane = backPane();
+	if(pane!=null){ pane.getView().setBack(x,y,z,axonRatio); }
+    }
+    public static void backView(){ back(); }
+    public static void backView(double x, double z){ back(x,z); }
+    public static void backView(double x, double y, double z){ back(x,y,z); }
+    public static void backView(double x, double y, double z, double axonRatio){ back(x,y,z,axonRatio); }
+    
+    /** put right view on the full screen inside the window */
+    public static void right(){
+	IPane pane = rightPane();
+	if(pane!=null){ pane.getView().setRight(); }
+    }
+    public static void right(double y, double z){
+	IPane pane = rightPane();
+	if(pane!=null){ pane.getView().setRight(y, z); }
+    }
+    public static void right(double x, double y, double z){
+	IPane pane = rightPane();
+	if(pane!=null){ pane.getView().setRight(x, y, z); }
+    }
+    public static void right(double x, double y, double z, double axonRatio){
+	IPane pane = rightPane();
+	if(pane!=null){ pane.getView().setRight(x, y, z, axonRatio); }
+    }
+    public static void rightView(){ right(); }
+    public static void rightView(double y, double z){ right(y,z); }
+    public static void rightView(double x, double y, double z){ right(x,y,z); }
+    public static void rightView(double x, double y, double z, double axonRatio){ right(x,y,z,axonRatio); }
+    
+    /** put left view on the full screen inside the window */
+    public static void left(){
+	IPane pane = leftPane();
+	if(pane!=null){ pane.getView().setLeft(); }
+    }
+    public static void left(double y, double z){
+	IPane pane = leftPane();
+	if(pane!=null){ pane.getView().setLeft(y,z); }
+    }
+    public static void left(double x, double y, double z){
+	IPane pane = leftPane();
+	if(pane!=null){ pane.getView().setLeft(x,y,z); }
+    }
+    public static void left(double x, double y, double z, double axonRatio){
+	IPane pane = leftPane();
+	if(pane!=null){ pane.getView().setLeft(x,y,z,axonRatio); }
+    }
+    public static void leftView(){ left(); }
+    public static void leftView(double y, double z){ left(y,z); }
+    public static void leftView(double x, double y, double z){ left(x,y,z); }
+    public static void leftView(double x, double y, double z, double axonRatio){ left(x,y,z,axonRatio); }
+    
+    
+    /****************************
+     * background color
+     ***************************/
     
     //public static void setBG(Color c){}
     //public static void setBG(Color c1, Color c2){}
@@ -561,6 +960,14 @@ public class IG implements IServerI{
     public static void enabePrintPrefix(){ IOut.enablePrefix(); }
     public static void disablePrintPrefix(){ IOut.disablePrefix(); }
     
+    /** Error print method.
+	This is a wrapper of IOut.err()
+    */
+    public static void err(Object obj){ IOut.errWithOffset(obj,1); }
+    public static void err(){ IOut.errWithOffset(1); }
+    public static void enabeErrorPrefix(){ IOut.enablePrefix(); }
+    public static void disableErrorPrefix(){ IOut.disablePrefix(); }
+    
     
     
     /*************************************************************************
@@ -669,7 +1076,7 @@ public class IG implements IServerI{
     public void startDynamics(){ server.start(); }
     public void stopDynamics(){ server.stop(); }
     
-    
+    //public boolean isDynamicsRunning(){ server.
     
     
     //public void draw(IGraphics g){ server.draw(g); }
@@ -685,6 +1092,18 @@ public class IG implements IServerI{
     /*********************************************************************
      * Static Geometry Operations
      ********************************************************************/
+    
+    /** point creation */
+    public static IPoint point(IVecI v){ return pt(v); }
+    public static IPoint point(IVec v){ return pt(v); }
+    public static IPoint point(double x, double y, double z){ return pt(x,y,z); }
+    public static IPoint point(double x, double y){ return pt(x,y); }
+        
+    /** point creation shorter name */
+    public static IPoint pt(IVecI v){ return new IPoint(v); }
+    public static IPoint pt(IVec v){ return new IPoint(v); }
+    public static IPoint pt(double x, double y, double z){ return new IPoint(x,y,z); }
+    public static IPoint pt(double x, double y){ return new IPoint(x,y); }
     
     
     public static ICurve curve(IVecI[] cpts, int degree, double[] knots, double ustart, double uend){
@@ -769,6 +1188,17 @@ public class IG implements IServerI{
 	return curve(xyzValues,degree,close);
     }
     public static ICurve crv(ICurveI crv){ return curve(crv); }
+    
+    
+
+    /***********
+     * line : type of curve.
+     **********/
+    
+    public static ICurve line(IVecI pt1, IVecI pt2){ return curve(pt1,pt2); }
+    public static ICurve line(double x1, double y1, double z1, double x2, double y2, double z2){
+	return curve(x1,y1,z1,x2,y2,z2);
+    }
     
     
     /************
@@ -1099,6 +1529,127 @@ public class IG implements IServerI{
 	return ISurfaceCreator.surface(trimCrvPts,trimCrvDeg,trimCrvKnots);
     }
     
+    
+
+    
+    /*****************************************************************
+     * srf : short name of surfaces
+     *****************************************************************/
+    
+    public static ISurface srf(IVecI[][] cpts, int udegree, int vdegree,
+			       double[] uknots, double[] vknots,
+			       double ustart, double uend, double vstart, double vend){
+	return surface(cpts,udegree,vdegree,uknots,vknots,ustart,uend,vstart,vend);
+    }
+    
+    public static ISurface srf(IVecI[][] cpts, int udegree, int vdegree,
+			       double[] uknots, double[] vknots){
+	return surface(cpts,udegree,vdegree,uknots,vknots);
+    }
+    
+    public static ISurface srf(IVecI[][] cpts, int udegree, int vdegree){
+        return surface(cpts,udegree,vdegree);
+    }
+    
+    public static ISurface srf(IVecI[][] cpts){ return surface(cpts); }
+    
+    public static ISurface srf(IVecI[][] cpts, int udegree, int vdegree,
+			       boolean closeU, boolean closeV){
+	return surface(cpts,udegree,vdegree,closeU,closeV);
+    }
+    
+    public static ISurface srf(IVecI[][] cpts, int udegree, int vdegree,
+			       boolean closeU, double[] vk){
+	return surface(cpts,udegree,vdegree,closeU,vk);
+    }
+    
+    public static ISurface srf(IVecI[][] cpts, int udegree, int vdegree,
+			       double[] uk, boolean closeV){
+	return surface(cpts,udegree,vdegree,uk,closeV);
+    }
+    
+    public static ISurface srf(IVecI[][] cpts, boolean closeU, boolean closeV){
+	return surface(cpts,closeU,closeV);
+    }
+    
+    public static ISurface srf(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4){
+	return surface(pt1,pt2,pt3,pt4);
+    }
+    
+    public static ISurface srf(IVecI pt1, IVecI pt2, IVecI pt3){
+	return surface(pt1,pt2,pt3);
+    }
+    
+    public static ISurface srf(double x1, double y1, double z1,
+			       double x2, double y2, double z2,
+			       double x3, double y3, double z3,
+			       double x4, double y4, double z4){
+	return surface(x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4);
+    }
+    
+    public static ISurface srf(double x1, double y1, double z1,
+			       double x2, double y2, double z2,
+			       double x3, double y3, double z3){
+	return surface(x1,y1,z1,x2,y2,z2,x3,y3,z3);
+    }
+    
+    public static ISurface srf(double[][][] xyzValues){ return surface(xyzValues); }
+    
+    public static ISurface srf(double[][][] xyzValues, int udeg, int vdeg){
+	return surface(xyzValues,udeg,vdeg);
+    }
+    
+    public static ISurface srf(double[][][] xyzValues, boolean closeU, boolean closeV){
+	return surface(xyzValues,closeU,closeV);
+    }
+    
+    public static ISurface srf(double[][][] xyzValues, int udeg, int vdeg, boolean closeU, boolean closeV){
+	return surface(xyzValues,udeg,vdeg,closeU,closeV);
+    }
+    
+    public static ISurface srf(ISurfaceI srf){ return surface(srf); }
+    
+    
+    /** planar surface with trim */
+    public static ISurface srf(ICurveI trimCurve){ return surface(trimCurve); }
+    public static ISurface srf(ICurveI[] trimCurves){ return surface(trimCurves); }
+    public static ISurface srf(IVecI[] trimCrvPts){ return surface(trimCrvPts); }
+    public static ISurface srf(IVecI[] trimCrvPts, int trimCrvDeg){
+	return surface(trimCrvPts,trimCrvDeg);
+    }
+    public static ISurface srf(IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots){
+	return surface(trimCrvPts,trimCrvDeg,trimCrvKnots);
+    }
+    
+    
+    
+
+    /*****************************************************************
+     * box
+     *****************************************************************/
+    public static IBox box(double x, double y, double z, double size){
+	return ISurfaceCreator.box(x,y,z,size);
+    }
+    public static IBox box(double x, double y, double z, double width, double height, double depth){
+	return ISurfaceCreator.box(x,y,z,width,height,depth);
+    }
+    public static IBox box(IVecI origin, double size){ return ISurfaceCreator.box(origin,size); }
+    public static IBox box(IVecI origin, double width, double height, double depth){
+	return ISurfaceCreator.box(origin,width,height,depth);
+    }
+    public static IBox box(IVecI origin, IVecI xvec, IVecI yvec, IVecI zvec){
+	return ISurfaceCreator.box(origin,xvec,yvec,zvec);
+    }
+    public static IBox box(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4,
+			   IVecI pt5, IVecI pt6, IVecI pt7, IVecI pt8 ){
+	return ISurfaceCreator.box(pt1,pt2,pt3,pt4,pt5,pt6,pt7,pt8);
+    }
+    public static IBox box(IVecI[][][] corners){ return ISurfaceCreator.box(corners); }
+    
+    
+    /*****************************************************************
+     * sphere
+     *****************************************************************/
     
     public static ISphere sphere(double x, double y, double z, double radius){
 	return ISurfaceCreator.sphere(x,y,z,radius);
@@ -1626,29 +2177,1436 @@ public class IG implements IServerI{
      * creating vector 
      ********************************************************/
     
-    public static IVec vector(double x, double y, double z){
+    public static IVec vec(double x, double y, double z){ return v(x,y,z); }
+    public static IVec vec(double x, double y){ return v(x,y); }
+    public static IVec vec(IVec v){ return v(v); }
+    public static IVec vec(IVecI v){ return v(v); }
+    public static IVec vec(IDoubleI x, IDoubleI y, IDoubleI z){ return v(x,y,z); }
+    public static IVec vec(IDoubleI x, IDoubleI y){ return v(x,y); }
+    public static IVec vec(IVec2I v){ return v(v); }
+    
+    /*********************************************************
+     * vector shorter name 
+     ********************************************************/
+    
+    public static IVec v(double x, double y, double z){ return new IVec(x,y,z); }
+    public static IVec v(double x, double y){ return new IVec(x,y); }
+    public static IVec v(IVec v){ return new IVec(v); }
+    public static IVec v(IVecI v){ return new IVec(v); }
+    public static IVec v(IDoubleI x, IDoubleI y, IDoubleI z){
 	return new IVec(x,y,z);
     }
-    public static IVec vector(IVec v){ return new IVec(v); }
-    public static IVec vector(IVecI v){ return new IVec(v); }
-    public static IVec vector(IDoubleI x, IDoubleI y, IDouble z){
-	return new IVec(x,y,z);
-    }
-    public static IVec vector(IVec2I v){
-	return new IVec(v);
+    public static IVec v(IDoubleI x, IDoubleI y){ return new IVec(x,y,new IDouble(0)); }
+    public static IVec v(IVec2I v){ return new IVec(v); }
+    
+    /*********************************************************
+     * vector longer name
+     ********************************************************/
+    public static IVec vector(double x, double y, double z){ return v(x,y,z); }
+    public static IVec vector(double x, double y){ return v(x,y); }
+    public static IVec vector(IVec v){ return v(v); }
+    public static IVec vector(IVecI v){ return v(v); }
+    public static IVec vector(IDoubleI x, IDoubleI y, IDoubleI z){ return v(x,y,z); }
+    public static IVec vector(IDoubleI x, IDoubleI y){ return v(x,y); }
+    public static IVec vector(IVec2I v){ return v(v); }
+    
+    
+    
+    /*********************************************************
+     * creating 4 dimensional vector with weight
+     ********************************************************/
+    public static IVec4 vec4(double x, double y, double z, double w){ return v4(x,y,z,w); }
+    public static IVec4 vec4(IVec v, double w){ return v4(v,w); }
+    public static IVec4 vec4(IVec4 v){ return v4(v); }
+    public static IVec4 vec4(IVecI v){ return v4(v); }
+    public static IVec4 vec4(IVecI v, double w){ return v4(v,w); }
+    public static IVec4 vec4(IVecI v, IDoubleI w){ return v4(v,w); }
+    public static IVec4 vec4(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI w){ return v4(x,y,z,w); }
+    
+    /*********************************************************
+     * 4d vector shorter name 
+     ********************************************************/
+    
+    public static IVec4 v4(double x, double y, double z, double w){ return new IVec4(x,y,z,w); }
+    public static IVec4 v4(IVec v, double w){ return new IVec4(v,w); }
+    public static IVec4 v4(IVec4 v){ return new IVec4(v); }
+    public static IVec4 v4(IVecI v){ return new IVec4(v); }
+    public static IVec4 v4(IVecI v, double w){ return new IVec4(v,w); }
+    public static IVec4 v4(IVecI v, IDoubleI w){ return new IVec4(v,w); }
+    public static IVec4 v4(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI w){
+	return new IVec4(x,y,z,w);
     }
     
     /*********************************************************
-     * vector short name
+     * 4d vector longer name
      ********************************************************/
-    public static IVec vec(double x, double y, double z){ return vector(x,y,z); }
-    public static IVec vec(IVec v){ return vector(v); }
-    public static IVec vec(IVecI v){ return vector(v); }
-    public static IVec vec(IDoubleI x, IDoubleI y, IDouble z){ return vector(x,y,z); }
-    public static IVec vec(IVec2I v){ return vector(v); }
+    public static IVec4 vector4(double x, double y, double z, double w){ return v4(x,y,z,w); }
+    public static IVec4 vector4(IVec v, double w){ return v4(v,w); }
+    public static IVec4 vector4(IVec4 v){ return v4(v); }
+    public static IVec4 vector4(IVecI v){ return v4(v); }
+    public static IVec4 vector4(IVecI v, double w){ return v4(v,w); }
+    public static IVec4 vector4(IVecI v, IDoubleI w){ return v4(v,w); }
+    public static IVec4 vector4(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI w){ return v4(x,y,z,w); }
+    
+    /*********************************************************
+     * creating 2 dimensional vector 
+     ********************************************************/
+    
+    public static IVec2 vec2(double x, double y){ return v2(x,y); }
+    public static IVec2 vec2(IVec2 v){ return v2(v); }
+    public static IVec2 vec2(IVecI v){ return v2(v); }
+    public static IVec2 vec2(IDoubleI x, IDoubleI y){ return v2(x,y); }
+    
+    /*********************************************************
+     * 2d vector  shorter name
+     ********************************************************/
+    
+    public static IVec2 v2(double x, double y){ return new IVec2(x,y); }
+    public static IVec2 v2(IVec2 v){ return new IVec2(v); }
+    public static IVec2 v2(IVecI v){ return new IVec2(v); }
+    public static IVec2 v2(IDoubleI x, IDoubleI y){ return new IVec2(x,y); }
+    
+    /*********************************************************
+     * 2d vector  longer name
+     ********************************************************/
+    
+    public static IVec2 vector2(double x, double y){ return v2(x,y); }
+    public static IVec2 vector2(IVec2 v){ return v2(v); }
+    public static IVec2 vector2(IVecI v){ return v2(v); }
+    public static IVec2 vector2(IDoubleI x, IDoubleI y){ return v2(x,y); }
     
     
-    // vector array?
+    /*********************************************************
+     * vector array
+     ********************************************************/
     
+    public static IVec[] vec(double x, double y, double z, double ... xyzvals){
+	return v(x,y,z,xyzvals);
+    }
+    public static IVec[] vec(IVec ... v){ return v(v); }
+    public static IVecI[] vec(IVecI ... v){ return v(v); }
+    public static IVec[] vec(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI ... xyzvals){
+	return v(x,y,z,xyzvals);
+    }
+    public static IVec[] vec(IVec2I ... v){ return v(v); }
+    
+    public static IVec[][] vec(IVec[] ... v){ return v(v); }
+    public static IVecI[][] vec(IVecI[] ... v){ return v(v); }
+    public static IVec[][][] vec(IVec[][] ... v){ return v(v); }
+    public static IVecI[][][] vec(IVecI[][] ... v){ return v(v); }
+    
+    /*********************************************************
+     * vector array shorter name
+     ********************************************************/
+    
+    public static IVec[] v(double x, double y, double z, double ... xyzvals){
+	int num = xyzvals.length/3 + 1;
+	if(xyzvals.length%3>0) num++;
+	IVec[] array = new IVec[num];
+	array[0] = new IVec(x,y,z);
+	for(int i=1; i<num; i++){
+	    array[i] = new IVec(xyzvals[(i-1)*3],
+				(i-1)*3+1<xyzvals.length?xyzvals[(i-1)*3+1]:0,
+				(i-1)*3+2<xyzvals.length?xyzvals[(i-1)*3+2]:0);
+	}
+	return array;
+    }
+    public static IVec[] v(IVec ... v){ return v; }
+    public static IVecI[] v(IVecI ... v){ return v; 
+	/*
+	if(v==null) return null;
+	IVec[] array = new IVec[v.length];
+	for(int i=0; i<v.length; i++){ array[i] = v[i].get(); }
+	return array;
+	*/
+    }
+    public static IVec[] v(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI ... xyzvals){
+	int num = xyzvals.length/3 + 1;
+	if(xyzvals.length%3>0) num++;
+	IVec[] array = new IVec[num];
+	array[0] = new IVec(x,y,z);
+	for(int i=1; i<num; i++){
+	    array[i] = new IVec(xyzvals[(i-1)*3],
+				(i-1)*3+1<xyzvals.length?xyzvals[(i-1)*3+1]:new IDouble(0),
+				(i-1)*3+2<xyzvals.length?xyzvals[(i-1)*3+2]:new IDouble(0));
+	}
+	return array;
+    }
+    public static IVec[] v(IVec2I ... v){
+	if(v==null) return null;
+	IVec[] array = new IVec[v.length];
+	for(int i=0; i<v.length; i++){ array[i] = new IVec(v[i]); }
+	return array;
+    }
+    
+    /**
+       IVec 2d array
+    */
+    public static IVec[][] v(IVec[] ... v){ return v; }
+    public static IVecI[][] v(IVecI[] ... v){ return v; }
+    
+    /**
+       IVec 3d array
+    */
+    public static IVec[][][] v(IVec[][] ... v){ return v; }
+    public static IVecI[][][] v(IVecI[][] ... v){ return v; }
+    
+    /*********************************************************
+     * vector array longer name
+     ********************************************************/
+    public static IVec[] vector(double x, double y, double z, double ... xyzvals){
+	return v(x,y,z,xyzvals);
+    }
+    public static IVec[] vector(IVec ... v){ return v(v); }
+    public static IVecI[] vector(IVecI ... v){ return v(v); }
+    public static IVec[] vector(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI ... xyzvals){
+	return v(x,y,z,xyzvals);
+    }
+    public static IVec[] vector(IVec2I ... v){ return v(v); }
+    
+    public static IVec[][] vector(IVec[] ... v){ return v(v); }
+    public static IVecI[][] vector(IVecI[] ... v){ return v(v); }
+    public static IVec[][][] vector(IVec[][] ... v){ return v(v); }
+    public static IVecI[][][] vector(IVecI[][] ... v){ return v(v); }
+    
+    
+    
+    /*********************************************************
+     * vector (IVec4) array
+     ********************************************************/
+    
+    public static IVec4[] vec4(double x, double y, double z, double w, double ... xyzwvals){
+	return v4(x,y,z,w,xyzwvals);
+    }
+    public static IVec4[] vec4(IVec4 ... v){ return v4(v); }
+    public static IVec4I[] vec4(IVec4I ... v){ return v4(v); }
+    public static IVec4[] vec4(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI w, IDoubleI ... xyzwvals){
+	return v4(x,y,z,w,xyzwvals);
+    }
+    
+    /** IVec4 2d array */
+    public static IVec4[][] vec4(IVec4[] ... v){ return v4(v); }
+    public static IVec4I[][] vec4(IVec4I[] ... v){ return v4(v); }
+    
+    /** IVec4 3d array */
+    public static IVec4[][][] vec4(IVec4[][] ... v){ return v4(v); }
+    public static IVec4I[][][] vec4(IVec4I[][] ... v){ return v4(v); }
+    
+    public static IVec4[] v4(double x, double y, double z, double w, double ... xyzwvals){
+	int num = xyzwvals.length/4 + 1;
+	if(xyzwvals.length%4>0) num++;
+	IVec4[] array = new IVec4[num];
+	array[0] = new IVec4(x,y,z,w);
+	for(int i=1; i<num; i++){
+	    array[i] = new IVec4(xyzwvals[(i-1)*4],
+				 (i-1)*4+1<xyzwvals.length?xyzwvals[(i-1)*4+1]:0,
+				 (i-1)*4+2<xyzwvals.length?xyzwvals[(i-1)*4+2]:0,
+				 (i-1)*4+3<xyzwvals.length?xyzwvals[(i-1)*4+3]:0);
+	}
+	return array;
+    }
+    public static IVec4[] v4(IVec4 ... v){ return v; }
+    public static IVec4I[] v4(IVec4I ... v){ return v; }
+    public static IVec4[] v4(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI w, IDoubleI ... xyzwvals){
+	int num = xyzwvals.length/4 + 1;
+	if(xyzwvals.length%4>0) num++;
+	IVec4[] array = new IVec4[num];
+	array[0] = new IVec4(x,y,z,w);
+	for(int i=1; i<num; i++){
+	    array[i] = new IVec4(xyzwvals[(i-1)*4],
+				 (i-1)*4+1<xyzwvals.length?xyzwvals[(i-1)*4+1]:new IDouble(0),
+				 (i-1)*4+2<xyzwvals.length?xyzwvals[(i-1)*4+2]:new IDouble(0),
+				 (i-1)*4+3<xyzwvals.length?xyzwvals[(i-1)*4+3]:new IDouble(0));
+	}
+	return array;
+    }
+    
+    /** IVec4 2d array */
+    public static IVec4[][] v4(IVec4[] ... v){ return v; }
+    public static IVec4I[][] v4(IVec4I[] ... v){ return v; }
+    
+    /** IVec4 3d array */
+    public static IVec4[][][] v4(IVec4[][] ... v){ return v; }
+    public static IVec4I[][][] v4(IVec4I[][] ... v){ return v; }
+    
+    public static IVec4[] vector4(double x, double y, double z, double w, double ... xyzwvals){
+	return v4(x,y,z,w,xyzwvals);
+    }
+    public static IVec4[] vector4(IVec4 ... v){ return v4(v); }
+    public static IVec4I[] vector4(IVec4I ... v){ return v4(v); }
+    public static IVec4[] vector4(IDoubleI x, IDoubleI y, IDoubleI z, IDoubleI w, IDoubleI ... xyzwvals){
+	return v4(x,y,z,w,xyzwvals);
+    }
+    
+    /** IVec4 2d array */
+    public static IVec4[][] vector4(IVec4[] ... v){ return v4(v); }
+    public static IVec4I[][] vector4(IVec4I[] ... v){ return v4(v); }
+    
+    /** IVec4 3d array */
+    public static IVec4[][][] vector4(IVec4[][] ... v){ return v4(v); }
+    public static IVec4I[][][] vector4(IVec4I[][] ... v){ return v4(v); }
+    
+    
+    /*********************************************************
+     * vector (IVec2) array
+     ********************************************************/
+    public static IVec2[] vec2(double x, double y, double ... xyvals){ return v2(x,y,xyvals); }
+    public static IVec2[] vec2(IVec2 ... v){ return v2(v); }
+    public static IVec2I[] vec2(IVec2I ... v){ return v2(v); }
+    public static IVec2[] vec2(IDoubleI x, IDoubleI y, IDoubleI... xyvals){ return v2(x,y,xyvals); }
+    
+    /** IVec4 2d array */
+    public static IVec2[][] vec2(IVec2[] ... v){ return v2(v); }
+    public static IVec2I[][] vec2(IVec2I[] ... v){ return v2(v); }
+    
+    /** IVec4 3d array */
+    public static IVec2[][][] vec2(IVec2[][] ... v){ return v2(v); }
+    public static IVec2I[][][] vec2(IVec2I[][] ... v){ return v2(v); }
+    
+    
+    public static IVec2[] v2(double x, double y, double ... xyvals){
+	int num = xyvals.length/2 + 1;
+	if(xyvals.length%2>0) num++;
+	IVec2[] array = new IVec2[num];
+	array[0] = new IVec2(x,y);
+	for(int i=1; i<num; i++){
+	    array[i] = new IVec2(xyvals[(i-1)*2],(i-1)*2+1<xyvals.length?xyvals[(i-1)*2+1]:0);
+	}
+	return array;
+    }
+    public static IVec2[] v2(IVec2 ... v){ return v; }
+    public static IVec2I[] v2(IVec2I ... v){ return v; }
+    public static IVec2[] v2(IDoubleI x, IDoubleI y, IDoubleI... xyvals){
+	int num = xyvals.length/2 + 1;
+	if(xyvals.length%2>0) num++;
+	IVec2[] array = new IVec2[num];
+	array[0] = new IVec2(x,y);
+	for(int i=1; i<num; i++){
+	    array[i] =
+		new IVec2(xyvals[(i-1)*2],(i-1)*2+1<xyvals.length?xyvals[(i-1)*2+1]:new IDouble(0));
+	}
+	return array;
+    }
+    
+    /** IVec4 2d array */
+    public static IVec2[][] v2(IVec2[] ... v){ return v; }
+    public static IVec2I[][] v2(IVec2I[] ... v){ return v; }
+    
+    /** IVec4 3d array */
+    public static IVec2[][][] v2(IVec2[][] ... v){ return v; }
+    public static IVec2I[][][] v2(IVec2I[][] ... v){ return v; }
+    
+    public static IVec2[] vector2(double x, double y, double ... xyvals){ return v2(x,y,xyvals); }
+    public static IVec2[] vector2(IVec2 ... v){ return v2(v); }
+    public static IVec2I[] vector2(IVec2I ... v){ return v2(v); }
+    public static IVec2[] vector2(IDoubleI x, IDoubleI y, IDoubleI... xyvals){ return v2(x,y,xyvals); }
+    
+    /** IVec4 2d array */
+    public static IVec2[][] vector2(IVec2[] ... v){ return v2(v); }
+    public static IVec2I[][] vector2(IVec2I[] ... v){ return v2(v); }
+    
+    /** IVec4 3d array */
+    public static IVec2[][][] vector2(IVec2[][] ... v){ return v2(v); }
+    public static IVec2I[][][] vector2(IVec2I[][] ... v){ return v2(v); }
+    
+    
+    /*********************************************************
+     * generic array 
+     ********************************************************/
+    /** create array of any class. */
+    public static <T> T[] array(T ... vals){ return a(vals); }
+    
+    /** create array of any class. */
+    public static <T> T[] array(int length, T ... vals){ return a(length,vals); }
+    
+    /** create 2D array of any class. */
+    public static <T> T[][] array2(int length1, int length2, T ... vals){
+	return a2(length1,length2,vals);
+    }
+    
+    /** create 2D array of any class. */
+    public static <T> T[][] array2(int length2, T ... vals){ return a2(length2,vals); }
+    
+    /** create 3D array of any class. */
+    public static <T> T[][][] array3(int length1, int length2, int length3, T ... vals){
+	return a3(length1,length2,length3,vals);
+    }
+    
+    /** create 3D array of any class. */
+    public static <T> T[][][] array3(int length2, int length3, T ... vals){
+	return a3(length2,length3,vals);
+    }
+    
+    /*********************************************************
+     * generic array short name
+     ********************************************************/
+    
+    /** create array of any class. */
+    public static <T> T[] arr(T ... vals){ return a(vals); }
+    
+    /** create array of any class. */
+    public static <T> T[] arr(int length, T ... vals){ return a(length,vals); }
+
+    /** create 2D array of any class. */
+    public static <T> T[][] arr2(int length1, int length2, T ... vals){
+	return a2(length1,length2,vals);
+    }
+    
+    /** create 2D array of any class. */
+    public static <T> T[][] arr2(int length2, T ... vals){ return a2(length2,vals); }
+    
+    /** create 3D array of any class. */
+    public static <T> T[][][] arr3(int length1, int length2, int length3, T ... vals){
+	return a3(length1,length2,length3,vals);
+    }
+    
+    /** create 3D array of any class. */
+    public static <T> T[][][] arr3(int length2, int length3, T ... vals){
+	return a3(length2,length3,vals);
+    }
+    
+    
+    /*********************************************************
+     * generic array much shorter name
+     ********************************************************/
+    /** create array of any class. */
+    public static <T> T[] a(T ... vals){ return vals; }
+    
+    /** create array of any class. */
+    @SuppressWarnings({"unchecked"})
+    public static <T> T[] a(int length, T ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	T[] array = (T[])Array.newInstance(vals[0].getClass(),length);
+	int i=0;
+	for(; i<length && i<vals.length; i++) array[i] = vals[i];
+	//for(; i<length; i++) array[i] = null;
+	return vals;
+    }
+    
+    /** create 2D array of any class. */
+    @SuppressWarnings({"unchecked"})
+    public static <T> T[][] a2(int length1, int length2, T ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	T[][] array = (T[][])Array.newInstance(vals.getClass(),length1);
+	for(int i=0; i<length1; i++){
+	    array[i] = (T[])Array.newInstance(vals[0].getClass(),length2);
+	}
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		array[i][j] = vals[idx++];
+	return array;
+    }
+    
+    /** create 2D array of any class. */
+    public static <T> T[][] a2(int length2, T ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/length2;
+	if(vals.length!=length1*length2){
+	    IOut.err("length2 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array2(length1,length2,vals);
+    }
+    
+    /** create 3D array of any class. */
+    @SuppressWarnings({"unchecked"})
+    public static <T> T[][][] a3(int length1, int length2, int length3, T ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	T[][][] array = (T[][][])Array.newInstance
+	    ( ((T[][])Array.newInstance(vals.getClass(),0)).getClass(), length1); // zero?
+	
+	for(int i=0; i<length1; i++){
+	    array[i] = (T[][])Array.newInstance(vals.getClass(),length2);
+	}
+	for(int i=0; i<length1; i++){
+	    for(int j=0; j<length2; j++){
+		array[i][j] = (T[])Array.newInstance(vals[0].getClass(),length3);
+	    }
+	}
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++)
+		    array[i][j][k] = vals[idx++];
+	return array;
+    }
+    
+    /** create 3D array of any class. */
+    public static <T> T[][][] a3(int length2, int length3, T ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/(length2*length3);
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length2*length3 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array3(length1,length2,length3,vals);
+    }
+    
+    
+    
+    
+    /*********************************************************
+     * primitive array 
+     ********************************************************/
+    /*********************************************************
+     * int array 
+     ********************************************************/
+    /** create array of any class. */
+    //public static int[] array(int ... vals){ return vals; }
+    
+    /** create 2D array of any class. */
+    /*
+    public static int[][] array2(int length1, int length2, int ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	int[][] array = new int[length1][length2];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++) array[i][j] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static int[][][] array3(int length1, int length2, int length3, int ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	int[][][] array = new int[length1][length2][length3];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++) array[i][j][k] = vals[idx++];
+	return array;
+    }
+    */
+    
+    /** create array of any class. */
+    //public static int[] arr(int ... vals){ return array(vals); }
+    /** create 2D array of any class. */
+    /*
+    public static int[][] arr2(int length1, int length2, int ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static int[][][] arr3(int length1, int length2, int length3, int ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    
+    /** create array of any class. */
+    //public static int[] a(int ... vals){ return array(vals); }
+    //public static Integer[] ia(Integer ... vals){ return array(vals); }
+    /** create 2D array of any class. */
+    /*
+    public static int[][] a2(int length1, int length2, int ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static int[][][] a3(int length1, int length2, int length3, int ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    
+    /*********************************************************
+     * double array 
+     ********************************************************/
+    /** create array of any class. */
+    //public static double[] array(double ... vals){ return vals; }
+    
+    /** create array of any class. */
+    /*
+    public static double[] array(int length, double ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	double[] array = new double[length];
+	int i=0;
+	for(; i<length && i<vals.length; i++) array[i] = vals[i];
+	return vals;
+    }
+    */
+    
+    /** create 2D array of any class. */
+    /*
+    public static double[][] array2(int length1, int length2, double ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	double[][] array = new double[length1][length2];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		array[i][j] = vals[idx++];
+	return array;
+    }
+    */
+    
+    /** create 2D array of any class. */
+    /*
+    public static double[][] array2(int length2, double ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/length2;
+	if(vals.length!=length1*length2){
+	    IOut.err("length2 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array2(length1,length2,vals);
+    }
+    */
+    
+    /** create 3D array of any class. */
+    /*
+    public static double[][][] array3(int length1, int length2, int length3, double ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	double[][][] array = new double[length1][length2][length3];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++)
+		    array[i][j][k] = vals[idx++];
+	return array;
+    }
+    */
+    
+    /** create 3D array of any class. */
+    /*
+    public static double[][][] array3(int length2, int length3, double ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/(length2*length3);
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length2*length3 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create array of any class. */
+    //public static double[] arr(double ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static double[] arr(int length, double ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static double[][] arr2(int length1, int length2, double ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static double[][] arr2(int length2, double ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static double[][][] arr3(int length1, int length2, int length3, double ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static double[][][] arr3(int length2, int length3, double ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    
+    /** create array of any class. */
+    //public static double[] a(double ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static double[] a(int length, double ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static double[][] a2(int length1, int length2, double ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static double[][] a2(int length2, double ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static double[][][] a3(int length1, int length2, int length3, double ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static double[][][] a3(int length2, int length3, double ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    
+    /*********************************************************
+     * float array 
+     ********************************************************/
+    /** create array of any class. */
+    //public static float[] array(float ... vals){ return vals; }
+    
+    /** create array of any class. */
+    /*
+    public static float[] array(int length, float ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	float[] array = new float[length];
+	int i=0;
+	for(; i<length && i<vals.length; i++) array[i] = vals[i];
+	return vals;
+    }
+    */
+    
+    /** create 2D array of any class. */
+    /*
+    public static float[][] array2(int length1, int length2, float ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	float[][] array = new float[length1][length2];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		array[i][j] = vals[idx++];
+	return array;
+    }
+    */
+    
+    /** create 2D array of any class. */
+    /*
+    public static float[][] array2(int length2, float ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/length2;
+	if(vals.length!=length1*length2){
+	    IOut.err("length2 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static float[][][] array3(int length1, int length2, int length3, float ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	float[][][] array = new float[length1][length2][length3];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++)
+		    array[i][j][k] = vals[idx++];
+	return array;
+    }
+    */
+    
+    /** create 3D array of any class. */
+    /*
+    public static float[][][] array3(int length2, int length3, float ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/(length2*length3);
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length2*length3 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    
+    /** create array of any class. */
+    //public static float[] arr(float ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static float[] arr(int length, float ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static float[][] arr2(int length1, int length2, float ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static float[][] arr2(int length2, float ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static float[][][] arr3(int length1, int length2, int length3, float ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static float[][][] arr3(int length2, int length3, float ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    /** create array of any class. */
+    //public static float[] a(float ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static float[] a(int length, float ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static float[][] a2(int length1, int length2, float ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static float[][] a2(int length2, float ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static float[][][] a3(int length1, int length2, int length3, float ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static float[][][] a3(int length2, int length3, float ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    
+    /*********************************************************
+     * short array 
+     ********************************************************/
+    /** create array of any class. */
+    //public static short[] array(short ... vals){ return vals; }
+    /** create array of any class. */
+    /*
+    public static short[] array(int length, short ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	short[] array = new short[length];
+	int i=0;
+	for(; i<length && i<vals.length; i++) array[i] = vals[i];
+	return vals;
+    }
+    */
+    /** create 2D array of any class. */
+    /*
+    public static short[][] array2(int length1, int length2, short ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	short[][] array = new short[length1][length2];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		array[i][j] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 2D array of any class. */
+    /*
+    public static short[][] array2(int length2, short ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/length2;
+	if(vals.length!=length1*length2){
+	    IOut.err("length2 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array2(length1,length2,vals);
+    }
+    */
+    
+    /** create 3D array of any class. */
+    /*
+    public static short[][][] array3(int length1, int length2, int length3, short ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	short[][][] array = new short[length1][length2][length3];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++)
+		    array[i][j][k] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static short[][][] array3(int length2, int length3, short ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/(length2*length3);
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length2*length3 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    
+    /** create array of any class. */
+    //public static short[] arr(short ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static short[] arr(int length, short ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static short[][] arr2(int length1, int length2, short ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static short[][] arr2(int length2, short ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static short[][][] arr3(int length1, int length2, int length3, short ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static short[][][] arr3(int length2, int length3, short ... vals){
+	return array3(length2,length3,vals); 
+	}
+    */
+    
+    /** create array of any class. */
+    //public static short[] a(short ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static short[] a(int length, short ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static short[][] a2(int length1, int length2, short ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static short[][] a2(int length2, short ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static short[][][] a3(int length1, int length2, int length3, short ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static short[][][] a3(int length2, int length3, short ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+
+    
+    
+    
+    /*********************************************************
+     * long array 
+     ********************************************************/
+    /** create array of any class. */
+    //public static long[] array(long ... vals){ return vals; }
+    
+    /** create array of any class. */
+    /*
+    public static long[] array(int length, long ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	long[] array = new long[length];
+	int i=0;
+	for(; i<length && i<vals.length; i++) array[i] = vals[i];
+	return vals;
+    }
+    */
+    /** create 2D array of any class. */
+    /*
+    public static long[][] array2(int length1, int length2, long ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	long[][] array = new long[length1][length2];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		array[i][j] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 2D array of any class. */
+    /*
+    public static long[][] array2(int length2, long ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/length2;
+	if(vals.length!=length1*length2){
+	    IOut.err("length2 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static long[][][] array3(int length1, int length2, int length3, long ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	long[][][] array = new long[length1][length2][length3];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++)
+		    array[i][j][k] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static long[][][] array3(int length2, int length3, long ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/(length2*length3);
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length2*length3 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create array of any class. */
+    //public static long[] arr(long ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static long[] arr(int length, long ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static long[][] arr2(int length1, int length2, long ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static long[][] arr2(int length2, long ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static long[][][] arr3(int length1, int length2, int length3, long ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static long[][][] arr3(int length2, int length3, long ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    /** create array of any class. */
+    //public static long[] a(long ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static long[] a(int length, long ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static long[][] a2(int length1, int length2, long ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static long[][] a2(int length2, long ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static long[][][] a3(int length1, int length2, int length3, long ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static long[][][] a3(int length2, int length3, long ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+
+    
+    
+    /*********************************************************
+     * byte array 
+     ********************************************************/
+    /** create array of any class. */
+    //public static byte[] array(byte ... vals){ return vals; }
+    
+    /** create array of any class. */
+    /*
+    public static byte[] array(int length, byte ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	byte[] array = new byte[length];
+	int i=0;
+	for(; i<length && i<vals.length; i++) array[i] = vals[i];
+	return vals;
+    }
+    */
+    
+    /** create 2D array of any class. */
+    /*
+    public static byte[][] array2(int length1, int length2, byte ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	byte[][] array = new byte[length1][length2];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		array[i][j] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 2D array of any class. */
+    /*
+    public static byte[][] array2(int length2, byte ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/length2;
+	if(vals.length!=length1*length2){
+	    IOut.err("length2 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static byte[][][] array3(int length1, int length2, int length3, byte ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	byte[][][] array = new byte[length1][length2][length3];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++)
+		    array[i][j][k] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static byte[][][] array3(int length2, int length3, byte ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/(length2*length3);
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length2*length3 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create array of any class. */
+    //public static byte[] arr(byte ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static byte[] arr(int length, byte ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static byte[][] arr2(int length1, int length2, byte ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static byte[][] arr2(int length2, byte ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static byte[][][] arr3(int length1, int length2, int length3, byte ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static byte[][][] arr3(int length2, int length3, byte ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    /** create array of any class. */
+    //public static byte[] a(byte ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static byte[] a(int length, byte ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static byte[][] a2(int length1, int length2, byte ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static byte[][] a2(int length2, byte ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static byte[][][] a3(int length1, int length2, int length3, byte ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+
+    /*
+    public static byte[][][] a3(int length2, int length3, byte ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+
+    
+    
+    /*********************************************************
+     * char array 
+     ********************************************************/
+    /** create array of any class. */
+    //public static char[] array(char ... vals){ return vals; }
+    
+    /** create array of any class. */
+    /*
+    public static char[] array(int length, char ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	char[] array = new char[length];
+	int i=0;
+	for(; i<length && i<vals.length; i++) array[i] = vals[i];
+	return vals;
+    }
+    */
+    /** create 2D array of any class. */
+    /*
+    public static char[][] array2(int length1, int length2, char ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	char[][] array = new char[length1][length2];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		array[i][j] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 2D array of any class. */
+    /*
+    public static char[][] array2(int length2, char ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/length2;
+	if(vals.length!=length1*length2){
+	    IOut.err("length2 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static char[][][] array3(int length1, int length2, int length3, char ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	char[][][] array = new char[length1][length2][length3];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++)
+		    array[i][j][k] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static char[][][] array3(int length2, int length3, char ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/(length2*length3);
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length2*length3 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create array of any class. */
+    //public static char[] arr(char ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static char[] arr(int length, char ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static char[][] arr2(int length1, int length2, char ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static char[][] arr2(int length2, char ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static char[][][] arr3(int length1, int length2, int length3, char ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static char[][][] arr3(int length2, int length3, char ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    /** create array of any class. */
+    //public static char[] a(char ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static char[] a(int length, char ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static char[][] a2(int length1, int length2, char ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static char[][] a2(int length2, char ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static char[][][] a3(int length1, int length2, int length3, char ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static char[][][] a3(int length2, int length3, char ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    
+    
+    /*********************************************************
+     * boolean array 
+     ********************************************************/
+    /** create array of any class. */
+    //public static boolean[] array(boolean ... vals){ return vals; }
+    
+    /** create array of any class. */
+    /*
+    public static boolean[] array(int length, boolean ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	boolean[] array = new boolean[length];
+	int i=0;
+	for(; i<length && i<vals.length; i++) array[i] = vals[i];
+	return vals;
+    }
+    */
+    
+    /** create 2D array of any class. */
+    /*
+    public static boolean[][] array2(int length1, int length2, boolean ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2){
+	    IOut.err("length1*length2 doesn't match with number of values");
+	}
+	boolean[][] array = new boolean[length1][length2];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		array[i][j] = vals[idx++];
+	return array;
+    }
+    */
+    
+    /** create 2D array of any class. */
+    /*
+    public static boolean[][] array2(int length2, boolean ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/length2;
+	if(vals.length!=length1*length2){
+	    IOut.err("length2 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static boolean[][][] array3(int length1, int length2, int length3, boolean ... vals){
+	if(vals==null) return null;
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length1*length2*length3 doesn't match with number of values");
+	}
+	boolean[][][] array = new boolean[length1][length2][length3];
+	int idx=0;
+	for(int i=0; i<length1 && idx<vals.length; i++)
+	    for(int j=0; j<length2 && idx<vals.length; j++)
+		for(int k=0; k<length3 && idx<vals.length; k++)
+		    array[i][j][k] = vals[idx++];
+	return array;
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static boolean[][][] array3(int length2, int length3, boolean ... vals){
+	if(vals==null) return null;
+	int length1 = vals.length/(length2*length3);
+	if(vals.length!=length1*length2*length3){
+	    IOut.err("length2*length3 doesn't match with number of values");
+	}
+	if(length1==0) length1=1;
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create array of any class. */
+    //public static boolean[] arr(boolean ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static boolean[] arr(int length, boolean ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static boolean[][] arr2(int length1, int length2, boolean ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static boolean[][] arr2(int length2, boolean ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static boolean[][][] arr3(int length1, int length2, int length3, boolean ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static boolean[][][] arr3(int length2, int length3, boolean ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
+    /** create array of any class. */
+    //public static boolean[] a(boolean ... vals){ return array(vals); }
+    /** create array of any class. */
+    //public static boolean[] a(int length, boolean ... vals){ return array(length,vals); }
+    /** create 2D array of any class. */
+    /*
+    public static boolean[][] a2(int length1, int length2, boolean ... vals){
+	return array2(length1,length2,vals);
+    }
+    */
+    /** create 2D array of any class. */
+    //public static boolean[][] a2(int length2, boolean ... vals){ return array2(length2,vals); }
+    /** create 3D array of any class. */
+    /*
+    public static boolean[][][] a3(int length1, int length2, int length3, boolean ... vals){
+	return array3(length1,length2,length3,vals);
+    }
+    */
+    /** create 3D array of any class. */
+    /*
+    public static boolean[][][] a3(int length2, int length3, boolean ... vals){
+	return array3(length2,length3,vals); 
+    }
+    */
     
 }

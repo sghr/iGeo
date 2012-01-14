@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -149,31 +149,41 @@ public class IAgent extends IObject implements IDynamics{
     public int time(){ return time; }
     /** not recommended to use. use carefully if you use */
     public IAgent time(int tm){ time=tm; return this; }
-
+    
     public int duration(){ return duration; }
     public IAgent duration(int dur){ duration=dur; return this; }
     
-    synchronized public void interact(ArrayList<IDynamics> dynamics){
-
+    //public void initInteract(ArrayList<IDynamics> agents){
+    synchronized public void preinteract(ArrayList<IDynamics> agents){
 	time++; // time needs to be updated here to have same value in interact() and update()
-	
-	if(localDynamics!=null) for(IDynamics d:localDynamics) d.interact(dynamics);
+	if(localDynamics!=null) for(IDynamics d:localDynamics) d.interact(agents);
     }
     
-    synchronized public void update(){
+    synchronized public void interact(ArrayList<IDynamics> agents){ // could be overridden
+	//initInteract(agents);
+	for(int i=0; i<agents.size(); i++){
+	    if(agents.get(i) != this) interact(agents.get(i));
+	}
+    }
+    
+    synchronized public void interact(IDynamics agent){}
+    
+    synchronized public void postinteract(ArrayList<IDynamics> agents){} // not used
+    
+    //synchronized public void initUpdate(){
+    synchronized public void preupdate(){
 	if(localDynamics!=null) for(IDynamics d:localDynamics) d.update();
-	
-	if( duration>=0 && time>=duration ){
-	    //alive=false; // done in del()
-	    del();
-	}
-	else{
-	    if(server!=null) server.updateState();
-	}
-	
+	if( duration>=0 && time>=duration ){ del(); }
+	else if(server!=null) server.updateState();
+    }
+    
+    synchronized public void update(){ // to be overridden
+	//initUpdate();
 	// localDynamics will update parent directly. So no need to update parent here.
 	//if(parent!=null) parent.updateGraphic(); // did anything change?
     }
+    
+    synchronized public void postupdate(){} // not used
     
     
     /**************************************

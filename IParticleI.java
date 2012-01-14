@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -31,15 +31,68 @@ package igeo;
    @version 0.7.0.0;
 */
 public interface IParticleI{
-    
+
+    /** get mass */
     public double mass();
-   
+    /** set mass */
+    public IParticleI mass(double m);
+    
+    /** get position */
     public IVec position();
+    /** get position */
     public IVec pos();
+    /** set position */
+    public IParticleI position(IVecI v);
+    /** set position */
+    public IParticleI pos(IVecI v);
     
+    /** get velocity */
     public IVec velocity();
+    /** get velocity */
     public IVec vel();
+    /** set velocity */
+    public IParticleI velocity(IVecI v);
+    /** set velocity */
+    public IParticleI vel(IVecI v);
     
-    public IParticleI addForce(IVec f);
+    /** get acceleration. no method to set acceleration. set force instead */
+    public IVec acceleration();
+    /** get acceleration. no method to set acceleration. set force instead */
+    public IVec acc();
+    
+    /** get force */
+    public IVec force();
+    /** get force */
+    public IVec frc();
+    /** set force */
+    public IParticleI force(IVecI v);
+    /** set force */
+    public IParticleI frc(IVecI v);
+
+    /** get friction */
+    public double friction();
+    /** get friction */
+    public double fric();
+    /** set friction */
+    public IParticleI friction(double f);
+    /** set friction */
+    public IParticleI fric(double f);
+    
+    /* alias of friction */
+    public double decay();
+    /* alias of friction */
+    public IParticleI decay(double d);
+    
+    
+    /** adding force to particle */
+    public IParticleI push(IVecI f);
+    /** equivalent to push(f.dup().neg()) */
+    public IParticleI pull(IVecI f);
+    /** alias of push */
+    public IParticleI addForce(IVecI f);
+    
+    /** setting force zero */
+    public IParticleI reset();
+    /** alias of reset */
     public IParticleI resetForce();
 }

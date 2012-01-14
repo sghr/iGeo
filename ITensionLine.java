@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -30,9 +30,9 @@ import java.util.ArrayList;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ITensionLine extends ICurve{
+public class ITensionLine extends ICurve implements ITensionI{
     
-    public ITension tensionDynamics;
+    public ITension tension;
     
     public ITensionLine(IParticleI p1, IParticleI p2){
 	super(p1.pos(), p2.pos());
@@ -79,14 +79,20 @@ public class ITensionLine extends ICurve{
     }
     
     public void initTensionLine(IParticleI p1, IParticleI p2){
-	tensionDynamics = new ITension(p1,p2,this);
-	addDynamics(tensionDynamics);
+	tension = new ITension(p1,p2,this);
+	addDynamics(tension);
     }
     
-    public double tension(){ return tensionDynamics.tension(); }
-    public ITensionLine tension(double tension){
-	tensionDynamics.tension(tension); return this;
+    public double tension(){ return tension.tension(); }
+    public ITensionLine tension(double tensionIntensity){
+	tension.tension(tensionIntensity); return this;
     }
     
+    public boolean constant(){ return tension.constant(); }
+    public ITensionLine constant(boolean cnst){
+	tension.constant(cnst); return this;
+    }
+    
+    public IParticleI pt(int i){ return tension.pt(i); }
     
 }

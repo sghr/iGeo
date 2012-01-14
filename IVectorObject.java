@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -123,8 +123,13 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject rev(){ return neg(); }
     public IVectorObject flip(){ return neg(); }
     
+    public IVectorObject zero(){ vec.zero(); return this; }
+    
     public IVectorObject add(IVecI v, double f){ vec.add(v,f); return this; }
     public IVectorObject add(IVecI v, IDoubleI f){ vec.add(v,f); return this; }
+    
+    public IVectorObject add(double f, IVecI v){ return add(v,f); }
+    public IVectorObject add(IDoubleI f, IVecI v){ return add(v,f); }
     
     
     public double dot(IVecI v){ return vec.dot(v); }
@@ -193,6 +198,9 @@ public class IVectorObject extends IObject implements IVecI{
     public double angle(ISwitchE e, IVecI v, IVecI axis){ return vec.angle(e,v,axis); }
     public IDoubleI angle(ISwitchR r, IVecI v, IVecI axis){ return vec.angle(r,v,axis); }
     
+    public IVectorObject rot(IDoubleI angle){ vec.rot(angle); return this; }
+    public IVectorObject rot(double angle){ vec.rot(angle); return this; }
+    
     public IVectorObject rot(IVecI axis, IDoubleI angle){ vec.rot(axis,angle); return this; }
     public IVectorObject rot(IVecI axis, double angle){ vec.rot(axis,angle); return this; }
     
@@ -209,6 +217,16 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject rot(IVecI center, IVecI axis, IVecI destPt){
 	vec.rot(center,axis,destPt); return this;
     }
+    
+    public IVectorObject rot2(IDoubleI angle){ return rot(angle); }
+    public IVectorObject rot2(double angle){ return rot(angle); }
+    public IVectorObject rot2(IVecI center, double angle){ vec.rot2(center,angle); return this; }
+    public IVectorObject rot2(IVecI center, IDoubleI angle){ vec.rot2(center,angle); return this; }
+    /** rotate to destination direction vector */
+    public IVectorObject rot2(IVecI destDir){ vec.rot2(destDir); return this; }
+    /** rotate to destination point location */
+    public IVectorObject rot2(IVecI center, IVecI destPt){ vec.rot2(center,destPt); return this; }
+    
     
     /** alias of mul */
     public IVectorObject scale(IDoubleI f){ vec.scale(f); return this; }
@@ -316,7 +334,8 @@ public class IVectorObject extends IObject implements IVecI{
     // methods creating new instance // returns IVectorObject?, not IVec?
     // returns IVec.
     //public IVectorObject diff(IVecI v){ return dup().sub(v); }
-    public IVecI diff(IVecI v){ return vec.diff(v); }
+    public IVecI dif(IVecI v){ return vec.dif(v); }
+    public IVecI diff(IVecI v){ return dif(v); }
     //public IVectorObject mid(IVecI v){ return dup().add(v).div(2); }
     public IVecI mid(IVecI v){ return vec.mid(v); }
     //public IVectorObject sum(IVecI v){ return dup().add(v); }

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -45,6 +45,16 @@ public /*class*/interface IDynamics extends ISubobject{
     public void interact(ArrayList<IDynamics> dynamics);
     /** behavior definition of updating dynamics in each time frame */
     public void update();
+    
+    /** executed before interact(ArrayList<IDynamics>). behavior can be changed by IConfig.enablePreinteract and IConfig.loopPreinteract. */
+    public void preinteract(ArrayList<IDynamics> dynamics);
+    /** executed after interact(ArrayList<IDynamics>). behavior can be changed by IConfig.enablePostinteract and IConfig.loopPostinteract. */
+    public void postinteract(ArrayList<IDynamics> dynamics);
+    
+    /** executed before update(). behavior can be changed by IConfig.enablePreupdate and IConfig.loopPreupdate. */
+    public void preupdate();
+    /** executed after update(). behavior can be changed by IConfig.enablePostupdate and IConfig.loopPostupdate. */
+    public void postupdate();
     
     
     /** add terget object to be updated by this dynamic object. */

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -163,8 +163,34 @@ public class IOut {
 	    err.println(str);
 	}
     }
-    
+
     public static void err(){
+	if(errEnabled){
+	    if(printErrorPrefix){
+		printCurrentStack(err); // added
+		err.print(errPrefix);
+	    }
+	    err.println();
+	}
+    }
+    
+    /**
+       @param stackOffset offset of the depth of stack of calling subroutines, to controll what subroutine name to be printed
+    */
+    public static void errWithOffset(Object str, int stackOffset){
+	if(errEnabled){
+	    if(printErrorPrefix){
+		printCurrentStack(err, stackOffset);
+		err.print(errPrefix);
+	    }
+	    err.println(str);
+	}
+    }
+    
+    /**
+       @param stackOffset offset of the depth of stack of calling subroutines, to controll what subroutine name to be printed
+    */
+    public static void errWithOffset(int stackOffset){
 	if(errEnabled){
 	    if(printErrorPrefix){
 		printCurrentStack(err); // added

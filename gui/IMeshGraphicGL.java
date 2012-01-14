@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -91,10 +91,11 @@ public class IMeshGraphicGL extends IGraphicObject{
 	    gl.glLineWidth(weight);
 	    //gl.glLineStipple(0,(short)0xFFFF);
 	    
-            float red = ISurfaceGraphicGL.defaultColorRed;
-            float green = ISurfaceGraphicGL.defaultColorGreen;
-            float blue = ISurfaceGraphicGL.defaultColorBlue;
-            float alpha = ISurfaceGraphicGL.defaultColorAlpha;
+            float red = defaultRed;
+            float green = defaultGreen;
+            float blue = defaultBlue;
+            float alpha = defaultAlpha;
+	    
             if(color!=null){
                 red = (float)color.getRed()/255;
                 green = (float)color.getGreen()/255;
@@ -139,7 +140,7 @@ public class IMeshGraphicGL extends IGraphicObject{
 	    if(g.view().mode().isTransparent()&&g.view().mode().isTransparentWireframe())
 		alpha = (float)transparentModeAlpha;
 	    else if(color!=null) alpha = (float)color.getAlpha()/255;
-	    else alpha = ISurfaceGraphicGL.defaultColorAlpha;
+	    else alpha = defaultAlpha;
 	    
             if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
                 float[] colorf = new float[]{ red, green, blue, alpha };

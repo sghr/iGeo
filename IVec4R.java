@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -130,11 +130,22 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IVec4R div(IDoubleI u){ op=new Div(op,u); return this; }
     public IVec4R div(double u){ op=new Div(op,new IDouble(u)); return this; }
     public IVec4R neg(){ op=new Neg(op); return this; }
+    /** alias of neg() */
     public IVec4R rev(){ return neg(); }
+    /** alias of neg() */
     public IVec4R flip(){ return neg(); }
-    
+    /** setting x,y,z zero (not w)  */
+    public IVec4R zero(){ return set(0,0,0); }
+
+    /** scale add */
     public IVec4R add(IVecI v, double f){ return add(v.dup().mul(f)); }
+    /** scale add */
     public IVec4R add(IVecI v, IDoubleI f){ return add(v.dup().mul(f)); }
+    
+    /** scale add alias */
+    public IVec4R add(double f, IVecI v){ return add(v,f); }
+    /** scale add alias */
+    public IVec4R add(IDoubleI f, IVecI v){ return add(v,f); }
     
     public double dot(IVecI u){ return get().dot(u); }
     //public IDoubleR dotR(IVecI u){ return new IDoubleR(new IVecR.Dot(op,u)); }
@@ -227,6 +238,9 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IDoubleR angle(ISwitchR r, IVecI u, IVecI axis){ return new IDoubleR(new IVecR.Angle(op,u,axis)); }
     
     
+    public IVec4R rot(IDoubleI angle){ op=new Rot2(op,angle); return this; }
+    public IVec4R rot(double angle){ op=new Rot2(op,new IDouble(angle)); return this; }
+    
     public IVec4R rot(IVecI axis, IDoubleI angle){
 	op=new Rot(op,axis,angle); return this; 
     }
@@ -251,7 +265,24 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	if(center==this) return this;
 	return sub(center).rot(axis,destPt.diff(center)).add(center);
     }
-
+    
+    /** alias of rot(IDoubleI) */
+    public IVec4R rot2(IDoubleI angle){ return rot(angle); }
+    /** alias of rot(double) */
+    public IVec4R rot2(double angle){ return rot(angle); }
+    
+    public IVec4R rot2(IVecI center, IDoubleI angle){
+	if(center==this){ return this; } return sub(center).rot(angle).add(center);
+    }
+    public IVec4R rot2(IVecI center, double angle){
+	if(center==this){ return this; } return sub(center).rot(angle).add(center);
+    }
+    public IVec4R rot2(IVecI destDir){ return rot(destDir.cross(IVec.zaxis).angle(cross(IVec.zaxis))); }
+    public IVec4R rot2(IVecI center, IVecI destPt){
+	if(center==this){ return this; } return sub(center).rot2(destPt.diff(center)).add(center);
+    }
+    
+    
     /** alias of mul */
     public IVec4R scale(IDoubleI f){ return mul(f); }
     public IVec4R scale(double f){ return mul(f); }
@@ -367,7 +398,8 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     
     
     // methods creating new instance
-    public IVec4R diff(IVecI v){ return dup().sub(v); }
+    public IVec4R dif(IVecI v){ return dup().sub(v); }
+    public IVec4R diff(IVecI v){ return dif(v); }
     public IVec4R mid(IVecI v){ return dup().add(v).div(2); }
     public IVec4R sum(IVecI v){ return dup().add(v); }
     public IVec4R sum(IVecI... v){
@@ -517,6 +549,13 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	public IDoubleOp angle;
 	public Rot(IVec4Op u, IVecOp ax, IDoubleOp a){ v=u; axis=ax; angle=a; }
 	public IVec4 get(){ return (IVec4)v.get().rot(axis.get(),angle.x()); }
+    }
+    
+    static public class Rot2 extends IParameterObject implements IVec4Op{
+	public IVec4Op v;
+	public IDoubleOp angle;
+	public Rot2(IVec4Op u, IDoubleOp a){ v=u; angle=a; }
+	public IVec4 get(){ return (IVec4)v.get().rot(angle.x()); }
     }
     
     /*

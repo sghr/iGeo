@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -114,7 +114,7 @@ public class IRand{
     }
     static public IVec point(IVec min, IVec max){ return pt(min,max); }
     static public IVec getPoint(IVec min, IVec max){ return pt(min,max); }
-
+    
     static public IVec pt(IVec max){
 	return new IVec(get(max.x),get(max.y),get(max.z));
     }
@@ -159,58 +159,260 @@ public class IRand{
     static public IVec getPoint(){ return pt(); }
     
     
+    /**
+       random point on XY plane
+    */
+    static public IVec pt2(double minx, double miny, double maxx, double maxy){
+	return new IVec(get(minx,maxx),get(miny,maxy),0);
+    }
+    static public IVec pt2(double min, double max){
+	return new IVec(get(min,max),get(min,max),0);
+    }
+    static public IVec pt2(double max){ return new IVec(get(0,max),get(0,max),0); }
+    static public IVec pt2(){ return new IVec(get(),get(),0); }
+    
+    static public IVec point2(double minx, double miny, double maxx, double maxy){
+	return pt2(minx,miny,maxx,maxy);
+    }
+    static public IVec point2(double min, double max){ return pt2(min,max); }
+    static public IVec point2(double max){ return pt2(max); }
+    static public IVec point2(){ return pt2(); }    
+    
+    static public IVec getPoint2(double minx, double miny, double maxx, double maxy){
+	return pt2(minx,miny,maxx,maxy);
+    }
+    static public IVec getPoint2(double min, double max){ return pt2(min,max); }
+    static public IVec getPoint2(double max){ return pt2(max); }
+    static public IVec getPoint2(){ return pt2(); }    
+    
+    
+    /**
+       random direction in 3D
+    */
+    static public IVec dir(){ return dir(1.0); }
+    static public IVec dir(double length){
+	IVec vec = pt(-1,1);
+	double l = vec.len();
+	while(l < IConfig.tolerance){ vec = pt(-1,1); l = vec.len(); }
+	return vec.mul(length/l);
+    }
+    static public IVec dir(IVecI perpendicularAxis){
+	return dir(perpendicularAxis, 1.0);
+    }
+    static public IVec dir(IVecI perpendicularAxis, double length){
+	IVec vec = null;
+	if(!IVec.zaxis.isParallel(perpendicularAxis))
+	    vec = IVec.zaxis.cross(perpendicularAxis);
+	else vec = IVec.xaxis.cross(perpendicularAxis);
+	return vec.rot(perpendicularAxis, get(Math.PI*2)).len(length);
+    }
+    
+    static public IVec direction(){ return dir(); }
+    static public IVec direction(double length){ return dir(length); }
+    static public IVec direction(IVecI perpendicularAxis){
+	return dir(perpendicularAxis);
+    }
+    static public IVec direction(IVecI perpendicularAxis, double length){
+	return dir(perpendicularAxis,length);
+    }
+    
+    static public IVec getDirection(){ return dir(); }
+    static public IVec getDirection(double length){ return dir(length); }
+    static public IVec getDirection(IVecI perpendicularAxis){
+	return dir(perpendicularAxis);
+    }
+    static public IVec getDirection(IVecI perpendicularAxis, double length){
+	return dir(perpendicularAxis,length);
+    }
+    
+    
+    /**
+       random direction on XY plane
+    */
+    static public IVec dir2(){ return dir2(1.0); }
+    static public IVec dir2(double length){
+	double a = get(Math.PI*2);
+	return new IVec(length*Math.cos(a), length*Math.sin(a), 0);
+    }    
+    static public IVec direction2(){ return dir2(); }
+    static public IVec direction2(double length){ return dir2(length); }
+    static public IVec getDirection2(){ return dir2(); }
+    static public IVec getDirection2(double length){ return dir2(length); }
+    
+    
     static public boolean getPercent(double percent){
 	return percent(percent);
     }
-    
     static public boolean percent(double percent){
 	return get()<(percent/100);
     }
+    static public boolean pct(double percent){return percent(percent); }
+    
     
     //static public Color color(){ return getColor(); } // PDE doesn't allow this name
     static public Color getColor(){ return clr(); }
     static public Color clr(){
-	return new Color(IRandom.getInt(0,255),
-			 IRandom.getInt(0,255),
-			 IRandom.getInt(0,255));
+	return new Color(getInt(0,255),getInt(0,255),getInt(0,255));
     }
     
     //static public Color color(int alpha){ getColor(alpha); } // PDE doesn't allow this name
     static public Color getColor(int alpha){ return clr(alpha); }
     static public Color clr(int alpha){
-	return new Color(IRandom.getInt(0,255),
-			 IRandom.getInt(0,255),
-			 IRandom.getInt(0,255),
+	return new Color(getInt(0,255),getInt(0,255),getInt(0,255),alpha);
+    }
+    static public Color getColor(int minRed, int maxRed,
+				 int minGreen, int maxGreen,
+				 int minBlue, int maxBlue,
+				 int minAlpha, int maxAlpha){
+	return clr(minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue,minAlpha,maxAlpha);
+    }
+    static public Color clr(int minRed, int maxRed,
+			    int minGreen, int maxGreen,
+			    int minBlue, int maxBlue,
+			    int minAlpha, int maxAlpha){
+	return new Color(getInt(minRed, maxRed),
+			 getInt(minGreen, maxGreen),
+			 getInt(minBlue, maxBlue),
+			 getInt(minAlpha, maxAlpha));
+    }
+    static public Color getColor(int minRed, int maxRed,
+				 int minGreen, int maxGreen,
+				 int minBlue, int maxBlue,
+				 int alpha){
+	return clr(minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue,alpha);
+    }
+    static public Color clr(int minRed, int maxRed,
+			    int minGreen, int maxGreen,
+			    int minBlue, int maxBlue,
+			    int alpha){
+	return new Color(getInt(minRed, maxRed),
+			 getInt(minGreen, maxGreen),
+			 getInt(minBlue, maxBlue),
 			 alpha);
     }
+    static public Color getColor(int maxRed, int maxGreen, int maxBlue, int alpha){
+	return clr(maxRed,maxGreen,maxBlue,alpha);
+    }
+    static public Color clr(int maxRed, int maxGreen, int maxBlue,
+			    int alpha){
+	return new Color(getInt(maxRed),getInt(maxGreen),getInt(maxBlue),alpha);
+    }
+    static public Color getColor(int maxRed, int maxGreen, int maxBlue){
+	return clr(maxRed,maxGreen,maxBlue);
+    }
+    static public Color clr(int maxRed, int maxGreen, int maxBlue){
+	return new Color(getInt(maxRed),getInt(maxGreen),getInt(maxBlue),255);
+    }
+    
+
+
     static public Color getColor(float alpha){ return clr(alpha); }
     static public Color clr(float alpha){
-	return new Color(IRandom.getFloat(),
-			 IRandom.getFloat(),
-			 IRandom.getFloat(),
+	return new Color(getFloat(),getFloat(),getFloat(),alpha);
+    }
+    
+    static public Color getColor(float minRed, float maxRed,
+				 float minGreen, float maxGreen,
+				 float minBlue, float maxBlue,
+				 float minAlpha, float maxAlpha){
+	return clr(minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue,minAlpha,maxAlpha);
+    }
+    static public Color clr(float minRed, float maxRed,
+			    float minGreen, float maxGreen,
+			    float minBlue, float maxBlue,
+			    float minAlpha, float maxAlpha){
+	return new Color(getFloat(minRed, maxRed),
+			 getFloat(minGreen, maxGreen),
+			 getFloat(minBlue, maxBlue),
+			 getFloat(minAlpha, maxAlpha));
+    }
+    static public Color getColor(float minRed, float maxRed,
+				 float minGreen, float maxGreen,
+				 float minBlue, float maxBlue,
+				 float alpha){
+	return clr(minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue,alpha);
+    }
+    static public Color clr(float minRed, float maxRed,
+			    float minGreen, float maxGreen,
+			    float minBlue, float maxBlue,
+			    float alpha){
+	return new Color(getFloat(minRed, maxRed),
+			 getFloat(minGreen, maxGreen),
+			 getFloat(minBlue, maxBlue),
 			 alpha);
     }
+    static public Color getColor(float maxRed,float maxGreen,float maxBlue,float alpha){
+	return clr(maxRed,maxGreen,maxBlue,alpha);
+    }
+    static public Color clr(float maxRed, float maxGreen, float maxBlue,
+			    float alpha){
+	return new Color(getFloat(maxRed),getFloat(maxGreen),getFloat(maxBlue),alpha);
+    }
+    static public Color getColor(float maxRed,float maxGreen,float maxBlue){
+	return clr(maxRed,maxGreen,maxBlue);
+    }
+    static public Color clr(float maxRed, float maxGreen, float maxBlue){
+	return new Color(getFloat(maxRed),getFloat(maxGreen),getFloat(maxBlue),1f);
+    }
+    
+    
     
     //static public Color gray(){ return getGray(); }
     static public Color getGrayColor(){ return gray(); }
     static public Color getGray(){ return gray(); }
     static public Color gray(){
-	int gray = IRandom.getInt(0,255);
+	int gray = getInt(0,255);
 	return new Color(gray,gray,gray);
     }
     //static public Color gray(int alpha){ return getGray(alpha); }
     static public Color getGrayColor(int alpha){ return gray(alpha); }
     static public Color getGray(int alpha){ return gray(alpha); }
     static public Color gray(int alpha){
-	int gray = IRandom.getInt(0,255);
+	int gray = getInt(0,255);
 	return new Color(gray,gray,gray,alpha);
     }
     static public Color getGrayColor(float alpha){ return gray(alpha); }
     static public Color getGray(float alpha){ return gray(alpha); }
     static public Color gray(float alpha){
-	float gray = IRandom.getFloat();
+	float gray = getFloat();
 	return new Color(gray,gray,gray,alpha);
     }
+
+    static public Color getGrayColor(float minGray, float maxGray, float minAlpha, float maxAlpha){
+	return gray(minGray,maxGray,minAlpha,maxAlpha);
+    }
+    static public Color getGray(float minGray, float maxGray, float minAlpha, float maxAlpha){
+	return gray(minGray,maxGray,minAlpha,maxAlpha);
+    }
+    static public Color gray(float minGray, float maxGray, float minAlpha, float maxAlpha){
+	float gray = getFloat(minGray,maxGray);
+	return new Color(gray,gray,gray,getFloat(minAlpha,maxAlpha));
+    }
+    
+    static public Color getGrayColor(float minGray, float maxGray, float alpha){
+	return gray(minGray,maxGray,alpha);
+    }
+    static public Color getGray(float minGray, float maxGray, float alpha){
+	return gray(minGray,maxGray,alpha);
+    }
+    static public Color gray(float minGray, float maxGray, float alpha){
+	float gray = getFloat(minGray,maxGray);
+	return new Color(gray,gray,gray,alpha);
+    }
+    
+    
+    static public Color getGrayColor(float minGray, float maxGray){
+	return gray(minGray,maxGray);
+    }
+    static public Color getGray(float minGray, float maxGray){
+	return gray(minGray,maxGray);
+    }
+    static public Color gray(float minGray, float maxGray){
+	float gray = getFloat(minGray,maxGray);
+	return new Color(gray,gray,gray);
+    }
+    
+    
 }
 
 

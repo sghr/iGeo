@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -72,10 +72,20 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
     public IVec2R div(IDoubleI u){ op = new Div(op,u); return this; }
     public IVec2R div(double u){ op = new Div(op, new IDouble(u)); return this; }
     public IVec2R neg(){ op = new Neg(op); return this; }
+    /** alias of neg() */
     public IVec2R rev(){ return neg(); }
+    /** alias of neg() */
+    public IVec2R flip(){ return neg(); }
 
+    /** setting all zero */
+    public IVec2R zero(){ return set(0,0); }
+    
+    /** scale add */
     public IVec2R add(IVec2I v, double f){ return add(v.dup().mul(f)); }
     public IVec2R add(IVec2I v, IDoubleI f){ return add(v.dup().mul(f)); }
+    /** scale add alias */
+    public IVec2R add(double f, IVec2I v){ return add(v,f); }
+    public IVec2R add(IDoubleI f, IVec2I v){ return add(v,f); }
     
     public double dot(IVec2I u){ return get().dot(u); }
     //public IDoubleR dotR(IVec2I u){ return new IDoubleR(new Dot(op,u)); }
@@ -202,8 +212,8 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
 	op = new TransformVec3(op,xvec,yvec,translate); return this; 
     }
     
-    
-    public IVec2R diff(IVec2I v){ return dup().sub(v); }
+    public IVec2R dif(IVec2I v){ return dup().sub(v); }
+    public IVec2R diff(IVec2I v){ return dif(v); }
     public IVec2R mid(IVec2I v){ return dup().add(v).div(2); }
     public IVec2R sum(IVec2I v){ return dup().add(v); }
     public IVec2R sum(IVec2I... v){

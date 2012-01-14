@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -152,7 +152,7 @@ public class IParticleDirectionLink extends IDynamicsBase{
 	    //if(p.parent!=null) p.parent.updateGraphic();
 	    p.updateTarget();
 	    
-	    p.frc.set(0,0,0);
+	    p.frc.zero();
 	}
 	
 	//if(parent!=null) parent.updateGraphic();

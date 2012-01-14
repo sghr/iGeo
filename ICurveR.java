@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -196,7 +196,12 @@ public class ICurveR extends IObject implements ICurveI{
     /** scale add */
     public ICurveR add(IVecI v, double f){ curve.add(v,f); return this; }
     public ICurveR add(IVecI v, IDoubleI f){ curve.add(v,f); return this; }
+    /** scale add alias */
+    public ICurveR add(double f, IVecI v){ return add(v,f); }
+    public ICurveR add(IDoubleI f, IVecI v){ return add(v,f); }
     
+    public ICurveR rot(IDoubleI angle){ curve.rot(angle); return this; }
+    public ICurveR rot(double angle){ curve.rot(angle); return this; }
     public ICurveR rot(IVecI axis, IDoubleI angle){ curve.rot(axis,angle); return this; }
     public ICurveR rot(IVecI axis, double angle){ curve.rot(axis,angle); return this; }
     public ICurveR rot(IVecI center, IVecI axis, IDoubleI angle){
@@ -207,13 +212,20 @@ public class ICurveR extends IObject implements ICurveI{
     }
     
     /** rotate to destination direction vector */
-    public ICurveR rot(IVecI axis, IVecI destDir){
-	curve.rot(axis,destDir); return this;
-    }
+    public ICurveR rot(IVecI axis, IVecI destDir){ curve.rot(axis,destDir); return this; }
     /** rotate to destination point location */    
     public ICurveR rot(IVecI center, IVecI axis, IVecI destPt){
 	curve.rot(center,axis,destPt); return this;
     }
+    
+    public ICurveR rot2(IDoubleI angle){ return rot(angle); }
+    public ICurveR rot2(double angle){ return rot(angle); }
+    public ICurveR rot2(IVecI center, IDoubleI angle){ curve.rot2(center,angle); return this; }
+    public ICurveR rot2(IVecI center, double angle){ curve.rot2(center,angle); return this; }
+    /** rotation on xy-plane to destination direction vector */
+    public ICurveR rot2(IVecI destDir){ curve.rot2(destDir); return this; }
+    /** rotation on xy-plane to destination point location */    
+    public ICurveR rot2(IVecI center, IVecI destPt){ curve.rot2(center,destPt); return this; }
     
     
     /** alias of mul */

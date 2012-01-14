@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -45,7 +45,7 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 		       int xnum, int ynum){
 	super(x,y,width,height);
 	setupGrid(xnum,ynum);
-	currentMousePane = gridPanes[0][0]; //
+	currentMousePane = gridPanes[1][0]; //
     }
     
     public void setupGrid(int xnum, int ynum){

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -326,6 +326,13 @@ public class ICurve extends IObject implements ICurveI{
     public ICurve add(IVecI v, double f){ curve.add(v,f); return this; }
     public ICurve add(IVecI v, IDoubleI f){ curve.add(v,f); return this; }
     
+    /** scale add alias */
+    public ICurve add(double f, IVecI v){ return add(v,f); }
+    public ICurve add(IDoubleI f, IVecI v){ return add(v,f); }
+    
+    public ICurve rot(IDoubleI angle){ curve.rot(angle); return this; }
+    public ICurve rot(double angle){ curve.rot(angle); return this; }
+    
     public ICurve rot(IVecI axis, IDoubleI angle){ curve.rot(axis,angle); return this; }
     public ICurve rot(IVecI axis, double angle){ curve.rot(axis,angle); return this; }
     public ICurve rot(IVecI center, IVecI axis, IDoubleI angle){
@@ -343,6 +350,15 @@ public class ICurve extends IObject implements ICurveI{
     public ICurve rot(IVecI center, IVecI axis, IVecI destPt){
 	curve.rot(center,axis,destPt); return this;
     }
+    
+    public ICurve rot2(IDoubleI angle){ return rot(angle); }
+    public ICurve rot2(double angle){ return rot(angle); }
+    public ICurve rot2(IVecI center, IDoubleI angle){ curve.rot2(center,angle); return this; }
+    public ICurve rot2(IVecI center, double angle){ curve.rot2(center,angle); return this; }
+    /** rotation on xy-plane to destination direction vector */
+    public ICurve rot2(IVecI destDir){ curve.rot2(destDir); return this; }
+    /** rotation on xy-plane to destination point location */    
+    public ICurve rot2(IVecI center, IVecI destPt){ curve.rot2(center,destPt); return this; }
     
     
     /** alias of mul */

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -248,6 +248,16 @@ public class IBrep extends IObject implements ITransformable{
 	for(int i=0; i<surfaces.length; i++) surfaces[i].add(v,f);
 	return this;
     }
+    /** scale add alias */
+    public IBrep add(double f, IVecI v){ return add(v,f); }
+    public IBrep add(IDoubleI f, IVecI v){ return add(v,f); }
+    
+    public IBrep rot(IDoubleI angle){
+	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot(angle); } return this;
+    }
+    public IBrep rot(double angle){
+	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot(angle); } return this;
+    }
     
     public IBrep rot(IVecI axis, IDoubleI angle){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot(axis,angle);
@@ -275,6 +285,25 @@ public class IBrep extends IObject implements ITransformable{
     /** rotate to destination point location */    
     public IBrep rot(IVecI center, IVecI axis, IVecI destPt){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot(center,axis,destPt);
+	return this;
+    }
+    
+    public IBrep rot2(IDoubleI angle){ return rot(angle); }
+    public IBrep rot2(double angle){ return rot(angle); }
+    public IBrep rot2(IVecI center, IDoubleI angle){
+	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot2(center,angle); }	return this;
+    }
+    public IBrep rot2(IVecI center, double angle){
+	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot2(center,angle); }	return this;
+    }
+    
+    /** rotation on xy-plane to destination direction vector */
+    public IBrep rot2(IVecI destDir){
+	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot2(destDir); } return this;
+    }
+    /** rotation on xy-plane to destination point location */    
+    public IBrep rot2(IVecI center, IVecI destPt){
+	for(int i=0; i<surfaces.length; i++) surfaces[i].rot2(center,destPt);
 	return this;
     }
     

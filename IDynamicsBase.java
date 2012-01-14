@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -62,7 +62,13 @@ public class IDynamicsBase implements IDynamics{
     
     public IObject parent(){ return parent; }
     public IDynamicsBase parent(IObject par){
-	if(this.parent!=null){// necessary?
+	if(this.parent==par) return this;
+	
+	if(this.parent==null){ // this would've been added to default dynamic server
+	    IServerI srv = IG.cur();
+	    if(srv!=null) srv.server().dynamicServer().remove(this); // necessary?
+	}
+	else{// necessary?
 	    this.parent.deleteDynamics(this);
 	    removeTarget(this.parent); // removing from target too.
 	}
@@ -118,5 +124,10 @@ public class IDynamicsBase implements IDynamics{
     public void interact(ArrayList<IDynamics> dynamics){}
     /** behavior definition of updating dynamics in each time frame */
     public void update(){}
+    
+    public void preinteract(ArrayList<IDynamics> dynamics){}
+    public void postinteract(ArrayList<IDynamics> dynamics){}
+    public void preupdate(){}
+    public void postupdate(){}
     
 }

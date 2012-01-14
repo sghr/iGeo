@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -51,11 +51,22 @@ public interface ITransformable{
     
     /** scale add */
     public ITransformable add(IVecI v, double f);
+    /** scale add */
     public ITransformable add(IVecI v, IDoubleI f); 
+    /** scale add alias */
+    public ITransformable add(double f, IVecI v);
+    /** scale add alias */
+    public ITransformable add(IDoubleI f, IVecI v); 
     
+    /** rotation around z-axis and origin */
+    public ITransformable rot(IDoubleI angle);
+    public ITransformable rot(double angle);
+    
+    /** rotation around axis vector */
     public ITransformable rot(IVecI axis, IDoubleI angle);
     public ITransformable rot(IVecI axis, double angle);
     
+    /** rotation around axis vector and center */
     public ITransformable rot(IVecI center, IVecI axis, IDoubleI angle);
     public ITransformable rot(IVecI center, IVecI axis, double angle);
     
@@ -63,6 +74,22 @@ public interface ITransformable{
     public ITransformable rot(IVecI axis, IVecI destDir);
     /** rotate to destination point location */    
     public ITransformable rot(IVecI center, IVecI axis, IVecI destPt);
+    
+    
+    /** rotation on xy-plane around origin; same with rot(IDoubleI) */
+    public ITransformable rot2(IDoubleI angle);
+    /** rotation on xy-plane around origin; same with rot(double) */
+    public ITransformable rot2(double angle);
+    
+    /** rotation on xy-plane around center */
+    public ITransformable rot2(IVecI center, IDoubleI angle);
+    public ITransformable rot2(IVecI center, double angle);
+    
+    /** rotation on xy-plane to destination direction vector */
+    public ITransformable rot2(IVecI destDir);
+    /** rotation on xy-plane to destination point location */    
+    public ITransformable rot2(IVecI center, IVecI destPt);
+    
     
     
     /** alias of mul */

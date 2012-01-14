@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -37,13 +37,13 @@ import igeo.*;
 */
 public class IView{
     
-    public static double defaultNear = 0.001;
-    public static double defaultFar = 10000; //1000; //10000;
+    public static double defaultNear = IConfig.nearView; //0.001;
+    public static double defaultFar = IConfig.farView; //10000; //1000; //10000;
     
-    public static double defaultAxonRatio = 1.0;
-    public static double defaultPersRatio = 0.5;
+    public static double defaultAxonRatio = IConfig.axonometricRatio; //1.0;
+    public static double defaultPersRatio = IConfig.perspectiveRatio; //0.5;
     
-    public static double defaultViewDistance=100; //1000;
+    public static double defaultViewDistance = IConfig.viewDistance; //100; //1000;
     
     public static IGraphicMode defaultMode =
 	new IGraphicMode(IGraphicMode.GraphicType.GL, true, true, true); //
@@ -143,7 +143,7 @@ public class IView{
 	target = new IVec();
     }
     public IView(double x, double y, double z,
-		  double yaw, double pitch){
+		 double yaw, double pitch){
 	//this.x = x; this.y = y; this.z = z;
 	pos = new IVec(x,y,z);
 	this.yaw = yaw; this.pitch = pitch; this.roll = 0;
@@ -288,7 +288,26 @@ public class IView{
 	return target.diff(pos).len();
     }
     
+    public void set(double x, double y, double z){ setLocation(x,y,z); }
+    public void set(IVec location){ setLocation(location); }
+    public void set(double x, double y, double z,
+		    double yaw, double pitch){ set(x,y,z,yaw,pitch,0); }
+    public void set(IVec location, double yaw, double pitch){ set(location,yaw,pitch,0); }
+    public void set(double x, double y, double z,
+		    double yaw, double pitch, double roll){
+	disableRotationAroundTarget();
+	setLocation(x,y,z);
+	setAngle(yaw,pitch,roll);
+ 	update();
+    }
+    public void set(IVec location, double yaw, double pitch, double roll){
+	disableRotationAroundTarget();
+	setLocation(location);
+	setAngle(yaw,pitch,roll);
+	update();
+    }
     
+    public IVec getLocation(){ return pos; }
     
     public void setLocation(double x, double y, double z){
 	//this.x=x; this.y=y; this.z=z;
@@ -312,9 +331,22 @@ public class IView{
 	*/
     }
     
+    public void setAngle(double yaw, double pitch, double roll, boolean updateTarget){
+	this.roll=roll; setAngle(yaw,pitch,updateTarget); 
+    }
+    
     public void setAngle(double yaw, double pitch){
+	setAngle(yaw,pitch,false);
+    }
+    
+    public void setAngle(double yaw, double pitch, boolean updateTarget){
 	this.yaw=yaw; this.pitch=pitch;
-	if(rotateAroundTarget){
+	if(updateTarget){ // update to the angle with the default view distance
+	    IVec dir = frontDirection();
+	    dir.len(defaultViewDistance);
+	    target.set(dir.add(pos));
+	}
+	else if(rotateAroundTarget){
 	    IVec dir = frontDirection();
 	    IVec tdir = target.diff(pos);
 	    double dist = -tdir.len();
@@ -443,6 +475,7 @@ public class IView{
 	}
 	setLocation(dir.add(center));
 	setTarget(center);
+	enableRotationAroundTarget(); // !! added 2011/12/29
 	update();
     }
     
@@ -703,37 +736,142 @@ public class IView{
 	}
     }
     
+    public void setTop(){ setTop(0,0); }
+    public void setTop(double x, double y){ setTop(x,y,defaultViewDistance); }
+    public void setTop(double x, double y, double z){ setTop(x,y,z,axonRatio); }
+    public void setTop(double x, double y, double z, double axonometricRatio){
+	setLocation(x,y,z);
+	setAngle(Math.PI/2, Math.PI/2, true);
+	setAxonometricRatio(axonometricRatio);
+    }
+    public void setBottom(){ setBottom(0,0); }
+    public void setBottom(double x, double y){ setBottom(x,y,-defaultViewDistance); }
+    public void setBottom(double x, double y, double z){ setBottom(x,y,z,axonRatio); }
+    public void setBottom(double x, double y, double z, double axonometricRatio){
+	setLocation(x,y,z);
+	setAngle(Math.PI/2, -Math.PI/2, true);
+	setAxonometricRatio(axonometricRatio);
+    }
+    public void setLeft(){ setLeft(0,0); }
+    public void setLeft(double y, double z){ setLeft(-defaultViewDistance,y,z); }
+    public void setLeft(double x, double y, double z){ setLeft(x,y,z,axonRatio); }
+    public void setLeft(double x, double y, double z, double axonometricRatio){
+	setLocation(x,y,z);
+	setAngle(0,0,true);
+	setAxonometricRatio(axonometricRatio);
+    }
+    public void setRight(){ setRight(0,0); }
+    public void setRight(double y, double z){ setRight(defaultViewDistance,y,z); }
+    public void setRight(double x, double y, double z){ setRight(x,y,z,axonRatio); }
+    public void setRight(double x, double y, double z, double axonometricRatio){
+	setLocation(x,y,z);
+	setAngle(Math.PI,0,true);
+	setAxonometricRatio(axonometricRatio);
+    }
+    public void setFront(){ setFront(0,0); }
+    public void setFront(double x, double z){ setFront(x,-defaultViewDistance,z); }
+    public void setFront(double x, double y, double z){ setFront(x,y,z,axonRatio); }
+    public void setFront(double x, double y, double z, double axonometricRatio){
+	setLocation(x,y,z);
+	setAngle(Math.PI/2,0,true);
+	setAxonometricRatio(axonometricRatio);
+    }
+    public void setBack(){ setBack(0,0); }
+    public void setBack(double x, double z){ setBack(x,defaultViewDistance,z); }
+    public void setBack(double x, double y, double z){ setBack(x,y,z,axonRatio); }
+    public void setBack(double x, double y, double z, double axonometricRatio){
+	setLocation(x,y,z);
+	setAngle(-Math.PI/2,0,true);
+	setAxonometricRatio(axonometricRatio);
+    }
+    
+    public void setPerspective(){
+	setPerspective(-defaultViewDistance/Math.sqrt(3),
+		       -defaultViewDistance/Math.sqrt(3),
+		       defaultViewDistance/Math.sqrt(3));
+    }
+    public void setPerspective(double x, double y, double z){
+	setPerspective(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
+    }
+    public void setPerspective(double x, double y, double z,
+			       double yaw, double pitch){
+	setLocation(x,y,z);
+	setAngle(yaw,pitch,true);
+	perspective();
+	setPerspectiveRatio(defaultPersRatio);
+    }
+    
+    public void setPerspective(double perspectiveAngle){
+	setPerspective(-defaultViewDistance/Math.sqrt(3),
+		       -defaultViewDistance/Math.sqrt(3),
+		       defaultViewDistance/Math.sqrt(3), perspectiveAngle);
+	setAngle(Math.PI/4,Math.atan(Math.sqrt(2)/2),true);
+	perspective();
+	setPerspectiveAngle(perspectiveAngle);
+    }
+    public void setPerspective(double x, double y, double z, double perspectiveAngle){
+	setPerspective(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
+    }
+    public void setPerspective(double x, double y, double z,
+			       double yaw, double pitch,
+			       double perspectiveAngle){
+	setLocation(x,y,z);
+	setAngle(yaw,pitch,true);
+	perspective();
+	setPerspectiveAngle(perspectiveAngle);
+    }
+    
+    public void setAxonometric(){
+	setAxonometric(-defaultViewDistance/Math.sqrt(3),
+		       -defaultViewDistance/Math.sqrt(3),
+		       defaultViewDistance/Math.sqrt(3));
+    }
+    public void setAxonometric(double x, double y, double z){
+	setAxonometric(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
+    }
+    public void setAxonometric(double x, double y, double z,
+			       double axonometricRatio){
+	setAxonometric(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2),axonometricRatio);
+    }
+    public void setAxonometric(double x, double y, double z, double yaw, double pitch){
+	setAxonometric(x,y,z,yaw,pitch,axonRatio);
+    }
+    public void setAxonometric(double x, double y, double z, double yaw, double pitch, double axonometricRatio){
+	setLocation(x,y,z);
+	setAngle(yaw,pitch,true);
+	setAxonometricRatio(axonometricRatio);
+    }
     
     
     public static IView getTopView(int screenX, int screenY,
-				    int screenWidth, int screenHeight){
+				   int screenWidth, int screenHeight){
 	return new IView(0,0,defaultViewDistance,
-			  Math.PI/2, Math.PI/2, 0,
-			  screenX, screenY, screenWidth, screenHeight, true);
+			 Math.PI/2, Math.PI/2, 0,
+			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getBottomView(int screenX, int screenY,
-				       int screenWidth, int screenHeight){
+				      int screenWidth, int screenHeight){
 	return new IView(0,0,-defaultViewDistance,
-			  Math.PI/2, -Math.PI/2, 0,
-			  screenX, screenY, screenWidth, screenHeight, true);
+			 Math.PI/2, -Math.PI/2, 0,
+			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getLeftView(int screenX, int screenY,
-				     int screenWidth, int screenHeight){
+				    int screenWidth, int screenHeight){
 	return new IView(-defaultViewDistance,0,0,
-			  0,0,0,
-			  screenX, screenY, screenWidth, screenHeight, true);
+			 0,0,0,
+			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getRightView(int screenX, int screenY,
-				      int screenWidth, int screenHeight){
+				     int screenWidth, int screenHeight){
 	return new IView(defaultViewDistance,0,0,
-			  Math.PI,0,0,
-			  screenX, screenY, screenWidth, screenHeight, true);
+			 Math.PI,0,0,
+			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getFrontView(int screenX, int screenY,
-				      int screenWidth, int screenHeight){
+				     int screenWidth, int screenHeight){
 	return new IView(0,-defaultViewDistance,0,
-			  Math.PI/2,0,0,
-			  screenX, screenY, screenWidth, screenHeight, true);
+			 Math.PI/2,0,0,
+			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getBackView(int screenX, int screenY,
 				    int screenWidth, int screenHeight){
@@ -743,11 +881,18 @@ public class IView{
     }
     public static IView getDefaultAxonometricView(int screenX, int screenY,
 						  int screenWidth, int screenHeight){
+	return new IView(-defaultViewDistance/Math.sqrt(3),
+			 -defaultViewDistance/Math.sqrt(3),
+			 defaultViewDistance/Math.sqrt(3),
+			 Math.PI/4,Math.atan(Math.sqrt(2)/2),0,
+			 screenX, screenY, screenWidth, screenHeight, true);
+	/*
 	return new IView(defaultViewDistance/Math.sqrt(3),
 			 defaultViewDistance/Math.sqrt(3),
 			 defaultViewDistance/Math.sqrt(3),
 			 -Math.PI*3/4,Math.atan(Math.sqrt(2)/2),0,
 			 screenX, screenY, screenWidth, screenHeight, true);
+	*/
     }
     public static IView getDefaultPerspectiveView(int screenX, int screenY,
 						  int screenWidth, int screenHeight){

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -297,7 +297,11 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
     /** scale add */
     public ITrimCurve add(IVecI v, double f){ super.add(v,f); return this; }
     public ITrimCurve add(IVecI v, IDoubleI f){ super.add(v,f); return this; }
+    public ITrimCurve add(double f, IVecI v){ return add(v,f); }
+    public ITrimCurve add(IDoubleI f, IVecI v){ return add(v,f); }
     
+    public ITrimCurve rot(IDoubleI angle){ super.rot(angle); return this; }
+    public ITrimCurve rot(double angle){ super.rot(angle); return this; }
     public ITrimCurve rot(IVecI axis, IDoubleI angle){ super.rot(axis,angle); return this; }
     public ITrimCurve rot(IVecI axis, double angle){ super.rot(axis,angle); return this; }
     public ITrimCurve rot(IVecI center, IVecI axis, IDoubleI angle){
@@ -314,6 +318,15 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
     public ITrimCurve rot(IVecI center, IVecI axis, IVecI destPt){
 	super.rot(center,axis,destPt); return this;
     }
+    
+    public ITrimCurve rot2(IDoubleI angle){ super.rot(angle); return this; }
+    public ITrimCurve rot2(double angle){ super.rot(angle); return this; }
+    public ITrimCurve rot2(IVecI center, IDoubleI angle){ super.rot2(center,angle); return this; }
+    public ITrimCurve rot2(IVecI center, double angle){ super.rot2(center,angle); return this; }
+    /** rotation on xy-plane to destination direction vector */
+    public ITrimCurve rot2(IVecI destDir){ super.rot2(destDir); return this; }
+    /** rotation on xy-plane to destination point location */
+    public ITrimCurve rot2(IVecI center, IVecI destPt){ super.rot2(center,destPt); return this; }
     
     /** same with mul */
     public ITrimCurve scale(IDoubleI f){ return mul(f); }

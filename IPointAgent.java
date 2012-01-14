@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -43,6 +43,12 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent(IPointAgent pa){ super(); pos=pa.pos.dup(); show(); }
     
     
+    public IVec position(){ return pos(); }
+    public IPointAgent position(IVecI v){ return pos(v); }
+    
+    public IVec pos(){ return pos; }
+    public IPointAgent pos(IVecI v){ pos.set(v); return this; }
+    
     /**************************************
      * methods of IVecI
      *************************************/
@@ -81,9 +87,14 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent neg(){ pos.neg(); return this; }
     public IPointAgent rev(){ return neg(); }
     public IPointAgent flip(){ return neg(); }
+
+    public IPointAgent zero(){ pos.zero(); return this; }
     
     public IPointAgent add(IVecI v, double f){ pos.add(v,f); return this; }
     public IPointAgent add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
+    
+    public IPointAgent add(double f, IVecI v){ return add(v,f); }
+    public IPointAgent add(IDoubleI f, IVecI v){ return add(v,f); }
     
     
     public double dot(IVecI v){ return pos.dot(v); }
@@ -150,6 +161,9 @@ public class IPointAgent extends IAgent implements IVecI{
     public double angle(ISwitchE e, IVecI v, IVecI axis){ return pos.angle(e,v,axis); }
     public IDouble angle(ISwitchR r, IVecI v, IVecI axis){ return pos.angle(r,v,axis); }
     
+    public IPointAgent rot(IDoubleI angle){ pos.rot(angle); return this; }
+    public IPointAgent rot(double angle){ pos.rot(angle); return this; }
+    
     public IPointAgent rot(IVecI axis, IDoubleI angle){ pos.rot(axis,angle); return this; }
     public IPointAgent rot(IVecI axis, double angle){ pos.rot(axis,angle); return this; }
     
@@ -164,6 +178,13 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent rot(IVecI center, IVecI axis, IVecI destPt){
 	pos.rot(center,axis,destPt); return this;
     }
+    
+    public IPointAgent rot2(IDoubleI angle){ return rot(angle); }
+    public IPointAgent rot2(double angle){ return rot(angle); }
+    public IPointAgent rot2(IVecI center, double angle){ pos.rot2(center,angle); return this; }
+    public IPointAgent rot2(IVecI center, IDoubleI angle){ pos.rot2(center,angle); return this; }
+    public IPointAgent rot2(IVecI destDir){ pos.rot2(destDir); return this; }
+    public IPointAgent rot2(IVecI center, IVecI destPt){ pos.rot2(center,destPt); return this; }
     
     public IPointAgent scale(IDoubleI f){ pos.scale(f); return this; }
     public IPointAgent scale(double f){ pos.scale(f); return this; }
@@ -257,7 +278,8 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent cp(IVecI v){ return dup().add(v); }
     
     // returns IVec, not IPointAgent
-    public IVec diff(IVecI v){ return pos.diff(v); }
+    public IVec dif(IVecI v){ return pos.dif(v); }
+    public IVec diff(IVecI v){ return dif(v); }
     public IVec mid(IVecI v){ return pos.mid(v); }
     public IVec sum(IVecI v){ return pos.sum(v); }
     public IVec sum(IVecI... v){ return pos.sum(v); }
@@ -289,8 +311,8 @@ public class IPointAgent extends IAgent implements IVecI{
      * methods of IObject
      *************************************/
     
-    public IPointAgent name(String nm){ super.name(nm); return this; }
-    public IPointAgent layer(ILayer l){ super.layer(l); return this; }
+    public IPointAgent name(String nm){ super.name(nm); point.name(nm); return this; }
+    public IPointAgent layer(ILayer l){ super.layer(l); point.layer(l); return this; }
     
     
     public IPointAgent show(){
@@ -299,7 +321,7 @@ public class IPointAgent extends IAgent implements IVecI{
 	super.show();
 	return this;
     }
-    public IPointAgent hide(){ if(point!=null) hide(); super.hide(); return this; }
+    public IPointAgent hide(){ if(point!=null) point.hide(); super.hide(); return this; }
     
     
     public IPointAgent clr(Color c){ super.clr(c); point.clr(c); return this; }

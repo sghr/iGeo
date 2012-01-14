@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -64,10 +64,21 @@ public interface IVec4I extends IVec4Op, IVecI{
     public IVec4I div(IDoubleI v);
     public IVec4I div(double v);
     public IVec4I neg();
+    /** alias of neg() */
     public IVec4I rev();
-    
+    /** alias of neg() */
+    public IVec4I flip();
+    /** setting all zero */
+    public IVec4I zero();
+
+    /** scale add */
     public IVec4I add(IVecI v, double f);
+    /** scale add */
     public IVec4I add(IVecI v, IDoubleI f); 
+    /** scale add alias */
+    public IVec4I add(double f, IVecI v);
+    /** scale add alias */
+    public IVec4I add(IDoubleI f, IVecI v); 
     
     public IVec4I len(IDoubleI l);
     public IVec4I len(double l);
@@ -112,13 +123,32 @@ public interface IVec4I extends IVec4Op, IVecI{
     public IBoolI eqW(ISwitchR r, IVec4I v, IDoubleI resolution);
     
     
+    /** rotation on xy-plane */
+    public IVec4I rot(IDoubleI angle);
+    /** rotation on xy-plane */
+    public IVec4I rot(double angle);
+    /** rotation around axis */
     public IVec4I rot(IVecI axis, IDoubleI angle);
+    /** rotation around axis */
     public IVec4I rot(IVecI axis, double angle);
     public IVec4I rot(IVecI center, IVecI axis, IDoubleI angle);
     public IVec4I rot(IVecI center, IVecI axis, double angle);
     
     public IVec4I rot(IVecI axis, IVecI destDir);
     public IVec4I rot(IVecI center, IVecI axis, IVecI destPt);
+
+    /** rotation on xy-plane; alias of rot(IDoubleI) */
+    public IVec4I rot2(IDoubleI angle);
+    /** rotation on xy-plane; alias of rot(double) */
+    public IVec4I rot2(double angle);
+    
+    public IVec4I rot2(IVecI center, IDoubleI angle);
+    public IVec4I rot2(IVecI center, double angle);
+    
+    public IVec4I rot2(IVecI destDir);
+    public IVec4I rot2(IVecI center, IVecI destPt);
+    
+    
     
     public IVec4I scale(IDoubleI f);
     public IVec4I scale(double f);
@@ -137,6 +167,7 @@ public interface IVec4I extends IVec4Op, IVecI{
     
     // methods creating new instance
     // use these carefully. w is set to the object's w (not input or addition with input's)
+    public IVec4I dif(IVecI v);
     public IVec4I diff(IVecI v);
     public IVec4I mid(IVecI v);
     public IVec4I sum(IVecI v);

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -104,6 +104,25 @@ public /*interface*/ class IConfig{
     //public static boolean autoStart = false;
     
     
+    /** enable preinteract method in IDynamicServer. Default is true. If false, some functionalities of IDynamics inheriting class like IAgent are disabled. */
+    public static boolean enablePreinteract=true;
+    /** enable postinteract method in IDynamicServer. Default is true. If false, some functionalities of IDynamics inheriting class like IAgent are disabled. */
+    public static boolean enablePostinteract=true;
+    /** enable preupdate method in IDynamicServer. Default is true. If false, some functionalities of IDynamics inheriting class like IAgent are disabled. */
+    public static boolean enablePreupdate=true;
+    /** enable postupdate method in IDynamicServer. Default is true. If false, some functionalities of IDynamics inheriting class like IAgent are disabled. */
+    public static boolean enablePostupdate=true;
+    
+    /** put preinteract method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
+    public static boolean loopPreinteract=false;
+    /** put postinteract method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
+    public static boolean loopPostinteract=false;
+    /** put preupdate method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
+    public static boolean loopPreupdate=false;
+    /** put postupdate method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
+    public static boolean loopPostupdate=false;
+    
+    
     /*****************************
      * mouse properties in INavigator
      *****************************/
@@ -183,7 +202,23 @@ public /*interface*/ class IConfig{
        Minimum size to create bounding box and to zoom into.
     */
     public static double minimumBoundingBox = 0.002;
-
+    
+    
+    /**
+       default parameters for IView class
+    */
+    /** default near clipping distance */
+    public static double nearView = 0.001;
+    /** default far clipping distance */
+    public static double farView = 10000;
+    /** default axonometric ratio */
+    public static double axonometricRatio = 1.0;
+    /** default perspective ratio */
+    public static double perspectiveRatio = 0.5;
+    /** default view distance */
+    public static double viewDistance = 100;
+    
+    
     
     /*************************************************************************************
      * NURBS geometry construction

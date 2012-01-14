@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -545,11 +545,15 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     /** alias of neg */
     public ICurveGeo flip(){ return neg(); }
     
-    
     /** scale add */
     public ICurveGeo add(IVecI v, double f){ for(IVecI p:controlPoints){ p.add(v,f); } return this; }
     public ICurveGeo add(IVecI v, IDoubleI f){ for(IVecI p:controlPoints){ p.add(v,f); } return this; }
+    /** scale add alias */
+    public ICurveGeo add(double f, IVecI v){ return add(v,f); }
+    public ICurveGeo add(IDoubleI f, IVecI v){ return add(v,f); }
     
+    public ICurveGeo rot(IDoubleI angle){ for(IVecI p:controlPoints){ p.rot(angle); } return this; }
+    public ICurveGeo rot(double angle){ for(IVecI p:controlPoints){ p.rot(angle); } return this; }
     public ICurveGeo rot(IVecI axis, IDoubleI angle){
 	for(IVecI p:controlPoints){ p.rot(axis,angle); } return this;
     }
@@ -570,6 +574,22 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public ICurveGeo rot(IVecI center, IVecI axis, IVecI destPt){
 	for(IVecI p:controlPoints){ p.rot(center,axis,destPt); } return this;
     }
+
+    public ICurveGeo rot2(IDoubleI angle){ return rot(angle); }
+    public ICurveGeo rot2(double angle){ return rot(angle); }
+    public ICurveGeo rot2(IVecI center, IDoubleI angle){
+	for(IVecI p:controlPoints){ p.rot2(center,angle); } return this;
+    }
+    public ICurveGeo rot2(IVecI center, double angle){
+	for(IVecI p:controlPoints){ p.rot2(center,angle); } return this;
+    }
+    /** rotation on xy-plane to destination direction vector */
+    public ICurveGeo rot2(IVecI destDir){ for(IVecI p:controlPoints){ p.rot2(destDir); } return this; }
+    /** rotation on xy-plane to destination point location */
+    public ICurveGeo rot2(IVecI center, IVecI destPt){
+	for(IVecI p:controlPoints){ p.rot2(center,destPt); } return this;
+    }
+    
     
     /** alias of mul */
     public ICurveGeo scale(IDoubleI f){ return mul(f); }

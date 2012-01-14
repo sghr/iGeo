@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2011 Satoru Sugihara
+    Copyright (c) 2002-2012 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -106,15 +106,21 @@ public class IParticleOnCurve extends IParticle{
     synchronized public IParticleOnCurve unfix(){ super.unfix(); return this; }
     
     synchronized public IParticleOnCurve mass(double mass){ super.mass(mass); return this; }
-    synchronized public IParticleOnCurve position(IVec v){ super.pos(v); return this; }
-    synchronized public IParticleOnCurve pos(IVec v){ super.pos(v); return this; }
-    synchronized public IParticleOnCurve velocity(IVec v){ super.vel(v); return this; }
-    synchronized public IParticleOnCurve vel(IVec v){ super.vel(v); return this; }
-    synchronized public IParticleOnCurve force(IVec v){ super.frc(v); return this; }
-    synchronized public IParticleOnCurve frc(IVec v){ super.frc(v); return this; }
+    synchronized public IParticleOnCurve position(IVecI v){ super.pos(v); return this; }
+    synchronized public IParticleOnCurve pos(IVecI v){ super.pos(v); return this; }
+    synchronized public IParticleOnCurve velocity(IVecI v){ super.vel(v); return this; }
+    synchronized public IParticleOnCurve vel(IVecI v){ super.vel(v); return this; }
+    synchronized public IParticleOnCurve force(IVecI v){ super.frc(v); return this; }
+    synchronized public IParticleOnCurve frc(IVecI v){ super.frc(v); return this; }
     synchronized public IParticleOnCurve friction(double friction){ super.fric(friction); return this; }
     synchronized public IParticleOnCurve fric(double friction){ super.fric(friction); return this; }
-    synchronized public IParticleOnCurve addForce(IVec f){ super.addForce(f); return this; }
+    /* alias of friction */
+    synchronized public IParticleOnCurve decay(double d){ return fric(d); }
+    
+    synchronized public IParticleOnCurve push(IVecI f){ super.push(f); return this; }
+    synchronized public IParticleOnCurve pull(IVecI f){ super.pull(f); return this; }
+    synchronized public IParticleOnCurve addForce(IVecI f){ super.addForce(f); return this; }
+    synchronized public IParticleOnCurve reset(){ super.reset(); return this; }
     synchronized public IParticleOnCurve resetForce(){ super.resetForce(); return this; }
     
     synchronized public IParticleOnCurve uposition(double u){ return upos(u); }
@@ -173,7 +179,7 @@ public class IParticleOnCurve extends IParticle{
 	pos.set(curve.pt(upos));
 
 	// reset
-	frc.set(0,0,0);
+	frc.zero();
 	ufrc=0; // also reset ufrc
 	
 	//if(parent!=null) parent.updateGraphic();
