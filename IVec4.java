@@ -162,32 +162,53 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     /** scale add alias */
     public IVec4 add(IDoubleI f, IVecI v){ return add(v,f); }
     
-    
+    /** setting length of vector, ignoring w */
     public IVec4 len(IDoubleI l){ super.len(l); return this; }
+    /** setting length of vector, ignoring w */
     public IVec4 len(double l){ super.len(l); return this; }
-    
+
+    /** unitize, ignoring w */
     public IVec4 unit(){ super.unit(); return this; }
     
-    /** cross returns a new instance
-     */
+    /** cross product, returning a new instance. w is the original value */
     public IVec4 cross(IVec v){
-        return dup().set(y*v.z - z*v.y, 
-                         z*v.x - x*v.z,
-                         x*v.y - y*v.x);
+        //return dup().set(y*v.z - z*v.y,  z*v.x - x*v.z, x*v.y - y*v.x);
+	return new IVec4(y*v.z - z*v.y,  z*v.x - x*v.z, x*v.y - y*v.x, w);
+    }
+    /** cross product, returning a new instance. w is the original value */
+    public IVec4 cross(double vx, double vy, double vz){
+        //return dup().set(y*vz - z*vy,  z*vx - x*vz, x*vy - y*vx);
+	return new IVec4(y*vz - z*vy,  z*vx - x*vz, x*vy - y*vx, w);
     }
     public IVec4 cross(IVecI v){ return cross(v.get()); }
     
+    /** cross product, changing the instance not creating a new instance */
+    public IVec4 icross(IVec v){
+	double xt = y*v.z - z*v.y;
+        double yt = z*v.x - x*v.z;
+        double zt = x*v.y - y*v.x;
+        x=xt; y=yt; z=zt; return this;
+    }
+    /** cross product, changing the instance not creating a new instance */
+    public IVec4 icross(double vx, double vy, double vz){
+	double xt = y*vz - z*vy;
+        double yt = z*vx - x*vz;
+        double zt = x*vy - y*vx;
+        x=xt; y=yt; z=zt; return this;
+    }
+    /** cross product, changing the instance not creating a new instance */
+    public IVec4 icross(IVecI v){ return icross(v.get()); }
     
-    
+    public boolean eqW(IVec4 v){ return eqW(v,IConfig.tolerance); }
+    public boolean eqW(double vw){ return eqW(vw,IConfig.tolerance); }
     public boolean eqW(IVec4I v){ return eqW(v,IConfig.tolerance); }
-    public boolean eqW(IVec4I v, double resolution){ return Math.abs(w-v.w())<=resolution; }
-    public boolean eqW(IVec4 v, double resolution){ return Math.abs(w-v.w)<=resolution; }
-    //public IBool eqWR(IVec4I v){ return new IBool(eqW(v,IConfig.tolerance)); }
-    //public IBool eqWR(IVec4I v, IDoubleI resolution){ return new IBool(eqW(v,resolution.x())); }
+    public boolean eqW(IVec4I v, double tolerance){ return Math.abs(w-v.w())<=tolerance; }
+    public boolean eqW(IVec4 v, double tolerance){ return Math.abs(w-v.w)<=tolerance; }
+    public boolean eqW(double vw, double tolerance){ return Math.abs(w-vw)<=tolerance; }
     public boolean eqW(ISwitchE e, IVec4I v){ return eqW(v); }
-    public boolean eqW(ISwitchE e, IVec4I v, double resolution){ return eqW(v,resolution); }
+    public boolean eqW(ISwitchE e, IVec4I v, double tolerance){ return eqW(v,tolerance); }
     public IBool eqW(ISwitchR r, IVec4I v){ return new IBool(eqW(v)); }
-    public IBool eqW(ISwitchR r, IVec4I v, IDoubleI resolution){ return new IBool(eqW(v,resolution.x())); }
+    public IBool eqW(ISwitchR r, IVec4I v, IDoubleI tolerance){ return new IBool(eqW(v,tolerance.x())); }
     
     public IVec4 rot(IDoubleI angle){ super.rot(angle); return this; }
     public IVec4 rot(double angle){ super.rot(angle); return this; }
@@ -195,6 +216,9 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 rot(IVecI axis, IDoubleI angle){ super.rot(axis,angle); return this; }
     public IVec4 rot(IVecI axis, double angle){ super.rot(axis,angle); return this; }
     public IVec4 rot(IVec axis, double angle){ super.rot(axis,angle); return this; }
+    public IVec4 rot(double axisX, double axisY, double axisZ, double angle){
+	super.rot(axisX,axisY,axisZ,angle); return this;
+    }
     public IVec4 rot(IVecI center, IVecI axis, IDoubleI angle){
 	super.rot(center,axis,angle); return this;
     }
@@ -204,7 +228,11 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 rot(IVec center, IVec axis, double angle){
 	super.rot(center,axis,angle); return this;
     }
-
+    public IVec4 rot(double centerX, double centerY, double centerZ,
+		     double axisX, double axisY, double axisZ, double angle){
+	super.rot(centerX,centerY,centerZ,axisX,axisY,axisZ,angle); return this;
+    }
+    
     public IVec4 rot(IVec axis, IVec destDir){ super.rot(axis,destDir); return this; }
     public IVec4 rot(IVecI axis, IVecI destDir){ super.rot(axis,destDir); return this; }
     public IVec4 rot(IVecI center, IVecI axis, IVecI destPt){
@@ -214,7 +242,7 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
 	super.rot(center,axis,destPt); return this;
     }
     
-
+    
     /** alias of rot(IDoubleI) */
     public IVec4 rot2(IDoubleI angle){ return rot(angle); }
     /** alias of rot(double) */
@@ -223,6 +251,9 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 rot2(IVecI center, IDoubleI angle){ super.rot2(center,angle); return this; }
     public IVec4 rot2(IVecI center, double angle){ super.rot2(center,angle); return this; }
     public IVec4 rot2(IVec center, double angle){ super.rot2(center,angle); return this; }
+    public IVec4 rot2(double centerX, double centerY,double angle){
+	super.rot2(centerX,centerY,angle); return this;
+    }
     
     public IVec4 rot2(IVec destDir){ super.rot2(destDir); return this; }
     public IVec4 rot2(IVecI destDir){ super.rot2(destDir); return this; }
@@ -237,12 +268,24 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 scale(IVecI center, IDoubleI f){ super.scale(center,f); return this; }
     public IVec4 scale(IVecI center, double f){ super.scale(center,f); return this; }
     public IVec4 scale(IVec center, double f){ super.scale(center,f); return this; }
+    public IVec4 scale(double centerX, double centerY, double centerZ, double f){
+	super.scale(centerX,centerY,centerZ,f); return this;
+    }
     
     
     /** scale only in 1 direction */
     public IVec4 scale1d(IVec axis, double f){ super.scale1d(axis,f); return this; }
+    public IVec4 scale1d(double axisX, double axisY, double axisZ, double f){
+	super.scale1d(axisX,axisY,axisZ,f); return this;
+    }
     public IVec4 scale1d(IVecI axis, double f){ super.scale1d(axis,f); return this; }
     public IVec4 scale1d(IVecI axis, IDoubleI f){ super.scale1d(axis,f); return this; }
+    public IVec4 scale1d(IVec center, IVec axis, double f){
+	super.scale1d(center,axis,f); return this;
+    }
+    public IVec4 scale1d(double centerX, double centerY, double centerZ, double axisX, double axisY, double axisZ, double f){
+	super.scale1d(centerX,centerY,centerZ,axisX,axisY,axisZ,f); return this;
+    }
     public IVec4 scale1d(IVecI center, IVecI axis, double f){
 	super.scale1d(center,axis,f); return this;
     }
@@ -251,13 +294,27 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     }
     
     public IVec4 ref(IVec planeDir){ super.ref(planeDir); return this; }
+    public IVec4 ref(double planeX, double planeY, double planeZ){
+	super.ref(planeX,planeY,planeZ); return this;
+    }
     public IVec4 ref(IVecI planeDir){ super.ref(planeDir); return this; }
     public IVec4 ref(IVec center, IVec planeDir){ super.ref(center,planeDir); return this; }
+    public IVec4 ref(double centerX, double centerY, double centerZ,
+		     double planeX, double planeY, double planeZ){
+	super.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
+    }
     public IVec4 ref(IVecI center, IVecI planeDir){ super.ref(center,planeDir); return this; }
     
     public IVec4 mirror(IVec planeDir){ super.ref(planeDir); return this; }
+    public IVec4 mirror(double planeX, double planeY, double planeZ){
+	super.ref(planeX,planeY,planeZ); return this;
+    }
     public IVec4 mirror(IVecI planeDir){ super.ref(planeDir); return this; }
     public IVec4 mirror(IVec center, IVec planeDir){ super.ref(center,planeDir); return this; }
+    public IVec4 mirror(double centerX, double centerY, double centerZ,
+			double planeX, double planeY, double planeZ){
+	super.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
+    }
     public IVec4 mirror(IVecI center, IVecI planeDir){ super.ref(center,planeDir); return this; }
     
     
@@ -265,7 +322,7 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
 	super.shear(sxy,syx,syz,szy,szx,sxz); return this;
     }
     public IVec4 shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
-		      IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+		       IDoubleI szy, IDoubleI szx, IDoubleI sxz){
 	super.shear(sxy,syx,syz,szy,szx,sxz); return this;
     }
     public IVec4 shear(IVecI center, double sxy, double syx, double syz, double szy, double szx, double sxz){
@@ -326,8 +383,8 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     
     
     /** mv() is alias of add() */
-    public IVec4 mv(double x, double y, double z){ return add(x,y,z); }
-    public IVec4 mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IVec4 mv(double vx, double vy, double vz){ return add(vx,vy,vz); }
+    public IVec4 mv(IDoubleI vx, IDoubleI vy, IDoubleI vz){ return add(vx,vy,vz); }
     public IVec4 mv(IVecI v){ return add(v); }
     
     // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
@@ -335,20 +392,38 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 cp(){ return dup(); }
     
     /** cp() is alias of dup().add() */
-    public IVec4 cp(double x, double y, double z){ return dup().add(x,y,z); }
-    public IVec4 cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IVec4 cp(IVec v){
+	//return dup().add(v);
+	return new IVec4(x+v.x, y+v.y, z+v.z, w);
+    }
+    public IVec4 cp(double vx, double vy, double vz){
+	return new IVec4(x+vx, y+vy, z+vz, w);
+    }
+    public IVec4 cp(IDoubleI vx, IDoubleI vy, IDoubleI vz){ return dup().add(vx,vy,vz); }
     public IVec4 cp(IVecI v){ return dup().add(v); }
     
     
     // methods creating new instance
     // use these carefully. w is set to the object's w (not input or addition with input's)
-    public IVec4 dif(IVec v){ return dup().sub(v); }
+    public IVec4 dif(IVec v){
+	//return dup().sub(v);
+	return new IVec4(x-v.x, y-v.y, z-v.z, w);
+    }
+    public IVec4 dif(double vx, double vy, double vz){ return new IVec4(x-vx, y-vy, z-vz, w); }
     public IVec4 dif(IVecI v){ return dup().sub(v); }
     public IVec4 diff(IVec v){ return dif(v); }
+    public IVec4 diff(double vx, double vy, double vz){ return dif(vx,vy,vz); }
     public IVec4 diff(IVecI v){ return dif(v); }
-    public IVec4 mid(IVec v){ return dup().add(v).div(2); }
+    public IVec4 mid(IVec v){
+	//return dup().add(v).div(2);
+	return new IVec4( (x+v.x)/2, (y+v.y)/2, (z+v.z)/2, w );
+    }
+    public IVec4 mid(double vx, double vy, double vz){
+	return new IVec4((x+vx)/2,(y+vy)/2,(z+vz)/2,w);
+    }
     public IVec4 mid(IVecI v){ return dup().add(v).div(2); }
-    public IVec4 sum(IVec v){ return dup().add(v); }
+    public IVec4 sum(IVec v){ return new IVec4(x+v.x, y+v.y, z+v.y, w); }
+    public IVec4 sum(double vx, double vy, double vz){ return new IVec4(x+vx, y+vy, z+vy, w); }
     public IVec4 sum(IVecI v){ return dup().add(v); }
     public IVec4 sum(IVec... v){
 	IVec4 ret = this.dup();
@@ -362,6 +437,10 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     }
     
     public IVec4 bisect(IVec v){ return dup().unit().add(v.dup().unit()); }
+    public IVec4 bisect(double vx, double vy, double vz){
+	double len = Math.sqrt(vx*vx + vy*vy + vz*vz);
+	return dup().unit().add(vx/len,vy/len,vz/len);
+    }
     public IVec4 bisect(IVecI v){ return bisect(v.get()); }
     
     
@@ -372,12 +451,26 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return sum(v2.get(),w1.x(),w2.x()); }
     public IVec4 sum(IVecI v2, IDoubleI w2){ return sum(v2.get(),w2.x()); }
     
-    /** alias of cross. (not unitized ... ?) */
+    /** alias of cross. (not unitized ... ) */
+    public IVec4 nml(IVec v){ return cross(v); }
+    /** alias of cross. (not unitized ... ) */
     public IVec4 nml(IVecI v){ return cross(v); }
-
-    /** create normal vector from 3 points of self, pt1 and pt2 */
-    public IVec nml(IVecI pt1, IVecI pt2){
-	return this.diff(pt1).cross(this.diff(pt2)).unit();
+    /** alias of cross. (not unitized ... ) */
+    public IVec4 nml(double vx, double vy, double vz){ return cross(vx,vy,vz); }
+    
+    /** create normal vector from 3 points of self, pt1 and pt2, not unitized */
+    public IVec4 nml(IVec pt1, IVec pt2){
+	//return this.diff(pt1).cross(this.diff(pt2)).unit();
+	return this.diff(pt1).icross(this.diff(pt2));
+    }
+    /** create normal vector from 3 points of self, pt1 and pt2, not unitized */
+    public IVec4 nml(double vx1, double vy1, double vz1, double vx2, double vy2, double vz2){
+	return this.diff(vx1,vy1,vz1).cross(this.diff(vx2,vy2,vz2));
+    }
+    /** create normal vector from 3 points of self, pt1 and pt2, not unitized */
+    public IVec4 nml(IVecI pt1, IVecI pt2){
+	//return this.diff(pt1).cross(this.diff(pt2)).unit();
+	return this.diff(pt1).icross(this.diff(pt2));
     }
     
     /** checking x, y, and z is valid number (not Infinite, nor NaN). */

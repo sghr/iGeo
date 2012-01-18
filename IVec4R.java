@@ -148,7 +148,7 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IVec4R add(IDoubleI f, IVecI v){ return add(v,f); }
     
     public double dot(IVecI u){ return get().dot(u); }
-    //public IDoubleR dotR(IVecI u){ return new IDoubleR(new IVecR.Dot(op,u)); }
+    public double dot(double ux, double uy, double uz){ return get().dot(ux,uy,uz); }
     public double dot(ISwitchE e, IVecI u){ return dot(u); }
     public IDoubleR dot(ISwitchR r, IVecI u){ return new IDoubleR(new IVecR.Dot(op,u)); }
     
@@ -156,14 +156,13 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
      */
     //public IVec4R cross(IVecI u){ op=new Cross(op,u); return this; }
     public IVec4R cross(IVecI u){ return new IVec4R(new Cross(op,u)); }
+    public IVec4R cross(double ux, double uy, double uz){ return new IVec4R(new Cross(op,new IVec(ux,uy,uz))); }
     
     public double len(){ return get().len(); }
-    //public IDoubleR lenR(){ return new IDoubleR(new IVecR.Len(op)); }
     public double len(ISwitchE e){ return len(); }
     public IDoubleR len(ISwitchR r){ return new IDoubleR(new IVecR.Len(op)); }
     
     public double len2(){ return get().len2(); }
-    //public IDoubleR len2R(){ return new IDoubleR(new IVecR.Len2(op)); }
     public double len2(ISwitchE e){ return len2(); }
     public IDoubleR len2(ISwitchR r){ return new IDoubleR(new IVecR.Len2(op)); }
     
@@ -172,19 +171,19 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     
     public IVec4R unit(){ op=new Unit(op); return this; }
     
-
+    
     public double dist(IVecI v){ return get().dist(v); }
-    //public IDoubleR distR(IVecI v){ return new IDoubleR(new Dist(op, v)); }
+    public double dist(double vx, double vy, double vz){ return get().dist(vx,vy,vz); }
     public double dist(ISwitchE e, IVecI v){ return dist(v); }
     public IDoubleR dist(ISwitchR r, IVecI v){ return new IDoubleR(new Dist(op, v)); }
     
     public double dist2(IVecI v){ return get().dist2(v); }
-    //public IDoubleR dist2R(IVecI v){ return new IDoubleR(new Dist2(op, v)); }
+    public double dist2(double vx, double vy, double vz){ return get().dist2(vx,vy,vz); }
     public double dist2(ISwitchE e, IVecI v){ return dist2(v); }
     public IDoubleR dist2(ISwitchR r, IVecI v){ return new IDoubleR(new Dist2(op, v)); }
     
     public boolean eq(IVecI v){ return get().eq(v); }
-    //public IBoolR eqR(IVecI v){ return new IBoolR(new Eq(op, v)); }
+    public boolean eq(double vx, double vy, double vz){ return get().eq(vx,vy,vz); }
     public boolean eq(ISwitchE e, IVecI v){ return eq(v); }
     public IBoolR eq(ISwitchR r, IVecI v){ return new IBoolR(new Eq(op, v)); }
     
@@ -192,10 +191,10 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public boolean eqY(IVecI v){ return get().eqY(v); }
     public boolean eqZ(IVecI v){ return get().eqZ(v); }
     public boolean eqW(IVec4I v){ return get().eqW(v); }
-    //public IBoolR eqXR(IVecI v){ return new IBoolR(new EqX(op, v)); }
-    //public IBoolR eqYR(IVecI v){ return new IBoolR(new EqY(op, v)); }
-    //public IBoolR eqZR(IVecI v){ return new IBoolR(new EqZ(op, v)); }
-    //public IBoolR eqWR(IVec4I v){ return new IBoolR(new EqW(op, v)); }
+    public boolean eqX(double vx){ return get().eqX(vx); }
+    public boolean eqY(double vy){ return get().eqY(vy); }
+    public boolean eqZ(double vz){ return get().eqZ(vz); }
+    public boolean eqW(double vw){ return get().eqW(vw); }
     public boolean eqX(ISwitchE e, IVecI v){ return eqX(v); }
     public boolean eqY(ISwitchE e, IVecI v){ return eqY(v); }
     public boolean eqZ(ISwitchE e, IVecI v){ return eqZ(v); }
@@ -205,38 +204,41 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IBoolR eqZ(ISwitchR r, IVecI v){ return new IBoolR(new EqZ(op, v)); }
     public IBoolR eqW(ISwitchR r, IVec4I v){ return new IBoolR(new EqW(op, v)); }
     
-    public boolean eq(IVecI v, double resolution){ return get().eq(v,resolution); }
-    //public IBoolR eqR(IVecI v, IDoubleI resolution){ return new IBoolR(new Eq(op, v, resolution)); }
-    public boolean eq(ISwitchE e, IVecI v, double resolution){ return eq(v,resolution); }
-    public IBoolR eq(ISwitchR r, IVecI v, IDoubleI resolution){ return new IBoolR(new Eq(op, v, resolution)); }
+    public boolean eq(IVecI v, double tolerance){ return get().eq(v,tolerance); }
+    public boolean eq(double vx, double vy, double vz, double tolerance){
+	return get().eq(vx,vy,vz,tolerance);
+    }
+    public boolean eq(ISwitchE e, IVecI v, double tolerance){ return eq(v,tolerance); }
+    public IBoolR eq(ISwitchR r, IVecI v, IDoubleI tolerance){ return new IBoolR(new Eq(op, v, tolerance)); }
     
-    public boolean eqX(IVecI v, double resolution){ return get().eqX(v,resolution); }
-    public boolean eqY(IVecI v, double resolution){ return get().eqY(v,resolution); }
-    public boolean eqZ(IVecI v, double resolution){ return get().eqZ(v,resolution); }
-    public boolean eqW(IVec4I v, double resolution){ return get().eqW(v,resolution); }
-    //public IBoolR eqXR(IVecI v, IDoubleI resolution){ return new IBoolR(new EqX(op,v,resolution)); }
-    //public IBoolR eqYR(IVecI v, IDoubleI resolution){ return new IBoolR(new EqY(op,v,resolution)); }
-    //public IBoolR eqZR(IVecI v, IDoubleI resolution){ return new IBoolR(new EqZ(op,v,resolution)); }
-    //public IBoolR eqWR(IVec4I v, IDoubleI resolution){ return new IBoolR(new EqW(op,v,resolution)); }
-    public boolean eqX(ISwitchE e, IVecI v, double resolution){ return eqX(v,resolution); }
-    public boolean eqY(ISwitchE e, IVecI v, double resolution){ return eqY(v,resolution); }
-    public boolean eqZ(ISwitchE e, IVecI v, double resolution){ return eqZ(v,resolution); }
-    public boolean eqW(ISwitchE e, IVec4I v, double resolution){ return eqW(v,resolution); }
-    public IBoolR eqX(ISwitchR r, IVecI v, IDoubleI resolution){ return new IBoolR(new EqX(op,v,resolution)); }
-    public IBoolR eqY(ISwitchR r, IVecI v, IDoubleI resolution){ return new IBoolR(new EqY(op,v,resolution)); }
-    public IBoolR eqZ(ISwitchR r, IVecI v, IDoubleI resolution){ return new IBoolR(new EqZ(op,v,resolution)); }
-    public IBoolR eqW(ISwitchR r, IVec4I v, IDoubleI resolution){ return new IBoolR(new EqW(op,v,resolution)); }
+    public boolean eqX(IVecI v, double tolerance){ return get().eqX(v,tolerance); }
+    public boolean eqY(IVecI v, double tolerance){ return get().eqY(v,tolerance); }
+    public boolean eqZ(IVecI v, double tolerance){ return get().eqZ(v,tolerance); }
+    public boolean eqW(IVec4I v, double tolerance){ return get().eqW(v,tolerance); }
+    public boolean eqX(double vx, double tolerance){ return get().eqX(vx,tolerance); }
+    public boolean eqY(double vy, double tolerance){ return get().eqY(vy,tolerance); }
+    public boolean eqZ(double vz, double tolerance){ return get().eqZ(vz,tolerance); }
+    public boolean eqW(double vw, double tolerance){ return get().eqW(vw,tolerance); }
+    public boolean eqX(ISwitchE e, IVecI v, double tolerance){ return eqX(v,tolerance); }
+    public boolean eqY(ISwitchE e, IVecI v, double tolerance){ return eqY(v,tolerance); }
+    public boolean eqZ(ISwitchE e, IVecI v, double tolerance){ return eqZ(v,tolerance); }
+    public boolean eqW(ISwitchE e, IVec4I v, double tolerance){ return eqW(v,tolerance); }
+    public IBoolR eqX(ISwitchR r, IVecI v, IDoubleI tolerance){ return new IBoolR(new EqX(op,v,tolerance)); }
+    public IBoolR eqY(ISwitchR r, IVecI v, IDoubleI tolerance){ return new IBoolR(new EqY(op,v,tolerance)); }
+    public IBoolR eqZ(ISwitchR r, IVecI v, IDoubleI tolerance){ return new IBoolR(new EqZ(op,v,tolerance)); }
+    public IBoolR eqW(ISwitchR r, IVec4I v, IDoubleI tolerance){ return new IBoolR(new EqW(op,v,tolerance)); }
     
     public double angle(IVecI u){ return get().angle(u); }
-    //public IDoubleI angleR(IVecI u){ return new IDoubleR(new IVecR.Angle(op,u)); }
+    public double angle(double ux, double uy, double uz){ return get().angle(ux,uy,uz); }
     public double angle(ISwitchE e, IVecI u){ return angle(u); }
     public IDoubleR angle(ISwitchR r, IVecI u){ return new IDoubleR(new IVecR.Angle(op,u)); }
     
     public double angle(IVecI u, IVecI axis){ return get().angle(u,axis); }
-    //public IDoubleR angleR(IVecI u, IVecI axis){ return new IDoubleR(new IVecR.Angle(op,u,axis)); }
+    public double angle(double ux, double uy, double uz, double axisX, double axisY, double axisZ){
+	return get().angle(ux,uy,uz,axisX,axisY,axisZ);
+    }
     public double angle(ISwitchE e, IVecI u, IVecI axis){ return angle(u,axis); }
     public IDoubleR angle(ISwitchR r, IVecI u, IVecI axis){ return new IDoubleR(new IVecR.Angle(op,u,axis)); }
-    
     
     public IVec4R rot(IDoubleI angle){ op=new Rot2(op,angle); return this; }
     public IVec4R rot(double angle){ op=new Rot2(op,new IDouble(angle)); return this; }
@@ -247,14 +249,20 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IVec4R rot(IVecI axis, double angle){
 	op=new Rot(op,axis,new IDouble(angle)); return this;
     }
+    public IVec4R rot(double axisX, double axisY, double axisZ, double angle){
+	op=new Rot(op,new IVec(axisX,axisY,axisZ),new IDouble(angle)); return this;
+    }
     
     public IVec4R rot(IVecI center, IVecI axis, IDoubleI angle){
 	if(center==this) return this;
 	return sub(center).rot(axis,angle).add(center);
     }
     public IVec4R rot(IVecI center, IVecI axis, double angle){
-	if(center==this) return this;
-	return sub(center).rot(axis,angle).add(center);
+	return rot(center,axis,new IDouble(angle));
+    }
+    public IVec4R rot(double centerX, double centerY, double centerZ,
+		      double axisX, double axisY, double axisZ, double angle){
+	return rot(new IVec(centerX,centerY,centerZ),new IVec(axisX,axisY,axisZ),new IDouble(angle));
     }
     
     public IVec4R rot(IVecI axis, IVecI destDir){
@@ -274,9 +282,11 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IVec4R rot2(IVecI center, IDoubleI angle){
 	if(center==this){ return this; } return sub(center).rot(angle).add(center);
     }
-    public IVec4R rot2(IVecI center, double angle){
-	if(center==this){ return this; } return sub(center).rot(angle).add(center);
+    public IVec4R rot2(IVecI center, double angle){ return rot2(center,new IDouble(angle)); }
+    public IVec4R rot2(double centerX, double centerY, double angle){
+	return rot2(new IVec(centerX,centerY), new IDouble(angle));
     }
+    
     public IVec4R rot2(IVecI destDir){ return rot(destDir.cross(IVec.zaxis).angle(cross(IVec.zaxis))); }
     public IVec4R rot2(IVecI center, IVecI destPt){
 	if(center==this){ return this; } return sub(center).rot2(destPt.diff(center)).add(center);
@@ -291,18 +301,25 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	if(center==this) return this;
 	return sub(center).mul(f).add(center);
     }
-    public IVec4R scale(IVecI center, double f){
-	if(center==this) return this;
-	return sub(center).mul(f).add(center);
+    public IVec4R scale(IVecI center, double f){ return scale(center,new IDouble(f)); }
+    public IVec4R scale(double centerX, double centerY, double centerZ, double f){
+	return scale(new IVec(centerX,centerY,centerZ),new IDouble(f));
     }
     
     /** scale only in 1 direction */
     public IVec4R scale1d(IVecI axis, double f){ return scale1d(axis,new IDouble(f)); }
+    public IVec4R scale1d(double axisX, double axisY, double axisZ, double f){
+	return scale1d(new IVec(axisX,axisY,axisZ),new IDouble(f));
+    }
     public IVec4R scale1d(IVecI axis, IDoubleI f){
 	op = new Scale1d(op, axis, f); return this;
     }
     public IVec4R scale1d(IVecI center, IVecI axis, double f){
 	return scale1d(center,axis,new IDouble(f));
+    }
+    public IVec4R scale1d(double centerX, double centerY, double centerZ,
+			  double axisX, double axisY, double axisZ, double f){
+	return scale1d(new IVec(centerX,centerY,centerZ),new IVec(axisX,axisY,axisZ),new IDouble(f));
     }
     public IVec4R scale1d(IVecI center, IVecI axis, IDoubleI f){
 	if(center==this) return this;
@@ -311,12 +328,26 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     
     
     public IVec4R ref(IVecI planeDir){ op=new Ref(op,planeDir); return this; }
+    public IVec4R ref(double planeX, double planeY, double planeZ){
+	op=new Ref(op,new IVec(planeX,planeY,planeZ)); return this;
+    }
     public IVec4R ref(IVecI center, IVecI planeDir){
         if(center==this) return this;
         return sub(center).ref(planeDir).add(center);
     }
+    public IVec4R ref(double centerX, double centerY, double centerZ,
+		      double planeX, double planeY, double planeZ){
+        return ref(new IVec(centerX,centerY,centerZ),new IVec(planeX,planeY,planeZ));
+    }
     public IVec4R mirror(IVecI planeDir){ return ref(planeDir); }
+    public IVec4R mirror(double planeX, double planeY, double planeZ){
+	return ref(planeX,planeY,planeZ);
+    }
     public IVec4R mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    public IVec4R mirror(double centerX, double centerY, double centerZ,
+			 double planeX, double planeY, double planeZ){
+	return ref(centerX,centerY,centerZ,planeX,planeY,planeZ);
+    }
     
     
     /** shear operation */
@@ -399,9 +430,13 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     
     // methods creating new instance
     public IVec4R dif(IVecI v){ return dup().sub(v); }
+    public IVec4R dif(double vx, double vy, double vz){ return dup().sub(new IVec(vx,vy,vz)); }
     public IVec4R diff(IVecI v){ return dif(v); }
+    public IVec4R diff(double vx, double vy, double vz){ return dif(vx,vy,vz); }
     public IVec4R mid(IVecI v){ return dup().add(v).div(2); }
+    public IVec4R mid(double vx, double vy, double vz){ return dup().add(new IVec(vx,vy,vz)).div(2); }
     public IVec4R sum(IVecI v){ return dup().add(v); }
+    public IVec4R sum(double vx, double vy, double vz){ return dup().add(new IVec(vx,vy,vz)); }
     public IVec4R sum(IVecI... v){
 	IVec4R ret = this.dup();
 	for(IVecI vi: v) ret.add(vi);
@@ -409,6 +444,10 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     }
     
     public IVec4R bisect(IVecI v){ return dup().unit().add(v.dup().unit()); }
+    public IVec4R bisect(double vx, double vy, double vz){
+	return dup().unit().add(new IVecR(vx,vy,vz).unit());
+    }
+    
     
     /**
        weighted sum, creating a new instance
@@ -426,15 +465,22 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public IVec4R sum(IVecI v2, double w2){ return sum(v2,new IDouble(w2)); }    
     
 
-    /**
-       alias of cross. (not unitized ... ?)
-    */
+    /** alias of cross. (not unitized ... ) */
     public IVec4R nml(IVecI v){ return cross(v); }
+    /** alias of cross. (not unitized ... ) */
+    public IVec4R nml(double vx, double vy, double vz){ return cross(new IVec(vx,vy,vz)); }
     /**
-       create normal vector from 3 points of self, pt1 and pt2
+       create normal vector from 3 points of self, pt1 and pt2, not unitized
     */
     public IVec4R nml(IVecI pt1, IVecI pt2){
-	return this.diff(pt1).cross(this.diff(pt2)).unit();
+	//return this.diff(pt1).cross(this.diff(pt2)).unit();
+	return this.diff(pt1).cross(this.diff(pt2));
+    }
+    /**
+       create normal vector from 3 points of self, pt1 and pt2, not unitized
+    */
+    public IVec4R nml(double vx1, double vy1, double vz1, double vx2, double vy2, double vz2){
+	return this.diff(vx1,vy1,vz1).cross(this.diff(vx2,vy2,vz2));
     }
     
     /** checking x, y, and z is valid number (not Infinite, nor NaN). */
@@ -631,32 +677,32 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     static public class Eq extends IParameterObject implements IBoolOp{
 	public IVec4Op v1;
         public IVecOp v2;
-	public IDoubleOp resolution=null;
+	public IDoubleOp tolerance=null;
         public Eq(IVec4Op v1, IVecOp v2){ this.v1=v1; this.v2=v2; }
-	public Eq(IVec4Op v1, IVecOp v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; resolution=reso; }
+	public Eq(IVec4Op v1, IVecOp v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; tolerance=reso; }
         public boolean x(){
-	    if(resolution==null) return v1.get().eq(v2.get());
-	    return v1.get().eq(v2.get(),resolution.x());
+	    if(tolerance==null) return v1.get().eq(v2.get());
+	    return v1.get().eq(v2.get(),tolerance.x());
 	}
         public IBool get(){
-	    if(resolution==null) return v1.get().eq((Ir)null,v2.get());
-	    return v1.get().eq((Ir)null,v2.get(),resolution.get());
+	    if(tolerance==null) return v1.get().eq((Ir)null,v2.get());
+	    return v1.get().eq((Ir)null,v2.get(),tolerance.get());
 	}
     }
     
     static public class EqX extends IParameterObject implements IBoolOp{
 	public IVec4Op v1;
         public IVecOp v2;
-	public IDoubleOp resolution=null;
+	public IDoubleOp tolerance=null;
         public EqX(IVec4Op v1, IVecOp v2){ this.v1=v1; this.v2=v2; }
-	public EqX(IVec4Op v1, IVecOp v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; resolution=reso; }
+	public EqX(IVec4Op v1, IVecOp v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; tolerance=reso; }
         public boolean x(){
-	    if(resolution==null) return v1.get().eqX(v2.get());
-	    return v1.get().eqX(v2.get(),resolution.x());
+	    if(tolerance==null) return v1.get().eqX(v2.get());
+	    return v1.get().eqX(v2.get(),tolerance.x());
 	}
         public IBool get(){
-	    if(resolution==null) return v1.get().eqX((Ir)null,v2.get());
-	    return v1.get().eqX((Ir)null,v2.get(),resolution.get());
+	    if(tolerance==null) return v1.get().eqX((Ir)null,v2.get());
+	    return v1.get().eqX((Ir)null,v2.get(),tolerance.get());
 	}
     }
     
@@ -664,48 +710,48 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     static public class EqY extends IParameterObject implements IBoolOp{
 	public IVec4Op v1;
         public IVecOp v2;
-	public IDoubleOp resolution=null;
+	public IDoubleOp tolerance=null;
         public EqY(IVec4Op v1, IVecOp v2){ this.v1=v1; this.v2=v2; }
-	public EqY(IVec4Op v1, IVecOp v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; resolution=reso; }
+	public EqY(IVec4Op v1, IVecOp v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; tolerance=reso; }
         public boolean x(){
-	    if(resolution==null) return v1.get().eqY(v2.get());
-	    return v1.get().eqY(v2.get(),resolution.x());
+	    if(tolerance==null) return v1.get().eqY(v2.get());
+	    return v1.get().eqY(v2.get(),tolerance.x());
 	}
         public IBool get(){
-	    if(resolution==null) return v1.get().eqY((Ir)null,v2.get());
-	    return v1.get().eqY((Ir)null,v2.get(),resolution.get());
+	    if(tolerance==null) return v1.get().eqY((Ir)null,v2.get());
+	    return v1.get().eqY((Ir)null,v2.get(),tolerance.get());
 	}
     }
     
     static public class EqZ extends IParameterObject implements IBoolOp{
 	public IVec4Op v1;
         public IVecOp v2;
-	public IDoubleOp resolution=null;
+	public IDoubleOp tolerance=null;
         public EqZ(IVec4Op v1, IVecOp v2){ this.v1=v1; this.v2=v2; }
-	public EqZ(IVec4Op v1, IVecOp v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; resolution=reso; }
+	public EqZ(IVec4Op v1, IVecOp v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; tolerance=reso; }
         public boolean x(){
-	    if(resolution==null) return v1.get().eqZ(v2.get());
-	    return v1.get().eqZ(v2.get(),resolution.x());
+	    if(tolerance==null) return v1.get().eqZ(v2.get());
+	    return v1.get().eqZ(v2.get(),tolerance.x());
 	}
         public IBool get(){
-	    if(resolution==null) return v1.get().eqZ((Ir)null,v2.get());
-	    return v1.get().eqZ((Ir)null,v2.get(),resolution.get());
+	    if(tolerance==null) return v1.get().eqZ((Ir)null,v2.get());
+	    return v1.get().eqZ((Ir)null,v2.get(),tolerance.get());
 	}
     }
     
     static public class EqW extends IParameterObject implements IBoolOp{
 	public IVec4Op v1;
         public IVec4Op v2;
-	public IDoubleOp resolution=null;
+	public IDoubleOp tolerance=null;
         public EqW(IVec4Op v1, IVec4Op v2){ this.v1=v1; this.v2=v2; }
-	public EqW(IVec4Op v1, IVec4Op v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; resolution=reso; }
+	public EqW(IVec4Op v1, IVec4Op v2, IDoubleOp reso){ this.v1=v1; this.v2=v2; tolerance=reso; }
         public boolean x(){
-	    if(resolution==null) return v1.get().eqW(v2.get());
-	    return v1.get().eqW(v2.get(),resolution.x());
+	    if(tolerance==null) return v1.get().eqW(v2.get());
+	    return v1.get().eqW(v2.get(),tolerance.x());
 	}
         public IBool get(){
-	    if(resolution==null) return v1.get().eqW((Ir)null,v2.get());
-	    return v1.get().eqW((Ir)null,v2.get(),resolution.get());
+	    if(tolerance==null) return v1.get().eqW((Ir)null,v2.get());
+	    return v1.get().eqW((Ir)null,v2.get(),tolerance.get());
 	}
     }
     

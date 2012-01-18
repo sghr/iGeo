@@ -63,7 +63,7 @@ public class IParticleOnCurve extends IParticle{
     }
     
     public IParticleOnCurve(ICurveI curve, IVec pos, IObject parent){ this(curve,0,pos,parent); }
-
+    
     public IParticleOnCurve(ICurveI curve, double u, IVec pos, IObject parent){
 	super(pos,parent);
 	pos.set(curve.pt(u).get());
@@ -209,15 +209,24 @@ public class IParticleOnCurve extends IParticle{
     public IParticleOnCurve neg(){ pos.neg(); return this; }
     public IParticleOnCurve rev(){ return neg(); }
     public IParticleOnCurve flip(){ return neg(); }
+    public IParticleOnCurve zero(){ pos.zero(); return this; }
+    
     
     public IParticleOnCurve add(IVecI v, double f){ pos.add(v,f); return this; }
     public IParticleOnCurve add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
+    public IParticleOnCurve add(double f, IVecI v){ pos.add(f,v); return this; }
+    public IParticleOnCurve add(IDoubleI f, IVecI v){ pos.add(f,v); return this; }
     
     
     public IParticleOnCurve unit(){ pos.unit(); return this; }
     
+    public IParticleOnCurve rot(IDoubleI angle){ pos.rot(angle); return this; }
+    public IParticleOnCurve rot(double angle){ pos.rot(angle); return this; }
     public IParticleOnCurve rot(IVecI axis, IDoubleI angle){ pos.rot(axis,angle); return this; }
     public IParticleOnCurve rot(IVecI axis, double angle){ pos.rot(axis,angle); return this; }
+    public IParticleOnCurve rot(double axisX, double axisY, double axisZ, double angle){
+	pos.rot(axisX,axisY,axisZ,angle); return this;
+    }
     
     public IParticleOnCurve rot(IVecI center, IVecI axis, double angle){
 	pos.rot(center, axis,angle); return this;
@@ -225,7 +234,10 @@ public class IParticleOnCurve extends IParticle{
     public IParticleOnCurve rot(IVecI center, IVecI axis, IDoubleI angle){
 	pos.rot(center, axis,angle); return this;
     }
-    
+    public IParticleOnCurve rot(double centerX, double centerY, double centerZ,
+				double axisX, double axisY, double axisZ, double angle){
+	pos.rot(centerX, centerY, centerZ, axisX, axisY, axisZ, angle); return this;
+    }
     
     /** Rotate to destination direction vector. */
     public IParticleOnCurve rot(IVecI axis, IVecI destDir){ pos.rot(axis,destDir); return this; }
@@ -234,6 +246,26 @@ public class IParticleOnCurve extends IParticle{
 	pos.rot(center,axis,destPt); return this;
     }
     
+    /** rotation on xy-plane; alias of rot(double) */
+    public IParticleOnCurve rot2(double angle){ pos.rot2(angle); return this; }
+    /** rotation on xy-plane; alias of rot(IDoubleI) */
+    public IParticleOnCurve rot2(IDoubleI angle){ pos.rot2(angle); return this; }
+    
+    /** rotation on xy-plane */
+    public IParticleOnCurve rot2(IVecI center, double angle){ pos.rot2(center,angle); return this; }
+    /** rotation on xy-plane */
+    public IParticleOnCurve rot2(IVecI center, IDoubleI angle){ pos.rot2(center,angle); return this; }
+    /** rotation on xy-plane */
+    public IParticleOnCurve rot2(double centerX, double centerY, double angle){
+	pos.rot2(centerX,centerY,angle); return this;
+    }
+    
+    /** rotation on xy-plane towards destDir */
+    public IParticleOnCurve rot2(IVecI destDir){ pos.rot2(destDir); return this; }
+    /** rotation on xy-plane towards destPt */
+    public IParticleOnCurve rot2(IVecI center, IVecI destPt){ pos.rot2(center,destPt); return this; }
+    
+    
     /** alias of mul */
     public IParticleOnCurve scale(IDoubleI f){ pos.scale(f); return this; }
     /** alias of mul */
@@ -241,29 +273,57 @@ public class IParticleOnCurve extends IParticle{
     
     public IParticleOnCurve scale(IVecI center, IDoubleI f){ pos.scale(center,f); return this; }
     public IParticleOnCurve scale(IVecI center, double f){ pos.scale(center,f); return this; }
+    public IParticleOnCurve scale(double centerX, double centerY, double centerZ, double f){
+	pos.scale(centerX,centerY,centerZ,f); return this;
+    }
     
     /** scale only in 1 direction */
     public IParticleOnCurve scale1d(IVecI axis, double f){ pos.scale1d(axis,f); return this; }
     public IParticleOnCurve scale1d(IVecI axis, IDoubleI f){ pos.scale1d(axis,f); return this; }
+    public IParticleOnCurve scale1d(double axisX, double axisY, double axisZ, double f){
+	pos.scale1d(axisX,axisY,axisZ,f); return this;
+    }
     public IParticleOnCurve scale1d(IVecI center, IVecI axis, double f){
 	pos.scale1d(center,axis,f); return this;
     }
     public IParticleOnCurve scale1d(IVecI center, IVecI axis, IDoubleI f){
 	pos.scale1d(center,axis,f); return this;
     }
+    public IParticleOnCurve scale1d(double centerX, double centerY, double centerZ,
+				    double axisX, double axisY, double axisZ, double f){
+	pos.scale1d(centerX,centerY,centerZ,axisX,axisY,axisZ,f); return this;
+    }
     
     
     /** reflect (mirror) 3 dimensionally to the other side of the plane */
     public IParticleOnCurve ref(IVecI planeDir){ pos.ref(planeDir); return this; }
     /** reflect (mirror) 3 dimensionally to the other side of the plane */
+    public IParticleOnCurve ref(double planeX, double planeY, double planeZ){
+	pos.ref(planeX,planeY,planeZ); return this;
+    }
+    /** reflect (mirror) 3 dimensionally to the other side of the plane */
     public IParticleOnCurve ref(IVecI center, IVecI planeDir){
 	pos.ref(center,planeDir); return this;
     }
     /** reflect (mirror) 3 dimensionally to the other side of the plane */
+    public IParticleOnCurve ref(double centerX, double centerY, double centerZ,
+				double planeX, double planeY, double planeZ){
+	pos.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
+    }
+    /** reflect (mirror) 3 dimensionally to the other side of the plane */
     public IParticleOnCurve mirror(IVecI planeDir){ pos.ref(planeDir); return this; }
+    /** reflect (mirror) 3 dimensionally to the other side of the plane */
+    public IParticleOnCurve mirror(double planeX, double planeY, double planeZ){
+	pos.ref(planeX,planeY,planeZ); return this;
+    }
     /** reflect (mirror) 3 dimensionally to the other side of the plane */
     public IParticleOnCurve mirror(IVecI center, IVecI planeDir){
 	pos.ref(center,planeDir); return this;
+    }
+    /** reflect (mirror) 3 dimensionally to the other side of the plane */
+    public IParticleOnCurve mirror(double centerX, double centerY, double centerZ,
+				   double planeX, double planeY, double planeZ){
+	pos.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
     }
     
     /** shear operation */

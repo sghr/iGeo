@@ -255,10 +255,21 @@ public class IRand{
 	return new Color(getInt(0,255),getInt(0,255),getInt(0,255));
     }
     
+    static protected int limit255(int value){
+	if(value<0) return 0;
+	if(value>255) return 255;
+	return value;
+    }
+    static protected float limit1(float value){
+	if(value<0f) return 0f;
+	if(value>1f) return 1f;
+	return value;
+    }
+    
     //static public Color color(int alpha){ getColor(alpha); } // PDE doesn't allow this name
     static public Color getColor(int alpha){ return clr(alpha); }
     static public Color clr(int alpha){
-	return new Color(getInt(0,255),getInt(0,255),getInt(0,255),alpha);
+	return new Color(getInt(0,255),getInt(0,255),getInt(0,255),limit255(alpha));
     }
     static public Color getColor(int minRed, int maxRed,
 				 int minGreen, int maxGreen,
@@ -270,11 +281,32 @@ public class IRand{
 			    int minGreen, int maxGreen,
 			    int minBlue, int maxBlue,
 			    int minAlpha, int maxAlpha){
-	return new Color(getInt(minRed, maxRed),
-			 getInt(minGreen, maxGreen),
-			 getInt(minBlue, maxBlue),
-			 getInt(minAlpha, maxAlpha));
+	return new Color(limit255(getInt(minRed, maxRed)),
+			 limit255(getInt(minGreen, maxGreen)),
+			 limit255(getInt(minBlue, maxBlue)),
+			 limit255(getInt(minAlpha, maxAlpha)));
     }
+    
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, 
+				 int minRed, int maxRed,
+				 int minGreen, int maxGreen,
+				 int minBlue, int maxBlue,
+				 int minAlpha, int maxAlpha){
+	return clr(c,minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue,minAlpha,maxAlpha);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, 
+			    int minRed, int maxRed,
+			    int minGreen, int maxGreen,
+			    int minBlue, int maxBlue,
+			    int minAlpha, int maxAlpha){
+	return new Color(limit255(c.getRed()+getInt(minRed, maxRed)),
+			 limit255(c.getGreen()+getInt(minGreen, maxGreen)),
+			 limit255(c.getBlue()+getInt(minBlue, maxBlue)),
+			 limit255(c.getAlpha()+getInt(minAlpha, maxAlpha)));
+    }
+    
     static public Color getColor(int minRed, int maxRed,
 				 int minGreen, int maxGreen,
 				 int minBlue, int maxBlue,
@@ -285,31 +317,104 @@ public class IRand{
 			    int minGreen, int maxGreen,
 			    int minBlue, int maxBlue,
 			    int alpha){
-	return new Color(getInt(minRed, maxRed),
-			 getInt(minGreen, maxGreen),
-			 getInt(minBlue, maxBlue),
-			 alpha);
+	return new Color(limit255(getInt(minRed, maxRed)),
+			 limit255(getInt(minGreen, maxGreen)),
+			 limit255(getInt(minBlue, maxBlue)),
+			 limit255(alpha));
     }
+    
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, int minRed, int maxRed,
+				 int minGreen, int maxGreen,
+				 int minBlue, int maxBlue,
+				 int alpha){
+	return clr(c,minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue,alpha);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, int minRed, int maxRed,
+			    int minGreen, int maxGreen,
+			    int minBlue, int maxBlue,
+			    int alpha){
+	return new Color(limit255(c.getRed()+getInt(minRed, maxRed)),
+			 limit255(c.getGreen()+getInt(minGreen, maxGreen)),
+			 limit255(c.getBlue()+getInt(minBlue, maxBlue)),
+			 limit255(alpha));
+    }
+
+
+    static public Color getColor(int minRed, int maxRed,
+				 int minGreen, int maxGreen,
+				 int minBlue, int maxBlue){
+	return clr(minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue);
+    }
+    static public Color clr(int minRed, int maxRed,
+			    int minGreen, int maxGreen,
+			    int minBlue, int maxBlue){
+	return new Color(limit255(getInt(minRed, maxRed)),
+			 limit255(getInt(minGreen, maxGreen)),
+			 limit255(getInt(minBlue, maxBlue)));
+    }
+    
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, int minRed, int maxRed,
+				 int minGreen, int maxGreen,
+				 int minBlue, int maxBlue){
+	return clr(c,minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, int minRed, int maxRed,
+			    int minGreen, int maxGreen,
+			    int minBlue, int maxBlue){
+	return new Color(limit255(c.getRed()+getInt(minRed, maxRed)),
+			 limit255(c.getGreen()+getInt(minGreen, maxGreen)),
+			 limit255(c.getBlue()+getInt(minBlue, maxBlue)));
+    }
+    
+    
     static public Color getColor(int maxRed, int maxGreen, int maxBlue, int alpha){
 	return clr(maxRed,maxGreen,maxBlue,alpha);
     }
     static public Color clr(int maxRed, int maxGreen, int maxBlue,
 			    int alpha){
-	return new Color(getInt(maxRed),getInt(maxGreen),getInt(maxBlue),alpha);
+	return new Color(limit255(getInt(maxRed)),limit255(getInt(maxGreen)),limit255(getInt(maxBlue)),
+			 limit255(alpha));
     }
+
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, int maxRed, int maxGreen, int maxBlue, int alpha){
+	return clr(c,maxRed,maxGreen,maxBlue,alpha);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, int maxRed, int maxGreen, int maxBlue,
+			    int alpha){
+	return new Color(limit255(c.getRed()+getInt(maxRed)),
+			 limit255(c.getGreen()+getInt(maxGreen)),
+			 limit255(c.getBlue()+getInt(maxBlue)),
+			 limit255(alpha));
+    }
+    
     static public Color getColor(int maxRed, int maxGreen, int maxBlue){
 	return clr(maxRed,maxGreen,maxBlue);
     }
     static public Color clr(int maxRed, int maxGreen, int maxBlue){
-	return new Color(getInt(maxRed),getInt(maxGreen),getInt(maxBlue),255);
+	return new Color(limit255(getInt(maxRed)),limit255(getInt(maxGreen)),limit255(getInt(maxBlue)));
+    }
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, int maxRed, int maxGreen, int maxBlue){
+	return clr(c,maxRed,maxGreen,maxBlue);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, int maxRed, int maxGreen, int maxBlue){
+	return new Color(limit255(c.getRed()+getInt(maxRed)),
+			 limit255(c.getGreen()+getInt(maxGreen)),
+			 limit255(c.getBlue()+getInt(maxBlue)));
     }
     
-
-
     static public Color getColor(float alpha){ return clr(alpha); }
     static public Color clr(float alpha){
-	return new Color(getFloat(),getFloat(),getFloat(),alpha);
+	return new Color(getFloat(),getFloat(),getFloat(),limit1(alpha));
     }
+    
     
     static public Color getColor(float minRed, float maxRed,
 				 float minGreen, float maxGreen,
@@ -321,11 +426,29 @@ public class IRand{
 			    float minGreen, float maxGreen,
 			    float minBlue, float maxBlue,
 			    float minAlpha, float maxAlpha){
-	return new Color(getFloat(minRed, maxRed),
-			 getFloat(minGreen, maxGreen),
-			 getFloat(minBlue, maxBlue),
-			 getFloat(minAlpha, maxAlpha));
+	return new Color(limit1(getFloat(minRed, maxRed)),
+			 limit1(getFloat(minGreen, maxGreen)),
+			 limit1(getFloat(minBlue, maxBlue)),
+			 limit1(getFloat(minAlpha, maxAlpha)));
     }
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, float minRed, float maxRed,
+				 float minGreen, float maxGreen,
+				 float minBlue, float maxBlue,
+				 float minAlpha, float maxAlpha){
+	return clr(c,minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue,minAlpha,maxAlpha);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, float minRed, float maxRed,
+			    float minGreen, float maxGreen,
+			    float minBlue, float maxBlue,
+			    float minAlpha, float maxAlpha){
+	return new Color(limit1((float)c.getRed()/255f+getFloat(minRed, maxRed)),
+			 limit1((float)c.getGreen()/255f+getFloat(minGreen, maxGreen)),
+			 limit1((float)c.getBlue()/255f+getFloat(minBlue, maxBlue)),
+			 limit1((float)c.getAlpha()/255f+getFloat(minAlpha, maxAlpha)));
+    }
+    
     static public Color getColor(float minRed, float maxRed,
 				 float minGreen, float maxGreen,
 				 float minBlue, float maxBlue,
@@ -336,25 +459,93 @@ public class IRand{
 			    float minGreen, float maxGreen,
 			    float minBlue, float maxBlue,
 			    float alpha){
-	return new Color(getFloat(minRed, maxRed),
-			 getFloat(minGreen, maxGreen),
-			 getFloat(minBlue, maxBlue),
-			 alpha);
+	return new Color(limit1(getFloat(minRed, maxRed)),
+			 limit1(getFloat(minGreen, maxGreen)),
+			 limit1(getFloat(minBlue, maxBlue)),
+			 limit1(alpha));
     }
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, float minRed, float maxRed,
+				 float minGreen, float maxGreen,
+				 float minBlue, float maxBlue,
+				 float alpha){
+	return clr(c,minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue,alpha);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, float minRed, float maxRed,
+			    float minGreen, float maxGreen,
+			    float minBlue, float maxBlue,
+			    float alpha){
+	return new Color(limit1((float)c.getRed()/255f+getFloat(minRed, maxRed)),
+			 limit1((float)c.getGreen()/255f+getFloat(minGreen, maxGreen)),
+			 limit1((float)c.getBlue()/255f+getFloat(minBlue, maxBlue)),
+			 limit1(alpha));
+    }
+    
+    static public Color getColor(float minRed, float maxRed,
+				 float minGreen, float maxGreen,
+				 float minBlue, float maxBlue){
+	return clr(minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue);
+    }
+    static public Color clr(float minRed, float maxRed,
+			    float minGreen, float maxGreen,
+			    float minBlue, float maxBlue){
+	return new Color(limit1(getFloat(minRed, maxRed)),
+			 limit1(getFloat(minGreen, maxGreen)),
+			 limit1(getFloat(minBlue, maxBlue)));
+    }
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, float minRed, float maxRed,
+				 float minGreen, float maxGreen,
+				 float minBlue, float maxBlue){
+	return clr(c,minRed,maxRed,minGreen,maxGreen,minBlue,maxBlue);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, float minRed, float maxRed,
+			    float minGreen, float maxGreen,
+			    float minBlue, float maxBlue){
+	return new Color(limit1((float)c.getRed()/255f+getFloat(minRed, maxRed)),
+			 limit1((float)c.getGreen()/255f+getFloat(minGreen, maxGreen)),
+			 limit1((float)c.getBlue()/255f+getFloat(minBlue, maxBlue)));
+    }
+    
     static public Color getColor(float maxRed,float maxGreen,float maxBlue,float alpha){
 	return clr(maxRed,maxGreen,maxBlue,alpha);
     }
     static public Color clr(float maxRed, float maxGreen, float maxBlue,
 			    float alpha){
-	return new Color(getFloat(maxRed),getFloat(maxGreen),getFloat(maxBlue),alpha);
+	return new Color(limit1(getFloat(maxRed)),limit1(getFloat(maxGreen)),limit1(getFloat(maxBlue)),
+			 limit1(alpha));
     }
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, float maxRed,float maxGreen,float maxBlue,float alpha){
+	return clr(c,maxRed,maxGreen,maxBlue,alpha);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, float maxRed, float maxGreen, float maxBlue,
+			    float alpha){
+	return new Color(limit1((float)c.getRed()/255f+getFloat(maxRed)),
+			 limit1((float)c.getGreen()/255f+getFloat(maxGreen)),
+			 limit1((float)c.getBlue()/255f+getFloat(maxBlue)),
+			 limit1(alpha));
+    }
+    
     static public Color getColor(float maxRed,float maxGreen,float maxBlue){
 	return clr(maxRed,maxGreen,maxBlue);
     }
     static public Color clr(float maxRed, float maxGreen, float maxBlue){
-	return new Color(getFloat(maxRed),getFloat(maxGreen),getFloat(maxBlue),1f);
+	return new Color(limit1(getFloat(maxRed)),limit1(getFloat(maxGreen)),limit1(getFloat(maxBlue)));
     }
-    
+    /** add random numbers to each component of color */
+    static public Color getColor(Color c, float maxRed,float maxGreen,float maxBlue){
+	return clr(c,maxRed,maxGreen,maxBlue);
+    }
+    /** add random numbers to each component of color */
+    static public Color clr(Color c, float maxRed, float maxGreen, float maxBlue){
+	return new Color(limit1((float)c.getRed()/255f+getFloat(maxRed)),
+			 limit1((float)c.getGreen()/255f+getFloat(maxGreen)),
+			 limit1((float)c.getBlue()/255f+getFloat(maxBlue)));
+    }
     
     
     //static public Color gray(){ return getGray(); }
@@ -369,13 +560,13 @@ public class IRand{
     static public Color getGray(int alpha){ return gray(alpha); }
     static public Color gray(int alpha){
 	int gray = getInt(0,255);
-	return new Color(gray,gray,gray,alpha);
+	return new Color(gray,gray,gray,limit255(alpha));
     }
     static public Color getGrayColor(float alpha){ return gray(alpha); }
     static public Color getGray(float alpha){ return gray(alpha); }
     static public Color gray(float alpha){
 	float gray = getFloat();
-	return new Color(gray,gray,gray,alpha);
+	return new Color(gray,gray,gray,limit1(alpha));
     }
 
     static public Color getGrayColor(float minGray, float maxGray, float minAlpha, float maxAlpha){
@@ -385,8 +576,8 @@ public class IRand{
 	return gray(minGray,maxGray,minAlpha,maxAlpha);
     }
     static public Color gray(float minGray, float maxGray, float minAlpha, float maxAlpha){
-	float gray = getFloat(minGray,maxGray);
-	return new Color(gray,gray,gray,getFloat(minAlpha,maxAlpha));
+	float gray = limit1(getFloat(minGray,maxGray));
+	return new Color(gray,gray,gray,limit1(getFloat(minAlpha,maxAlpha)));
     }
     
     static public Color getGrayColor(float minGray, float maxGray, float alpha){
@@ -396,8 +587,8 @@ public class IRand{
 	return gray(minGray,maxGray,alpha);
     }
     static public Color gray(float minGray, float maxGray, float alpha){
-	float gray = getFloat(minGray,maxGray);
-	return new Color(gray,gray,gray,alpha);
+	float gray = limit1(getFloat(minGray,maxGray));
+	return new Color(gray,gray,gray,limit1(alpha));
     }
     
     
@@ -408,7 +599,7 @@ public class IRand{
 	return gray(minGray,maxGray);
     }
     static public Color gray(float minGray, float maxGray){
-	float gray = getFloat(minGray,maxGray);
+	float gray = limit1(getFloat(minGray,maxGray));
 	return new Color(gray,gray,gray);
     }
     

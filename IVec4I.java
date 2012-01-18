@@ -79,48 +79,45 @@ public interface IVec4I extends IVec4Op, IVecI{
     public IVec4I add(double f, IVecI v);
     /** scale add alias */
     public IVec4I add(IDoubleI f, IVecI v); 
-    
+
+    /** setting length */
     public IVec4I len(IDoubleI l);
+    /** setting length */
     public IVec4I len(double l);
     
     public IVec4I unit();
     
     public IVec4I cross(IVecI v);
+    public IVec4I cross(double vx, double vy, double vz);
     
     
-    public boolean eqX(IVecI v);
-    public boolean eqY(IVecI v);
-    public boolean eqZ(IVecI v);
+    //public boolean eqX(IVecI v);
+    //public boolean eqY(IVecI v);
+    //public boolean eqZ(IVecI v);
     public boolean eqW(IVec4I v);
-    //public IBoolI eqXR(IVecI v);
-    //public IBoolI eqYR(IVecI v);
-    //public IBoolI eqZR(IVecI v);
-    //public IBoolI eqWR(IVec4I v);
-    public boolean eqX(ISwitchE e, IVecI v);
-    public boolean eqY(ISwitchE e, IVecI v);
-    public boolean eqZ(ISwitchE e, IVecI v);
+    public boolean eqW(double vw);
+    //public boolean eqX(ISwitchE e, IVecI v);
+    //public boolean eqY(ISwitchE e, IVecI v);
+    //public boolean eqZ(ISwitchE e, IVecI v);
     public boolean eqW(ISwitchE e, IVec4I v);
-    public IBoolI eqX(ISwitchR r, IVecI v);
-    public IBoolI eqY(ISwitchR r, IVecI v);
-    public IBoolI eqZ(ISwitchR r, IVecI v);
+    //public IBoolI eqX(ISwitchR r, IVecI v);
+    //public IBoolI eqY(ISwitchR r, IVecI v);
+    //public IBoolI eqZ(ISwitchR r, IVecI v);
     public IBoolI eqW(ISwitchR r, IVec4I v);
     
-    public boolean eqX(IVecI v, double resolution);
-    public boolean eqY(IVecI v, double resolution);
-    public boolean eqZ(IVecI v, double resolution);
-    public boolean eqW(IVec4I v, double resolution);
-    //public IBoolI eqXR(IVecI v, IDoubleI resolution);
-    //public IBoolI eqYR(IVecI v, IDoubleI resolution);
-    //public IBoolI eqZR(IVecI v, IDoubleI resolution);
-    //public IBoolI eqWR(IVec4I v, IDoubleI resolution);
-    public boolean eqX(ISwitchE e, IVecI v, double resolution);
-    public boolean eqY(ISwitchE e, IVecI v, double resolution);
-    public boolean eqZ(ISwitchE e, IVecI v, double resolution);
-    public boolean eqW(ISwitchE e, IVec4I v, double resolution);
-    public IBoolI eqX(ISwitchR r, IVecI v, IDoubleI resolution);
-    public IBoolI eqY(ISwitchR r, IVecI v, IDoubleI resolution);
-    public IBoolI eqZ(ISwitchR r, IVecI v, IDoubleI resolution);
-    public IBoolI eqW(ISwitchR r, IVec4I v, IDoubleI resolution);
+    //public boolean eqX(IVecI v, double tolerance);
+    //public boolean eqY(IVecI v, double tolerance);
+    //public boolean eqZ(IVecI v, double tolerance);
+    public boolean eqW(IVec4I v, double tolerance);
+    public boolean eqW(double vw, double tolerance);
+    //public boolean eqX(ISwitchE e, IVecI v, double tolerance);
+    //public boolean eqY(ISwitchE e, IVecI v, double tolerance);
+    //public boolean eqZ(ISwitchE e, IVecI v, double tolerance);
+    public boolean eqW(ISwitchE e, IVec4I v, double tolerance);
+    //public IBoolI eqX(ISwitchR r, IVecI v, IDoubleI tolerance);
+    //public IBoolI eqY(ISwitchR r, IVecI v, IDoubleI tolerance);
+    //public IBoolI eqZ(ISwitchR r, IVecI v, IDoubleI tolerance);
+    public IBoolI eqW(ISwitchR r, IVec4I v, IDoubleI tolerance);
     
     
     /** rotation on xy-plane */
@@ -131,59 +128,206 @@ public interface IVec4I extends IVec4Op, IVecI{
     public IVec4I rot(IVecI axis, IDoubleI angle);
     /** rotation around axis */
     public IVec4I rot(IVecI axis, double angle);
+    /** rotation around axis */
+    public IVec4I rot(double vx, double vy, double vz, double angle);
+    /** rotation around axis and center*/
     public IVec4I rot(IVecI center, IVecI axis, IDoubleI angle);
+    /** rotation around axis and center*/
     public IVec4I rot(IVecI center, IVecI axis, double angle);
+    /** rotation around axis and center*/
+    public IVec4I rot(double centerX, double centerY, double centerZ,
+		      double axisX, double axisY, double axisZ, double angle);
     
+    /** rotation around axis towards destination direction */
     public IVec4I rot(IVecI axis, IVecI destDir);
+    /** rotation around axis and center towards destination point */
     public IVec4I rot(IVecI center, IVecI axis, IVecI destPt);
-
+    
     /** rotation on xy-plane; alias of rot(IDoubleI) */
     public IVec4I rot2(IDoubleI angle);
     /** rotation on xy-plane; alias of rot(double) */
     public IVec4I rot2(double angle);
-    
+    /** rotation on xy-plane at center */
     public IVec4I rot2(IVecI center, IDoubleI angle);
+    /** rotation on xy-plane at center */
     public IVec4I rot2(IVecI center, double angle);
+    /** rotation on xy-plane at center */
+    public IVec4I rot2(double centerX, double centerY, double angle);
     
+    /** rotation on xy-plane towards destination direction */
     public IVec4I rot2(IVecI destDir);
+    /** rotation on xy-plane at center towards destination point */
     public IVec4I rot2(IVecI center, IVecI destPt);
-    
-    
-    
+        
+    /** alias of mul */
     public IVec4I scale(IDoubleI f);
+    /** alias of mul */
     public IVec4I scale(double f);
-    
+
+    /** scale around center */
     public IVec4I scale(IVecI center, IDoubleI f);
+    /** scale around center */
     public IVec4I scale(IVecI center, double f);
+    /** scale around center */
+    public IVec4I scale(double centerX, double centerY, double centerZ, double f);
     
+    
+    /** scale only in 1 direction */
+    public IVec4I scale1d(IVecI axis, double f);
+    /** scale only in 1 direction */
+    public IVec4I scale1d(IVecI axis, IDoubleI f);
+    /** scale only in 1 direction */
+    public IVec4I scale1d(double axisX, double axisY, double axisZ, double f);
+    /** scale only in 1 direction from a center */
+    public IVec4I scale1d(IVecI center, IVecI axis, double f);
+    /** scale only in 1 direction from a center */
+    public IVec4I scale1d(IVecI center, IVecI axis, IDoubleI f);
+    /** scale only in 1 direction from a center */
+    public IVec4I scale1d(double centerX, double centerY, double centerZ,
+			 double axisX, double axisY, double axisZ, double f);
+    
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public IVec4I ref(IVecI planeDir);
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public IVec4I ref(double planeX, double planeY, double planeZ);
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public IVec4I ref(IVecI center, IVecI planeDir);
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public IVec4I ref(double centerX, double centerY, double centerZ, double planeX, double planeY, double planeZ);
+    /** alias of ref */
     public IVec4I mirror(IVecI planeDir);
+    /** alias of ref */
+    public IVec4I mirror(double planeX, double planeY, double planeZ);
+    /** alias of ref */
     public IVec4I mirror(IVecI center, IVecI planeDir);
+    /** alias of ref */
+    public IVec4I mirror(double centerX, double centerY, double centerZ, double planeX, double planeY, double planeZ);
     
+    
+    /** shear operation */
+    public IVec4I shear(double sxy, double syx, double syz,
+			double szy, double szx, double sxz);
+    /** shear operation */
+    public IVec4I shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    /** shear operation */
+    public IVec4I shear(IVecI center, double sxy, double syx, double syz,
+			double szy, double szx, double sxz);
+    /** shear operation */
+    public IVec4I shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    
+    /** shear operation on XY*/
+    public IVec4I shearXY(double sxy, double syx);
+    /** shear operation on XY*/
+    public IVec4I shearXY(IDoubleI sxy, IDoubleI syx);
+    /** shear operation on XY*/
+    public IVec4I shearXY(IVecI center, double sxy, double syx);
+    /** shear operation on XY*/
+    public IVec4I shearXY(IVecI center, IDoubleI sxy, IDoubleI syx);
+    
+    /** shear operation on YZ*/
+    public IVec4I shearYZ(double syz, double szy);
+    /** shear operation on YZ*/
+    public IVec4I shearYZ(IDoubleI syz, IDoubleI szy);
+    /** shear operation on YZ*/
+    public IVec4I shearYZ(IVecI center, double syz, double szy);
+    /** shear operation on YZ*/
+    public IVec4I shearYZ(IVecI center, IDoubleI syz, IDoubleI szy);
+    
+    /** shear operation on ZX*/
+    public IVec4I shearZX(double szx, double sxz);
+    /** shear operation on ZX*/
+    public IVec4I shearZX(IDoubleI szx, IDoubleI sxz);
+    /** shear operation on ZX*/
+    public IVec4I shearZX(IVecI center, double szx, double sxz);
+    /** shear operation on ZX*/
+    public IVec4I shearZX(IVecI center, IDoubleI szx, IDoubleI sxz);
+    
+    /** alias of add() */
+    public IVec4I translate(double x, double y, double z);
+    /** alias of add() */
+    public IVec4I translate(IDoubleI x, IDoubleI y, IDoubleI z);
+    /** alias of add() */
+    public IVec4I translate(IVecI v);
+    
+    /** transform with a transformation matrix */
     public IVec4I transform(IMatrix3I mat);
+    /** transform with a transformation matrix */
     public IVec4I transform(IMatrix4I mat);
+    /** transform with a transformation vectors */
     public IVec4I transform(IVecI xvec, IVecI yvec, IVecI zvec);
+    /** transform with a transformation vectors */
     public IVec4I transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate);
     
     
+    /** mv() is alias of add() */
+    public IVec4I mv(double x, double y, double z);
+    /** mv() is alias of add() */
+    public IVec4I mv(IDoubleI x, IDoubleI y, IDoubleI z);
+    /** mv() is alias of add() */
+    public IVec4I mv(IVecI v);
+    
+    /** cp() is alias of dup() */ 
+    public IVec4I cp();
+    
+    /** cp() is alias of dup().add() */
+    public IVec4I cp(double x, double y, double z);
+    /** cp() is alias of dup().add() */
+    public IVec4I cp(IDoubleI x, IDoubleI y, IDoubleI z);
+    /** cp() is alias of dup().add() */
+    public IVec4I cp(IVecI v);
+
+    
     // methods creating new instance
-    // use these carefully. w is set to the object's w (not input or addition with input's)
+    // use these carefully. w is set to the current instance's w (not input or addition with input's)
+    /** create a new instance of difference */
     public IVec4I dif(IVecI v);
+    /** create a new instance of difference */
+    public IVec4I dif(double vx, double vy, double vz);
+    /** alias of dif */
     public IVec4I diff(IVecI v);
+    /** alias of dif */
+    public IVec4I diff(double vx, double vy, double vz);
+    /** create a new instance of midpoint */
     public IVec4I mid(IVecI v);
+    /** create a new instance of midpoint */
+    public IVec4I mid(double vx, double vy, double vz);
+    /** create a new instance of total summation */
     public IVec4I sum(IVecI v);
+    /** create a new instance of total summation */
+    public IVec4I sum(double vx, double vy, double vz);
+    /** create a new instance of total summation */
     public IVec4I sum(IVecI... v);
     
+    /** create a new instance of bisector */
     public IVec4I bisect(IVecI v);
+    /** create a new instance of bisector */
+    public IVec4I bisect(double vx, double vy, double vz);
     
+    /** create a new instance of weighted sum */
     public IVec4I sum(IVecI v2, double w1, double w2);
+    /** create a new instance of weighted sum */
     public IVec4I sum(IVecI v2, double w2);
-    
+    /** create a new instance of weighted sum */
     public IVec4I sum(IVecI v2, IDoubleI w1, IDoubleI w2);
+    /** create a new instance of weighted sum */
     public IVec4I sum(IVecI v2, IDoubleI w2);
-
-
+    
+    
+    /** alias of cross */
+    public IVec4I nml(IVecI v);
+    /** alias of cross */
+    public IVec4I nml(double vx, double vy, double vz);
+    /** create normal vector from 3 points of self, pt1 and pt2 */
+    public IVec4I nml(IVecI pt1, IVecI pt2);
+    /** create normal vector from 3 points of self, pt1 and pt2 */
+    public IVec4I nml(double vx1, double vy1, double vz1, double vx2, double vy2, double vz2);
+    
+    
     /** checking x, y, and z is valid number (not Infinite, nor NaN). */
-    public boolean isValid();
+    //public boolean isValid(); // defined in IVecI
     
     
 }

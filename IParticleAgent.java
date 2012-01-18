@@ -147,6 +147,8 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     public IParticleAgent neg(){ pos.neg(); return this; }
     public IParticleAgent rev(){ return neg(); }
     public IParticleAgent flip(){ return neg(); }
+
+    public IParticleAgent zero(){ pos.zero(); return this; }
     
     public IParticleAgent add(IVecI v, double f){ pos.add(v,f); return this; }
     public IParticleAgent add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
@@ -164,12 +166,19 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     
     public IParticleAgent rot(IVecI axis, IDoubleI angle){ pos.rot(axis,angle); return this; }
     public IParticleAgent rot(IVecI axis, double angle){ pos.rot(axis,angle); return this; }
+    public IParticleAgent rot(double axisX, double axisY, double axisZ, double angle){
+	pos.rot(axisX,axisY,axisZ,angle); return this;
+    }
     
     public IParticleAgent rot(IVecI center, IVecI axis, double angle){
 	pos.rot(center, axis,angle); return this;
     }
     public IParticleAgent rot(IVecI center, IVecI axis, IDoubleI angle){
 	pos.rot(center, axis,angle); return this;
+    }
+    public IParticleAgent rot(double centerX, double centerY, double centerZ,
+			      double axisX, double axisY, double axisZ, double angle){
+	pos.rot(centerX,centerY,centerZ,axisX,axisY,axisZ,angle); return this;
     }
     
     public IParticleAgent rot(IVecI axis, IVecI destDir){ pos.rot(axis,destDir); return this; }
@@ -181,6 +190,10 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     public IParticleAgent rot2(double angle){ return rot(angle); }
     public IParticleAgent rot2(IVecI center, double angle){ pos.rot2(center,angle); return this; }
     public IParticleAgent rot2(IVecI center, IDoubleI angle){ pos.rot2(center,angle); return this; }
+    public IParticleAgent rot2(double centerX, double centerY, double angle){
+	pos.rot2(centerX,centerY,angle); return this;
+    }
+    
     public IParticleAgent rot2(IVecI destDir){ pos.rot2(destDir); return this; }
     public IParticleAgent rot2(IVecI center, IVecI destPt){ pos.rot2(center,destPt); return this; }
     
@@ -189,24 +202,48 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     
     public IParticleAgent scale(IVecI center, IDoubleI f){ pos.scale(center,f); return this; }
     public IParticleAgent scale(IVecI center, double f){ pos.scale(center,f); return this; }
+    public IParticleAgent scale(double centerX, double centerY, double centerZ, double f){
+	pos.scale(centerX,centerY,centerZ,f); return this;
+    }
     
     /** scale only in 1 direction */
     public IParticleAgent scale1d(IVecI axis, double f){ pos.scale1d(axis,f); return this; }
     public IParticleAgent scale1d(IVecI axis, IDoubleI f){ pos.scale1d(axis,f); return this; }
+    public IParticleAgent scale1d(double axisX, double axisY, double axisZ, double f){
+	pos.scale1d(axisX,axisY,axisZ,f); return this;
+    }
     public IParticleAgent scale1d(IVecI center, IVecI axis, double f){
 	pos.scale1d(center,axis,f); return this;
     }
     public IParticleAgent scale1d(IVecI center, IVecI axis, IDoubleI f){
 	pos.scale1d(center,axis,f); return this;
     }
-        
+    public IParticleAgent scale1d(double centerX, double centerY, double centerZ,
+				  double axisX, double axisY, double axisZ, double f){
+	pos.scale1d(centerX,centerY,centerZ,axisX,axisY,axisZ,f); return this;
+    }
+    
     public IParticleAgent ref(IVecI planeDir){ pos.ref(planeDir); return this; }
+    public IParticleAgent ref(double planeX, double planeY, double planeZ){
+	pos.ref(planeX,planeY,planeZ); return this;
+    }
     public IParticleAgent ref(IVecI center, IVecI planeDir){
 	pos.ref(center,planeDir); return this;
     }
+    public IParticleAgent ref(double centerX, double centerY, double centerZ,
+			      double planeX, double planeY, double planeZ){
+	pos.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
+    }
     public IParticleAgent mirror(IVecI planeDir){ pos.ref(planeDir); return this; }
+    public IParticleAgent mirror(double planeX, double planeY, double planeZ){
+	pos.ref(planeX, planeY, planeZ); return this;
+    }
     public IParticleAgent mirror(IVecI center, IVecI planeDir){
 	pos.ref(center,planeDir); return this;
+    }
+    public IParticleAgent mirror(double centerX, double centerY, double centerZ,
+				 double planeX, double planeY, double planeZ){
+	pos.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
     }
     
     public IParticleAgent shear(double sxy, double syx, double syz,

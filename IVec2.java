@@ -99,118 +99,150 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     
     /** scale add */
     public IVec2 add(IVec2 v, double f){ x+=v.x*f; y+=v.y*f; return this; }
+    /** scale add */
     public IVec2 add(IVec2I v, double f){ return add(v.get(),f); }
+    /** scale add */
     public IVec2 add(IVec2I v, IDoubleI f){ add(v.get(),f.x()); return this; }
     
     /** scale add; alias */
     public IVec2 add(double f, IVec2 v){ return add(v,f); }
+    /** scale add; alias */
     public IVec2 add(double f, IVec2I v){ return add(v,f); }
+    /** scale add; alias */
     public IVec2 add(IDoubleI f, IVec2I v){ return add(v,f); }
     
     
-    /**
-       @return dot product in double (P for Primitive)
-    */
+    /** dot product */
     public double dot(IVec2 v){ return x*v.x + y*v.y; }
+    /** dot product */
+    public double dot(double vx, double vy){ return x*vx + y*vy; }
+    /** dot product */
     public double dot(IVec2I v){ return dot(v.get()); }
-    //public IDouble dotR(IVec2 v){ return new IDouble(dot(v)); }
-    //public IDouble dotR(IVec2I v){ return dotR(v.get()); }
+    /** dot product */
     public double dot(ISwitchE e, IVec2I v){ return dot(v); }
+    /** dot product */
     public IDouble dot(ISwitchR r, IVec2I v){ return new IDouble(dot(v)); }
     
-    /**
-       @return cross product in z direction
-    */
+    /** cross product in z direction as IVec */
     public IVec cross(IVec2 v){ return new IVec(0, 0, x*v.y - y*v.x); }
+    /** cross product in z direction as IVec */
+    public IVec cross(double vx, double vy){ return new IVec(0, 0, x*vy - y*vx); }
+    /** cross product in z direction as IVec */
     public IVec cross(IVec2I v){ return cross(v.get()); }
     
-    /**
-       @return length (norm) of the vector in double (P for Primitive)
-    */
+    /** @return length (norm) of the vector in double */
     public double len(){ return Math.sqrt(x*x+y*y); }
-    //public IDouble lenR(){ return new IDouble(len()); }
+    /** @return length (norm) of the vector in double */
     public double len(ISwitchE e){ return len(); }
+    /** @return length (norm) of the vector in double */
     public IDouble len(ISwitchR r){ return new IDouble(len()); }
     
-    /**
-       @return squared length of the vector in double (P for Primitive)
-    */
+    /** return squared length of the vector in double */
     public double len2(){ return x*x+y*y; }
-    //public IDouble len2R(){ return new IDouble(len2()); }
+    /** return squared length of the vector in double */
     public double len2(ISwitchE e){ return len2(); }
+    /** return squared length of the vector in double */
     public IDouble len2(ISwitchR r){ return new IDouble(len2()); }
-    
+
+    /** setting length */
     public IVec2 len(IDoubleI l){ return len(l.x()); }
+    /** setting length */
     public IVec2 len(double l){ l/=len(); x*=l; y*=l; return this; }
     
-    /**
-       normalize (unitize) vector
-    */
+    /** unitize (normalize) vector */
     public IVec2 unit(){ double l=len(); x/=l; y/=l; return this; }
-    /**
-       rotate vector in Pi/2
-    */
+    /** rotate vector in Pi/2 */
     public IVec2 ortho(){ double tmp = x; x=-y; y=tmp; return this; }
     
-    
-    
-    public double dist(IVec2 v){
-	return Math.sqrt( (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y) );
-    }
+    /** distance of two vectors */    
+    public double dist(IVec2 v){ return Math.sqrt((x-v.x)*(x-v.x)+(y-v.y)*(y-v.y)); }
+    /** distance of two vectors */    
+    public double dist(double vx, double vy){ return Math.sqrt((x-vx)*(x-vx)+(y-vy)*(y-vy)); }
+    /** distance of two vectors */
     public double dist(IVec2I v){ return dist(v.get()); }
-    //public IDouble distR(IVec2I v){ return new IDouble(dist(v)); }
+    /** distance of two vectors */
     public double dist(ISwitchE e, IVec2I v){ return dist(v); }
+    /** distance of two vectors */
     public IDouble dist(ISwitchR r, IVec2I v){ return new IDouble(dist(v)); }
-    
-    public double dist2(IVec2 v){
-	return (x-v.x)*(x-v.x) + (y-v.y)*(y-v.y);
-    }
+
+    /** squared distance of two vectors */
+    public double dist2(IVec2 v){ return (x-v.x)*(x-v.x)+(y-v.y)*(y-v.y); }
+    /** squared distance of two vectors */
+    public double dist2(double vx, double vy){ return (x-vx)*(x-vx)+(y-vy)*(y-vy); }
+    /** squared distance of two vectors */
     public double dist2(IVec2I v){ return dist2(v.get()); }
-    //public IDouble dist2R(IVec2I v){ return new IDouble(dist2(v)); }
+    /** squared distance of two vectors */
     public double dist2(ISwitchE e, IVec2I v){ return dist2(v); }
+    /** squared distance of two vectors */
     public IDouble dist2(ISwitchR r, IVec2I v){ return new IDouble(dist2(v)); }
     
-    /**
-       whether location is same or not
-    */
+    /** whether location is same or not */
     public boolean eq(IVec2 v){ return eq(v,IConfig.tolerance); }
+    /** whether location is same or not */
+    public boolean eq(double vx, double vy){ return eq(vx,vy,IConfig.tolerance); }
+    /** whether location is same or not */
     public boolean eq(IVec2I v){ return eq(v.get(),IConfig.tolerance); }
-    //public IBool eqR(IVec2I v){ return new IBool(eq(v.get(),IConfig.tolerance)); }
+    /** whether location is same or not */
     public boolean eq(ISwitchE e, IVec2I v){ return eq(v); }
+    /** whether location is same or not */
     public IBool eq(ISwitchR r, IVec2I v){ return new IBool(eq(v)); }
     
-    public boolean eq(IVec2 v, double resolution){ return dist2(v) <= resolution*resolution; }
-    public boolean eq(IVec2I v, double resolution){ return eq(v.get(),resolution); }
-    //public IBool eqR(IVec2I v, IDoubleI resolution){ return new IBool(eq(v.get(),resolution.x())); }    
-    public boolean eq(ISwitchE e, IVec2I v, double resolution){ return eq(v,resolution); }
-    public IBool eq(ISwitchR r, IVec2I v, IDoubleI resolution){ return new IBool(eq(v,resolution.x())); }    
-    
+    /** whether location is same or not within tolerance */
+    public boolean eq(IVec2 v, double tolerance){ return dist2(v) <= tolerance*tolerance; }
+    /** whether location is same or not within tolerance */
+    public boolean eq(double vx, double vy, double tolerance){ return dist2(vx,vy) <= tolerance*tolerance; }
+    /** whether location is same or not within tolerance */
+    public boolean eq(IVec2I v, double tolerance){ return eq(v.get(),tolerance); }
+    /** whether location is same or not within tolerance */
+    public boolean eq(ISwitchE e, IVec2I v, double tolerance){ return eq(v,tolerance); }
+    /** whether location is same or not within tolerance */
+    public IBool eq(ISwitchR r, IVec2I v, IDoubleI tolerance){ return new IBool(eq(v,tolerance.x())); }    
+
+    /** check if same in X */
     public boolean eqX(IVec2 v){ return eqX(v,IConfig.tolerance); }
+    /** check if same in Y */
     public boolean eqY(IVec2 v){ return eqY(v,IConfig.tolerance); }
+    /** check if same in X */
+    public boolean eqX(double vx){ return eqX(vx,IConfig.tolerance); }
+    /** check if same in Y */
+    public boolean eqY(double vy){ return eqY(vy,IConfig.tolerance); }
+    /** check if same in X */
     public boolean eqX(IVec2I v){ return eqX(v.get(),IConfig.tolerance); }
+    /** check if same in Y */
     public boolean eqY(IVec2I v){ return eqY(v.get(),IConfig.tolerance); }
-    //public IBool eqXR(IVec2I v){ return new IBool(eqX(v.get(),IConfig.tolerance)); }
-    //public IBool eqYR(IVec2I v){ return new IBool(eqY(v.get(),IConfig.tolerance)); }
+    /** check if same in X */
     public boolean eqX(ISwitchE e, IVec2I v){ return eqX(v); }
+    /** check if same in Y */
     public boolean eqY(ISwitchE e, IVec2I v){ return eqY(v); }
+    /** check if same in X */
     public IBool eqX(ISwitchR r, IVec2I v){ return new IBool(eqX(v)); }
+    /** check if same in Y */
     public IBool eqY(ISwitchR r, IVec2I v){ return new IBool(eqY(v)); }
     
-    public boolean eqX(IVec2 v, double resolution){ return Math.abs(v.x-x)<=resolution; }
-    public boolean eqY(IVec2 v, double resolution){ return Math.abs(v.y-y)<=resolution; }
-    public boolean eqX(IVec2I v, double resolution){ return Math.abs(v.x()-x)<=resolution; }
-    public boolean eqY(IVec2I v, double resolution){ return Math.abs(v.y()-y)<=resolution; }
-    //public IBool eqXR(IVec2I v, IDoubleI resolution){ return new IBool(eqX(v,resolution.x())); }
-    //public IBool eqYR(IVec2I v, IDoubleI resolution){ return new IBool(eqY(v,resolution.x())); }
-    public boolean eqX(ISwitchE e, IVec2I v, double resolution){ return eqX(v,resolution); }
-    public boolean eqY(ISwitchE e, IVec2I v, double resolution){ return eqY(v,resolution); }
-    public IBool eqX(ISwitchR r, IVec2I v, IDoubleI resolution){ return new IBool(eqX(v,resolution.x())); }
-    public IBool eqY(ISwitchR r, IVec2I v, IDoubleI resolution){ return new IBool(eqY(v,resolution.x())); }
+    
+    /** check if same in X within tolerance */
+    public boolean eqX(IVec2 v, double tolerance){ return Math.abs(v.x-x)<=tolerance; }
+    /** check if same in Y within tolerance */
+    public boolean eqY(IVec2 v, double tolerance){ return Math.abs(v.y-y)<=tolerance; }
+    /** check if same in X within tolerance */
+    public boolean eqX(double vx, double tolerance){ return Math.abs(vx-x)<=tolerance; }
+    /** check if same in Y within tolerance */
+    public boolean eqY(double vy, double tolerance){ return Math.abs(vy-y)<=tolerance; }
+    /** check if same in X within tolerance */
+    public boolean eqX(IVec2I v, double tolerance){ return Math.abs(v.x()-x)<=tolerance; }
+    /** check if same in Y within tolerance */
+    public boolean eqY(IVec2I v, double tolerance){ return Math.abs(v.y()-y)<=tolerance; }
+    /** check if same in X within tolerance */
+    public boolean eqX(ISwitchE e, IVec2I v, double tolerance){ return eqX(v,tolerance); }
+    /** check if same in Y within tolerance */
+    public boolean eqY(ISwitchE e, IVec2I v, double tolerance){ return eqY(v,tolerance); }
+    /** check if same in X within tolerance */
+    public IBool eqX(ISwitchR r, IVec2I v, IDoubleI tolerance){ return new IBool(eqX(v,tolerance.x())); }
+    /** check if same in Y within tolerance */
+    public IBool eqY(ISwitchR r, IVec2I v, IDoubleI tolerance){ return new IBool(eqY(v,tolerance.x())); }
     
     
-    /**
-       @return angle of two vector. From -Pi to Pi. Sign follows right-handed screw rule (P for Primitive)
-    */
+    /** @return angle of two vector. From -Pi to Pi. Sign follows right-handed screw rule */
     public double angle(IVec2 v){
 	double dot = x*v.x+y*v.y;
 	double len1 = len(); if(len1==0) return 0;
@@ -222,54 +254,94 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	if(cross<0) return -angle; // negative
 	return angle;
     }
+    /** @return angle of two vector. From -Pi to Pi. Sign follows right-handed screw rule */
+    public double angle(double vx, double vy){
+	double dot = x*vx+y*vy;
+	double len1 = len(); if(len1==0) return 0;
+	double len2 = Math.sqrt(vx*vx+vy*vy); if(len2==0) return 0;
+	double cross = x*vy-y*vx; //if(cross==0) return 0;
+	double cos = dot/(len1*len2);
+	if(cos>1.) cos=1; else if(cos<-1.) cos=-1; // in case of rounding error
+	double angle = Math.acos(cos);
+	if(cross<0) return -angle; // negative
+	return angle;
+    }
+    /** @return angle of two vector. From -Pi to Pi. Sign follows right-handed screw rule */
     public double angle(IVec2I v){ return angle(v.get()); }
-    //public IDouble angleR(IVec2 v){ return new IDouble(angle(v)); }
-    //public IDouble angleR(IVec2I v){ return angleR(v.get()); }
+    /** @return angle of two vector. From -Pi to Pi. Sign follows right-handed screw rule */
     public double angle(ISwitchE e, IVec2I v){ return angle(v); }
-    //public IDouble angleR(IVec2 v){ return new IDouble(angle(v)); }
+    /** @return angle of two vector. From -Pi to Pi. Sign follows right-handed screw rule */
     public IDouble angle(ISwitchR r, IVec2I v){ return new IDouble(angle(v)); }
     
-    
+    /** rotate */
     public IVec2 rot(double angle){
 	double origx = x;
 	x = x*Math.cos(angle) - y*Math.sin(angle);
 	y = origx*Math.sin(angle) + y*Math.cos(angle);
 	return this;
     }
-    //public IVec2 rot(IDouble angle){ return rot(angle.x); }
+    /** rotate */
     public IVec2 rot(IDoubleI angle){ return rot(angle.x()); }
-    
+
+    /** rotate around center */
     public IVec2 rot(IVec2 center, double angle){
 	if(center==this) return this;
 	return sub(center).rot(angle).add(center);
     }
+    /** rotate around center */
+    public IVec2 rot(double centerX, double centerY, double angle){
+	return sub(centerX,centerY).rot(angle).add(centerX,centerY);
+    }
+    /** rotate around center */
     public IVec2 rot(IVec2I center, double angle){ return rot(center.get(),angle); }
+    /** rotate around center */
     public IVec2 rot(IVec2I center, IDoubleI angle){ return rot(center.get(),angle.x()); }
     
     // to be tested !!! (direction of rotation)
+    /** rotate towards destination direction */
     public IVec2 rot(IVec2 destDir){ return rot(angle(destDir)); }
+    /** rotate towards destination direction */
     public IVec2 rot(IVec2I destDir){ return rot(destDir.get()); }
+    /** rotate around center towards destination point */
     public IVec2 rot(IVec2 center, IVec2 destPt){
 	if(center==this) return this;
 	return sub(center).rot(destPt.diff(center)).add(center);
     }
+    /** rotate around center towards destination point */
     public IVec2 rot(IVec2I center, IVec2I destPt){ return rot(center.get(),destPt.get()); }
     
-    
+    /** alias of mul */
     public IVec2 scale(double f){ return mul(f); }
+    /** alias of mul */
     public IVec2 scale(IDoubleI f){ return mul(f); }
+    /** scale around center */
     public IVec2 scale(IVec2 center, double f){
 	if(center==this) return this;
 	return sub(center).mul(f).add(center);
     }
+    /** scale around center */
+    public IVec2 scale(double centerX, double centerY, double f){
+	return sub(centerX,centerY).mul(f).add(centerX,centerY);
+    }
+    /** scale around center */
     public IVec2 scale(IVec2I center, double f){ return scale(center.get(),f); }
+    /** scale around center */
     public IVec2 scale(IVec2I center, IDoubleI f){ return scale(center.get(),f.x()); }
+    
     
     /** reflect (mirror) 2 dimensionally to the other side of the line
 	@param lineDir direction of reflection line
     */
     public IVec2 ref(IVec2 lineDir){
 	return rev().add(lineDir.dup().mul(dot(lineDir)/lineDir.len2()*-2));
+    }
+    /** reflect (mirror) 2 dimensionally to the other side of the line */
+    // please test this method
+    public IVec2 ref(double lineX, double lineY){
+	double d = dot(lineX,lineY)/(lineX*lineX+lineY*lineY)*-2;
+	x = -x + lineX*d;
+	y = -y + lineY*d;
+	return this;
     }
     /** reflect (mirror) 2 dimensionally to the other side of the line
 	@param lineDir direction of reflection line
@@ -283,6 +355,10 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	if(linePt==this) return this;
 	return sub(linePt).ref(lineDir).add(linePt);
     }
+    /** reflect (mirror) 2 dimensionally to the other side of the line at line point */
+    public IVec2 ref(double linePtX, double linePtY, double lineDirX, double lineDirY){
+	return sub(linePtX,linePtY).ref(lineDirX,lineDirY).add(linePtX,linePtY);
+    }
     /** reflect (mirror) 2 dimensionally to the other side of the line
 	@param linePt start point of reflection line
 	@param lineDir direction of reflection line
@@ -293,6 +369,8 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	@param lineDir direction of reflection line
     */
     public IVec2 mirror(IVec2 lineDir){ return ref(lineDir); }
+    /** reflect (mirror) 2 dimensionally to the other side of the line */
+    public IVec2 mirror(double lineX, double lineY){ return ref(lineX,lineY); }
     /** reflect (mirror) 2 dimensionally to the other side of the line
 	@param lineDir direction of reflection line
     */
@@ -302,6 +380,10 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	@param lineDir direction of reflection line
     */
     public IVec2 mirror(IVec2 linePt, IVec2 lineDir){ return ref(linePt,lineDir); }
+    /** reflect (mirror) 2 dimensionally to the other side of the line at line point */
+    public IVec2 mirror(double linePtX, double linePtY, double lineDirX, double lineDirY){
+	return ref(linePtX,linePtY,lineDirX,lineDirY);
+    }
     /** reflect (mirror) 2 dimensionally to the other side of the line
 	@param linePt start point of reflection line
 	@param lineDir direction of reflection line
@@ -311,6 +393,7 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     
     //public IVec2I transform(IMatrix2I mat);
     //public IVec2I transform(IMatrix3I mat);
+    /** transform with transform vectors */
     public IVec2 transform(IVec2 xvec, IVec2 yvec){
 	double tx,ty;
 	tx = xvec.x*x + yvec.x*y;
@@ -318,62 +401,123 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	x = tx; y = ty;
 	return this;
     }
+    /** transform with transform vectors */
     public IVec2 transform(IVec2I xvec, IVec2I yvec){ return transform(xvec.get(),yvec.get()); }
+    /** transform with transform vectors */
     public IVec2 transform(IVec2 xvec, IVec2 yvec, IVec2 translate){
 	return transform(xvec,yvec).add(translate);
     }
+    /** transform with transform vectors */
     public IVec2 transform(IVec2I xvec, IVec2I yvec, IVec2I translate){
 	return transform(xvec.get(),yvec.get(),translate.get());
     }
     
     
     // methods creating new instance
+    /** create a new instance of difference */
+    public IVec2 dif(IVec2 v){
+	//return dup().sub(v);
+	return new IVec2(x-v.x, y-v.y);
+    }
+    /** create a new instance of difference */
+    public IVec2 dif(double vx, double vy){
+	//return dup().sub(vx,vy);
+	return new IVec2(x-vx, y-vy);
+    }
+    /** create a new instance of difference */
     public IVec2 dif(IVec2I v){ return dup().sub(v); }
+    /** alias of dif */
+    public IVec2 diff(IVec2 v){ return dif(v); }
+    /** alias of dif */
+    public IVec2 diff(double vx, double vy){ return dif(vx,vy); }
+    /** alias of dif */
     public IVec2 diff(IVec2I v){ return dif(v); }
+    /** create a new instance of midpoint */
+    public IVec2 mid(IVec2 v){
+	//return dup().add(v).div(2);
+	return new IVec2( (x+v.x)/2, (y+v.y)/2 );
+    }
+    /** create a new instance of midpoint */
+    public IVec2 mid(double vx, double vy){
+	//return dup().add(v).div(2);
+	return new IVec2( (x+vx)/2, (y+vy)/2 );
+    }
+    /** create a new instance of midpoint */
     public IVec2 mid(IVec2I v){ return dup().add(v).div(2); }
+    /** create a new instance of summation */
+    public IVec2 sum(IVec2 v){ return dup().add(v); }
+    /** create a new instance of summation */
+    public IVec2 sum(double vx, double vy){ return dup().add(vx,vy); }
+    /** create a new instance of summation */
     public IVec2 sum(IVec2I v){ return dup().add(v); }
+    /** create a new instance of summation */
     public IVec2 sum(IVec2I... v){
         IVec2 ret = this.dup();
         for(IVec2I vi: v) ret.add(vi);
         return ret;
     }
-    
+    /** create a new instance of bisector */
     public IVec2 bisect(IVec2 v){ return dup().unit().add(v.dup().unit()); }
+    /** create a new instance of bisector */
+    public IVec2 bisect(double vx, double vy){
+	double len = Math.sqrt(vx*vx+vy*vy);
+	return dup().unit().add(vx/len, vy/len);
+    }
+    /** create a new instance of bisector */
     public IVec2 bisect(IVec2I v){ return bisect(v.get()); }
     
-    /**
-       weighted sum
-    */
+    /** create a new instance of weighted sum */
     public IVec2 sum(IVec2 v2, double w1, double w2){ return dup().mul(w1).add(v2,w2); }
+    /** create a new instance of weighted sum */
     public IVec2 sum(IVec2I v2, double w1, double w2){ return sum(v2.get(),w1,w2); }
+    /** create a new instance of weighted sum */
     public IVec2 sum(IVec2I v2, IDoubleI w1, IDoubleI w2){ return sum(v2.get(),w1.x(),w2.x()); }
+    /** create a new instance of weighted sum */
     public IVec2 sum(IVec2 v2, double w2){ return dup().mul(1.0-w2).add(v2,w2); }
+    /** create a new instance of weighted sum */
     public IVec2 sum(IVec2I v2, double w2){ return sum(v2.get(),w2); }
+    /** create a new instance of weighted sum */
     public IVec2 sum(IVec2I v2, IDoubleI w2){ return sum(v2.get(),w2.get()); }
+
+    /** alias of cross */
+    public IVec nml(IVec2 v){ return cross(v); }
+    /** alias of cross */
+    public IVec nml(IVec2I v){ return cross(v); }
+    /** alias of cross */
+    public IVecI nml(double vx, double vy){ return cross(vx,vy); }
+    /** create normal vector from 3 points of self, pt1 and pt2 */
+    public IVecI nml(IVec2 pt1, IVec2 pt2){ return this.dif(pt1).cross(this.dif(pt2)); }
+    /** create normal vector from 3 points of self, pt1 and pt2 */
+    public IVecI nml(double vx1, double vy1, double vx2, double vy2){
+	return this.dif(vx1,vy1).cross(this.dif(vx2,vy2)); 
+    }
+    /** create normal vector from 3 points of self, pt1 and pt2 */
+    public IVecI nml(IVec2I pt1, IVec2I pt2){ return this.dif(pt1).cross(this.dif(pt2)); }
     
     
+    /** check if two vectors are parallel */
     public boolean isParallel(IVec2I v){ return isParallel(v, IConfig.angleTolerance); }
+    /** check if two vectors are parallel */
     public boolean isParallel(IVec2I v, double angleReso){
 	//return dup().normalize().diff(v.get().dup().normalize()).len() < IConfig.tolerance;
 	//return dot(v.get())/(len()*v.get().len()) > Math.cos(IConfig.angleTolerance);
 	// opposite directions is regarded as parallel too
 	return Math.abs(dot(v.get())/(len()*v.get().len())) > Math.cos(angleReso);
-	
     }
     
+    /** check if three locations are on straight line */
     public boolean isStraight(IVec2I v1, IVec2I v2){
 	//return this.diff(v1).isParallel(this.diff(v2));
 	//return v1.get().diff(this).isParallel(v2.get().diff(v1));
 	return isStraight(v1,v2,IConfig.angleTolerance);
     }
+    /** check if three locations are on straight line */
     public boolean isStraight(IVec2I v1, IVec2I v2, double angleReso){
 	return v1.get().diff(this).isParallel(v2.get().diff(v1),angleReso);
     }
     
-    //public boolean isSameX(IVec2I v){ return Math.abs(x-v.x())<IConfig.tolerance; }
-    //public boolean isSameY(IVec2I v){ return Math.abs(y-v.y())<IConfig.tolerance; }
-    
     //
+    /** intersection of two infinite lines */
     public static IVec2 intersect(IVec2I pt1, IVec2I dir1,
 				  IVec2I pt2, IVec2I dir2){
 	double det = dir2.x()*dir1.y() - dir1.x()*dir2.y();

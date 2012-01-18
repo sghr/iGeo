@@ -133,11 +133,13 @@ public class IVectorObject extends IObject implements IVecI{
     
     
     public double dot(IVecI v){ return vec.dot(v); }
+    public double dot(double vx, double vy, double vz){ return vec.dot(vx,vy,vz); }
     public double dot(ISwitchE e, IVecI v){ return vec.dot(e,v); }
     public IDoubleI dot(ISwitchR r, IVecI v){ return vec.dot(r,v); }
     
     // returns IVecI, not IVectorObject
     public IVecI cross(IVecI v){ return vec.cross(v); }
+    public IVecI cross(double vx, double vy, double vz){ return vec.cross(vx,vy,vz); }
     //public IVectorObject cross(IVecI v){ return dup().set(vec.cross(v)); }
     
     public double len(){ return vec.len(); }
@@ -154,24 +156,33 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject unit(){ vec.unit(); return this; }
     
     public double dist(IVecI v){ return vec.dist(v); }
+    public double dist(double vx, double vy, double vz){ return vec.dist(vx,vy,vz); }
     public double dist(ISwitchE e, IVecI v){ return vec.dist(e,v); }
     public IDoubleI dist(ISwitchR r, IVecI v){ return vec.dist(r,v); }
     
     public double dist2(IVecI v){ return vec.dist2(v); }
+    public double dist2(double vx, double vy, double vz){ return vec.dist2(vx,vy,vz); }
     public double dist2(ISwitchE e, IVecI v){ return vec.dist2(e,v); }
     public IDoubleI dist2(ISwitchR r, IVecI v){ return vec.dist2(r,v); }
     
     public boolean eq(IVecI v){ return vec.eq(v); }
+    public boolean eq(double vx, double vy, double vz){ return vec.eq(vx,vy,vz); }
     public boolean eq(ISwitchE e, IVecI v){ return vec.eq(e,v); }
     public IBoolI eq(ISwitchR r, IVecI v){ return vec.eq(r,v); }
     
-    public boolean eq(IVecI v, double resolution){ return vec.eq(v,resolution); }
-    public boolean eq(ISwitchE e, IVecI v, double resolution){ return vec.eq(e,v,resolution); }
-    public IBoolI eq(ISwitchR r, IVecI v, IDoubleI resolution){ return vec.eq(r,v,resolution); }
+    public boolean eq(IVecI v, double tolerance){ return vec.eq(v,tolerance); }
+    public boolean eq(double vx, double vy, double vz, double tolerance){
+	return vec.eq(vx,vy,vz,tolerance);
+    }
+    public boolean eq(ISwitchE e, IVecI v, double tolerance){ return vec.eq(e,v,tolerance); }
+    public IBoolI eq(ISwitchR r, IVecI v, IDoubleI tolerance){ return vec.eq(r,v,tolerance); }
     
     public boolean eqX(IVecI v){ return vec.eqX(v); }
     public boolean eqY(IVecI v){ return vec.eqY(v); }
     public boolean eqZ(IVecI v){ return vec.eqZ(v); }
+    public boolean eqX(double vx){ return vec.eqX(vx); }
+    public boolean eqY(double vy){ return vec.eqY(vy); }
+    public boolean eqZ(double vz){ return vec.eqZ(vz); }
     public boolean eqX(ISwitchE e, IVecI v){ return vec.eqX(e,v); }
     public boolean eqY(ISwitchE e, IVecI v){ return vec.eqY(e,v); }
     public boolean eqZ(ISwitchE e, IVecI v){ return vec.eqZ(e,v); }
@@ -179,22 +190,29 @@ public class IVectorObject extends IObject implements IVecI{
     public IBoolI eqY(ISwitchR r, IVecI v){ return vec.eqY(r,v); }
     public IBoolI eqZ(ISwitchR r, IVecI v){ return vec.eqZ(r,v); }
     
-    public boolean eqX(IVecI v, double resolution){ return vec.eqX(v,resolution); }
-    public boolean eqY(IVecI v, double resolution){ return vec.eqY(v,resolution); }
-    public boolean eqZ(IVecI v, double resolution){ return vec.eqZ(v,resolution); }
-    public boolean eqX(ISwitchE e, IVecI v, double resolution){ return vec.eqX(e,v,resolution); }
-    public boolean eqY(ISwitchE e, IVecI v, double resolution){ return vec.eqY(e,v,resolution); }
-    public boolean eqZ(ISwitchE e, IVecI v, double resolution){ return vec.eqZ(e,v,resolution); }
-    public IBoolI eqX(ISwitchR r, IVecI v, IDoubleI resolution){ return vec.eqX(r,v,resolution); }
-    public IBoolI eqY(ISwitchR r, IVecI v, IDoubleI resolution){ return vec.eqY(r,v,resolution); }
-    public IBoolI eqZ(ISwitchR r, IVecI v, IDoubleI resolution){ return vec.eqZ(r,v,resolution); }
+    public boolean eqX(IVecI v, double tolerance){ return vec.eqX(v,tolerance); }
+    public boolean eqY(IVecI v, double tolerance){ return vec.eqY(v,tolerance); }
+    public boolean eqZ(IVecI v, double tolerance){ return vec.eqZ(v,tolerance); }
+    public boolean eqX(double vx, double tolerance){ return vec.eqX(vx,tolerance); }
+    public boolean eqY(double vy, double tolerance){ return vec.eqY(vy,tolerance); }
+    public boolean eqZ(double vz, double tolerance){ return vec.eqZ(vz,tolerance); }
+    public boolean eqX(ISwitchE e, IVecI v, double tolerance){ return vec.eqX(e,v,tolerance); }
+    public boolean eqY(ISwitchE e, IVecI v, double tolerance){ return vec.eqY(e,v,tolerance); }
+    public boolean eqZ(ISwitchE e, IVecI v, double tolerance){ return vec.eqZ(e,v,tolerance); }
+    public IBoolI eqX(ISwitchR r, IVecI v, IDoubleI tolerance){ return vec.eqX(r,v,tolerance); }
+    public IBoolI eqY(ISwitchR r, IVecI v, IDoubleI tolerance){ return vec.eqY(r,v,tolerance); }
+    public IBoolI eqZ(ISwitchR r, IVecI v, IDoubleI tolerance){ return vec.eqZ(r,v,tolerance); }
     
     
     public double angle(IVecI v){ return vec.angle(v); }
+    public double angle(double vx, double vy, double vz){ return vec.angle(vx,vy,vz); }
     public double angle(ISwitchE e, IVecI v){ return vec.angle(e,v); }
     public IDoubleI angle(ISwitchR r, IVecI v){ return vec.angle(r,v); }
     
     public double angle(IVecI v, IVecI axis){ return vec.angle(v,axis); }
+    public double angle(double vx, double vy, double vz, double axisX, double axisY, double axisZ){
+	return vec.angle(vx,vy,vz,axisX,axisY,axisZ);
+    }
     public double angle(ISwitchE e, IVecI v, IVecI axis){ return vec.angle(e,v,axis); }
     public IDoubleI angle(ISwitchR r, IVecI v, IVecI axis){ return vec.angle(r,v,axis); }
     
@@ -203,12 +221,19 @@ public class IVectorObject extends IObject implements IVecI{
     
     public IVectorObject rot(IVecI axis, IDoubleI angle){ vec.rot(axis,angle); return this; }
     public IVectorObject rot(IVecI axis, double angle){ vec.rot(axis,angle); return this; }
+    public IVectorObject rot(double axisX, double axisY, double axisZ, double angle){
+	vec.rot(axisX,axisY,axisZ,angle); return this;
+    }
     
     public IVectorObject rot(IVecI center, IVecI axis, double angle){
 	vec.rot(center, axis,angle); return this;
     }
     public IVectorObject rot(IVecI center, IVecI axis, IDoubleI angle){
 	vec.rot(center, axis,angle); return this;
+    }
+    public IVectorObject rot(double centerX, double centerY, double centerZ,
+			     double axisX, double axisY, double axisZ, double angle){
+	vec.rot(centerX,centerY,centerY,axisX,axisY,axisZ,angle); return this;
     }
     
     /** rotate to destination direction vector */
@@ -222,6 +247,10 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject rot2(double angle){ return rot(angle); }
     public IVectorObject rot2(IVecI center, double angle){ vec.rot2(center,angle); return this; }
     public IVectorObject rot2(IVecI center, IDoubleI angle){ vec.rot2(center,angle); return this; }
+    public IVectorObject rot2(double centerX, double centerY, double angle){
+	vec.rot2(centerX,centerY,angle); return this;
+    }
+    
     /** rotate to destination direction vector */
     public IVectorObject rot2(IVecI destDir){ vec.rot2(destDir); return this; }
     /** rotate to destination point location */
@@ -233,26 +262,50 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject scale(double f){ vec.scale(f); return this; }
     public IVectorObject scale(IVecI center, IDoubleI f){ vec.scale(center,f); return this; }
     public IVectorObject scale(IVecI center, double f){ vec.scale(center,f); return this; }
+    public IVectorObject scale(double centerX, double centerY, double centerZ, double f){
+	vec.scale(centerX, centerY, centerZ, f); return this;
+    }
     
     /** scale only in 1 direction */
     public IVectorObject scale1d(IVecI axis, double f){ vec.scale1d(axis,f); return this; }
     public IVectorObject scale1d(IVecI axis, IDoubleI f){ vec.scale1d(axis,f); return this; }
+    public IVectorObject scale1d(double axisX, double axisY, double axisZ, double f){
+	vec.scale1d(axisX,axisY,axisZ,f); return this;
+    }
     public IVectorObject scale1d(IVecI center, IVecI axis, double f){
 	vec.scale1d(center,axis,f); return this;
     }
     public IVectorObject scale1d(IVecI center, IVecI axis, IDoubleI f){
 	vec.scale1d(center,axis,f); return this;
     }
+    public IVectorObject scale1d(double centerX, double centerY, double centerZ,
+				 double axisX, double axisY, double axisZ, double f){
+	vec.scale1d(centerX,centerY,centerZ,axisX,axisY,axisZ,f); return this;
+    }
     
     /** reflect (mirror) 3 dimensionally to the other side of the plane */
     public IVectorObject ref(IVecI planeDir){ vec.ref(planeDir); return this; }
+    public IVectorObject ref(double planeX, double planeY, double planeZ){
+	vec.ref(planeX,planeY,planeZ); return this;
+    }
     public IVectorObject ref(IVecI center, IVecI planeDir){
 	vec.ref(center,planeDir); return this;
     }
+    public IVectorObject ref(double centerX, double centerY, double centerZ,
+			     double planeX, double planeY, double planeZ){
+	vec.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
+    }
     /** reflect (mirror) 3 dimensionally to the other side of the plane */
     public IVectorObject mirror(IVecI planeDir){ vec.ref(planeDir); return this; }
+    public IVectorObject mirror(double planeX, double planeY, double planeZ){
+	vec.ref(planeX,planeY,planeZ); return this;
+    }
     public IVectorObject mirror(IVecI center, IVecI planeDir){
 	vec.ref(center,planeDir); return this;
+    }
+    public IVectorObject mirror(double centerX, double centerY, double centerZ,
+				double planeX, double planeY, double planeZ){
+	vec.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
     }
     
     
@@ -335,16 +388,21 @@ public class IVectorObject extends IObject implements IVecI{
     // returns IVec.
     //public IVectorObject diff(IVecI v){ return dup().sub(v); }
     public IVecI dif(IVecI v){ return vec.dif(v); }
+    public IVecI dif(double vx, double vy, double vz){ return vec.dif(vx,vy,vz); }
     public IVecI diff(IVecI v){ return dif(v); }
+    public IVecI diff(double vx, double vy, double vz){ return dif(vx,vy,vz); }
     //public IVectorObject mid(IVecI v){ return dup().add(v).div(2); }
     public IVecI mid(IVecI v){ return vec.mid(v); }
+    public IVecI mid(double vx, double vy, double vz){ return vec.mid(vx,vy,vz); }
     //public IVectorObject sum(IVecI v){ return dup().add(v); }
     public IVecI sum(IVecI v){ return vec.sum(v); }
+    public IVecI sum(double vx, double vy, double vz){ return vec.sum(vx,vy,vz); }
     //public IVectorObject sum(IVecI... v){IVectorObject ret=this.dup();for(IVecI vi:v)ret.add(vi);return ret;}
     public IVecI sum(IVecI... v){ return vec.sum(v); }
     
     //public IVectorObject bisect(IVecI v){ return dup().unit().add(v.dup().unit()); }
     public IVecI bisect(IVecI v){ return vec.bisect(v); }
+    public IVecI bisect(double vx, double vy, double vz){ return vec.bisect(vx,vy,vz); }
     
     
     /**
@@ -367,9 +425,13 @@ public class IVectorObject extends IObject implements IVecI{
     /** alias of cross. (not unitized ... ?) return IVecI. */
     //public IVectorObject nml(IVecI v){ return cross(v); }
     public IVecI nml(IVecI v){ return vec.nml(v); }
+    public IVecI nml(double vx, double vy, double vz){ return vec.nml(vx,vy,vz); }
     /** create normal vector from 3 points of self, pt1 and pt2 */
     //public IVectorObject nml(IVecI pt1, IVecI pt2){ return this.diff(pt1).cross(this.diff(pt2)).unit(); }
     public IVecI nml(IVecI pt1, IVecI pt2){ return vec.nml(pt1,pt2); }
+    public IVecI nml(double vx1, double vy1, double vz1, double vx2, double vy2, double vz2){
+	return vec.nml(vx1,vy1,vz1,vx2,vy2,vz2);
+    }
     
     
     public boolean isValid(){ return vec.isValid(); }
