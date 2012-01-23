@@ -182,11 +182,17 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     
     /** adding force */
     synchronized public IParticle push(IVecI f){ frc.add(f); return this; }
+    /** adding force */
+    synchronized public IParticle push(double fx, double fy, double fz){ frc.add(fx,fy,fz); return this; }
     /** adding negative force */
     synchronized public IParticle pull(IVecI f){ frc.sub(f); return this; }
+    /** adding negative force */
+    synchronized public IParticle pull(double fx, double fy, double fz){ frc.sub(fx,fy,fz); return this; }
     /** adding force (alias of push) */
     synchronized public IParticle addForce(IVecI f){ return push(f); }
-
+    /** adding force (alias of push) */
+    synchronized public IParticle addForce(double fx, double fy, double fz){ return push(fx,fy,fz); }
+    
     /** setting force zero */
     synchronized public IParticle reset(){ frc.zero(); return this; }
     /** setting force zero (alias of reset()) */

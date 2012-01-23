@@ -86,10 +86,16 @@ public interface IParticleI{
     
     /** adding force to particle */
     public IParticleI push(IVecI f);
+    /** adding force to particle */
+    public IParticleI push(double fx, double fy, double fz);
     /** equivalent to push(f.dup().neg()) */
     public IParticleI pull(IVecI f);
+    /** equivalent to push(f.dup().neg()) */
+    public IParticleI pull(double fx, double fy, double fz);
     /** alias of push */
     public IParticleI addForce(IVecI f);
+    /** alias of push */
+    public IParticleI addForce(double fx, double fy, double fz);
     
     /** setting force zero */
     public IParticleI reset();

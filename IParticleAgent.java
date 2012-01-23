@@ -76,6 +76,10 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
 	frc = particle.frc;
 	addDynamics(particle);
     }
+
+    /**************************************
+     * IParticleI API
+     **************************************/
     
     synchronized public IParticleAgent fix(){ particle.fix(); return this; }
     synchronized public IParticleAgent unfix(){ particle.unfix(); return this; }
@@ -117,8 +121,13 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     synchronized public IParticleAgent decay(double d){ return fric(d); }
     
     synchronized public IParticleAgent push(IVecI f){ particle.push(f); return this; }
+    synchronized public IParticleAgent push(double fx, double fy, double fz){ particle.push(fx,fy,fz); return this; }
     synchronized public IParticleAgent pull(IVecI f){ particle.pull(f); return this; }
+    synchronized public IParticleAgent pull(double fx, double fy, double fz){ particle.pull(fx,fy,fz); return this; }
     synchronized public IParticleAgent addForce(IVecI f){ particle.addForce(f); return this; }
+    synchronized public IParticleAgent addForce(double fx, double fy, double fz){ particle.addForce(fx,fy,fz); return this; }
+    
+    
     
     synchronized public IParticleAgent reset(){ particle.reset(); return this; }
     synchronized public IParticleAgent resetForce(){ particle.resetForce(); return this; }

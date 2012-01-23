@@ -377,11 +377,46 @@ public class IBoid extends IParticleAgent{
 	*/
     //}
     
+    /**************************************
+     * IParticleI API
+     **************************************/
+    
+    public IBoid fix(){ super.fix(); return this; }
+    public IBoid unfix(){ super.unfix(); return this; }
+    public IBoid mass(double mass){ super.mass(mass); return this; }
+    public IBoid position(IVecI v){ super.position(v); return this; }
+    public IBoid pos(IVecI v){ super.pos(v); return this; }
+    public IBoid velocity(IVecI v){ super.velocity(v); return this; }
+    public IBoid vel(IVecI v){ super.vel(v); return this; }
+    public IBoid force(IVecI v){ super.force(v); return this; }
+    public IBoid frc(IVecI v){ super.frc(v); return this; }
+    public IBoid friction(double friction){ super.friction(friction); return this; }
+    public IBoid fric(double friction){ super.fric(friction); return this; }
+    public IBoid decay(double d){ return fric(d); }
+    
+    public IBoid push(IVecI f){ super.push(f); return this; }
+    public IBoid push(double fx, double fy, double fz){ super.push(fx,fy,fz); return this; }
+    public IBoid pull(IVecI f){ super.pull(f); return this; }
+    public IBoid pull(double fx, double fy, double fz){ super.pull(fx,fy,fz); return this; }
+    public IBoid addForce(IVecI f){ super.addForce(f); return this; }
+    public IBoid addForce(double fx, double fy, double fz){ super.addForce(fx,fy,fz); return this; }
+    public IBoid reset(){ super.reset(); return this; }
+    public IBoid resetForce(){ super.resetForce(); return this; }
+    
     
     
     /**************************************
      * methods of IVecI
      *************************************/
+    public IBoid x(double vx){ pos.x(vx); return this; }
+    public IBoid y(double vy){ pos.y(vy); return this; }
+    public IBoid z(double vz){ pos.z(vz); return this; }
+    
+    public IBoid x(IDoubleI vx){ pos.x(vx); return this; }
+    public IBoid y(IDoubleI vy){ pos.y(vy); return this; }
+    public IBoid z(IDoubleI vz){ pos.z(vz); return this; }
+    
+    
     public IBoid dup(){ return new IBoid(this); }
     
     public IBoid set(IVecI v){ pos.set(v); return this; }
