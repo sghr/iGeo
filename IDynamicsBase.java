@@ -43,7 +43,7 @@ public class IDynamicsBase implements IDynamics{
     /** registered in specified IDynamicServer. not registered if the server is null. */
     public IDynamicsBase(IServerI server){ initDynamicsBase(server); }
     
-    public IDynamicsBase(IObject parent){ parent(parent); }
+    public IDynamicsBase(IObject parent){ initDynamicsBase(parent); }
     
     public IDynamicsBase(IDynamicsBase d){
 	if(d.parent!=null){ parent(d.parent); }
@@ -56,9 +56,19 @@ public class IDynamicsBase implements IDynamics{
 	initDynamicsBase(IG.cur());
     }
     
+    /** if null is provided at server, this will not be added to any server, not even the default one */
     public void initDynamicsBase(IServerI server){
 	if(server!=null) server.server().dynamicServer().add(this);
     }
+    
+    public void initDynamicsBase(IObject parent){
+	this.parent = parent;
+	if(this.parent!=null){
+	    this.parent.addDynamics(this);
+	    target(this.parent);
+	}
+    }
+    
     
     public IObject parent(){ return parent; }
     public IDynamicsBase parent(IObject par){

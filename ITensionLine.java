@@ -32,7 +32,7 @@ import java.util.ArrayList;
 */
 public class ITensionLine extends ICurve implements ITensionI{
     
-    public ITension tension;
+    public ITension tensionDynamics;
     
     public ITensionLine(IParticleI p1, IParticleI p2){
 	super(p1.pos(), p2.pos());
@@ -41,8 +41,7 @@ public class ITensionLine extends ICurve implements ITensionI{
     
     public ITensionLine(IParticleI p1, IParticleI p2, double tension){
 	super(p1.pos(), p2.pos());
-	initTensionLine(p1,p2);
-	tension(tension);
+	initTensionLine(p1,p2,tension);
     }
     
     public ITensionLine(IParticle p1, IParticle p2){
@@ -52,8 +51,17 @@ public class ITensionLine extends ICurve implements ITensionI{
     
     public ITensionLine(IParticle p1, IParticle p2, double tension){
 	super(p1.pos(), p2.pos());
+	initTensionLine(p1,p2,tension);
+    }
+    
+    public ITensionLine(IParticleAgent p1, IParticleAgent p2){
+	super(p1.pos(), p2.pos());
 	initTensionLine(p1,p2);
-	tension(tension);
+    }
+    
+    public ITensionLine(IParticleAgent p1, IParticleAgent p2, double tension){
+	super(p1.pos(), p2.pos());
+	initTensionLine(p1,p2,tension);
     }
     
     public ITensionLine(IVec p1, IVec p2){
@@ -63,8 +71,7 @@ public class ITensionLine extends ICurve implements ITensionI{
     
     public ITensionLine(IVec p1, IVec p2, double tension){
 	super(p1, p2);
-	initTensionLine(new IParticle(p1),new IParticle(p2));
-	tension(tension);
+	initTensionLine(new IParticle(p1),new IParticle(p2),tension);
     }
     
     public ITensionLine(IVecI p1, IVecI p2){
@@ -74,25 +81,28 @@ public class ITensionLine extends ICurve implements ITensionI{
     
     public ITensionLine(IVecI p1, IVecI p2, double tension){
 	super(p1, p2);
-	initTensionLine(new IParticle(p1.get()),new IParticle(p2.get()));
-	tension(tension);
+	initTensionLine(new IParticle(p1.get()),new IParticle(p2.get()),tension);
     }
     
     public void initTensionLine(IParticleI p1, IParticleI p2){
-	tension = new ITension(p1,p2,this);
-	addDynamics(tension);
+	tensionDynamics = new ITension(p1,p2,this);
+	addDynamics(tensionDynamics);
+    }
+    public void initTensionLine(IParticleI p1, IParticleI p2, double tension){
+	tensionDynamics = new ITension(p1,p2,tension,this);
+	addDynamics(tensionDynamics);
     }
     
-    public double tension(){ return tension.tension(); }
+    public double tension(){ return tensionDynamics.tension(); }
     public ITensionLine tension(double tensionIntensity){
-	tension.tension(tensionIntensity); return this;
+	tensionDynamics.tension(tensionIntensity); return this;
     }
     
-    public boolean constant(){ return tension.constant(); }
+    public boolean constant(){ return tensionDynamics.constant(); }
     public ITensionLine constant(boolean cnst){
-	tension.constant(cnst); return this;
+	tensionDynamics.constant(cnst); return this;
     }
     
-    public IParticleI pt(int i){ return tension.pt(i); }
+    public IParticleI pt(int i){ return tensionDynamics.pt(i); }
     
 }

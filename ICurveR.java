@@ -67,7 +67,7 @@ public class ICurveR extends IObject implements ICurveI{
 	return null;
     }
     
-    public boolean isValid(){ return curve.isValid(); }
+    public boolean isValid(){ if(curve==null){ return false; } return curve.isValid(); }
     
     public ICurveGeo get(){ return curve.get(); } //?
     

@@ -87,6 +87,32 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     
     
     public double w(){ return w; }
+
+    /** setting x component */
+    public IVec4 x(double vx){ x = vx; return this; }
+    /** setting y component */
+    public IVec4 y(double vy){ y = vy; return this; }
+    /** setting z component */
+    public IVec4 z(double vz){ z = vz; return this; }
+    /** setting w component */
+    public IVec4 w(double vw){ w = vw; return this; }
+    
+    /** setting x component */
+    public IVec4 x(IDoubleI vx){ x=vx.x(); return this; }
+    /** setting y component */
+    public IVec4 y(IDoubleI vy){ y=vy.x(); return this; }
+    /** setting z component */
+    public IVec4 z(IDoubleI vz){ z=vz.x(); return this; }
+    /** setting z component */
+    public IVec4 w(IDoubleI vw){ w=vw.x(); return this; }
+    
+    /** getting z component */
+    public double w(ISwitchE e){ return w(); }
+    
+    /** getting z component */
+    public IDouble w(ISwitchR r){ return new IDouble(w()); }
+    
+    
     //public IVec4 get(){ return this; } // why not this ??
     public IVec4 get(){ return new IVec4(x,y,z,w); } // why this ???
     public IVec4 dup(){ return new IVec4(x,y,z,w); }

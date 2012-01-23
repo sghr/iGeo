@@ -56,6 +56,24 @@ public class IPointAgent extends IAgent implements IVecI{
     public double x(){ return pos.x(); }
     public double y(){ return pos.y(); }
     public double z(){ return pos.z(); }
+    
+    public IPointAgent x(double vx){ pos.x(vx); return this; }
+    public IPointAgent y(double vy){ pos.y(vy); return this; }
+    public IPointAgent z(double vz){ pos.z(vz); return this; }
+    
+    public IPointAgent x(IDoubleI vx){ pos.x(vx); return this; }
+    public IPointAgent y(IDoubleI vy){ pos.y(vy); return this; }
+    public IPointAgent z(IDoubleI vz){ pos.z(vz); return this; }
+    
+    public double x(ISwitchE e){ return pos.x(e); }
+    public double y(ISwitchE e){ return pos.y(e); }
+    public double z(ISwitchE e){ return pos.z(e); }
+    
+    public IDouble x(ISwitchR r){ return pos.x(r); }
+    public IDouble y(ISwitchR r){ return pos.y(r); }
+    public IDouble z(ISwitchR r){ return pos.z(r); }
+    
+    
     public IVec get(){ return pos.get(); }
     
     public IPointAgent dup(){ return new IPointAgent(this); }
@@ -355,9 +373,9 @@ public class IPointAgent extends IAgent implements IVecI{
 	return pos.nml(vx1,vy1,vz1,vx2,vy2,vz2);
     }
     
-    public boolean isValid(){ return pos.isValid(); }
-    public String toString(){ return pos.toString(); }
+    public boolean isValid(){ if(pos==null){ return false; } return pos.isValid(); }
     
+    public String toString(){ if(pos==null){ return super.toString(); } return pos.toString(); }
     
     
     /**************************************

@@ -31,10 +31,56 @@ package igeo;
    @version 0.7.0.0;
 */
 public interface IVec4I extends IVec4Op, IVecI{
+
+    
+    /** getting x component */
     public double x();
+    /** getting y component */
     public double y();
+    /** getting z component */
     public double z();
+    /** getting w component */
     public double w();
+    
+    /** setting x component */
+    public IVec4I x(double vx);
+    /** setting y component */
+    public IVec4I y(double vy);
+    /** setting z component */
+    public IVec4I z(double vz);
+    /** setting w component */
+    public IVec4I w(double vz);
+    
+    /** setting x component */
+    public IVec4I x(IDoubleI vx);
+    /** setting y component */
+    public IVec4I y(IDoubleI vy);
+    /** setting z component */
+    public IVec4I z(IDoubleI vz);
+    /** setting w component */
+    public IVec4I w(IDoubleI vz);
+    
+    
+    /** getting x component */
+    public double x(ISwitchE e);
+    /** getting y component */
+    public double y(ISwitchE e);
+    /** getting z component */
+    public double z(ISwitchE e);
+    /** getting z component */
+    public double w(ISwitchE e);
+    
+    /** getting x component */
+    public IDoubleI x(ISwitchR r);
+    /** getting y component */
+    public IDoubleI y(ISwitchR r);
+    /** getting z component */
+    public IDoubleI z(ISwitchR r);
+    /** getting z component */
+    public IDoubleI w(ISwitchR r);
+    
+    
+
     public IVec4 get();
     public IVec4I dup();
     

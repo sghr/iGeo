@@ -161,8 +161,19 @@ public class IAgent extends IObject implements IDynamics{
     
     synchronized public void interact(ArrayList<IDynamics> agents){ // could be overridden
 	//initInteract(agents);
-	for(int i=0; i<agents.size(); i++){
-	    if(agents.get(i) != this) interact(agents.get(i));
+	
+	// to take care of possible definition of interact(IDynamics) in a child class.
+	boolean interactOverridden=false;
+	try{
+	    interactOverridden = 
+		getClass().getMethod("interact", IDynamics.class).getDeclaringClass() !=
+		IAgent.class;
+	}catch(NoSuchMethodException e){}
+	
+	if(interactOverridden){
+	    for(int i=0; i<agents.size(); i++){
+		if(agents.get(i) != this) interact(agents.get(i));
+	    }
 	}
     }
     

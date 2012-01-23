@@ -63,7 +63,13 @@ public class IDynamicServer implements Runnable{
     
     public synchronized void add(IDynamics e){
 	// added object is once buffered in addingDynamics and actually added in the update cycle
-	addingDynamics.add(e);
+	
+	if(!addingDynamics.contains(e) &&
+	   !dynamics.contains(e) ){ // isn't this heavy?
+	    
+	    addingDynamics.add(e);
+	    if(removingDynamics.contains(e)){ removingDynamics.remove(e); }
+	}
 	
 	/*
 	if(!dynamics.contains(e)){
@@ -105,12 +111,21 @@ public class IDynamicServer implements Runnable{
     
     public synchronized void remove(int i){
 	// removed object is once buffered in removingDynamics and actually removed in the update cycle
-	removingDynamics.add(dynamics.get(i));
+	IDynamics d = dynamics.get(i);
+	if(!removingDynamics.contains(d)){
+	    removingDynamics.add(d);
+	    if(addingDynamics.contains(d)){ addingDynamics.remove(d); }
+	}
+	
 	//dynamics.remove(i);
     }
     public synchronized void remove(IDynamics d){
 	// removed object is once buffered in removingDynamics and actually removed in the update cycle
-	removingDynamics.add(d);
+	
+	if(!removingDynamics.contains(d)){
+	    removingDynamics.add(d);
+	    if(addingDynamics.contains(d)){ addingDynamics.remove(d); }
+	}
 	//dynamics.remove(d);
     }
     

@@ -40,12 +40,48 @@ public class ITension extends IDynamicsBase implements ITensionI{
 	Only direction of force changes. But if the distance is zero, force is also zero. */
     public boolean constantTension = false;
     
+    public ITension(IParticleI p1, IParticleI p2, double tension, IObject parent){
+	super(parent);
+	pt1=p1; pt2=p2;
+	this.tension = tension;
+    }
+    
+    public ITension(IParticle p1, IParticle p2, double tension, IObject parent){
+	super(parent);
+	pt1=p1; pt2=p2;
+	this.tension = tension;
+    }
+    
+    public ITension(IParticleAgent p1, IParticleAgent p2, double tension, IObject parent){
+	super(parent);
+	pt1=p1; pt2=p2;
+	this.tension = tension;
+    }
+    
+    public ITension(IVec p1, IVec p2, double tension, IObject parent){
+	super(parent);
+	pt1 = new IParticle(p1); pt2=new IParticle(p2);
+	this.tension = tension;
+    }
+    
+    public ITension(IVecI p1, IVecI p2, double tension, IObject parent){
+	super(parent);
+	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	this.tension = tension;
+    }
+
+
     public ITension(IParticleI p1, IParticleI p2, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
     }
     
     public ITension(IParticle p1, IParticle p2, IObject parent){
+	super(parent);
+	pt1=p1; pt2=p2;
+    }
+    
+    public ITension(IParticleAgent p1, IParticleAgent p2, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
     }
@@ -60,12 +96,49 @@ public class ITension extends IDynamicsBase implements ITensionI{
 	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
     }
     
+    
+    public ITension(IParticleI p1, IParticleI p2, double tension){
+	super();
+	pt1=p1; pt2=p2;
+	this.tension = tension;
+    }
+    
+    public ITension(IParticle p1, IParticle p2, double tension){
+	super();
+	pt1=p1; pt2=p2;
+	this.tension = tension;
+    }
+    
+    public ITension(IParticleAgent p1, IParticleAgent p2, double tension){
+	super();
+	pt1=p1; pt2=p2;
+	this.tension = tension;
+    }
+    
+    public ITension(IVec p1, IVec p2, double tension){
+	super();
+	pt1 = new IParticle(p1); pt2=new IParticle(p2);
+	this.tension = tension;
+    }
+    
+    public ITension(IVecI p1, IVecI p2, double tension){
+	super();
+	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	this.tension = tension;
+    }
+    
+
     public ITension(IParticleI p1, IParticleI p2){
 	super();
 	pt1=p1; pt2=p2;
     }
     
     public ITension(IParticle p1, IParticle p2){
+	super();
+	pt1=p1; pt2=p2;
+    }
+    
+    public ITension(IParticleAgent p1, IParticleAgent p2){
 	super();
 	pt1=p1; pt2=p2;
     }
@@ -80,6 +153,7 @@ public class ITension extends IDynamicsBase implements ITensionI{
 	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
     }
     
+    
     public double tension(){ return tension; }
     public ITension tension(double tension){ this.tension = tension; return this; }
     
@@ -93,15 +167,13 @@ public class ITension extends IDynamicsBase implements ITensionI{
     public ITension removeTarget(int i){ super.removeTarget(i); return this; }
     public ITension removeTarget(IObject obj){ super.removeTarget(obj); return this; }
     
-    
     synchronized public void interact(ArrayList<IDynamics> dynamics){
-	IVec diff = pt2.pos().diff(pt1.pos());
-	if(constantTension){
-	    if(diff.len2()>0) diff.len(tension);
-	}
-	else{ diff.mul(tension); }
-	pt1.addForce(diff);
-	pt2.addForce(diff.neg()); // opposite dir
+	IVec dif = pt2.pos().dif(pt1.pos());
+	// excludes the case direction cannot be defined
+	if(constantTension && dif.len2()>0){ dif.len(tension); }
+	else{ dif.mul(tension); }
+	pt1.push(dif);
+	pt2.pull(dif); // opposite dir
     }
     
     synchronized public void update(){

@@ -50,6 +50,28 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     
     public double x(){ return x; }
     public double y(){ return y; }
+    
+    /** setting x component */
+    public IVec2 x(double vx){ x=vx; return this; }
+    /** setting y component */
+    public IVec2 y(double vy){ y=vy; return this; }
+    
+    /** setting x component */
+    public IVec2 x(IDoubleI vx){ x=vx.x(); return this; }
+    /** setting y component */
+    public IVec2 y(IDoubleI vy){ y=vy.x(); return this; }
+    
+    /** getting x component */
+    public double x(ISwitchE e){ return x(); }
+    /** getting y component */
+    public double y(ISwitchE e){ return y(); }
+    
+    /** getting x component */
+    public IDouble x(ISwitchR r){ return new IDouble(x); }
+    /** getting y component */
+    public IDouble y(ISwitchR r){ return new IDouble(y); }
+    
+    
     //public IVec2 get(){ return this; }
     public IVec2 get(){ return new IVec2(this); }
     public IVec2 dup(){ return new IVec2(this); }
@@ -705,6 +727,13 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	//IOut.p("true");
 	return true; // inside
 	
+    }
+    
+    /** checking x, y is valid number (not Infinite, nor NaN). */
+    public boolean isValid(){
+	if(!IDouble.isValid(x)){ IOut.err("invalid x ("+x+")"); return false; }
+	if(!IDouble.isValid(y)){ IOut.err("invalid y ("+y+")"); return false; }
+	return true;
     }
     
     public String toString(){

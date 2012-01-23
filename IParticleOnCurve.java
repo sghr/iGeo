@@ -190,6 +190,14 @@ public class IParticleOnCurve extends IParticle{
     /****************************************************************************
      * implementation of IVecI
      ***************************************************************************/
+
+    public IParticleOnCurve x(double vx){ pos.x(vx); return this; }
+    public IParticleOnCurve y(double vy){ pos.y(vy); return this; }
+    public IParticleOnCurve z(double vz){ pos.z(vz); return this; }
+    
+    public IParticleOnCurve x(IDoubleI vx){ pos.x(vx); return this; }
+    public IParticleOnCurve y(IDoubleI vy){ pos.y(vy); return this; }
+    public IParticleOnCurve z(IDoubleI vz){ pos.z(vz); return this; }
     
     public IParticleOnCurve set(IVecI v){ pos.set(v); return this; }
     public IParticleOnCurve set(double x, double y, double z){ pos.set(x,y,z); return this;}

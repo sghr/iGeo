@@ -39,8 +39,33 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
     public IVec2R(IServerI s, double x, double y){ super(s); op=new IVec2(x,y); }
     public IVec2R(IServerI s, IDoubleI x, IDoubleI y){ super(s); op = new FromXY(x,y); }
     
+    
+    /** getting x component */
     public double x(){ return op.get().x; }
+    /** getting y component */
     public double y(){ return op.get().y; }
+    
+    /** setting x component */
+    public IVec2R x(double vx){ op = new FromX(op,new IDouble(vx)); return this; }
+    /** setting y component */
+    public IVec2R y(double vy){ op = new FromY(op,new IDouble(vy)); return this; }
+    
+    /** setting x component */
+    public IVec2R x(IDoubleI vx){ op = new FromX(op,vx); return this; }
+    /** setting y component */
+    public IVec2R y(IDoubleI vy){ op = new FromY(op,vy); return this; }
+    
+    /** getting x component */
+    public double x(ISwitchE e){ return x(); }
+    /** getting y component */
+    public double y(ISwitchE e){ return y(); }
+    
+    /** getting x component */
+    public IDoubleR x(ISwitchR r){ return new IDoubleR(new X(op)); }
+    /** getting y component */
+    public IDoubleR y(ISwitchR r){ return new IDoubleR(new Y(op)); }
+    
+
     public IVec2 get(){ return op.get(); }
     
     public IDoubleR getX(){ return new IDoubleR(new X(op)); }
@@ -267,6 +292,9 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
     public IVecR nml(double vx1, double vy1, double vx2, double vy2){
 	return this.dif(vx1,vy1).cross(this.dif(vx2,vy2)); 
     }
+    /** checking x, y is valid number (not Infinite, nor NaN). */
+    public boolean isValid(){ return get().isValid(); }
+
     
     static public class ToVec3 extends IParameterObject implements IVecOp{
 	public IVec2Op v;
@@ -344,6 +372,18 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
 	public IDoubleOp x, y;
 	public FromXY(IDoubleOp x, IDoubleOp y){ this.x=x; this.y=y; }
 	public IVec2 get(){ return new IVec2(x.x(), y.x()); }
+    }
+    static public class FromX extends IParameterObject implements IVec2Op{
+	public IVec2Op v;
+	public IDoubleOp x;
+	public FromX(IVec2Op v, IDoubleOp x){ this.v=v; this.x=x; }
+	public IVec2 get(){ return new IVec2(x.x(), v.get().y()); }
+    }
+    static public class FromY extends IParameterObject implements IVec2Op{
+	public IVec2Op v;
+	public IDoubleOp y;
+	public FromY(IVec2Op v, IDoubleOp y){ this.v=v; this.y=y; }
+	public IVec2 get(){ return new IVec2(v.get().x(), y.x()); }
     }
     static public class Len extends IParameterObject implements IDoubleOp{
 	public IVec2Op v;

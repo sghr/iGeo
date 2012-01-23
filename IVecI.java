@@ -33,9 +33,44 @@ public interface IVecI extends IVecOp, ITransformable{
     //public static final IVec yaxis = new IVec(0,1,0);
     //public static final IVec zaxis = new IVec(0,0,1);
     
+    /** getting x component */
     public double x();
+    /** getting y component */
     public double y();
+    /** getting z component */
     public double z();
+
+    /** setting x component */
+    public IVecI x(double vx);
+    /** setting y component */
+    public IVecI y(double vy);
+    /** setting z component */
+    public IVecI z(double vz);
+    
+    /** setting x component */
+    public IVecI x(IDoubleI vx);
+    /** setting y component */
+    public IVecI y(IDoubleI vy);
+    /** setting z component */
+    public IVecI z(IDoubleI vz);
+    
+    
+    /** getting x component */
+    public double x(ISwitchE e);
+    /** getting y component */
+    public double y(ISwitchE e);
+    /** getting z component */
+    public double z(ISwitchE e);
+    
+    /** getting x component */
+    public IDoubleI x(ISwitchR r);
+    /** getting y component */
+    public IDoubleI y(ISwitchR r);
+    /** getting z component */
+    public IDoubleI z(ISwitchR r);
+    
+    
+    
     public IVec get();
     
     public IVecI dup();

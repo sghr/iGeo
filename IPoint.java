@@ -89,6 +89,25 @@ public class IPoint extends IObject implements IVecI{
     public double x(){ return pos.x(); }
     public double y(){ return pos.y(); }
     public double z(){ return pos.z(); }
+
+    public IPoint x(double vx){ pos.x(vx); return this; }
+    public IPoint y(double vy){ pos.y(vy); return this; }
+    public IPoint z(double vz){ pos.z(vz); return this; }
+    
+    public IPoint x(IDoubleI vx){ pos.x(vx); return this; }
+    public IPoint y(IDoubleI vy){ pos.y(vy); return this; }
+    public IPoint z(IDoubleI vz){ pos.z(vz); return this; }
+    
+    public double x(ISwitchE e){ return pos.x(e); }
+    public double y(ISwitchE e){ return pos.y(e); }
+    public double z(ISwitchE e){ return pos.z(e); }
+    
+    public IDouble x(ISwitchR r){ return pos.x(r); }
+    public IDouble y(ISwitchR r){ return pos.y(r); }
+    public IDouble z(ISwitchR r){ return pos.z(r); }
+    
+    
+    
     //public IVec get(){ return pos.get(); } // when pos is IVecI
     public IVec get(){ return pos; }
     
@@ -442,10 +461,13 @@ public class IPoint extends IObject implements IVecI{
     
     
     /** checking x, y, and z is valid number (not Infinite, nor NaN). */
-    public boolean isValid(){ return pos.isValid(); }
+    public boolean isValid(){ if(pos==null){ return false; } return pos.isValid(); }
     
     
-    public String toString(){ return pos.toString(); }
+    public String toString(){
+	if(pos==null) return super.toString();
+	return pos.toString();
+    }
     
     
     /** set size of dot in graphic */

@@ -118,13 +118,19 @@ public class IDouble extends IParameterObject implements IDoubleI, IEntityParame
     public IBool eq(ISwitchR r, IDoubleI v, IDoubleI resolution){ return new IBool(eq(v,resolution.x())); }
     
     public boolean isValid(){
-	if(!isValid(x)){ IOut.err("invalid valud "+x); return false; }
+	if(!isValid(x)){ IOut.err("invalid value "+x); return false; }
 	return true;
     }
     
     public static boolean isValid(double val){
 	if(Double.isNaN(val)) return false;
 	if(Double.isInfinite(val)) return false;
+	return true;
+    }
+    
+    public static boolean isValid(float val){
+	if(Float.isNaN(val)) return false;
+	if(Float.isInfinite(val)) return false;
 	return true;
     }
     

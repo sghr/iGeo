@@ -281,6 +281,20 @@ public class IBoid extends IParticleAgent{
 	}
 	
 	
+	boolean interactOverridden=false;
+	// to take care of possible definition of interact(IDynamics) in a child class.
+	try{
+	    interactOverridden = 
+		getClass().getMethod("interact", IDynamics.class).getDeclaringClass() !=
+		IAgent.class;
+	}catch(NoSuchMethodException e){}
+	
+	if(interactOverridden){
+	    for(int i=0; i<dynamics.size(); i++){
+		if(dynamics.get(i) != this) interact(dynamics.get(i));
+	    }
+	}
+	
 	/*
 	for(IDynamics obj: dynamics){
 	    

@@ -37,7 +37,6 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
     
     public double x,y,z;
-    
     public IVec(){}
     public IVec(double x, double y, double z){ this.x=x; this.y=y; this.z=z; }
     public IVec(double x, double y){ this.x=x; this.y=y; z=0; }
@@ -62,6 +61,38 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public double x(){ return x; }
     public double y(){ return y; }
     public double z(){ return z; }
+
+    
+    /** setting x component */
+    public IVec x(double vx){ x=vx; return this; }
+    /** setting y component */
+    public IVec y(double vy){ y=vy; return this; }
+    /** setting z component */
+    public IVec z(double vz){ z=vz; return this; }
+    
+    /** setting x component */
+    public IVec x(IDoubleI vx){ x=vx.x(); return this; }
+    /** setting y component */
+    public IVec y(IDoubleI vy){ y=vy.x(); return this; }
+    /** setting z component */
+    public IVec z(IDoubleI vz){ z=vz.x(); return this; }
+    
+    /** getting x component */
+    public double x(ISwitchE e){ return x(); }
+    /** getting y component */
+    public double y(ISwitchE e){ return y(); }
+    /** getting z component */
+    public double z(ISwitchE e){ return z(); }
+    
+    /** getting x component */
+    public IDouble x(ISwitchR r){ return new IDouble(x); }
+    /** getting y component */
+    public IDouble y(ISwitchR r){ return new IDouble(y); }
+    /** getting z component */
+    public IDouble z(ISwitchR r){ return new IDouble(z); }
+    
+
+
     public IVec get(){ return this; }
     //public IVec get(){ return new IVec(x,y,z); }
     

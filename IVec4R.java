@@ -69,8 +69,47 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     public double y(){ return op.get().y; }
     public double z(){ return op.get().z; }
     public double w(){ return op.get().w; }
+        
+    
+    /** setting x component */
+    public IVec4R x(double vx){ op = new FromX(op,new IDouble(vx)); return this; }
+    /** setting y component */
+    public IVec4R y(double vy){ op = new FromY(op,new IDouble(vy)); return this; }
+    /** setting z component */
+    public IVec4R z(double vz){ op = new FromZ(op,new IDouble(vz)); return this; }
+    /** setting w component */
+    public IVec4R w(double vw){ op = new FromW(op,new IDouble(vw)); return this; }
+    
+    /** setting x component */
+    public IVec4R x(IDoubleI vx){ op = new FromX(op,vx); return this; }
+    /** setting y component */
+    public IVec4R y(IDoubleI vy){ op = new FromY(op,vy); return this; }
+    /** setting z component */
+    public IVec4R z(IDoubleI vz){ op = new FromZ(op,vz); return this; }
+    /** setting w component */
+    public IVec4R w(IDoubleI vw){ op = new FromW(op,vw); return this; }
+    
+    /** getting x component */
+    public double x(ISwitchE e){ return x(); }
+    /** getting y component */
+    public double y(ISwitchE e){ return y(); }
+    /** getting z component */
+    public double z(ISwitchE e){ return z(); }
+    /** getting w component */
+    public double w(ISwitchE e){ return w(); }
+    
+    /** getting x component */
+    public IDoubleR x(ISwitchR r){ return new IDoubleR(new X(op)); }
+    /** getting y component */
+    public IDoubleR y(ISwitchR r){ return new IDoubleR(new Y(op)); }
+    /** getting z component */
+    public IDoubleR z(ISwitchR r){ return new IDoubleR(new Z(op)); }
+    /** getting w component */
+    public IDoubleR w(ISwitchR r){ return new IDoubleR(new W(op)); }
+    
+    
     public IVec4 get(){ return op.get(); }
-
+    
     public IVec4R dup(){ return new IVec4R(op); }
     
     
@@ -498,6 +537,42 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	public IDoubleOp w;
 	public FromVecAndW(IVecOp v, IDoubleOp w){ this.v=v; this.w=w; }
 	public IVec4 get(){ return new IVec4(v.get(),w.x()); }
+    }
+    static public class FromX extends IParameterObject implements IVec4Op{
+	public IVec4Op v;
+	public IDoubleOp x;
+	public FromX(IVec4Op v, IDoubleOp x){ this.v=v; this.x=x; }
+	public IVec4 get(){
+	    IVec4 vec = v.get();
+	    return new IVec4(x.x(),vec.y(),vec.z(),vec.w());
+	}
+    }
+    static public class FromY extends IParameterObject implements IVec4Op{
+	public IVec4Op v;
+	public IDoubleOp y;
+	public FromY(IVec4Op v, IDoubleOp y){ this.v=v; this.y=y; }
+	public IVec4 get(){
+	    IVec4 vec = v.get();
+	    return new IVec4(vec.x(),y.x(),vec.z(),vec.w());
+	}
+    }
+    static public class FromZ extends IParameterObject implements IVec4Op{
+	public IVec4Op v;
+	public IDoubleOp z;
+	public FromZ(IVec4Op v, IDoubleOp z){ this.v=v; this.z=z; }
+	public IVec4 get(){
+	    IVec4 vec = v.get();
+	    return new IVec4(vec.x(),vec.y(),z.x(),vec.w());
+	}
+    }
+    static public class FromW extends IParameterObject implements IVec4Op{
+	public IVec4Op v;
+	public IDoubleOp w;
+	public FromW(IVec4Op v, IDoubleOp w){ this.v=v; this.w=w; }
+	public IVec4 get(){
+	    IVec4 vec = v.get();
+	    return new IVec4(vec.x(),vec.y(),vec.z(),w.x());
+	}
     }
     static public class FromXYZ extends IParameterObject implements IVec4Op{
 	public IDoubleOp x,y,z;

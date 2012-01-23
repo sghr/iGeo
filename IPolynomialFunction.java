@@ -137,6 +137,7 @@ public class IPolynomialFunction implements IFunction{
     }
     
     public String toString(){
+	if(coeff==null) return super.toString();
 	String str = "";
 	for(int i=degree; i>=0; i--){
 	    if(coeff[i]!=0 && i<degree ) str += " ";

@@ -31,6 +31,28 @@ package igeo;
 public interface IVec2I extends IVec2Op{
     public double x();
     public double y();
+    
+    /** setting x component */
+    public IVec2I x(double vx);
+    /** setting y component */
+    public IVec2I y(double vy);
+    
+    /** setting x component */
+    public IVec2I x(IDoubleI vx);
+    /** setting y component */
+    public IVec2I y(IDoubleI vy);
+    
+    /** getting x component */
+    public double x(ISwitchE e);
+    /** getting y component */
+    public double y(ISwitchE e);
+    
+    /** getting x component */
+    public IDoubleI x(ISwitchR r);
+    /** getting y component */
+    public IDoubleI y(ISwitchR r);
+    
+
     public IVec2 get();
     public IVec2I dup();
     
@@ -292,5 +314,7 @@ public interface IVec2I extends IVec2Op{
     /** create normal vector from 3 points of self, pt1 and pt2 */
     public IVecI nml(double vx1, double vy1, double vx2, double vy2);
     
-    
+    /** check if the content of vector is valid; no NaN value */
+    public boolean isValid();
+        
 }

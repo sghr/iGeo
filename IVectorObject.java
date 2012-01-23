@@ -92,6 +92,23 @@ public class IVectorObject extends IObject implements IVecI{
     public double x(){ return vec.x(); }
     public double y(){ return vec.y(); }
     public double z(){ return vec.z(); }
+    
+    public IVectorObject x(double vx){ vec.x(vx); return this; }
+    public IVectorObject y(double vy){ vec.y(vy); return this; }
+    public IVectorObject z(double vz){ vec.z(vz); return this; }
+    
+    public IVectorObject x(IDoubleI vx){ vec.x(vx); return this; }
+    public IVectorObject y(IDoubleI vy){ vec.y(vy); return this; }
+    public IVectorObject z(IDoubleI vz){ vec.z(vz); return this; }
+    
+    public double x(ISwitchE e){ return vec.x(e); }
+    public double y(ISwitchE e){ return vec.y(e); }
+    public double z(ISwitchE e){ return vec.z(e); }
+    
+    public IDoubleI x(ISwitchR r){ return vec.x(r); }
+    public IDoubleI y(ISwitchR r){ return vec.y(r); }
+    public IDoubleI z(ISwitchR r){ return vec.z(r); }
+    
     public IVec get(){ return vec.get(); }
     
     public IVectorObject dup(){ return new IVectorObject(this); }
@@ -434,8 +451,12 @@ public class IVectorObject extends IObject implements IVecI{
     }
     
     
-    public boolean isValid(){ return vec.isValid(); }
+    public boolean isValid(){ if(vec==null){ return false; } return vec.isValid(); }
     
+    public String toString(){
+        if(vec==null) return super.toString();
+        return vec.toString();
+    }
     
     /**
        set size of dot in graphic 

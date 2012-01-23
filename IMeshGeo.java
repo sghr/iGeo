@@ -255,6 +255,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public IMeshGeo dup(){ return new IMeshGeo(this); }
 
     public boolean isValid(){
+	if(vertices==null) return false;
 	for(int i=0; i<vertices.size(); i++){
 	    if(!vertices.get(i).isValid()){
 		IOut.err("vertices at "+i+" is invalid");

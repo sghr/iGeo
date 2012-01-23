@@ -183,6 +183,7 @@ public class IEdge{
     
     public String toString(){
 	//return "IEdge: "+String.valueOf(vertices[0].getIndex())+"-"+String.valueOf(vertices[1].getIndex());
+	if(vertices==null) return super.toString();
 	String s1 = "null";
 	if(vertices[0]!=null) s1=vertices[0].toString();
 	String s2 = "null";

@@ -180,9 +180,9 @@ public class IBoundingBox{
     
     public String toString(){
 	//return min!=null?min.toString():"null" + "-" + max!=null?max.toString():"null";
-	String s1 = null;
+	String s1 = "null";
 	if(min!=null) s1=min.toString();
-	String s2 = null;
+	String s2 = "null";
 	if(max!=null) s2=max.toString();
 	return s1+"-"+s2;
     }

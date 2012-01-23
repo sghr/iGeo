@@ -140,6 +140,7 @@ public class IPiecewisePolynomialFunction extends IPiecewiseFunction{
     }
     
     public String toString(){
+	if(functions==null || domains==null) return super.toString();
 	String str = "";
 	for(int i=0; i<functions.length; i++){
 	    if(i==0){

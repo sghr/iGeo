@@ -207,8 +207,8 @@ public class IMatrix implements IMatrixI{
     
     
     public String toString(){
+	if(val==null) return super.toString();
 	String str = new String();
-	
 	for(int i=0; i<rowNum; i++){
 	    for(int j=0; j<columnNum; j++){
 		str += String.valueOf(val[i][j]);

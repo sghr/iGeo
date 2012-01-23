@@ -126,8 +126,18 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     //public IObject parent(){ return parent; }
     //public ISubobject parent(IObject parent){ this.parent=parent; return this; }
     
-    synchronized public IParticle fix(){ fixed=true; return this; }
-    synchronized public IParticle unfix(){ fixed=false; return this; }
+    synchronized public IParticle fix(){
+	fixed=true;
+	frc.zero(); // added 20120119
+	vel.zero(); // added 20120119
+	return this;
+    }
+    synchronized public IParticle unfix(){
+	frc.zero(); // added 20120119 in case frc is added up during it's been fixed.
+	vel.zero(); // added 20120119
+	fixed=false;
+	return this;
+    }
     
     synchronized public double mass(){ return mass; }
     synchronized public IParticle mass(double mass){ this.mass=mass; return this; }
@@ -202,6 +212,24 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     public double x(){ return pos.x(); }
     public double y(){ return pos.y(); }
     public double z(){ return pos.z(); }
+
+    public IParticle x(double vx){ pos.x(vx); return this; }
+    public IParticle y(double vy){ pos.y(vy); return this; }
+    public IParticle z(double vz){ pos.z(vz); return this; }
+    
+    public IParticle x(IDoubleI vx){ pos.x(vx); return this; }
+    public IParticle y(IDoubleI vy){ pos.y(vy); return this; }
+    public IParticle z(IDoubleI vz){ pos.z(vz); return this; }
+    
+    public double x(ISwitchE e){ return pos.x(e); }
+    public double y(ISwitchE e){ return pos.y(e); }
+    public double z(ISwitchE e){ return pos.z(e); }
+    
+    public IDoubleI x(ISwitchR r){ return pos.x(r); }
+    public IDoubleI y(ISwitchR r){ return pos.y(r); }
+    public IDoubleI z(ISwitchR r){ return pos.z(r); }
+    
+    
     public IVec get(){ return pos.get(); }
     
     public IVec2 to2d(){ return pos.to2d(); }
@@ -549,10 +577,13 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
     }
     
     /** checking x, y, and z is valid number (not Infinite, nor NaN). */
-    public boolean isValid(){ return pos.isValid(); }
+    public boolean isValid(){ if(pos==null){ return false; } return pos.isValid(); }
     
     
-    public String toString(){ return pos.toString(); }
+    public String toString(){
+	if(pos==null) return super.toString();
+	return pos.toString();
+    }
     
     
 }

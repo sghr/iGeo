@@ -82,6 +82,23 @@ public class IVertex implements IVecI{
     public double x(){ return pos.x(); }
     public double y(){ return pos.y(); }
     public double z(){ return pos.z(); }
+    
+    public IVertex x(double vx){ pos.x(vx); return this; }
+    public IVertex y(double vy){ pos.y(vy); return this; }
+    public IVertex z(double vz){ pos.z(vz); return this; }
+    
+    public IVertex x(IDoubleI vx){ pos.x(vx); return this; }
+    public IVertex y(IDoubleI vy){ pos.y(vy); return this; }
+    public IVertex z(IDoubleI vz){ pos.z(vz); return this; }
+    
+    public double x(ISwitchE e){ return pos.x(e); }
+    public double y(ISwitchE e){ return pos.y(e); }
+    public double z(ISwitchE e){ return pos.z(e); }
+    
+    public IDoubleI x(ISwitchR r){ return pos.x(r); }
+    public IDoubleI y(ISwitchR r){ return pos.y(r); }
+    public IDoubleI z(ISwitchR r){ return pos.z(r); }
+    
     public IVec get(){ return pos.get(); }
     
     public IVertex dup(){ return new IVertex(this); }
@@ -441,7 +458,7 @@ public class IVertex implements IVecI{
     public IVertex nml(double x, double y, double z){ return nml(new IVec(x,y,z)); }
     
     
-    public boolean isValid(){ return pos.isValid(); }
+    public boolean isValid(){ if(pos==null){ return false; } return pos.isValid(); }
     
     
     public IVec2I texture(){ return texture; }

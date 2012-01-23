@@ -127,6 +127,16 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     /**************************************
      * methods of IVecI
      *************************************/
+    
+    public IParticleAgent x(double vx){ pos.x(vx); return this; }
+    public IParticleAgent y(double vy){ pos.y(vy); return this; }
+    public IParticleAgent z(double vz){ pos.z(vz); return this; }
+    
+    public IParticleAgent x(IDoubleI vx){ pos.x(vx); return this; }
+    public IParticleAgent y(IDoubleI vy){ pos.y(vy); return this; }
+    public IParticleAgent z(IDoubleI vz){ pos.z(vz); return this; }
+    
+
     public IParticleAgent dup(){ return new IParticleAgent(this); }
     
     public IParticleAgent set(IVecI v){ pos.set(v); return this; }

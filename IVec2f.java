@@ -49,8 +49,36 @@ public class IVec2f extends IParameterObject implements IVec2I{
     
     public double x(){ return x; }
     public double y(){ return y; }
+    
+    /** setting x component */
+    public IVec2f x(double vx){ x=(float)vx; return this; }
+    /** setting y component */
+    public IVec2f y(double vy){ y=(float)vy; return this; }
+
+    /** setting x component */
+    public IVec2f x(float vx){ x=vx; return this; }
+    /** setting y component */
+    public IVec2f y(float vy){ y=vy; return this; }
+    
+    /** setting x component */
+    public IVec2f x(IDoubleI vx){ x=(float)vx.x(); return this; }
+    /** setting y component */
+    public IVec2f y(IDoubleI vy){ y=(float)vy.x(); return this; }
+    
+    /** getting x component */
+    public double x(ISwitchE e){ return x(); }
+    /** getting y component */
+    public double y(ISwitchE e){ return y(); }
+    
+    /** getting x component */
+    public IDouble x(ISwitchR r){ return new IDouble(x); }
+    /** getting y component */
+    public IDouble y(ISwitchR r){ return new IDouble(y); }
+    
+    
     public IVec2 get(){ return new IVec2(x,y); }
     public IVec2f dup(){ return new IVec2f(this); }
+    
     
     public IVec to3d(){ return new IVec(this); }
     public IVec to3d(double z){ return new IVec(x,y,z); }
@@ -498,6 +526,13 @@ public class IVec2f extends IParameterObject implements IVec2I{
     /** create normal vector from 3 points of self, pt1 and pt2 */
     public IVec nml(float vx1, float vy1, float vx2, float vy2){
 	return this.dif(vx1,vy1).cross(this.dif(vx2,vy2));
+    }
+    
+    /** checking x, y is valid number (not Infinite, nor NaN). */
+    public boolean isValid(){
+        if(!IDouble.isValid(x)){ IOut.err("invalid x ("+x+")"); return false; }
+        if(!IDouble.isValid(y)){ IOut.err("invalid y ("+y+")"); return false; }
+        return true;
     }
     
 }
