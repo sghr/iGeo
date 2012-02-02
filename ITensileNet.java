@@ -25,6 +25,8 @@ package igeo;
 import java.util.*;
 import java.awt.Color;
 
+import java.lang.reflect.*;
+
 /**
    Class to create tensile network which consists of IParticle and ITensionLine.
    
@@ -101,13 +103,43 @@ public class ITensileNet{
     /** boolean switch to put spacing equalizer force on the same rail curves */
     public static boolean enableSpacingEqualizer=false; // default false
     
+    //public static IParticleI particleClassReference=null;
+    //public static ITensionI tensionClassReference=null;
+    
+    /** class for a custom particle class */
+    public static Class<? extends IParticleI> particleClass=null;
+    /** class for a custom tension class */
+    public static Class<? extends ITensionI> tensionClass=null;
+    /** class for a custom particle on curve class */
+    public static Class<? extends IParticleOnCurveI> particleOnCurveClass=null;
+    
+    /** constructor for a custom particle class */
+    public static Constructor<? extends IParticleI> particleConstructor;
+    public static Class<?>[] particleConstructorParameters;
+    /** constructor for a custom tension class */
+    public static Constructor<? extends ITensionI> tensionConstructor;
+    public static Class<?>[] tensionConstructorParameters;
+    /** constructor for a custom particle on curve class */
+    public static Constructor<? extends IParticleOnCurveI> particleOnCurveConstructor;
+    public static Class<?>[] particleOnCurveConstructorParameters;
     
     
-    public ArrayList<ITensionLine> links;
-    public ArrayList<IParticleAgent> nodes;
     
-    ITensileNet(){}
-    ITensileNet(ArrayList<ITensionLine> links, ArrayList<IParticleAgent> nodes){
+    //public ArrayList<ITensionLine> links;
+    public ArrayList<ITensionI> links;
+    //public ArrayList<IParticleAgent> nodes;
+    public ArrayList<IParticleI> nodes;
+    
+    public ITensileNet(){}
+    /* // erasure issue
+    public ITensileNet(ArrayList<ITensionLine> links, ArrayList<IParticleAgent> nodes){
+	this.links = new ArrayList<ITensionI>();
+	this.nodes = new ArrayList<IParticleI>();
+	for(int i=0; i<links.size(); i++){ this.links.add(links.get(i)); }
+	for(int i=0; i<nodes.size(); i++){ this.nodes.add(nodes.get(i)); }
+    }
+    */
+    public ITensileNet(ArrayList<ITensionI> links, ArrayList<IParticleI> nodes){
 	this.links = links; this.nodes = nodes;
     }
     
@@ -189,16 +221,76 @@ public class ITensileNet{
 	    fixedPoints = openPts.toArray(new IVecI[openPts.size()]);
 	}
 	
+	// check custom class
+	if(particleClass!=null){
+	    searchParticleConstructor(particleClass);
+	}
+	if(tensionClass!=null){
+	    searchTensionConstructor(tensionClass);
+	}
+	
 	ITensileNet network = null;
 	synchronized(server.dynamicServer()){
 	    
-	    ArrayList<IParticleAgent> particles = new ArrayList<IParticleAgent>();
+	    //ArrayList<IParticleAgent> particles = new ArrayList<IParticleAgent>();
+	    ArrayList<IParticleI> particles = new ArrayList<IParticleI>();
 	    for(int i=0; i<uniquePts.size(); i++){
-		IParticleAgent pa = new IParticleAgent(uniquePts.get(i));
-		pa.fric(friction);
-		pa.clr(pointColor);
-		particles.add(pa);
-		if(pointLayer!=null) pa.layer(IG.layer(pointLayer).clr(pointColor));
+		
+		IParticleI ptcl=null;
+		// custom particle class instantiation
+		if(particleConstructor!=null && particleConstructorParameters!=null){
+		    ptcl = getParticleInstance(uniquePts.get(i));
+		    /*
+		    try{
+			if(particleConstructorParameters.length==0){
+			    ptcl =  particleConstructor.newInstance();
+			    ptcl.pos().set(uniquePts.get(i)); // would this always work?
+			}
+			else if(particleConstructorParameters.length==1 &&
+				particleConstructorParameters[0] == IVecI.class){
+			    ptcl =  particleConstructor.newInstance(uniquePts.get(i));
+			}
+			else if(particleConstructorParameters.length==2 &&
+				particleConstructorParameters[0] == IVecI.class){
+			    // second parameter is velocity (zero)
+			    ptcl =  particleConstructor.newInstance(uniquePts.get(i),new IVec());
+			}
+			else if(particleConstructorParameters.length==1 &&
+				particleConstructorParameters[0] == Object.class){
+			    ptcl =  particleConstructor.newInstance((Object)null);
+			    ptcl.pos().set(uniquePts.get(i)); // would this always work?
+			}
+			else if(particleConstructorParameters.length==2 &&
+				particleConstructorParameters[0] == Object.class){
+			    ptcl =  particleConstructor.newInstance(null, uniquePts.get(i));
+			}
+			else if(particleConstructorParameters.length==3 &&
+				particleConstructorParameters[0] == Object.class){
+			    ptcl =  particleConstructor.newInstance(null,
+								    uniquePts.get(i),
+								    new IVec());
+			}
+			
+		    }catch(Exception e){ e.printStackTrace(); }
+		    */
+		    
+		    if(ptcl!=null){
+			ptcl.fric(friction);
+			if(ptcl instanceof IObject){
+			    ((IObject)ptcl).clr(pointColor);
+			    if(pointLayer!=null) ((IObject)ptcl).layer(IG.layer(pointLayer).clr(pointColor));
+			}
+			particles.add(ptcl);
+		    }
+		}
+		
+		if(ptcl==null){
+		    IParticleAgent pa = new IParticleAgent(uniquePts.get(i));
+		    pa.fric(friction);
+		    pa.clr(pointColor);
+		    particles.add(pa);
+		    if(pointLayer!=null) pa.layer(IG.layer(pointLayer).clr(pointColor));
+		}
 	    }
 	    
 	    // fixing particle
@@ -207,14 +299,20 @@ public class ITensileNet{
 		    for(int j=0; j<particles.size(); j++){
 			if(fixedPoints[i].eq(particles.get(j), tolerance)){
 			    particles.get(j).fix();
-			    particles.get(j).clr(fixedPointColor);
-			    if(fixedPointLayer!=null) particles.get(j).layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+			    if(particles.get(j) instanceof IObject){
+				IObject obj = (IObject)particles.get(j);
+				obj.clr(fixedPointColor);
+				if(fixedPointLayer!=null){
+				    obj.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+				}
+			    }
 			}
 		    }
 		}
 	    }
 	    
-	    ArrayList<ITensionLine> tlines = new ArrayList<ITensionLine>();
+	    //ArrayList<ITensionLine> tlines = new ArrayList<ITensionLine>();
+	    ArrayList<ITensionI> tlines = new ArrayList<ITensionI>();
 	    for(int i=0; i<endPts.length; i++){
 		IVec[] epts = endPts[i];
 		int index1 = uniquePts.indexOf(epts[0]);
@@ -222,13 +320,45 @@ public class ITensileNet{
 		if(index1>=0 && index2>=0){
 		    IParticleI pa1 = particles.get(index1);
 		    IParticleI pa2 = particles.get(index2);
-		    ITensionLine tl = new ITensionLine(pa1, pa2, tension);
-		    if(lineColors[i]!=null) tl.clr(lineColors[i]);
-		    if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
 		    
-		    tl.tension(tension);
-		    tl.constant(constantTension);
-		    tlines.add(tl);
+		    ITensionI tnsn = null;
+		    // custom tension class instantiation
+		    if(tensionConstructor!=null && tensionConstructorParameters!=null){
+			tnsn = getTensionInstance(pa1,pa2);
+			
+			/*
+			try{
+			    if(tensionConstructorParameters.length==2){
+				tnsn =  tensionConstructor.newInstance(pa1,pa2);
+			    }
+			    else if(tensionConstructorParameters.length==3){
+				// third parameter is tension
+				tnsn =  tensionConstructor.newInstance(pa1,pa2,tension);
+			    }
+			}catch(Exception e){ e.printStackTrace(); }
+			*/
+			
+			if(tnsn!=null){
+			    if(tnsn instanceof IObject){
+				
+				if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
+				if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
+			    }
+			    tnsn.tension(tension);
+			    tnsn.constant(constantTension);
+			    tlines.add(tnsn);
+			}
+		    }
+		    
+		    if(tnsn==null){
+			ITensionLine tl = new ITensionLine(pa1, pa2, tension);
+			if(lineColors[i]!=null) tl.clr(lineColors[i]);
+			if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
+			
+			tl.tension(tension);
+			tl.constant(constantTension);
+			tlines.add(tl);
+		    }
 		}
 		else{
 		    IOut.err("end point is not found");
@@ -304,6 +434,442 @@ public class ITensileNet{
 	
 	return network;
     }
+
+    
+    /** set constructor of particle class. if success returns true */
+    @SuppressWarnings("unchecked")
+    public static boolean searchParticleConstructor(Class<? extends IParticleI> pclass){
+	
+	if(pclass==null) return false;
+	
+	Constructor<? extends IParticleI> constructorIVecIVec=null;
+	Constructor<? extends IParticleI> constructorIVec=null;
+	Constructor<? extends IParticleI> constructorNull=null;
+	Constructor<? extends IParticleI> constructorObjIVecIVec=null; // inner class
+	Constructor<? extends IParticleI> constructorObjIVec=null; // inner class
+	Constructor<? extends IParticleI> constructorObj=null; // inner class
+	
+	try{
+	    Constructor[] constructors = pclass.getDeclaredConstructors();
+	    if(constructors==null) return false;
+	    
+	    for(int i=0; i<constructors.length; i++){
+		Class<?>[] param = constructors[i].getParameterTypes();
+		
+		if(param==null || param.length==0){
+		    constructorNull = constructors[i];
+		}
+		else if(param.length==1 && IVecI.class.isAssignableFrom(param[0])){
+		    constructorIVec = constructors[i];
+		}
+		else if(param.length==2 &&
+			IVecI.class.isAssignableFrom(param[0]) &&
+			IVecI.class.isAssignableFrom(param[1])){
+		    constructorIVecIVec = constructors[i];
+		}
+		else if(param.length==1 && !IVecI.class.isAssignableFrom(param[0])){
+		    constructorObj = constructors[i];
+		}
+		else if(param.length==2 &&
+			!IVecI.class.isAssignableFrom(param[0]) &&
+			IVecI.class.isAssignableFrom(param[1])){
+		    constructorObjIVec = constructors[i];
+		}
+		else if(param.length==3 &&
+			!IVecI.class.isAssignableFrom(param[0]) &&
+			IVecI.class.isAssignableFrom(param[1])&&
+			IVecI.class.isAssignableFrom(param[2])){
+		    constructorObjIVecIVec = constructors[i];
+		}
+	    }
+	}catch(Exception e){
+	    e.printStackTrace();
+	    return false;
+	}
+	
+	if(constructorIVecIVec!=null){ // first priority
+	    particleConstructor = constructorIVecIVec;
+	    particleConstructor.setAccessible(true); // always ok?
+	    particleConstructorParameters = new Class<?>[]{ IVecI.class, IVecI.class };
+	    return true;
+	}
+	if(constructorIVec!=null){ // second priority
+	    particleConstructor = constructorIVec;
+	    particleConstructor.setAccessible(true); // always ok?
+	    particleConstructorParameters = new Class<?>[]{ IVecI.class };
+	    return true;
+	}
+	if(constructorNull!=null){ // third priority
+	    particleConstructor = constructorNull;
+	    particleConstructor.setAccessible(true); // always ok?
+	    particleConstructorParameters = new Class<?>[]{};
+	    return true;
+	}
+	
+	if(constructorObjIVecIVec!=null){ 
+	    particleConstructor = constructorObjIVecIVec;
+	    particleConstructor.setAccessible(true); // always ok?
+	    particleConstructorParameters = new Class<?>[]{ Object.class, IVecI.class, IVecI.class };
+	    return true;
+	}
+	if(constructorObjIVec!=null){ 
+	    particleConstructor = constructorObjIVec;
+	    particleConstructor.setAccessible(true); // always ok?
+	    particleConstructorParameters = new Class<?>[]{ Object.class, IVecI.class };
+	    return true;
+	}
+	if(constructorObj!=null){ 
+	    particleConstructor = constructorObj;
+	    particleConstructor.setAccessible(true); // always ok?
+	    particleConstructorParameters = new Class<?>[]{ Object.class };
+	    return true;
+	}
+	
+	IOut.err("no matching particle constructor found. it should be like constructor(IVec) or constructor(IVec,IVec)"); //
+	
+	return false;
+    }
+    
+    /** set constructor of tension class. if success returns true */
+    @SuppressWarnings("unchecked")
+    public static boolean searchTensionConstructor(Class<? extends ITensionI> tclass){
+	if(tclass==null) return false;
+	
+	Constructor<? extends ITensionI> constructorIParticleIParticle=null;
+	Constructor<? extends ITensionI> constructorIParticleIParticleDouble=null;
+	Constructor<? extends ITensionI> constructorObjIParticleIParticle=null;
+	Constructor<? extends ITensionI> constructorObjIParticleIParticleDouble=null;
+	
+	try{
+	    Constructor[] constructors = tclass.getDeclaredConstructors();
+	    if(constructors==null) return false;
+	    
+	    for(int i=0; i<constructors.length; i++){
+		Class<?>[] param = constructors[i].getParameterTypes();
+		if(param.length==2 &&
+		   IParticleI.class.isAssignableFrom(param[0]) &&
+		   IParticleI.class.isAssignableFrom(param[1])){
+		    constructorIParticleIParticle = constructors[i];
+		}
+		else if(param.length==3 &&
+			IParticleI.class.isAssignableFrom(param[0]) &&
+			IParticleI.class.isAssignableFrom(param[1]) &&
+			double.class.isAssignableFrom(param[2])){
+		    constructorIParticleIParticleDouble = constructors[i];
+		}
+		else if(param.length==3 &&
+			!IParticleI.class.isAssignableFrom(param[0]) &&
+			IParticleI.class.isAssignableFrom(param[1]) &&
+			IParticleI.class.isAssignableFrom(param[2])){
+		    constructorObjIParticleIParticle = constructors[i];
+		}
+		else if(param.length==4 &&
+			!IParticleI.class.isAssignableFrom(param[0]) &&
+			IParticleI.class.isAssignableFrom(param[1]) &&
+			IParticleI.class.isAssignableFrom(param[2]) &&
+			double.class.isAssignableFrom(param[3])){
+		    constructorObjIParticleIParticleDouble = constructors[i];
+		}
+	    }
+	}catch(Exception e){
+	    e.printStackTrace();
+	    return false;
+	}
+	
+	if(constructorIParticleIParticleDouble!=null){ // first priority
+	    tensionConstructor = constructorIParticleIParticleDouble;
+	    tensionConstructor.setAccessible(true); // always ok?
+	    tensionConstructorParameters = new Class<?>[]{ IParticleI.class, IParticleI.class, double.class };
+	    return true;
+	}
+	if(constructorIParticleIParticle!=null){ // second priority
+	    tensionConstructor = constructorIParticleIParticle;
+	    tensionConstructor.setAccessible(true); // always ok?
+	    tensionConstructorParameters = new Class<?>[]{ IParticleI.class, IParticleI.class};
+	    return true;
+	}
+	
+	if(constructorObjIParticleIParticleDouble!=null){
+	    tensionConstructor = constructorObjIParticleIParticleDouble;
+	    tensionConstructor.setAccessible(true); // always ok?
+	    tensionConstructorParameters = new Class<?>[]{ Object.class, IParticleI.class, IParticleI.class, double.class };
+	    return true;
+	}
+	if(constructorObjIParticleIParticle!=null){ 
+	    tensionConstructor = constructorObjIParticleIParticle;
+	    tensionConstructor.setAccessible(true); // always ok?
+	    tensionConstructorParameters = new Class<?>[]{ Object.class, IParticleI.class, IParticleI.class};
+	    return true;
+	}
+	
+	IOut.err("no matching tension constructor found. it should be like constructor(IParticleI,IParticleI,double) or constructor(IParticleI,IParticleI)");
+	
+	return false;
+    }
+    
+    /** set constructor of particle class. if success returns true */
+    @SuppressWarnings("unchecked")
+    public static boolean searchParticleOnCurveConstructor(Class<? extends IParticleOnCurveI> pclass){
+	
+	if(pclass==null) return false;
+	
+	Constructor<? extends IParticleOnCurveI> constructorICurveDouble=null;
+	Constructor<? extends IParticleOnCurveI> constructorICurveDoubleDouble=null;
+	Constructor<? extends IParticleOnCurveI> constructorObjICurveDouble=null;
+	Constructor<? extends IParticleOnCurveI> constructorObjICurveDoubleDouble=null;
+	Constructor<? extends IParticleOnCurveI> constructorICurveDoubleIVec=null;
+	Constructor<? extends IParticleOnCurveI> constructorICurveDoubleDoubleIVec=null;
+	Constructor<? extends IParticleOnCurveI> constructorObjICurveDoubleIVec=null;
+	Constructor<? extends IParticleOnCurveI> constructorObjICurveDoubleDoubleIVec=null;
+	
+	try{
+	    Constructor[] constructors = pclass.getDeclaredConstructors();
+	    if(constructors==null) return false;
+	    
+	    for(int i=0; i<constructors.length; i++){
+		Class<?>[] param = constructors[i].getParameterTypes();
+		if(param.length==2 &&
+		   ICurveI.class.isAssignableFrom(param[0]) &&
+		   double.class.isAssignableFrom(param[1]) ){
+		    constructorICurveDouble = constructors[i];
+		}
+		else if(param.length==3 &&
+			ICurveI.class.isAssignableFrom(param[0]) &&
+			double.class.isAssignableFrom(param[1]) &&
+			double.class.isAssignableFrom(param[2]) ){
+		    constructorICurveDoubleDouble = constructors[i];
+		}
+		else if(param.length==3 &&
+			!ICurveI.class.isAssignableFrom(param[0]) &&
+			ICurveI.class.isAssignableFrom(param[1]) &&
+			double.class.isAssignableFrom(param[2]) ){
+		    constructorObjICurveDouble = constructors[i];
+		}
+		else if(param.length==4 &&
+			!ICurveI.class.isAssignableFrom(param[0]) &&
+			ICurveI.class.isAssignableFrom(param[1]) &&
+			double.class.isAssignableFrom(param[2]) &&
+			double.class.isAssignableFrom(param[3]) ){
+		    constructorObjICurveDoubleDouble = constructors[i];
+		}
+		else if(param.length==3 &&
+			ICurveI.class.isAssignableFrom(param[0]) &&
+			double.class.isAssignableFrom(param[1]) &&
+			IVec.class.isAssignableFrom(param[2]) ){
+		    constructorICurveDoubleIVec = constructors[i];
+		}
+		else if(param.length==4 &&
+			ICurveI.class.isAssignableFrom(param[0]) &&
+			double.class.isAssignableFrom(param[1]) &&
+			double.class.isAssignableFrom(param[2]) &&
+			double.class.isAssignableFrom(param[3]) ){
+		    constructorICurveDoubleDoubleIVec = constructors[i];
+		}
+		else if(param.length==4 &&
+			!ICurveI.class.isAssignableFrom(param[0]) &&
+			ICurveI.class.isAssignableFrom(param[1]) &&
+			double.class.isAssignableFrom(param[2]) &&
+			double.class.isAssignableFrom(param[3]) ){
+		    constructorObjICurveDoubleIVec = constructors[i];
+		}
+		else if(param.length==5 &&
+			!ICurveI.class.isAssignableFrom(param[0]) &&
+			ICurveI.class.isAssignableFrom(param[1]) &&
+			double.class.isAssignableFrom(param[2]) &&
+			double.class.isAssignableFrom(param[3]) &&
+			double.class.isAssignableFrom(param[4]) ){
+		    constructorObjICurveDoubleDoubleIVec = constructors[i];
+		}
+		
+	    }
+	}catch(Exception e){
+	    e.printStackTrace();
+	    return false;
+	}
+	
+	if(constructorICurveDoubleDoubleIVec!=null){ // first priority
+	    particleOnCurveConstructor = constructorICurveDoubleDoubleIVec;
+	    particleOnCurveConstructor.setAccessible(true); // always ok?
+	    particleOnCurveConstructorParameters = new Class<?>[]{ ICurveI.class, double.class, double.class, IVec.class };
+	    return true;
+	}
+	if(constructorICurveDoubleIVec!=null){ // second priority
+	    particleOnCurveConstructor = constructorICurveDoubleIVec;
+	    particleOnCurveConstructor.setAccessible(true); // always ok?
+	    particleOnCurveConstructorParameters = new Class<?>[]{ ICurveI.class, double.class, IVec.class };
+	    return true;
+	}
+	if(constructorObjICurveDoubleDoubleIVec!=null){
+	    particleOnCurveConstructor = constructorObjICurveDoubleDoubleIVec;
+	    particleOnCurveConstructor.setAccessible(true); // always ok?
+	    particleOnCurveConstructorParameters = new Class<?>[]{ Object.class, ICurveI.class, double.class, double.class, IVec.class };
+	    return true;
+	}
+	if(constructorObjICurveDoubleIVec!=null){ 
+	    particleOnCurveConstructor = constructorObjICurveDoubleIVec;
+	    particleOnCurveConstructor.setAccessible(true); // always ok?
+	    particleOnCurveConstructorParameters = new Class<?>[]{ Object.class, ICurveI.class, double.class, IVec.class };
+	    return true;
+	}
+	
+	if(constructorICurveDoubleDouble!=null){
+	    particleOnCurveConstructor = constructorICurveDoubleDouble;
+	    particleOnCurveConstructor.setAccessible(true); // always ok?
+	    particleOnCurveConstructorParameters = new Class<?>[]{ ICurveI.class, double.class, double.class };
+	    return true;
+	}
+	if(constructorICurveDouble!=null){
+	    particleConstructor = constructorICurveDouble;
+	    particleConstructor.setAccessible(true); // always ok?
+	    particleConstructorParameters = new Class<?>[]{ ICurveI.class, double.class };
+	    return true;
+	}
+	if(constructorObjICurveDoubleDouble!=null){
+	    particleOnCurveConstructor = constructorObjICurveDoubleDouble;
+	    particleOnCurveConstructor.setAccessible(true); // always ok?
+	    particleOnCurveConstructorParameters = new Class<?>[]{ Object.class, ICurveI.class, double.class, double.class };
+	    return true;
+	}
+	if(constructorObjICurveDouble!=null){ 
+	    particleOnCurveConstructor = constructorObjICurveDouble;
+	    particleOnCurveConstructor.setAccessible(true); // always ok?
+	    particleOnCurveConstructorParameters = new Class<?>[]{ Object.class, ICurveI.class, double.class };
+	    return true;
+	}
+	
+	IOut.err("no matching particle on curve constructor found. it should be like constructor(ICurve,double) or constructor(ICurve,double,double)"); //
+	
+	return false;
+    }
+    
+    
+    public static IParticleI getParticleInstance(IVec pt){
+	IParticleI ptcl=null;
+	try{
+	    if(particleConstructorParameters.length==0){
+		ptcl =  particleConstructor.newInstance();
+		ptcl.pos().set(pt); // would this always work?
+	    }
+	    else if(particleConstructorParameters.length==1 &&
+		    particleConstructorParameters[0] == IVecI.class){
+		ptcl =  particleConstructor.newInstance(pt);
+	    }
+	    else if(particleConstructorParameters.length==2 &&
+		    particleConstructorParameters[0] == IVecI.class){
+		// second parameter is velocity (zero)
+		ptcl =  particleConstructor.newInstance(pt,new IVec());
+	    }
+	    else if(particleConstructorParameters.length==1 &&
+		    particleConstructorParameters[0] == Object.class){
+		ptcl =  particleConstructor.newInstance((Object)null);
+		ptcl.pos().set(pt); // would this always work?
+	    }
+	    else if(particleConstructorParameters.length==2 &&
+		    particleConstructorParameters[0] == Object.class){
+		ptcl =  particleConstructor.newInstance(null, pt);
+	    }
+	    else if(particleConstructorParameters.length==3 &&
+		    particleConstructorParameters[0] == Object.class){
+		ptcl =  particleConstructor.newInstance(null, pt, new IVec());
+	    }
+	}catch(Exception e){ e.printStackTrace(); }
+	return ptcl;
+    }
+
+    public static ITensionI getTensionInstance(IParticleI pt1, IParticleI pt2){
+	ITensionI tnsn=null;
+	try{
+	    if(tensionConstructorParameters.length==2 &&
+	       tensionConstructorParameters[0]== IParticleI.class &&
+	       tensionConstructorParameters[1]== IParticleI.class ){
+		tnsn =  tensionConstructor.newInstance(pt1,pt2);
+	    }
+	    else if(tensionConstructorParameters.length==3 &&
+		    tensionConstructorParameters[0]== IParticleI.class &&
+		    tensionConstructorParameters[1]== IParticleI.class &&
+		    tensionConstructorParameters[2]== double.class ){
+		// third parameter is tension
+		tnsn =  tensionConstructor.newInstance(pt1,pt2,tension);
+	    }
+	    else if(tensionConstructorParameters.length==3 &&
+		    tensionConstructorParameters[0]== Object.class &&
+		    tensionConstructorParameters[1]== IParticleI.class &&
+		    tensionConstructorParameters[2]== IParticleI.class){
+		// third parameter is tension
+		tnsn =  tensionConstructor.newInstance((Object)null,pt1,pt2);
+	    }
+	    else if(tensionConstructorParameters.length==4 &&
+		    tensionConstructorParameters[0]== Object.class &&
+		    tensionConstructorParameters[1]== IParticleI.class &&
+		    tensionConstructorParameters[2]== IParticleI.class &&
+		    tensionConstructorParameters[3]== double.class){
+		// third parameter is tension
+		tnsn =  tensionConstructor.newInstance((Object)null,pt1,pt2,tension);
+	    }
+	}catch(Exception e){ e.printStackTrace(); }
+	return tnsn;
+    }
+    
+    public static IParticleOnCurveI getParticleOnCurveInstance(ICurveI curve, double upos, IVec pos){
+	IParticleOnCurveI ptcl=null;
+	try{
+	    if(particleOnCurveConstructorParameters.length==2 &&
+	       particleOnCurveConstructorParameters[0]==ICurveI.class &&
+	       particleOnCurveConstructorParameters[1]==double.class){
+		ptcl =  particleOnCurveConstructor.newInstance(curve,upos); // pos not used
+	    }
+	    else if(particleOnCurveConstructorParameters.length==3 &&
+		    particleOnCurveConstructorParameters[0]==ICurveI.class &&
+		    particleOnCurveConstructorParameters[1]==double.class &&
+		    particleOnCurveConstructorParameters[2]==double.class ){
+		ptcl =  particleOnCurveConstructor.newInstance(curve,upos,0); // pos not used
+	    }
+	    else if(particleOnCurveConstructorParameters.length==3 &&
+		    particleOnCurveConstructorParameters[0]==Object.class &&
+		    particleOnCurveConstructorParameters[1]==ICurveI.class &&
+		    particleOnCurveConstructorParameters[2]==double.class){
+		ptcl =  particleOnCurveConstructor.newInstance((Object)null,curve,upos); // pos not used
+	    }
+	    else if(particleOnCurveConstructorParameters.length==4 &&
+		    particleOnCurveConstructorParameters[0]==Object.class &&
+		    particleOnCurveConstructorParameters[1]==ICurveI.class &&
+		    particleOnCurveConstructorParameters[2]==double.class &&
+		    particleOnCurveConstructorParameters[3]==double.class){
+		ptcl =  particleOnCurveConstructor.newInstance((Object)null,curve,upos,0); // pos not used
+	    }
+	    else if(particleOnCurveConstructorParameters.length==3 &&
+		    particleOnCurveConstructorParameters[0]==ICurveI.class &&
+		    particleOnCurveConstructorParameters[1]==double.class &&
+		    particleOnCurveConstructorParameters[2]==IVec.class){
+		ptcl =  particleOnCurveConstructor.newInstance(curve,upos,pos); 
+	    }
+	    else if(particleOnCurveConstructorParameters.length==4 &&
+		    particleOnCurveConstructorParameters[0]==ICurveI.class &&
+		    particleOnCurveConstructorParameters[1]==double.class &&
+		    particleOnCurveConstructorParameters[2]==double.class &&
+		    particleOnCurveConstructorParameters[3]==IVec.class){
+		ptcl =  particleOnCurveConstructor.newInstance(curve,upos,0,pos);
+	    }
+	    else if(particleOnCurveConstructorParameters.length==4 &&
+		    particleOnCurveConstructorParameters[0]==Object.class &&
+		    particleOnCurveConstructorParameters[1]==ICurveI.class &&
+		    particleOnCurveConstructorParameters[2]==double.class &&
+		    particleOnCurveConstructorParameters[3]==IVec.class){
+		ptcl =  particleOnCurveConstructor.newInstance((Object)null,curve,upos,pos);
+	    }
+	    else if(particleOnCurveConstructorParameters.length==5 &&
+		    particleOnCurveConstructorParameters[0]==Object.class &&
+		    particleOnCurveConstructorParameters[1]==ICurveI.class &&
+		    particleOnCurveConstructorParameters[2]==double.class &&
+		    particleOnCurveConstructorParameters[3]==double.class &&
+		    particleOnCurveConstructorParameters[4]==IVec.class){
+		ptcl =  particleOnCurveConstructor.newInstance((Object)null,curve,upos,0,pos);
+	    }
+	}catch(Exception e){ e.printStackTrace(); }
+	return ptcl;
+    }
+    
+    
     
     /*
     public static ITensileNet create(ICurveI[] linkLines, IVecI[] fixedPoints,
@@ -330,8 +896,8 @@ public class ITensileNet{
     }
     */
     
-
-
+    
+    
     
     
     /*
@@ -540,18 +1106,30 @@ public class ITensileNet{
 	    }
 	}
 	
-	ArrayList<IParticleOnCurve>[] particleOnRail = null;
+	ArrayList<IParticleOnCurveI>[] particleOnRail = null;
 	
 	
 	if(tensionOnSameRail || enableSpacingEqualizer){
 	    // !!!
 	    @SuppressWarnings("unchecked")
-		ArrayList<IParticleOnCurve>[] pos = new ArrayList[railCurves.length];
+		ArrayList<IParticleOnCurveI>[] pos = new ArrayList[railCurves.length];
 	    particleOnRail = pos;
 	    
 	    for(int i=0; i<particleOnRail.length; i++){
-		particleOnRail[i] = new ArrayList<IParticleOnCurve>();
+		particleOnRail[i] = new ArrayList<IParticleOnCurveI>();
 	    }
+	}
+	
+
+	// check custom class
+	if(particleClass!=null){
+	    searchParticleConstructor(particleClass);
+	}
+	if(tensionClass!=null){
+	    searchTensionConstructor(tensionClass);
+	}
+	if(particleOnCurveClass!=null){
+	    searchParticleOnCurveConstructor(particleOnCurveClass);
 	}
 	
 	
@@ -561,17 +1139,23 @@ public class ITensileNet{
 	    final double uCurveTolerance = 1.0/1000;
 	    
 	    // find a rail curve to be on for each uniquePts
-	    ArrayList<IParticleAgent> particles = new ArrayList<IParticleAgent>();
+	    //ArrayList<IParticleAgent> particles = new ArrayList<IParticleAgent>();
+	    ArrayList<IParticleI> particles = new ArrayList<IParticleI>();
 	    
 	    for(int i=0; i<uniquePts.size(); i++){
 		if(uniquePts.size()>100 && i%100==0){
 		    IOut.debug(0, "finding curve for point to be on ("+i+"/"+uniquePts.size()+")"); //
 		}
 		
-		IParticleOnCurve poc = createParticleOnClosestCurve(railCurves,
-								    uniquePts.get(i),
-								    railTolerance, //tolerance,
-								    uCurveTolerance);
+		IParticleOnCurveI poc = createParticleOnClosestCurve(railCurves,
+								     uniquePts.get(i),
+								     railTolerance, //tolerance,
+								     uCurveTolerance);
+		
+		IParticleI ptcl = poc;
+		
+		//if(ptcl != null){ particles.add(poc); }
+		/*
 		IParticleAgent pa=null;
 		if(poc!=null){
 		    pa = new IParticleAgent(poc);
@@ -580,27 +1164,63 @@ public class ITensileNet{
 		    
 		    //unfix if it's 
 		}
-		else{
-		    pa = new IParticleAgent(uniquePts.get(i));
-		    if(fixPointNotOnRail ||
-		       fixOpenLinePoint &&openPts!=null && openPts.contains(uniquePts.get(i))){ // in case the point is open point and fixOpenLinePoint is true.
-			pa.fix(); // if not on the curve, fixed.
-			pa.clr(fixedPointColor);
-			if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+		*/
+		if(ptcl == null){
+		    // just particle not on a rail curve
+		    if(particleConstructor!=null && particleConstructorParameters!=null){
+			ptcl = getParticleInstance(uniquePts.get(i));
+			
+			if(ptcl!=null){
+			    ptcl.fric(friction);
+			    
+			    if(fixPointNotOnRail ||
+			       fixOpenLinePoint &&openPts!=null && openPts.contains(uniquePts.get(i))){ // in case the point is open point and fixOpenLinePoint is true.
+				ptcl.fix(); // if not on the curve, fixed.
+				
+				if(ptcl instanceof IObject){
+				    if(fixedPointLayer!=null) ((IObject)ptcl).layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+				    ((IObject)ptcl).clr(fixedPointColor);
+				}
+			    }
+			    else{
+				if(ptcl instanceof IObject){
+				    if(pointLayer!=null) ((IObject)ptcl).layer(IG.layer(pointLayer).clr(pointColor));
+				    ((IObject)ptcl).clr(pointColor);
+				}
+			    }
+			}
 		    }
-		    else{
-			pa.clr(pointColor);
-			if(pointLayer!=null) pa.layer(IG.layer(pointLayer).clr(pointColor));
+		    
+		    if(ptcl == null){
+			IParticleAgent pa = new IParticleAgent(uniquePts.get(i));
+			pa.fric(friction);
+			
+			if(fixPointNotOnRail ||
+			   fixOpenLinePoint &&openPts!=null && openPts.contains(uniquePts.get(i))){ // in case the point is open point and fixOpenLinePoint is true.
+			    pa.fix(); // if not on the curve, fixed.
+			    pa.clr(fixedPointColor);
+			    if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+			}
+			else{
+			    pa.clr(pointColor);
+			    if(pointLayer!=null) pa.layer(IG.layer(pointLayer).clr(pointColor));
+			}
+			
+			ptcl = pa;
 		    }
 		}
 		
-		pa.fric(friction);
-		particles.add(pa);
+		particles.add(ptcl);
 		
 		if(fixlist[i]){
-		    pa.fix();
-		    pa.clr(fixedPointColor);
-		    if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+		    ptcl.fix();
+		    if(ptcl instanceof IObject){
+		    
+			((IObject)ptcl).clr(fixedPointColor);
+			if(fixedPointLayer!=null) ((IObject)ptcl).layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+		    }
+		    //pa.clr(fixedPointColor);
+		    //if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
 		}
 		
 		if(poc!=null){
@@ -617,10 +1237,15 @@ public class ITensileNet{
 			if(poc.upos()<IConfig.parameterTolerance ||
 			   poc.upos()>1.0-IConfig.parameterTolerance){
 			    poc.fix();
-			    if(pa!=null){
-				pa.clr(fixedPointColor);
-				if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+			    
+			    if(poc instanceof IObject){
+				((IObject)poc).clr(fixedPointColor);
+				if(fixedPointLayer!=null) ((IObject)poc).layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
 			    }
+			    //if(pa!=null){
+			    //	pa.clr(fixedPointColor);
+			    //	if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
+			    //}
 			}
 		    }
 		}
@@ -628,20 +1253,46 @@ public class ITensileNet{
 	    
 	    
 	    
-	    ArrayList<ITensionLine> tlines = new ArrayList<ITensionLine>();
+	    //ArrayList<ITensionLine> tlines = new ArrayList<ITensionLine>();
+	    ArrayList<ITensionI> tlines = new ArrayList<ITensionI>();
 	    for(int i=0; i<endPts.length; i++){
 		IVec[] epts = endPts[i];
 		int index1 = uniquePts.indexOf(epts[0]);
 		int index2 = uniquePts.indexOf(epts[1]);
+		
+		//IG.p("epts0 = "+((Object)epts[0]).toString());
+		//IG.p("epts1 = "+((Object)epts[1]).toString());
+		
 		if(index1>=0 && index2>=0){
 		    IParticleI pa1 = particles.get(index1);
 		    IParticleI pa2 = particles.get(index2);
-		    ITensionLine tl = new ITensionLine(pa1, pa2, tension);
-		    if(lineColors[i]!=null) tl.clr(lineColors[i]);
-		    if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
-		    tl.tension(tension);
-		    tl.constant(constantTension);
-		    tlines.add(tl);
+		    
+		    //IG.p("pa1 = "+((Object)pa1).toString());
+		    //IG.p("pa2 = "+((Object)pa2).toString());
+		    
+		    ITensionI tnsn = null;
+		    if(tensionConstructor!=null && tensionConstructorParameters!=null){
+			tnsn = getTensionInstance(pa1,pa2);
+			if(tnsn!=null){
+			    if(tnsn instanceof IObject){
+				if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
+				if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
+			    }
+			    tnsn.tension(tension);
+			    tnsn.constant(constantTension);
+			    tlines.add(tnsn);
+			}
+		    }
+		    
+		    if(tnsn==null){
+			ITensionLine tl = new ITensionLine(pa1, pa2, tension);
+			if(lineColors[i]!=null) tl.clr(lineColors[i]);
+			if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
+			tl.tension(tension);
+			tl.constant(constantTension);
+			tlines.add(tl);
+			
+		    }
 		}
 		else{
 		    IOut.err("end point is not found");
@@ -937,12 +1588,12 @@ public class ITensileNet{
        @param closenessTolerance tolerance to determine if the point is on the curve or not
        @param uTolerance tolerance in u parameter to specify how precise u parameter of particle shoould be
     */
-    public static IParticleOnCurve createParticleOnClosestCurve(ICurveI[] railCurves,
-								IVec pos,
-								double closenessTolerance,
-								double uTolerance){
+    public static IParticleOnCurveI createParticleOnClosestCurve(ICurveI[] railCurves,
+								 IVec pos,
+								 double closenessTolerance,
+								 double uTolerance){
 	final int roughSearchResolution = 20;
-	IParticleOnCurve particle = null;
+	IParticleOnCurveI particle = null;
 	do{
 	    ICurveI closestCrv = null;
 	    if(railCurves.length==1) closestCrv = railCurves[0];
@@ -975,10 +1626,10 @@ public class ITensileNet{
        @param closenessTolerance tolerance to determine if the point is on the curve or not. if this is negative, it will create any closest particle to the point even if it's far.
        @param uTolerance tolerance in u parameter to specify how precise u parameter of particle shoould be
     */
-    public static IParticleOnCurve createParticleOnCurve(ICurveI curve,
-							 IVec pos,
-							 double closenessTolerance,
-							 double uTolerance){
+    public static IParticleOnCurveI createParticleOnCurve(ICurveI curve,
+							  IVec pos,
+							  double closenessTolerance,
+							  double uTolerance){
 	final int maxResolution = 10000;
 	int resolution=0;
 	if(curve==null) return null;
@@ -1012,14 +1663,34 @@ public class ITensileNet{
 	    minDist = curve.pt(minU).dist(pos);
 	}
 	
-	if(closenessTolerance >=0 && minDist > closenessTolerance) return null; // no particle found
+	if(closenessTolerance >= 0 && minDist > closenessTolerance) return null; // no particle found
 	
-	return new IParticleOnCurve(curve, minU, pos);
+	if(particleOnCurveConstructor!=null && particleOnCurveConstructorParameters!=null){
+	    IParticleOnCurveI ptcl = getParticleOnCurveInstance(curve,minU,pos);
+	    if(ptcl!=null){
+		ptcl.friction(friction);
+		if(ptcl instanceof IObject){
+		    if(pointLayer!=null) ((IObject)ptcl).layer(IG.layer(pointLayer).clr(pointColor));
+		    ((IObject)ptcl).clr(railPointColor);
+		    
+		}
+		return ptcl;
+	    }
+	}
+	
+	IParticleOnCurveAgent poca = new IParticleOnCurveAgent(curve, minU, pos);
+	
+	poca.fric(friction);
+	if(pointLayer!=null) poca.layer(IG.layer(pointLayer).clr(pointColor));
+	poca.clr(railPointColor);
+	
+	return poca;
+	//return new IParticleOnCurve(curve, minU, pos);
     }
     
     
-    public static class IParticleOnCurveComparator implements IComparator<IParticleOnCurve>{
-	public int compare(IParticleOnCurve p1, IParticleOnCurve p2){
+    public static class IParticleOnCurveComparator implements IComparator<IParticleOnCurveI>{
+	public int compare(IParticleOnCurveI p1, IParticleOnCurveI p2){
 	    if(p1.upos()<p2.upos()) return -1;
 	    if(p1.upos()>p2.upos()) return 1;
 	    return 0;

@@ -30,7 +30,7 @@ package igeo;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public interface IParticleI{
+public interface IParticleI extends IVecI{
 
     /** get mass */
     public double mass();
@@ -101,4 +101,10 @@ public interface IParticleI{
     public IParticleI reset();
     /** alias of reset */
     public IParticleI resetForce();
+    
+    /** fix movement */
+    public IParticleI fix();
+    /** unfix movement */
+    public IParticleI unfix();
+    
 }

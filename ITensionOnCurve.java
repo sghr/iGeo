@@ -33,7 +33,7 @@ import java.util.ArrayList;
 public class ITensionOnCurve extends IDynamicsBase implements ITensionI{
     //public static double defaultTension=1.0;
     
-    public IParticleOnCurve pt1, pt2;
+    public IParticleOnCurveI pt1, pt2;
     /** tension is a coefficient to convert distance of two points to amount of force. */
     public double tension = defaultTension;
     /** if constantTension is true, amount of force is always constant and it's equals to tension.
@@ -42,35 +42,35 @@ public class ITensionOnCurve extends IDynamicsBase implements ITensionI{
     
     public boolean isCurveClosed;
     
-    public ITensionOnCurve(IParticleOnCurve p1, IParticleOnCurve p2, double tension, IObject parent){
+    public ITensionOnCurve(IParticleOnCurveI p1, IParticleOnCurveI p2, double tension, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
 	this.tension = tension;
-	isCurveClosed = pt1.curve.isClosed();
+	isCurveClosed = pt1.curve().isClosed();
 	// curve of p1 and p2 has to be same. but not checked.
     }
     
-    public ITensionOnCurve(IParticleOnCurve p1, IParticleOnCurve p2, IObject parent){
+    public ITensionOnCurve(IParticleOnCurveI p1, IParticleOnCurveI p2, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
 	
-	isCurveClosed = pt1.curve.isClosed();
+	isCurveClosed = pt1.curve().isClosed();
 	// curve of p1 and p2 has to be same. but not checked.
     }
     
-    public ITensionOnCurve(IParticleOnCurve p1, IParticleOnCurve p2, double tension){
+    public ITensionOnCurve(IParticleOnCurveI p1, IParticleOnCurveI p2, double tension){
 	super();
 	pt1=p1; pt2=p2;
 	this.tension = tension;
-	isCurveClosed = pt1.curve.isClosed();
+	isCurveClosed = pt1.curve().isClosed();
 	// curve of p1 and p2 has to be same. but not checked.
     }
     
-    public ITensionOnCurve(IParticleOnCurve p1, IParticleOnCurve p2){
+    public ITensionOnCurve(IParticleOnCurveI p1, IParticleOnCurveI p2){
 	super();
 	pt1=p1; pt2=p2;
 	
-	isCurveClosed = pt1.curve.isClosed();
+	isCurveClosed = pt1.curve().isClosed();
 	// curve of p1 and p2 has to be same. but not checked.
     }
     
@@ -90,7 +90,7 @@ public class ITensionOnCurve extends IDynamicsBase implements ITensionI{
     
     synchronized public void interact(ArrayList<IDynamics> dynamics){
 	
-	double udiff = pt2.upos - pt1.upos;
+	double udiff = pt2.upos() - pt1.upos();
 	if(isCurveClosed){
 	    if(udiff>0.5) udiff -= 1.0; // cyclic
 	    else if(udiff<-0.5) udiff += 1.0; // cyclic

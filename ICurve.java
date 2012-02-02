@@ -51,6 +51,8 @@ public class ICurve extends IObject implements ICurveI{
     }
     public ICurve(IVecI[] cpts, boolean close){ this((IServerI)null, cpts, close); }
     public ICurve(IVecI pt1, IVecI pt2){ this((IServerI)null, pt1, pt2); }
+    /** this creates a line between a same point */
+    public ICurve(IVecI pt){ this((IServerI)null, pt); }
     public ICurve(double x1, double y1, double z1, double x2, double y2, double z2){
 	this((IServerI)null, x1,y1,z1,x2,y2,z2);
     }
@@ -101,6 +103,10 @@ public class ICurve extends IObject implements ICurveI{
     }
     public ICurve(IServerI s, IVecI pt1, IVecI pt2){
 	super(s); curve = new ICurveGeo(pt1,pt2); initCurve(s); 
+    }
+    /** this creates a line between a same point */
+    public ICurve(IServerI s, IVecI pt){
+	super(s); curve = new ICurveGeo(pt); initCurve(s); 
     }
     public ICurve(IServerI s, double x1, double y1, double z1, double x2, double y2, double z2){
 	super(s); curve = new ICurveGeo(new IVec(x1,y1,z1),new IVec(x2,y2,z2));initCurve(s); 
@@ -226,6 +232,89 @@ public class ICurve extends IObject implements ICurveI{
     public IVec startCP(){ return curve.startCP(); }
     /** end control point of the curve */
     public IVec endCP(){ return curve.endCP(); }
+    
+
+    /** add control point at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurve addCP(IVecI pt){
+	curve.addCP(pt); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
+    /** add control point at i and rebuild the curve.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurve addCP(int index, IVecI pt){
+	curve.addCP(index,pt); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this; 
+    }
+    
+    /** add control points at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurve addCP(IVecI[] pts){
+	curve.addCP(pts); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
+    /** add control points at i and rebuild the curve.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurve addCP(int index, IVecI[] pts){
+	curve.addCP(index,pts); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
+    /** alias of addCP(int,IVecI) */
+    public ICurve insertCP(int index, IVecI pt){
+	curve.insertCP(index,pt); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    /** alias of addCP(int,IVecI[]) */
+    public ICurve insertCP(int index, IVecI[] pts){
+	curve.insertCP(index,pts); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
+    /** removing control point at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurve removeCP(){
+	curve.removeCP(); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
+    /** removing control point at i and rebuild the curve 
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurve removeCP(int index){
+	curve.removeCP(index); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
+    /** removing control point from indexFrom to indexTo-1 and rebuild the curve 
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurve removeCP(int indexFrom, int indexTo){
+	curve.removeCP(indexFrom, indexTo); updateGraphic();
+	if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
+    /** close curve with the current control points.
+	it changes total number of control points and knot vector dependng on the degree.
+	new knot vector has equal default intervals destroying original variable intervals.
+    */
+    //public ICurve close();
+
     
     public double knot(int i){ return curve.knot(i); }
     public IDouble knot(IIntegerI i){ return curve.knot(i); }

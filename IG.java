@@ -968,6 +968,9 @@ public class IG implements IServerI{
     public static void enabeErrorPrefix(){ IOut.enablePrefix(); }
     public static void disableErrorPrefix(){ IOut.disablePrefix(); }
     
+    /** change the debug level of IOut */
+    public static void debugLevel(int level){ IOut.debugLevel(level); }
+    public static int debugLevel(){ return IOut.debugLevel(); }
     
     
     /*************************************************************************
@@ -1131,6 +1134,9 @@ public class IG implements IServerI{
     public static ICurve curve(IVecI pt1, IVecI pt2){
 	return ICurveCreator.curve(pt1,pt2);
     }
+    /** this creates a line between a same point */
+    public static ICurve curve(IVecI pt){ return ICurveCreator.curve(pt); }
+    
     
     public static ICurve curve(double x1, double y1, double z1, double x2, double y2, double z2){
 	return ICurveCreator.curve(x1,y1,z1,x2,y2,z2);
@@ -1174,6 +1180,8 @@ public class IG implements IServerI{
 	return curve(cpts,close);
     }
     public static ICurve crv(IVecI pt1, IVecI pt2){ return curve(pt1,pt2); }
+    /** this creates a line between a same point */
+    public static ICurve crv(IVecI pt){ return curve(pt); }
     public static ICurve crv(double x1, double y1, double z1, double x2, double y2, double z2){
 	return curve(x1,y1,z1,x2,y2,z2);
     }
@@ -1196,6 +1204,8 @@ public class IG implements IServerI{
      **********/
     
     public static ICurve line(IVecI pt1, IVecI pt2){ return curve(pt1,pt2); }
+    /** this creates a line between a same point */
+    public static ICurve line(IVecI pt){ return curve(pt); }
     public static ICurve line(double x1, double y1, double z1, double x2, double y2, double z2){
 	return curve(x1,y1,z1,x2,y2,z2);
     }

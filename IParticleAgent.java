@@ -34,14 +34,15 @@ import java.util.ArrayList;
 public class IParticleAgent extends IPointAgent implements IParticleI{
     
     public IParticle particle;
-    public IVec vel, frc;
+    /** only to refer to particle.vel and particle.frc */
+    public IVec vel, frc; 
     
     public IParticleAgent(){ super(); initParticleAgent(); }
     public IParticleAgent(double x, double y, double z){ super(x,y,z); initParticleAgent(); }
     public IParticleAgent(IVec p){ super(p); initParticleAgent(); }
     public IParticleAgent(IVecI p){ super(p); initParticleAgent(); }
     public IParticleAgent(IParticle ptcl){ super(ptcl.pos); initParticleAgent(ptcl); }
-    public IParticleAgent(IParticleAgent p){ super((IPointAgent)p); initParticleAgent(); }    
+    public IParticleAgent(IParticleAgent p){ super((IPointAgent)p); initParticleAgent(p); }    
     
     public IParticleAgent(double x, double y, double z, double vx, double vy, double vz){ super(x,y,z); initParticleAgent(new IVec(vx,vy,vz)); }
     public IParticleAgent(IVec p, IVec vel){ super(p); initParticleAgent(vel); }
@@ -57,6 +58,13 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     }
     public void initParticleAgent(IParticle ptcl){
 	particle = ptcl;
+	pos = particle.pos;
+	vel = particle.vel;
+	frc = particle.frc;
+	addDynamics(particle);
+    }
+    public void initParticleAgent(IParticleAgent ptcl){
+	particle = new IParticle(this.pos, ptcl.vel().dup(), (IObject)this);
 	pos = particle.pos;
 	vel = particle.vel;
 	frc = particle.frc;

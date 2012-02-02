@@ -44,5 +44,15 @@ public interface ITensionI{
     
     /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i);
+    /** alias of pt(int) */
+    public IParticleI pos(int i);
+    /** getting end point1. */
+    public IParticleI pt1();
+    /** alias of pt1() */
+    public IParticleI pos1();
+    /** getting end point2. */
+    public IParticleI pt2();
+    /** alias of pt2() */
+    public IParticleI pos2();
     
 }

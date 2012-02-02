@@ -160,7 +160,19 @@ public class ITension extends IDynamicsBase implements ITensionI{
     public boolean constant(){ return constantTension; }
     public ITension constant(boolean cnst){ constantTension = cnst; return this; }
     
-    public IParticleI pt(int i){ if(i==0) return pt1; return pt2; }
+    /** getting end point. i==0 or i==1. if i is other value, returns first point. */
+    public IParticleI pt(int i){ if(i==1){ return pt2; } return pt1; }
+    /** alias of pt(int) */
+    public IParticleI pos(int i){ return pt(i); }
+    /** getting end point1. */
+    public IParticleI pt1(){ return pt1; }
+    /** alias of pt1() */
+    public IParticleI pos1(){ return pt1(); }
+    /** getting end point2. */
+    public IParticleI pt2(){ return pt2; }
+    /** alias of pt2() */
+    public IParticleI pos2(){ return pt2(); }
+
     
     public ITension parent(IObject par){ super.parent(par); return this; }
     public ITension target(IObject targetObj){ super.target(targetObj); return this; }

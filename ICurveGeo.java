@@ -30,29 +30,27 @@ package igeo;
 */
 public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
+    /** control points */
     public IVecI[] controlPoints;
     
     // degree and knots should not be parameterized
     // because number of control points, degree and knots are intertwined together: 
     // changing them independently doesn't make sense
+    /** degree of NURBS curve */
     public int degree;
     
-    /**
-       normalized knot vector (start value in knot vector is 0, end value is 1)
-       normalized if IConfig.normalizeKots is true
-    */
+    /** normalized knot vector (start value in knot vector is 0, end value is 1) */
     public double[] knots;
-    /**
-       ustart and uend is not normalized, keeping original value
-    */
+    
+    /** ustart and uend are not normalized, keeping original value in input files */
     public double ustart, uend;
     
-    /**
-       flag to determine to use default weight value (1.0)
-    */
+    /** flag to determine to use default weight value (1.0) */
     public boolean[] defaultWeights;
     
+    /** bernstein basis function */
     public IBSplineBasisFunction basisFunction;
+    /** derivative of bernstein basis function */
     public IBSplineBasisFunction derivativeFunction;
     
     
@@ -100,6 +98,12 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public ICurveGeo(IVecI pt1, IVecI pt2){
 	ustart=0.; uend=1.;
 	init(new IVecI[]{ pt1, pt2 }, 1, createKnots(1, 2));
+    }
+    
+    //this creates line between a same point
+    public ICurveGeo(IVecI pt){
+	ustart=0.; uend=1.;
+	init(new IVecI[]{ pt, pt.dup() }, 1, createKnots(1, 2));
     }
     
     public ICurveGeo(double x1,double y1,double z1,double x2,double y2,double z2){
@@ -170,7 +174,6 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(cpts); }
 	else if(IConfig.checkDuplicatedControlPointOnEdge){ checkDuplicatedCPOnEdge(cpts); }
 	
-	
 	controlPoints = cpts;
 	this.degree = degree;
 	this.knots = knots;
@@ -181,6 +184,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	    defaultWeights[i] = !(cpts[i] instanceof IVec4I);
 	}
     }
+    
     public boolean isValid(){
 	return isValidCP(controlPoints, degree, knots);
     }
@@ -237,6 +241,17 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	for(int i=0; i<cpts.length; i++)
 	    for(int j=i+1; j<cpts.length; j++)
 		if(cpts[j]==cpts[i]) cpts[j] = cpts[i].dup();
+    }
+    
+    static public void checkDuplicatedCP(IVecI[] origCPs, IVecI newCP){
+	for(int i=0; i<origCPs.length; i++)
+	    if(origCPs[i]==newCP) origCPs[i] = newCP.dup();
+    }
+    
+    static public void checkDuplicatedCP(IVecI[] origCPs, IVecI[] newCPs){
+	for(int i=0; i<origCPs.length; i++)
+	    for(int j=0; j<newCPs.length; j++)
+		if(origCPs[i]==newCPs[j]) origCPs[i] = newCPs[j].dup();
     }
     
     static public void checkDuplicatedCPOnEdge(IVecI[] cpts){
@@ -345,6 +360,236 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public IVecI cp(IIntegerI i){ return controlPoints[i.x()]; }
     
     public IVecI[] cps(){ return controlPoints; }
+    
+    
+    /** add control point at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo addCP(IVecI pt){
+	if(!pt.isValid()){
+	    IOut.err("input pt is invalid. not added");
+	    return this; 
+	}
+	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pt); }
+	int num = controlPoints.length;
+	IVecI[] controlPoints2 = new IVecI[num+1];
+	for(int i=0; i<num; i++){ controlPoints2[i] = controlPoints[i]; }
+	controlPoints2[num] = pt;
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] knots2  =createKnots(degree, num+1);
+	IBSplineBasisFunction basisFunction2 = new IBSplineBasisFunction(degree, knots2);
+	boolean[] defaultWeights2 = new boolean[num+1];
+	for(int i=0; i<num; i++) defaultWeights2[i] = defaultWeights[i];
+	defaultWeights2[num] = !(pt instanceof IVec4I);
+	
+	controlPoints = controlPoints2;
+	knots = knots2;
+	basisFunction = basisFunction2;
+	defaultWeights = defaultWeights2;
+	return this;
+    }
+    /** add control point at i and rebuild the curve.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo addCP(int index, IVecI pt){
+	int num = controlPoints.length;
+	if(index<0 || index>=num){
+	    IOut.err("index "+index+" is out of range. not added");
+	    return this;
+	}
+	if(!pt.isValid()){
+	    IOut.err("input pt is invalid. not added");
+	    return this; 
+	}
+	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pt); }
+	
+	IVecI[] controlPoints2 = new IVecI[num+1];
+	int i=0; 
+	for(; i<index; i++) controlPoints2[i] = controlPoints[i];
+	controlPoints2[i++] = pt;
+	for(; i<num+1; i++) controlPoints2[i] = controlPoints[i-1];
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] knots2  =createKnots(degree, num+1);
+	IBSplineBasisFunction basisFunction2 = new IBSplineBasisFunction(degree, knots2);
+	boolean[] defaultWeights2 = new boolean[num+1];
+	i=0;
+	for(; i<index; i++) defaultWeights2[i] = defaultWeights[i];
+	defaultWeights2[i++] = !(pt instanceof IVec4I);
+	for(; i<num+1; i++) defaultWeights2[i] = defaultWeights[i-1];
+	
+	controlPoints = controlPoints2;
+	knots = knots2;
+	basisFunction = basisFunction2;
+	defaultWeights = defaultWeights2;
+	return this;
+    }
+    
+    /** add control points at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo addCP(IVecI[] pts){
+	int num2 = pts.length;
+	for(int i=0; i < num2; i++){
+	    if(!pts[i].isValid()){
+		IOut.err("input pts["+i+"] is invalid. not added");
+		return this; 
+	    }
+	}
+	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pts); }
+	int num = controlPoints.length;
+	IVecI[] controlPoints2 = new IVecI[num+num2];
+	int i=0;
+	for(; i<num; i++){ controlPoints2[i] = controlPoints[i]; }
+	for(; i<num+num2; i++){ controlPoints2[i] =  pts[i-num]; }
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] knots2  =createKnots(degree, num+num2);
+	IBSplineBasisFunction basisFunction2 = new IBSplineBasisFunction(degree, knots2);
+	boolean[] defaultWeights2 = new boolean[num+num2];
+	i=0;
+	for(; i<num; i++) defaultWeights2[i] = defaultWeights[i];
+	for(; i<num+num2; i++) defaultWeights2[i] = !(pts[i-num] instanceof IVec4I);
+	
+	controlPoints = controlPoints2;
+	knots = knots2;
+	basisFunction = basisFunction2;
+	defaultWeights = defaultWeights2;
+	return this;
+    }
+    /** add control points at i and rebuild the curve.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo addCP(int index, IVecI[] pts){
+	int num = controlPoints.length;
+	if(index<0 || index>=num){
+	    IOut.err("index "+index+" is out of range. not added");
+	    return this;
+	}
+	int num2 = pts.length;
+	for(int i=0; i < num2; i++){
+	    if(!pts[i].isValid()){
+		IOut.err("input pts["+i+"] is invalid. not added");
+		return this; 
+	    }
+	}
+	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pts); }
+	
+	IVecI[] controlPoints2 = new IVecI[num+num2];
+	int i=0;
+	for(; i<index; i++){ controlPoints2[i] = controlPoints[i]; }
+	for(; i<index+num2; i++){ controlPoints2[i] = pts[i-index]; }
+	for(; i<num+num2; i++){ controlPoints2[i] =  controlPoints[i-num2]; }
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] knots2  =createKnots(degree, num+num2);
+	IBSplineBasisFunction basisFunction2 = new IBSplineBasisFunction(degree, knots2);
+	boolean[] defaultWeights2 = new boolean[num+num2];
+	i=0;
+	for(; i<index; i++) defaultWeights2[i] = defaultWeights[i];
+	for(; i<index+num2; i++) defaultWeights2[i] = !(pts[i-index] instanceof IVec4I);
+	for(; i<num+num2; i++) defaultWeights2[i] = defaultWeights[i-num2];
+	
+	controlPoints = controlPoints2;
+	knots = knots2;
+	basisFunction = basisFunction2;
+	defaultWeights = defaultWeights2;
+	return this;
+    }
+    
+    /** alias of addCP(int,IVecI) */
+    public ICurveGeo insertCP(int i, IVecI pt){ return addCP(i,pt); }
+    /** alias of addCP(int,IVecI[]) */
+    public ICurveGeo insertCP(int i, IVecI[] pts){ return addCP(i,pts); }
+    
+    /** removing control point at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo removeCP(){
+	int num = controlPoints.length;
+	IVecI[] controlPoints2 = new IVecI[num-1];
+	for(int i=0; i<num-1; i++){ controlPoints2[i] = controlPoints[i]; }
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] knots2=createKnots(degree, num-1);
+	IBSplineBasisFunction basisFunction2 = new IBSplineBasisFunction(degree, knots2);
+	boolean[] defaultWeights2 = new boolean[num-1];
+	for(int i=0; i<num-1; i++) defaultWeights2[i] = defaultWeights[i];
+	
+	controlPoints = controlPoints2;
+	knots = knots2;
+	basisFunction = basisFunction2;
+	defaultWeights = defaultWeights2;
+	return this;
+    }
+    /** removing control point at i and rebuild the curve 
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo removeCP(int index){
+	int num = controlPoints.length;
+	if(index<0 || index>=num){
+	    IOut.err("index "+index+" is out of range. not removed");
+	    return this;
+	}
+	IVecI[] controlPoints2 = new IVecI[num-1];
+	int i=0;
+	for(; i<index; i++){ controlPoints2[i] = controlPoints[i]; }
+	for(; i<num-1; i++){ controlPoints2[i] = controlPoints[i+1]; }
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] knots2 = createKnots(degree, num-1);
+	IBSplineBasisFunction basisFunction2 = new IBSplineBasisFunction(degree, knots2);
+	boolean[] defaultWeights2 = new boolean[num-1];
+	i=0;
+	for(; i<index; i++) defaultWeights2[i] = defaultWeights[i];
+	for(; i<num-1; i++) defaultWeights2[i] = defaultWeights[i+1];
+	
+	controlPoints = controlPoints2;
+	knots = knots2;
+	basisFunction = basisFunction2;
+	defaultWeights = defaultWeights2;
+	return this;
+    }
+    /** removing control point from indexFrom to indexTo-1 and rebuild the curve.
+	note taht point at indexTo is not removed.
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo removeCP(int indexFrom, int indexTo){
+	int num = controlPoints.length;
+	if(indexFrom<0 || indexFrom>=num || indexTo<0 || indexFrom>=num || indexFrom>=indexTo){
+	    IOut.err("index range ["+indexFrom+"-"+indexTo+" is invalid. not removed");
+	    return this;
+	}
+	int num2 = indexTo-indexFrom;
+	IVecI[] controlPoints2 = new IVecI[num-num2];
+	int i=0;
+	for(; i<indexFrom; i++){ controlPoints2[i] = controlPoints[i]; }
+	for(; i<num-num2; i++){ controlPoints2[i] = controlPoints[i+num2]; }
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] knots2 = createKnots(degree, num-num2);
+	IBSplineBasisFunction basisFunction2 = new IBSplineBasisFunction(degree, knots2);
+	boolean[] defaultWeights2 = new boolean[num-num2];
+	i=0;
+	for(; i<indexFrom; i++) defaultWeights2[i] = defaultWeights[i];
+	for(; i<num-num2; i++) defaultWeights2[i] = defaultWeights[i+num2];
+	
+	controlPoints = controlPoints2;
+	knots = knots2;
+	basisFunction = basisFunction2;
+	defaultWeights = defaultWeights2;
+	return this;
+    }
+    
+    /** close curve with the current control points.
+	it changes total number of control points and knot vector dependng on the degree.
+	new knot vector has equal default intervals destroying original variable intervals.
+    */
+    //public ICurveGeo close();
+
+
+    
     
     public IVec ep(int i){ return pt(knots[i+degree]); }
     public IVec ep(IIntegerI i){ return pt(knots[i.x()+degree]); }

@@ -31,7 +31,7 @@ import java.util.ArrayList;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IParticleOnCurve extends IParticle{
+public class IParticleOnCurve extends IParticle implements IParticleOnCurveI{
     
     public ICurveI curve;
     public double upos;
@@ -45,12 +45,18 @@ public class IParticleOnCurve extends IParticle{
     public IParticleOnCurve(ICurveI curve, double u){
 	super(curve.pt(u).get()); this.curve=curve; upos=u; 
     }
+    public IParticleOnCurve(ICurveI curve, double u, double uvl){
+	this(curve,u); uvel=uvl;
+    }
     public IParticleOnCurve(ICurveI curve, IVec pos){ this(curve,0,pos); }
     public IParticleOnCurve(ICurveI curve, double u, IVec pos){
 	super(pos);
 	pos.set(curve.pt(u).get());
 	this.curve=curve;
 	upos=u;
+    }
+    public IParticleOnCurve(ICurveI curve, double u, double uvl, IVec pos){
+	this(curve,u,pos); uvel=uvl;
     }
     
     public IParticleOnCurve(ICurveI curve, IObject parent){
@@ -61,6 +67,9 @@ public class IParticleOnCurve extends IParticle{
 	this.curve=curve;
 	upos=u;
     }
+    public IParticleOnCurve(ICurveI curve, double u, double uvl, IObject parent){
+	this(curve,u,parent); uvel=uvl;
+    }
     
     public IParticleOnCurve(ICurveI curve, IVec pos, IObject parent){ this(curve,0,pos,parent); }
     
@@ -70,18 +79,25 @@ public class IParticleOnCurve extends IParticle{
 	this.curve=curve;
 	upos=u;
     }
+    public IParticleOnCurve(ICurveI curve, double u, double uvl, IVec pos, IObject parent){
+	this(curve,u,pos,parent); uvel=uvl;
+    }
     
     
     public IParticleOnCurve(ICurveI curve, double u, IPoint pt){ this(curve,u,pt.pos,pt); }
+    public IParticleOnCurve(ICurveI curve, double u, double uvl, IPoint pt){ this(curve,u,uvl,pt.pos,pt); }
     public IParticleOnCurve(ICurveI curve, IPoint pt){ this(curve,0,pt.pos,pt); }
     public IParticleOnCurve(ICurveI curve, IPointR pt){ this(curve,0,pt.pos.get(),pt); }
     public IParticleOnCurve(ICurveI curve, double u, IPointR pt){ this(curve,u,pt.pos.get(),pt); }
+    public IParticleOnCurve(ICurveI curve, double u, double uvl, IPointR pt){ this(curve,u,uvl,pt.pos.get(),pt); }
     
     
     public IParticleOnCurve(ICurve curve){ this(curve,0,curve); }
     public IParticleOnCurve(ICurve curve, double u){ this(curve,u,curve); }
+    public IParticleOnCurve(ICurve curve, double u, double uvl){ this(curve,u,uvl,curve); }
     public IParticleOnCurve(ICurve curve, IVec pos){ this(curve,0,pos,curve); }
     public IParticleOnCurve(ICurve curve, double u, IVec pos){ this(curve,u,pos,curve); }
+    public IParticleOnCurve(ICurve curve, double u, double uvl, IVec pos){ this(curve,u,uvl,pos,curve); }
     
     public IParticleOnCurve(IParticleOnCurve p){
 	this(p.curve, p.upos, p.pos.dup(), p.parent());
@@ -97,7 +113,7 @@ public class IParticleOnCurve extends IParticle{
     }
     
     public IParticleOnCurve dup(){ return new IParticleOnCurve(this); }
-
+    
     public ICurveI curve(){ return curve; }
     
     
@@ -136,8 +152,12 @@ public class IParticleOnCurve extends IParticle{
     synchronized public double uforce(){ return ufrc(); }
     synchronized public double ufrc(){ return ufrc; }
     
-    synchronized public IParticleOnCurve addUForce(double uforce){ ufrc+=uforce; return this; }
-    synchronized public IParticleOnCurve resetUForce(){ ufrc=0; return this; }
+    synchronized public IParticleOnCurve addUForce(double uforce){ return upush(uforce); }
+    synchronized public IParticleOnCurve resetUForce(){ return ureset(); }
+    
+    synchronized public IParticleOnCurve upush(double uforce){ ufrc+=uforce; return this; }
+    synchronized public IParticleOnCurve upull(double uforce){ ufrc-=uforce; return this; }
+    synchronized public IParticleOnCurve ureset(){ ufrc=0; return this; }
     
     
     

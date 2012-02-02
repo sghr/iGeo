@@ -59,6 +59,58 @@ public interface ICurveI extends ICurveOp, ITransformable{
     /** all control points */
     public IVecI[] cps();
     
+    // maybe those are only for ICurve & ICurveGeo, not ICurveR
+    //
+    /** add control point at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    //public ICurveI addCP(IVecI pt);
+    /** add control point at i and rebuild the curve.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    //public ICurveI addCP(int i, IVecI pt);
+
+    /** add control points at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    //public ICurveI addCP(IVecI[] pt);
+    /** add control points at i and rebuild the curve.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    //public ICurveI addCP(int i, IVecI[] pt);
+    
+    /** alias of addCP(int,IVecI) */
+    //public ICurveI insertCP(int i, IVecI pt);
+    /** alias of addCP(int,IVecI[]) */
+    //public ICurveI insertCP(int i, IVecI[] pt);
+    
+    /** removing control point at the end and rebuild the curve.
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    //public ICurveI removeCP();
+    /** removing control point at i and rebuild the curve 
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    //public ICurveI removeCP(int i);
+    /** removing control point from indexFrom to indexTo-1 and rebuild the curve 
+	note that a knots is rebuilt with default equal interval
+	and destroy original knot intervals if variable, like circle.
+    */
+    //public ICurveI removeCP(int indexFrom int indexTo);
+    
+    /** close curve with the current control points.
+	it changes total number of control points and knot vector dependng on the degree.
+	new knot vector has equal default intervals destroying original variable intervals.
+    */
+    //public ICurveI close();
+    
+    
     public double knot(int i);
     public IDoubleI knot(IIntegerI i);
     
@@ -83,6 +135,12 @@ public interface ICurveI extends ICurveOp, ITransformable{
     //public IIntegerI degR();
     public int deg(ISwitchE e);
     public IIntegerI deg(ISwitchR r);
+    
+    /** change degree. this operation is costly because it needs to rebuild the whole knots and basisFunction */
+    //public ICurveI deg(int d);
+    //sholud I not allow to record changing degree?
+    //public ICurveI deg(IDoubeI d);
+    
     
     public int num(); // equals to cpNum
     //public IIntegerI numR(); // equals to cpNum

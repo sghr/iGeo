@@ -103,6 +103,17 @@ public class ITensionLine extends ICurve implements ITensionI{
 	tensionDynamics.constant(cnst); return this;
     }
     
+    /** getting end point. i==0 or i==1. if i is other value, returns first point. */
     public IParticleI pt(int i){ return tensionDynamics.pt(i); }
+    /** alias of pt(int) */
+    public IParticleI pos(int i){ return pos(i); }
+    /** getting end point1. */
+    public IParticleI pt1(){ return tensionDynamics.pt1(); }
+    /** alias of pt1() */
+    public IParticleI pos1(){ return pt1(); }
+    /** getting end point2. */
+    public IParticleI pt2(){ return tensionDynamics.pt2(); }
+    /** alias of pt2() */
+    public IParticleI pos2(){ return pt2(); }
     
 }

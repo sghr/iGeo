@@ -61,6 +61,8 @@ public class ICurveCreator{
 	return new ICurve(server,cpts,close);
     }
     public static ICurve curve(IVecI pt1, IVecI pt2){ return new ICurve(server,pt1,pt2); }
+    /** this creates a line between a same point */
+    public static ICurve curve(IVecI pt){ return new ICurve(server,pt); }
     
     public static ICurve curve(double x1, double y1, double z1, double x2, double y2, double z2){
 	return new ICurve(server, x1,y1,z1,x2,y2,z2);

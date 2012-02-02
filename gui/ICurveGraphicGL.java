@@ -93,7 +93,7 @@ public class ICurveGraphicGL extends IGraphicObject{
     
     public void draw(IGraphics g){
 	
-	if(curve==null || update && curve.deg()>1 )
+	if(curve==null || update /*&& curve.deg()>1*/ ) // now need to be updated with deg 1
 	    initCurve(); // not initizlized at the constructor // shouldn't it?
 	
 	GL gl = g.getGL();

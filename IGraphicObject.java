@@ -88,8 +88,7 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     
     /** updating graphic when geometry change. actual update happens when it's drawn.*/
     public void update(){ update=true; }
-    
-    
+        
     public void setColor(Color c){ color=c; }
     
     public Color getColor(){ return color; }

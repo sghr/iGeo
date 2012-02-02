@@ -67,15 +67,19 @@ public class INurbsGeo extends IParameterObject{
     public static double[] createKnots(int degree, int num){
         double knots[] = new double[degree+num+1];
         int k,m;
+	double inc = 1.0/(num-degree);
         for(k=0; k<=degree; k++) knots[k]=0;
-        for(m=1; k<num; k++,m++) knots[k]=(double)m/(num-degree);
+        //for(m=1; k<num; k++,m++) knots[k]=(double)m/(num-degree);
+	for(m=1; k<num; k++,m++) knots[k]=m*inc;
         for(; k<=(degree+num); k++) knots[k]=1.;
 	return knots; 
     }
     public static double[] createClosedKnots(int degree, int num){
 	double knots[] = new double[degree+num+1];
-	for(int k=0,m=-degree; k<=(degree+num); k++,m++) knots[k]=(double)m/(num-degree);
-	return knots; 
+	double inc = 1.0/(num-degree);
+	//for(int k=0,m=-degree; k<=(degree+num); k++,m++) knots[k]=(double)m/(num-degree);
+	for(int k=0,m=-degree; k<=(degree+num); k++,m++) knots[k]=m*inc;
+	return knots;
     }
     
     public static IVecI[] createClosedCP(IVecI[] cpts, int degree){
