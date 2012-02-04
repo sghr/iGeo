@@ -1197,7 +1197,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    //for(int j=0; loop!=null&&j<loop.size(); j++) loop.get(j).del();
 	    loop.clear();
 	}
-	innerTrimLoop.clear();
+	if(innerTrimLoop!=null) innerTrimLoop.clear();
 	return this;
     }
     public ISurfaceGeo clearOuterTrim(){
@@ -1206,7 +1206,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    //for(int j=0; loop!=null&&j<loop.size(); j++) loop.get(j).del();
 	    loop.clear();
 	}
-	outerTrimLoop.clear();
+	if(outerTrimLoop!=null) outerTrimLoop.clear();
 	return this;
     }
     public ISurfaceGeo clearTrim(){

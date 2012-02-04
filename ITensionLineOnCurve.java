@@ -60,6 +60,17 @@ public class ITensionLineOnCurve extends ICurve implements ITensionI{
 	tension.constant(cnst); return this;
     }
     
+    /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i){ return tension.pt(i); }
+    /** alias of pt(int) */
+    public IParticleI pos(int i){ return pt(i); }
+    /** getting end point1. */
+    public IParticleI pt1(){ return tension.pt1(); }
+    /** alias of pt1() */
+    public IParticleI pos1(){ return pt1(); }
+    /** getting end point2. */
+    public IParticleI pt2(){ return tension.pt2(); }
+    /** alias of pt2() */
+    public IParticleI pos2(){ return pt2(); }
     
 }

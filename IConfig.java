@@ -85,6 +85,13 @@ public /*interface*/ class IConfig{
     */
     public static int surfaceTrimEdgeResolution=4; //2;
     
+    /**
+       This is only for saving brep or trimmed surface to Rhino file where
+       the 2D trim curve is also required to have 3D representation;
+       3D curve is approximated with sampled points in this resolution. 
+    */
+    public static int trim3dCurveInterpolationResolution = 20;
+    
     /*****************************
      * dynamics properties
      *****************************/

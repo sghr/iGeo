@@ -37,91 +37,224 @@ public class ITensileNet{
     
     // physical attributes
     /** friction of node points (of IParticleAgent) */
-    public static double friction = 0.005; //0.0; 
+    public static double friction = 0.005; //0.0;
+    
+    /** friction of node points (of IParticleAgent) */
+    public static void friction(double f){ friction = f; }
+    /** alias of frction(double) */
+    public static void fric(double f){ friction(f); }
+    
+    
     /** strength of tension (of ITensionLine) */
     public static double tension = 1.0;
+    
+    /** strength of tension (of ITensionLine) */
+    public static void tension(double t){ tension = t; }
+    
     /** strength of tension between points on the same rail curves */
     public static double onRailTension = 1.0;
+    
+    /** strength of tension between points on the same rail curves */
+    public static void onRailTension(double t){ onRailTension = t; }
+    
     /** strength of tension to straighten lines */
     public static double straightenerTension = 1.0;
+
+    /** strength of tension to straighten lines */
+    public static void straightenerTension(double t){ straightenerTension=t; }
+    
     /** strength of tension to equalize spacing on the same rail curves */
     public static double equalizerTension = 1.0;
     
+    /** strength of tension to equalize spacing on the same rail curves */
+    public static void equalizerTension(double t){ equalizerTension = t; }
+    
     /** boolean switch to make tension (of ITensionLine) constant not depending on the distance of two points*/
     public static boolean constantTension = false;
+    
+    /** boolean switch to make tension (of ITensionLine) constant not depending on the distance of two points*/
+    public static void constantTension(boolean c){ constantTension = c; }
+    public static void enableConstantTension(){ constantTension = true; }
+    public static void disableConstantTension(){ constantTension = false; }
+    
+    
     
     
     /** tolerance to check which points are identical and which lines are connected */
     public static double tolerance = IConfig.tolerance;
     
+    /** tolerance to check which points are identical and which lines are connected */
+    public static void tolerance(double t){ tolerance=t; }
+    
     /** tolerance to check which points are on rail */
     public static double railTolerance = IConfig.tolerance;
+    
+    /** tolerance to check which points are identical and which lines are connected */
+    public static void railTolerance(double t){ railTolerance=t; }
     
     
     /** color of node points */
     public static Color pointColor = new Color(255,255,255);
+    /** color of node points */
+    public static void pointColor(Color c){ pointColor = c; }
+    
     /** color of node points on rail curve */
     public static Color railPointColor = new Color(192,192,192);
+    /** color of node points on rail curve */
+    public static void railPointColor(Color c){ railPointColor = c; }
+    
     /** color of fixed node points */
     public static Color fixedPointColor = new Color(255,255,0);
+    /** color of fixed node points */
+    public static void fixedPointColor(Color c){ fixedPointColor=c; }
+    
     /** color of straightener curve */
     public static Color straightenerColor = new Color(255,128,0);
     
+    /** color of straightener curve */
+    public static void straightenerColor(Color c){ straightenerColor = c; }
+    
     
     public static String pointLayer = "nodes";
+    public static void pointLayer(String l){ pointLayer = l; }
+    
     public static String fixedPointLayer = "fixedNodes";
+    public static void fixedPointLayer(String l){ fixedPointLayer = l; }
+    
     public static String straightenerLayer = "straightener";
+    public static void straightenerLayer(String l){ straightenerLayer = l; }
+    
     public static String equalizerLayer = "equalizer";
+    public static void equalizerLayer(String l){ equalizerLayer = l; }
     
     
     // boolean options for create() methods
     /** boolean switch to fix open end points of lines which are not connected any other line */
     public static boolean fixOpenLinePoint=true;
+    /** boolean switch to fix open end points of lines which are not connected any other line */
+    public static void fixOpenLinePoint(boolean f){ fixOpenLinePoint=f; }
+    /** boolean switch to fix open end points of lines which are not connected any other line */
+    public static void enableFixOpenLinePoint(){ fixOpenLinePoint=true; }
+    /** boolean switch to fix open end points of lines which are not connected any other line */
+    public static void disableFixOpenLinePoint(){ fixOpenLinePoint=false; }
     
     /** boolean switch to delete input lines */
     public static boolean deleteInputLine=true;
+    /** boolean switch to delete input lines */
+    public static void deleteInputLine(boolean f){ deleteInputLine=f; }
+    /** boolean switch to fix open end points of lines which are not connected any other line */
+    public static void enableDeleteInputLine(){ deleteInputLine=true; }
+    /** boolean switch to fix open end points of lines which are not connected any other line */
+    public static void disableDeleteInputLine(){ deleteInputLine=false; }
     
     /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
     public static boolean tensionOnSameRail=true;
+    /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
+    public static void tensionOnSameRail(boolean f){ tensionOnSameRail=f; }
+    /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
+    public static void enableTensionOnSameRail(){ tensionOnSameRail=true; }
+    /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
+    public static void disableTensionOnSameRail(){ tensionOnSameRail=false; }
+    
     
     /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
     public static boolean fixPointOnRailEnd=true;
+    /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
+    public static void fixPointOnRailEnd(boolean f){ fixPointOnRailEnd=f; }
+    /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
+    public static void enableFixPointOnRailEnd(){ fixPointOnRailEnd=true; }
+    /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
+    public static void disableFixPointOnRailEnd(){ fixPointOnRailEnd=false; }
     
     /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
     public static boolean fixPointNotOnRail=true;
+    /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
+    public static void fixPointNotOnRail(boolean f){ fixPointNotOnRail=f; }
+    /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
+    public static void enableFixPointNotOnRail(boolean f){ fixPointNotOnRail=true; }
+    /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
+    public static void disableFixPointNotOnRail(boolean f){ fixPointNotOnRail=false; }
+    
     
     /** boolean switch to put straightening force on connected lines */
-    public static boolean enableStraightener=false; //true;
+    public static boolean straightener=false; //true;
+    /** boolean switch to put straightening force on connected lines */
+    public static void straightener(boolean s){ straightener=s; }
+    /** boolean switch to put straightening force on connected lines */
+    public static void enableStraightener(){ straightener=true; }
+    /** boolean switch to put straightening force on connected lines */
+    public static void disableStraightener(){ straightener=false; }
     
     /** if the connected line is less than this angle, it put straightening force on those lines */
     public static double straightenerThresholdAngle=Math.PI/3;
+    /** if the connected line is less than this angle, it put straightening force on those lines */
+    public static void straightenerThresholdAngle(double angle){ straightenerThresholdAngle=angle; }
     
     /** remove straighteners whose two points are shared and branching. */
-    public static boolean noBranchingStraightener=true;
+    public static boolean removeBranchStraightener=true;
+    /** remove straighteners whose two points are shared and branching. */
+    public static void removeBranchStraightener(boolean f){ removeBranchStraightener=f; }
+    /** remove straighteners whose two points are shared and branching. */
+    public static void enableRemoveBranchStraightener(){ removeBranchStraightener=true; }
+    /** remove straighteners whose two points are shared and branching. */
+    public static void disableRemoveBranchStraightener(){ removeBranchStraightener=false; }
     
     
     /** boolean switch to put spacing equalizer force on the same rail curves */
-    public static boolean enableSpacingEqualizer=false; // default false
+    public static boolean spacingEqualizer=false; // default false
+    /** boolean switch to put spacing equalizer force on the same rail curves */
+    public static void spacingEqualizer(boolean f){ spacingEqualizer=f; }
+    /** boolean switch to put spacing equalizer force on the same rail curves */
+    public static void enableSpacingEqualizer(){ spacingEqualizer=true; }
+    /** boolean switch to put spacing equalizer force on the same rail curves */
+    public static void disableSpacingEqualizer(){ spacingEqualizer=false; }
     
     //public static IParticleI particleClassReference=null;
     //public static ITensionI tensionClassReference=null;
     
     /** class for a custom particle class */
     public static Class<? extends IParticleI> particleClass=null;
+    /** class for a custom particle class */
+    public static void particleClass(Class<? extends IParticleI> cls){ particleClass = cls; }
+    
     /** class for a custom tension class */
     public static Class<? extends ITensionI> tensionClass=null;
+    /** class for a custom tension class */
+    public static void tensionClass(Class<? extends ITensionI> cls){ tensionClass=cls; }
+    
     /** class for a custom particle on curve class */
     public static Class<? extends IParticleOnCurveI> particleOnCurveClass=null;
+    /** class for a custom particle on curve class */
+    public static void particleOnCurveClass(Class<? extends IParticleOnCurveI> cls){ particleOnCurveClass=cls; }
     
     /** constructor for a custom particle class */
     public static Constructor<? extends IParticleI> particleConstructor;
+    
+    /** constructor for a custom particle class */
+    public static void particleConstructor(Constructor<? extends IParticleI> c){ particleConstructor=c; }
+    
+    /** parameters of constructor for a custom particle class */
     public static Class<?>[] particleConstructorParameters;
+    /** parameters of constructor for a custom particle class */
+    public static void particleConstructorParameters(Class<?>[] p){ particleConstructorParameters=p; }
+    
     /** constructor for a custom tension class */
     public static Constructor<? extends ITensionI> tensionConstructor;
+    /** constructor for a custom tension class */
+    public static void tensionConstructor(Constructor<? extends ITensionI> c){ tensionConstructor=c; }
+    /** parameters of constructor for a custom tension class */
     public static Class<?>[] tensionConstructorParameters;
+    /** parameters of constructor for a custom tension class */
+    public static void tensionConstructorParameters(Class<?>[] p){ tensionConstructorParameters=p; }
+    
     /** constructor for a custom particle on curve class */
     public static Constructor<? extends IParticleOnCurveI> particleOnCurveConstructor;
+    /** constructor for a custom particle on curve class */
+    public static void particleOnCurveConstructor(Constructor<? extends IParticleOnCurveI> c){ particleOnCurveConstructor=c; }
+    /** parameters of constructor for a custom particle on curve class */
     public static Class<?>[] particleOnCurveConstructorParameters;
+    /** parameters of constructor for a custom particle on curve class */
+    public static void particleOnCurveConstructorParameters(Class<?>[] p){ particleOnCurveConstructorParameters=p; }
     
     
     
@@ -170,13 +303,13 @@ public class ITensileNet{
 	ILayer[] lineLayer = new ILayer[linkLines.length];
 	
 	IServer server=null;
-	if(deleteInputLine){
-	    for(int i=0; i<linkLines.length; i++){
-		if(linkLines[i] instanceof IObject){
-		    lineColors[i] = ((IObject)linkLines[i]).clr();
-		    lineLayer[i] = ((IObject)linkLines[i]).layer();
+	for(int i=0; i<linkLines.length; i++){
+	    if(linkLines[i] instanceof IObject){
+		lineColors[i] = ((IObject)linkLines[i]).clr();
+		lineLayer[i] = ((IObject)linkLines[i]).layer();
+		if(server==null) server = ((IObject)linkLines[i]).server();
+		if(deleteInputLine){
 		    ((IObject)linkLines[i]).del();
-		    if(server==null) server = ((IObject)linkLines[i]).server();
 		}
 	    }
 	}
@@ -186,21 +319,28 @@ public class ITensileNet{
 	// find connection and remove duplicates
 	for(int i=0; i<endPts.length; i++){
 	    IVec[] epts1 = endPts[i];
-	    if(epts1[1].eq(epts1[0], tolerance)){ epts1[1] = epts1[0]; }
-	    for(int j=i+1; j<endPts.length; j++){
-		IVec[] epts2 = endPts[j];
-		for(int k=0; k<2; k++){
-		    if(epts2[k].eq(epts1[0], tolerance)) epts2[k] = epts1[0];
-		    else if(epts2[k].eq(epts1[1], tolerance)) epts2[k] = epts1[1];
+	    if(epts1[1].eq(epts1[0], tolerance)){ // case of line of length zero
+		//epts1[1] = epts1[0];
+		endPts[i] = null;  // skip
+	    }
+	    else{
+		for(int j=i+1; j<endPts.length; j++){
+		    IVec[] epts2 = endPts[j];
+		    for(int k=0; k<2; k++){
+			if(epts2[k].eq(epts1[0], tolerance)) epts2[k] = epts1[0];
+			else if(epts2[k].eq(epts1[1], tolerance)) epts2[k] = epts1[1];
+		    }
 		}
 	    }
 	}
 	
 	ArrayList<IVec> uniquePts = new ArrayList<IVec>();
 	for(int i=0; i<endPts.length; i++){
-	    for(int j=0; j<2; j++){
-		IVec pt = endPts[i][j];
-		if(!uniquePts.contains(pt)) uniquePts.add(pt);
+	    if(endPts[i]!=null){
+		for(int j=0; j<2; j++){
+		    IVec pt = endPts[i][j];
+		    if(!uniquePts.contains(pt)) uniquePts.add(pt);
+		}
 	    }
 	}
 	
@@ -210,8 +350,10 @@ public class ITensileNet{
 	    for(int i=0; i<uniquePts.size(); i++){
 		int count=0;
 		for(int j=0; j<endPts.length; j++){
-		    if(endPts[j][0] == uniquePts.get(i)) count++;
-		    if(endPts[j][1] == uniquePts.get(i)) count++;
+		    if(endPts[j]!=null){
+			if(endPts[j][0] == uniquePts.get(i)) count++;
+			if(endPts[j][1] == uniquePts.get(i)) count++;
+		    }
 		}
 		if(count==1){ openPts.add(uniquePts.get(i)); }
 	    }
@@ -315,17 +457,18 @@ public class ITensileNet{
 	    ArrayList<ITensionI> tlines = new ArrayList<ITensionI>();
 	    for(int i=0; i<endPts.length; i++){
 		IVec[] epts = endPts[i];
-		int index1 = uniquePts.indexOf(epts[0]);
-		int index2 = uniquePts.indexOf(epts[1]);
-		if(index1>=0 && index2>=0){
-		    IParticleI pa1 = particles.get(index1);
-		    IParticleI pa2 = particles.get(index2);
-		    
-		    ITensionI tnsn = null;
-		    // custom tension class instantiation
-		    if(tensionConstructor!=null && tensionConstructorParameters!=null){
-			tnsn = getTensionInstance(pa1,pa2);
+		if(epts!=null){
+		    int index1 = uniquePts.indexOf(epts[0]);
+		    int index2 = uniquePts.indexOf(epts[1]);
+		    if(index1>=0 && index2>=0){
+			IParticleI pa1 = particles.get(index1);
+			IParticleI pa2 = particles.get(index2);
 			
+			ITensionI tnsn = null;
+			// custom tension class instantiation
+			if(tensionConstructor!=null && tensionConstructorParameters!=null){
+			    tnsn = getTensionInstance(pa1,pa2);
+			    
 			/*
 			try{
 			    if(tensionConstructorParameters.length==2){
@@ -337,35 +480,36 @@ public class ITensileNet{
 			    }
 			}catch(Exception e){ e.printStackTrace(); }
 			*/
-			
-			if(tnsn!=null){
-			    if(tnsn instanceof IObject){
-				
-				if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
-				if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
+			    
+			    if(tnsn!=null){
+				if(tnsn instanceof IObject){
+				    
+				    if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
+				    if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
 			    }
-			    tnsn.tension(tension);
-			    tnsn.constant(constantTension);
-			    tlines.add(tnsn);
+				tnsn.tension(tension);
+				tnsn.constant(constantTension);
+				tlines.add(tnsn);
+			    }
+			}
+			
+			if(tnsn==null){
+			    ITensionLine tl = new ITensionLine(pa1, pa2, tension);
+			    if(lineColors[i]!=null) tl.clr(lineColors[i]);
+			    if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
+			    
+			    tl.tension(tension);
+			    tl.constant(constantTension);
+			    tlines.add(tl);
 			}
 		    }
-		    
-		    if(tnsn==null){
-			ITensionLine tl = new ITensionLine(pa1, pa2, tension);
-			if(lineColors[i]!=null) tl.clr(lineColors[i]);
-			if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
-			
-			tl.tension(tension);
-			tl.constant(constantTension);
-			tlines.add(tl);
+		    else{
+			IOut.err("end point is not found");
 		    }
-		}
-		else{
-		    IOut.err("end point is not found");
 		}
 	    }
 	    
-	    if(enableStraightener){
+	    if(straightener){
 		ArrayList<IStraightenerCurve> straighteners = new ArrayList<IStraightenerCurve>();
 		
 		for(int i=0; i<tlines.size(); i++){
@@ -393,7 +537,7 @@ public class ITensileNet{
 		    }
 		}
 		
-		if(noBranchingStraightener){
+		if(removeBranchStraightener){
 		    for(int i=0; i<straighteners.size(); i++){
 			IParticleI p11 = straighteners.get(i).pt(0);
 			IParticleI p12 = straighteners.get(i).pt(1);
@@ -1059,21 +1203,28 @@ public class ITensileNet{
 	// find connection and remove duplicates
 	for(int i=0; i<endPts.length; i++){
 	    IVec[] epts1 = endPts[i];
-	    if(epts1[1].eq(epts1[0], tolerance)){ epts1[1] = epts1[0]; }
-	    for(int j=i+1; j<endPts.length; j++){
-		IVec[] epts2 = endPts[j];
-		for(int k=0; k<2; k++){
-		    if(epts2[k].eq(epts1[0], tolerance)) epts2[k] = epts1[0];
-		    else if(epts2[k].eq(epts1[1], tolerance)) epts2[k] = epts1[1];
+	    if(epts1[1].eq(epts1[0], tolerance)){
+		//epts1[1] = epts1[0];
+		endPts[i] = null; // skip
+	    }
+	    else{
+		for(int j=i+1; j<endPts.length; j++){
+		    IVec[] epts2 = endPts[j];
+		    for(int k=0; k<2; k++){
+			if(epts2[k].eq(epts1[0], tolerance)) epts2[k] = epts1[0];
+			else if(epts2[k].eq(epts1[1], tolerance)) epts2[k] = epts1[1];
+		    }
 		}
 	    }
 	}
 	
 	ArrayList<IVec> uniquePts = new ArrayList<IVec>();
 	for(int i=0; i<endPts.length; i++){
-	    for(int j=0; j<2; j++){
-		IVec pt = endPts[i][j];
-		if(!uniquePts.contains(pt)) uniquePts.add(pt);
+	    if(endPts[i]!=null){
+		for(int j=0; j<2; j++){
+		    IVec pt = endPts[i][j];
+		    if(!uniquePts.contains(pt)) uniquePts.add(pt);
+		}
 	    }
 	}
 	
@@ -1085,8 +1236,10 @@ public class ITensileNet{
 	    for(int i=0; i<uniquePts.size(); i++){
 		int count=0;
 		for(int j=0; j<endPts.length; j++){
-		    if(endPts[j][0] == uniquePts.get(i)) count++;
-		    if(endPts[j][1] == uniquePts.get(i)) count++;
+		    if(endPts[j]!=null){
+			if(endPts[j][0] == uniquePts.get(i)) count++;
+			if(endPts[j][1] == uniquePts.get(i)) count++;
+		    }
 		}
 		if(count==1){ openPts.add(uniquePts.get(i)); }
 	    }
@@ -1109,7 +1262,7 @@ public class ITensileNet{
 	ArrayList<IParticleOnCurveI>[] particleOnRail = null;
 	
 	
-	if(tensionOnSameRail || enableSpacingEqualizer){
+	if(tensionOnSameRail || spacingEqualizer){
 	    // !!!
 	    @SuppressWarnings("unchecked")
 		ArrayList<IParticleOnCurveI>[] pos = new ArrayList[railCurves.length];
@@ -1224,7 +1377,7 @@ public class ITensileNet{
 		}
 		
 		if(poc!=null){
-		    if(tensionOnSameRail || enableSpacingEqualizer){
+		    if(tensionOnSameRail || spacingEqualizer){
 			// put particle on each list of rail
 			int sectIdx = -1;
 			for(int j=0; j<railCurves.length && sectIdx<0; j++){
@@ -1257,49 +1410,51 @@ public class ITensileNet{
 	    ArrayList<ITensionI> tlines = new ArrayList<ITensionI>();
 	    for(int i=0; i<endPts.length; i++){
 		IVec[] epts = endPts[i];
-		int index1 = uniquePts.indexOf(epts[0]);
-		int index2 = uniquePts.indexOf(epts[1]);
-		
-		//IG.p("epts0 = "+((Object)epts[0]).toString());
-		//IG.p("epts1 = "+((Object)epts[1]).toString());
-		
-		if(index1>=0 && index2>=0){
-		    IParticleI pa1 = particles.get(index1);
-		    IParticleI pa2 = particles.get(index2);
+		if(epts!=null){
+		    int index1 = uniquePts.indexOf(epts[0]);
+		    int index2 = uniquePts.indexOf(epts[1]);
 		    
-		    //IG.p("pa1 = "+((Object)pa1).toString());
-		    //IG.p("pa2 = "+((Object)pa2).toString());
+		    //IG.p("epts0 = "+((Object)epts[0]).toString());
+		    //IG.p("epts1 = "+((Object)epts[1]).toString());
 		    
-		    ITensionI tnsn = null;
-		    if(tensionConstructor!=null && tensionConstructorParameters!=null){
-			tnsn = getTensionInstance(pa1,pa2);
-			if(tnsn!=null){
-			    if(tnsn instanceof IObject){
-				if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
-				if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
+		    if(index1>=0 && index2>=0){
+			IParticleI pa1 = particles.get(index1);
+			IParticleI pa2 = particles.get(index2);
+			
+			//IG.p("pa1 = "+((Object)pa1).toString());
+			//IG.p("pa2 = "+((Object)pa2).toString());
+			
+			ITensionI tnsn = null;
+			if(tensionConstructor!=null && tensionConstructorParameters!=null){
+			    tnsn = getTensionInstance(pa1,pa2);
+			    if(tnsn!=null){
+				if(tnsn instanceof IObject){
+				    if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
+				    if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
+				}
+				tnsn.tension(tension);
+				tnsn.constant(constantTension);
+				tlines.add(tnsn);
 			    }
-			    tnsn.tension(tension);
-			    tnsn.constant(constantTension);
-			    tlines.add(tnsn);
+			}
+			
+			if(tnsn==null){
+			    ITensionLine tl = new ITensionLine(pa1, pa2, tension);
+			    if(lineColors[i]!=null) tl.clr(lineColors[i]);
+			    if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
+			    tl.tension(tension);
+			    tl.constant(constantTension);
+			    tlines.add(tl);
+			    
 			}
 		    }
-		    
-		    if(tnsn==null){
-			ITensionLine tl = new ITensionLine(pa1, pa2, tension);
-			if(lineColors[i]!=null) tl.clr(lineColors[i]);
-			if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
-			tl.tension(tension);
-			tl.constant(constantTension);
-			tlines.add(tl);
-			
+		    else{
+			IOut.err("end point is not found");
 		    }
-		}
-		else{
-		    IOut.err("end point is not found");
 		}
 	    }
 	    
-	    if(tensionOnSameRail || enableSpacingEqualizer){
+	    if(tensionOnSameRail || spacingEqualizer){
 		// sort particleoncurve and create tension
 		
 		for(int i=0; i<railCurves.length; i++){
@@ -1320,7 +1475,7 @@ public class ITensileNet{
 			    }
 			}
 			
-			if(enableSpacingEqualizer){
+			if(spacingEqualizer){
 			    for(int j=0; !closed && j<particleOnRail[i].size()-2 ||
 				    closed && j<particleOnRail[i].size(); j++){
 				//new ITensionLineOnCurve(particleOnRail[i].get(j),particleOnRail[i].get(j+1),onRailTension).clr(IRand.clr());
@@ -1337,7 +1492,7 @@ public class ITensileNet{
 		}
 	    }
 	    
-	    if(enableStraightener){
+	    if(straightener){
 		
 		ArrayList<IStraightenerCurve> straighteners = new ArrayList<IStraightenerCurve>();
 		
@@ -1368,7 +1523,7 @@ public class ITensileNet{
 		    }
 		}
 		
-		if(noBranchingStraightener){
+		if(removeBranchStraightener){
 		    for(int i=0; i<straighteners.size(); i++){
 			IParticleI p11 = straighteners.get(i).pt(0);
 			IParticleI p12 = straighteners.get(i).pt(1);

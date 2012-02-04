@@ -86,9 +86,25 @@ public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
     public boolean constant(){ return constantTension; }
     public ISpacingEqualizer constant(boolean cnst){ constantTension = cnst; return this; }
 
+    /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i){
-	if(i==0) return pt1; if(i==1) return pt2; return pt3;
+	if(i==2) return pt3; if(i==1) return pt2; return pt1;
     }
+    /** alias of pt(int) */
+    public IParticleI pos(int i){ return pt(i); }
+    /** getting end point1. */
+    public IParticleI pt1(){ return pt1; }
+    /** alias of pt1() */
+    public IParticleI pos1(){ return pt1(); }
+    /** getting end point2. */
+    public IParticleI pt2(){ return pt2; }
+    /** alias of pt2() */
+    public IParticleI pos2(){ return pt2(); }
+    /** getting end point2. */
+    public IParticleI pt3(){ return pt3; }
+    /** alias of pt2() */
+    public IParticleI pos3(){ return pt3(); }
+
     
     public ISpacingEqualizer parent(IObject par){ super.parent(par); return this; }
     public ISpacingEqualizer target(IObject targetObj){ super.target(targetObj); return this; }

@@ -51,10 +51,16 @@ public class INurbsGeo extends IParameterObject{
     
     
     public static void normalizeKnots(double[] knots, double ustart, double uend){
+
+	//IOut.debug(20, "ustart="+ustart+", uend="+uend); //
+	//for(int i=0; i<knots.length; i++){ IOut.debug(20, "knots["+i+"]="+knots[i]); }
+	
 	for(int i=0; i<knots.length; i++){
             knots[i] -= ustart;
             knots[i] /= (uend-ustart);
         }
+	
+	//for(int i=0; i<knots.length; i++){ IOut.debug(20, "knots["+i+"]="+knots[i]); }
     }
     public static double[] createKnots(int degree, int num, boolean closed){
 	if(closed) return createClosedKnots(degree,num);

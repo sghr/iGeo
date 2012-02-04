@@ -5297,28 +5297,31 @@ public class IRhino3dm{
 			ttag.mappingId = readUUID(is);
 			
 			if(vcount>0){
-
+			    
 			    int sz = readCompressedBufferSize(is);
 			    int ptsz = 2*8; // 2 dim doulbe points
-			    if(sz != ptsz*vcount){
-				throw new IOException("buffer size ("+sz+") doesn't match with vcount("+vcount+")*surface_parameter_data_size("+ptsz+")");
-			    }
-			    
-			    surfaceParameter =
-				readArrayPoint2(readCompressedBuffer(is, sz), vcount);
-			    
-			    if(endian()==Endian.BigEndian){
-				// flip order?
-			    }
-			    
-			    if(minorVersion>=4 && context.openNurbsVersion >= 200606010){
-				ttag.read(context, is);
+
+			    if(sz > 0){ // added 20120203; sometimes when vcount>0, sz is 0
+				if(sz != ptsz*vcount){
+				    throw new IOException("buffer size ("+sz+") doesn't match with vcount("+vcount+")*surface_parameter_data_size("+ptsz+")");
+				}
+				
+				surfaceParameter =
+				    readArrayPoint2(readCompressedBuffer(is, sz), vcount);
+				
+				if(endian()==Endian.BigEndian){
+				    // flip order?
+				}
+				
+				if(minorVersion>=4 && context.openNurbsVersion >= 200606010){
+				    ttag.read(context, is);
+				}
 			    }
 			}
 		    }
 		}
-
-
+		
+		
 		
 		if(surfaceParameter==null &&
 		   vertices!=null && vertices.size()>0){
@@ -5894,7 +5897,7 @@ public class IRhino3dm{
 	//public int cvCapacity;
 	//public double[] cv;
 	public IVec[] cv;
-
+	
 	public NurbsCurve(){}
 	
 	public NurbsCurve(ICurveGeo crv){
@@ -5907,7 +5910,7 @@ public class IRhino3dm{
 	    knot = getRhinoKnots(iknot);
 	    cv = new IVec[crv.num()];
 	    for(int i=0; i<crv.num(); i++) cv[i] = crv.cp(i).get();
-
+	    
 	    icurve = crv;
 	}
 	public NurbsCurve(ITrimCurve tcrv){
@@ -5948,8 +5951,7 @@ public class IRhino3dm{
 		knot = new double[knotCount];
 		for(int i=0; i<knotCount; i++){
 		    knot[i] = readDouble(is);
-		    
-		    //IOut.p("knot["+i+"] = "+knot[i]);
+		    IOut.debug(100, "knot["+i+"] = "+knot[i]);
 		}
 		
 		int cvCount = readInt(is);
@@ -6129,6 +6131,11 @@ public class IRhino3dm{
 	    if(knot.length>order-2){
 		ustart = knot[order-2];
 		uend = knot[knot.length-1-(order-2)];
+		
+		//IOut.debug(20, "order="+order); //
+		//for(int i=0; i<knot.length; i++) IOut.debug(20, "knot["+i+"]="+knot[i]);
+		//for(int i=0; i<knot2.length; i++) IOut.debug(20, "knot2["+i+"]="+knot2[i]);
+		//IOut.debug(20, "ustart="+ustart+", uend="+uend); //
 	    }
 	    else{
 		IOut.err("knot is too short: knot.length="+knot.length+", order="+order);
@@ -6279,11 +6286,17 @@ public class IRhino3dm{
 		
 		int knotCount = readInt(is);
 		knot[0] = new double[knotCount];
-		for(int i=0; i<knotCount; i++) knot[0][i] = readDouble(is);
+		for(int i=0; i<knotCount; i++){
+		    knot[0][i] = readDouble(is);
+		    IOut.debug(100, "uknot["+i+"]="+knot[0][i]);
+		}
 		
 		knotCount = readInt(is);
 		knot[1] = new double[knotCount];
-		for(int i=0; i<knotCount; i++) knot[1][i] = readDouble(is);
+		for(int i=0; i<knotCount; i++){
+		    knot[1][i] = readDouble(is);
+		    IOut.debug(100, "vknot["+i+"]="+knot[1][i]);
+		}
 		
 		
 		int count = readInt(is);
@@ -6315,6 +6328,8 @@ public class IRhino3dm{
 			    cv[i][j].y /= w;
 			    cv[i][j].z /= w;
 			}
+			
+			//IOut.debug(110, "cv["+i+"]["+j+"]="+cv[i][j]); //
 		    }
 		}
 	    }
@@ -7109,7 +7124,7 @@ public class IRhino3dm{
 		tmp = uend;
 		uend = vend;
 		vend = tmp;
-
+		
 		int itmp = udeg;
 		udeg = vdeg;
 		vdeg = itmp;
@@ -7120,8 +7135,9 @@ public class IRhino3dm{
 		
 		cpts = cpts2;
 	    }
-	    
-	    ISurfaceGeo surf = new ISurfaceGeo(cpts, udeg, vdeg, uknots, vknots);
+
+	    // ustart=0, uend=1, vstart=0, vend=1 not to  normalize knots
+	    ISurfaceGeo surf = new ISurfaceGeo(cpts, udeg, vdeg, uknots, vknots, 0.0, 1.0, 0.0, 1.0);
 	    surf.ustart = ustart;
 	    surf.uend = uend;
 	    surf.vstart = vstart;
@@ -7159,7 +7175,6 @@ public class IRhino3dm{
 		    else{ IOut.err("wrong instance of class : "+obj); } // 
 		}
 	    }
-	    
 	}
 	
 	public ISurface createIObject(Rhino3dmFile context, IServerI s){
@@ -7172,7 +7187,7 @@ public class IRhino3dm{
 	    
 	    ICurveGeo crv1 = curve[0].createIGeometry(context, s);
 	    ICurveGeo crv2 = curve[1].createIGeometry(context, s);
-
+	    
 	    //IOut.err("curve[0] == "+curve[0]);
 	    //IOut.err("curve[1] == "+curve[1]);
 	    
@@ -7197,13 +7212,22 @@ public class IRhino3dm{
 		    cpts[i][j] = basepoint.dup().add(crv1.cp(i)).add(crv2.cp(j));
 		}
 	    }
-	    
-	    ISurfaceGeo isurf = new ISurfaceGeo(cpts, udeg, vdeg, uknots, vknots);
+
+	    // putting ustart 0, uend 1, vstart 0, vend 1 is important. otherwise knots are normalized again especially when the surface is closed.
+	    ISurfaceGeo isurf = new ISurfaceGeo(cpts, udeg, vdeg, uknots, vknots, 0.0, 1.0, 0.0, 1.0);
 	    
 	    isurf.ustart = udom.v1;
 	    isurf.uend = udom.v2;
 	    isurf.vstart = vdom.v1;
 	    isurf.vend = vdom.v2;
+	    
+	    for(int i=0; i<uknots.length; i++){ IOut.debug(20, "uknots["+i+"]="+uknots[i]); }
+	    for(int i=0; i<vknots.length; i++){ IOut.debug(20, "vknots["+i+"]="+vknots[i]); }
+	    IOut.debug(20, "ustart="+isurf.ustart); //
+	    IOut.debug(20, "uend="+isurf.uend); //
+	    IOut.debug(20, "vstart="+isurf.vstart); //
+	    IOut.debug(20, "vend="+isurf.vend); //
+	    	    
 	    
 	    return isurf;
 	}

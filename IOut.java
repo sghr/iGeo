@@ -193,7 +193,7 @@ public class IOut {
     public static void errWithOffset(int stackOffset){
 	if(errEnabled){
 	    if(printErrorPrefix){
-		printCurrentStack(err); // added
+		printCurrentStack(err, stackOffset); // added
 		err.print(errPrefix);
 	    }
 	    err.println();

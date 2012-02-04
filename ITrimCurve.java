@@ -28,6 +28,8 @@ package igeo;
 
 import igeo.gui.*;
 
+import java.util.ArrayList;
+
 /**
    Geometry class of trim curve on a surface.
    A trim curve is either outer trim curve (outside edge) or inner trim curve (edge of hole). 
@@ -153,31 +155,100 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	    return null;
 	}
 	
-	IVec[] cpts = new IVec[this.num()];
-	for(int i=0; i<cpts.length; i++){
-	    IVecI cp = this.cp(i);
-	    if(this.defaultWeights[i]){
-		IVec cp2 = cp.get();
-		cpts[i] = surface.pt(cp2.x,cp2.y).get();
+	// when surface is planar & deg is 1
+	if(surface.udeg()==1 && surface.vdeg()==1 &&
+	   surface.unum()==2 && surface.vnum()==2 &&
+	   surface.isFlat()){
+	
+	    IVec[] cpts = new IVec[this.num()];
+	    for(int i=0; i<cpts.length; i++){
+		IVecI cp = this.cp(i);
+		if(this.defaultWeights[i]){
+		    IVec cp2 = cp.get();
+		    cpts[i] = surface.pt(cp2.x,cp2.y).get();
+		}
+		else{
+		    IVec cp2 = cp.get();
+		    IVec4 cp4 = surface.pt(cp2.x,cp2.y).to4d().get();
+		    if(cp instanceof IVec4I) cp4.w = ((IVec4I)cp).w();
+		    else cp4.w = 1.0;
+		    cpts[i] = cp4;
+		}
 	    }
-	    else{
-		IVec cp2 = cp.get();
-		IVec4 cp4 = surface.pt(cp2.x,cp2.y).to4d().get();
-		if(cp instanceof IVec4I) cp4.w = ((IVec4I)cp).w();
-		else cp4.w = 1.0;
-		cpts[i] = cp4;
-	    }
+	    
+	    int deg = this.deg();
+	    
+	    double[] knots = new double[this.knotNum()];
+	    for(int i=0; i<knots.length; i++) knots[i] = this.knot(i);
+	    
+	    double ustart = this.ustart();
+	    double uend = this.uend();
+	    
+	    return new ICurveGeo(cpts, deg, knots, ustart, uend);
 	}
 	
-	int deg = this.deg();
+	// when surface is not planar
+	// approximation with polyline
 	
-	double[] knots = new double[this.knotNum()];
-	for(int i=0; i<knots.length; i++) knots[i] = this.knot(i);
+	int uepnum = surface.uepNum();
+	int vepnum = surface.vepNum();
 	
-	double ustart = this.ustart();
-	double uend = this.uend();
+	// when trim curve is deg 1
+	if(deg()==1){
+	    // interpolate between each control points
+	    
+	    ArrayList<IVec> pts = new ArrayList<IVec>();
+	    IVec cp2 = this.cp(0).get();
+	    pts.add(surface.pt(cp2.x,cp2.y).get());
+	    IVec prevCp2=cp2;
+	    
+	    for(int i=1; i<cpNum(); i++){
+		cp2 = cp(i).get();
+		
+		double urange = Math.abs(cp2.x-prevCp2.x);
+		double vrange = Math.abs(cp2.y-prevCp2.y);
+		int unum = (int)(urange*uepnum*IConfig.trim3dCurveInterpolationResolution);
+		int vnum = (int)(vrange*vepnum*IConfig.trim3dCurveInterpolationResolution);
+		int num = Math.max(unum,vnum);
+		
+		for(int j=0; j<num; j++){
+		    IVec pt2 = prevCp2.sum(cp2, (double)j/(num+1));
+		    pts.add(surface.pt(pt2.x,pt2.y).get());
+		}
+		pts.add(surface.pt(cp2.x,cp2.y).get());
+		prevCp2 = cp2;
+	    }
+	    
+	    return new ICurveGeo(pts.toArray(new IVec[pts.size()]));
+	}
 	
-	return new ICurveGeo(cpts, deg, knots, ustart, uend);
+	
+	// check boundary by control points
+	double minu=1., minv=1., maxu=0., maxv=0.;
+	for(int i=0; i<cpNum(); i++){
+	    IVec cp = cp(i).get();
+	    if(cp.x < minu){ minu = cp.x; }
+	    if(cp.x > maxu){ maxu = cp.x; }
+	    if(cp.y < minv){ minv = cp.y; }
+	    if(cp.y > maxv){ maxv = cp.y; }
+	}
+	
+	if(minu<0.){ minu=0.; }
+	if(maxu>1.){ maxu=1.; }
+	if(minv<0.){ minv=0.; }
+	if(maxv>1.){ maxv=1.; }
+	
+	double urange = maxu - minu;
+	double vrange = maxv - minv;
+	int unum = (int)(urange*uepnum*IConfig.trim3dCurveInterpolationResolution);
+	int vnum = (int)(vrange*vepnum*IConfig.trim3dCurveInterpolationResolution);
+	int cnum = this.epNum()*IConfig.trim3dCurveInterpolationResolution;
+	int num = Math.max(cnum, Math.max(unum,vnum));
+	
+	IVec[] cpts = new IVec[num+1];
+	for(int i=0; i<=num; i++){ cpts[i] = this.pt((double)i/num); }
+	
+	return new ICurveGeo(cpts); 
     }
     
     
@@ -199,6 +270,8 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	//if(x<0.) x=0.; else if(x>1.) x=1.; // control points could be outside 
 	//if(y<0.) y=0.; else if(y>1.) y=1.; // control points could be outside 
 	//v.set(x,y,v.z());
+	
+	//for(int i=0; i<srf.uknotNum(); i++){ IG.err("uknots["+i+"]="+srf.uknot(i)); }//
     }
     
     public void pt(double u, IVec retval){
