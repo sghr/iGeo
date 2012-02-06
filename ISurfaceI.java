@@ -288,8 +288,14 @@ public interface ISurfaceI extends ISurfaceOp, ITransformable{
     public IBoolI isFlat(ISwitchR r);
     
     
-    //public boolean isUClosed();
-    //public boolean isVClosed();
+    public boolean isUClosed();
+    public boolean isUClosed(ISwitchE e);
+    public IBoolI isUClosed(ISwitchR r);
+    
+    public boolean isVClosed();
+    public boolean isVClosed(ISwitchE e);
+    public IBoolI isVClosed(ISwitchR r);
+    
     
     /**************************************************************************************
      * transformation methods; API of ITransformable interface

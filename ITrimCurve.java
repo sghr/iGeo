@@ -154,6 +154,83 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	    IOut.err("surface is not set");
 	    return null;
 	}
+
+	/* this should not happen
+	// default trim edges
+	if(this.cpNum()==5){
+	    IVecI[] cps1 = new IVecI[4];
+	    cps1[0] = cp(0); cps1[1] = cp(1); cps1[2] = cp(2); cps1[3] = cp(3);
+	    if(IVec.isArrayEqual(cps1, new IVec[]{ new IVec(0,0,0), new IVec(1.0,0,0),
+						   new IVec(1.0,1.,0), new IVec(0,1.0,0) },
+				 true, true)){
+	    }
+	}
+	*/
+	
+	// default trim edges
+	if(this.cpNum()==2){
+	    IVec p00 = new IVec(0.,0,0);
+	    IVec p10 = new IVec(1.,0,0);
+	    IVec p01 = new IVec(0,1.,0);
+	    IVec p11 = new IVec(1.,1.,0);
+	    
+	    if(cp(0).eq(p00)){
+		if(cp(1).eq(p10)){ // (0,0) - (1,0)
+		    int num = surface.unum();
+		    IVecI[] cps = new IVecI[num];
+		    for(int i=0; i<num; i++){ cps[i] = surface.cp(i,0); }
+		    return new ICurveGeo(cps, surface.udeg(), surface.uknots());
+		}
+		else if(cp(1).eq(p01)){ // (0,0) - (0,1)
+		    int num = surface.vnum();
+		    IVecI[] cps = new IVecI[num];
+		    for(int i=0; i<num; i++){ cps[i] = surface.cp(0,i); }
+		    return new ICurveGeo(cps, surface.vdeg(), surface.vknots());
+		}
+	    }
+	    else  if(cp(0).eq(p10)){
+		if(cp(1).eq(p00)){ // (1,0) - (0,0)
+		    int num = surface.unum();
+		    IVecI[] cps = new IVecI[num];
+		    for(int i=0; i<num; i++){ cps[i] = surface.cp(num-1-i,0); }
+		    return new ICurveGeo(cps, surface.udeg(), INurbsGeo.invertKnots(surface.uknots()));
+		}
+		else if(cp(1).eq(p11)){ // (1,0) - (1,1)
+		    int num = surface.vnum();
+		    IVecI[] cps = new IVecI[num];
+		    for(int i=0; i<num; i++){ cps[i] = surface.cp(surface.unum()-1,i); }
+		    return new ICurveGeo(cps, surface.vdeg(), surface.vknots());
+		}
+	    }
+	    else  if(cp(0).eq(p01)){
+		if(cp(1).eq(p00)){ // (0,1) - (0,0)
+		    int num = surface.vnum();
+		    IVecI[] cps = new IVecI[num];
+		    for(int i=0; i<num; i++){ cps[i] = surface.cp(0,num-1-i); }
+		    return new ICurveGeo(cps, surface.vdeg(), INurbsGeo.invertKnots(surface.vknots()));
+		}
+		else if(cp(1).eq(p11)){ // (0,1) - (1,1)
+		    int num = surface.unum();
+		    IVecI[] cps = new IVecI[num];
+		    for(int i=0; i<num; i++){ cps[i] = surface.cp(i,surface.vnum()-1); }
+		    return new ICurveGeo(cps, surface.udeg(), surface.uknots());
+		}
+	    }
+	    else  if(cp(0).eq(p11)){
+		if(cp(1).eq(p10)){ // (1,1) - (1,0)
+		    int num = surface.vnum();
+		    IVecI[] cps = new IVecI[num];
+		    for(int i=0; i<num; i++){ cps[i] = surface.cp(surface.unum()-1,num-1-i); }
+		    return new ICurveGeo(cps, surface.vdeg(), INurbsGeo.invertKnots(surface.vknots()));
+		}
+		else if(cp(1).eq(p01)){ // (1,1) - (0,1)
+		    int num = surface.unum();
+		    IVecI[] cps = new IVecI[num];
+		    for(int i=0; i<num; i++){ cps[i] = surface.cp(num-1-i,surface.vnum()-1); }
+		    return new ICurveGeo(cps, surface.udeg(), INurbsGeo.invertKnots(surface.uknots()));
+		}
+	    }
+	}
 	
 	// when surface is planar & deg is 1
 	if(surface.udeg()==1 && surface.vdeg()==1 &&

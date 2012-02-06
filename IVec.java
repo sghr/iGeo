@@ -1111,6 +1111,28 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return pt1.get().isOnPlane(pt2,pt3,pt4,tolerance);
     }
     
+    public static boolean isFlat(IVecI[] pts){ return isFlat(pts,IConfig.tolerance); }
+    
+    public static boolean isFlat(IVecI[] pts, double tolerance){
+	if(pts.length<=3) return true;
+	if(pts.length==4) return isFlat(pts[0],pts[1],pts[2],pts[3],tolerance);
+	IVec pt1 = pts[0].get();
+	IVecI pt2 = pts[1];
+	int i;
+	for(i=2; i<pts.length && pt1.eq(pt2,tolerance); i++){ pt2 = pts[i]; }
+	if(i>=pts.length-2) return true; // one point or straight line or triangle
+	//i++;
+	//if(i==pts.length-1) return true; // triangle
+	
+	IVecI pt3 = pts[i];
+	for(i++; i<pts.length && pt1.isStraight(pt2,pt3,tolerance); i++){ pt3 = pts[i]; }
+	if(i>=pts.length-1) return true; // straight line
+	
+	for(i++; i<pts.length; i++){
+	    if(!pt1.isOnPlane(pt2,pt3,pts[i],tolerance)){ return false; }
+	}
+	return true;
+    }
     
     public static boolean isArrayEqual(IVec[] pts1, IVec[] pts2,
 				       boolean cyclic, boolean reverse){
@@ -1219,8 +1241,14 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	
         return nml.unit();
     }
-    
 
+    /** calculating centetr of multiple points */
+    public static IVec center(IVecI... v){
+	IVec cnt = new IVec(v[0]);
+	for(int i=1; i<v.length; i++){ cnt.add(v[i]); }
+	return cnt.div(v.length);
+    }
+    
     
     public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal){
 	IVecI[] out = offset((IVecI[])pts,width,planeNormal);

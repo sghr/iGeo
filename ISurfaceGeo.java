@@ -1604,7 +1604,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public boolean hasDefaultTrim(ISwitchE e){ return hasDefaultTrim(); }
     public IBool hasDefaultTrim(ISwitchR r){ return new IBool(hasDefaultTrim()); }
     
-    
+    /** is the surface planar and flat */
     public boolean isFlat(){
 	IVecI planePt = corner(0,0);
 	IVecI planeDir = planePt.get().getNormal(corner(1,0),corner(0,1));
@@ -1620,7 +1620,47 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public boolean isFlat(ISwitchE e){ return isFlat(); }
     public IBool isFlat(ISwitchR r){ return new IBool(isFlat()); }
     
-
+    /** is the surface closed in u direction */
+    public boolean isUClosed(){
+	int vnum = vcpNum();
+        // check if start and end of parameter match with knots[0] and knots[knots.length-1]
+	if(uknots[0] != 0.0 || uknots[uknots.length-1] != 1.0){
+            // check by cp
+	    for(int v=0; v<vnum; v++){
+		if(!cp(0,v).eq(cp(ucpNum()-1, v))) return false;
+	    }
+	    return true;
+        }
+        // check by pt
+	for(int v=0; v<=vnum; v++){ // dividing by cp num?
+	    if(!pt(0., (double)v/vnum).eq(pt(1.,(double)v/vnum))) return false;
+	}
+        return true;
+    }
+    
+    public boolean isUClosed(ISwitchE e){ return isUClosed(); }
+    public IBool isUClosed(ISwitchR r){ return new IBool(isUClosed()); }
+    
+    /** is the surface closed in v direction */
+    public boolean isVClosed(){
+	int unum = ucpNum();
+        // check if start and end of parameter match with knots[0] and knots[knots.length-1]
+	if(vknots[0] != 0.0 || vknots[vknots.length-1] != 1.0){
+            // check by cp
+	    for(int u=0; u<unum; u++){
+		if(!cp(u,0).eq(cp(u, vcpNum()-1))) return false;
+	    }
+	    return true;
+        }
+        // check by pt
+	for(int u=0; u<=unum; u++){ // dividing by cp num?
+	    if(!pt((double)u/unum, 0.).eq(pt((double)u/unum, 1.))) return false;
+	}
+        return true;
+    }
+    public boolean isVClosed(ISwitchE e){ return isVClosed(); }
+    public IBool isVClosed(ISwitchR r){ return new IBool(isVClosed()); }
+    
     /**********************************************************************************
      * transformation methods; API of ITransformable interface
      *********************************************************************************/

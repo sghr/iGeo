@@ -318,9 +318,19 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public boolean isFlat(){ return surface.isFlat(); }
     //public IBoolI isFlatR(){ return surface.isFlatR(); }
     public boolean isFlat(ISwitchE e){ return surface.isFlat(); }
-    public IBoolI isFlat(ISwitchR r){ return surface.isFlat(r); }
-
-
+    //public IBoolI isFlat(ISwitchR r){ return surface.isFlat(r); }
+    public IBoolI isFlat(ISwitchR r){ return new IBoolR(new IsFlat(surface)); } // need to be checked
+    
+    public boolean isUClosed(){ return surface.isUClosed(); }
+    public boolean isUClosed(ISwitchE e){ return surface.isUClosed(); }
+    //public IBoolI isUClosed(ISwitchR r){ return surface.isUClosed(r); } // should have new UClosed(this)
+    public IBoolI isUClosed(ISwitchR r){ return new IBoolR(new IsUClosed(surface)); } // need to be checked
+    
+    public boolean isVClosed(){ return surface.isVClosed(); }
+    public boolean isVClosed(ISwitchE e){ return surface.isVClosed(); }
+    //public IBoolI isVClosed(ISwitchR r){ return surface.isVClosed(r); } // should have new VClosed(this)
+    public IBoolI isVClosed(ISwitchR r){ return new IBoolR(new IsVClosed(surface)); } // need to be checked
+    
     
     
     /*********************************************************************************
@@ -544,5 +554,27 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public ISurfaceR setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public ISurfaceR setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
-
+    
+    
+    static public class IsFlat extends IParameterObject implements IBoolOp{
+        public ISurfaceOp srf;
+        public IsFlat(ISurfaceOp s){ srf=s; }
+        public boolean x(){ return srf.get().isFlat(); }
+        public IBool get(){ return srf.get().isFlat((Ir)null); }
+    }
+    static public class IsUClosed extends IParameterObject implements IBoolOp{
+        public ISurfaceOp srf;
+        public IsUClosed(ISurfaceOp s){ srf=s; }
+        public boolean x(){ return srf.get().isUClosed(); }
+        public IBool get(){ return srf.get().isUClosed((Ir)null); }
+    }
+    static public class IsVClosed extends IParameterObject implements IBoolOp{
+        public ISurfaceOp srf;
+        public IsVClosed(ISurfaceOp s){ srf=s; }
+        public boolean x(){ return srf.get().isVClosed(); }
+        public IBool get(){ return srf.get().isVClosed((Ir)null); }
+    }
 }
+
+
+

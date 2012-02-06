@@ -538,8 +538,15 @@ public class ISurface extends IObject implements ISurfaceI{
     public boolean isFlat(){ return surface.isFlat(); }
     //public IBool isFlatR(){ return surface.isFlatR(); }
     public boolean isFlat(ISwitchE e){ return isFlat(); }
-    public IBool isFlat(ISwitchR r){ return new IBool(isFlat()); }
+    public IBool isFlat(ISwitchR r){ return surface.isFlat(r); }
     
+    public boolean isUClosed(){ return surface.isUClosed(); }
+    public boolean isUClosed(ISwitchE e){ return surface.isUClosed(); }
+    public IBool isUClosed(ISwitchR r){ return surface.isUClosed(r); }
+    
+    public boolean isVClosed(){ return surface.isVClosed(); }
+    public boolean isVClosed(ISwitchE e){ return surface.isVClosed(); }
+    public IBool isVClosed(ISwitchR r){ return surface.isVClosed(r); }
     
     
     /*********************************************************************************

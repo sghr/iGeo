@@ -2182,7 +2182,50 @@ public class IG implements IServerI{
     public static ISurface flatten(ISurfaceI surface){ return ISurfaceCreator.flatten(surface); }
     
     
-
+    /** cap a surface which is cyclically closed in u or v direction. */
+    public static IBrep cap(ISurfaceI surface){ return ISurfaceCreator.cap(surface); }
+    
+    
+    /** surface defined by closed profile.if the profile is flat, planar surface is created.
+	if not lofting profile into the center of the profile
+    */
+    public static ISurface profileSurface(IVecI[] cps, int deg, double[] knots){
+	return ISurfaceCreator.profileSurface(cps,deg,knots);
+    }
+    /**
+       surface defined by closed profile.if the profile is flat, planar surface is created.
+       if not lofting profile into the center of the profile
+    */
+    public static ISurface profileSurface(ICurveI profile){
+	return ISurfaceCreator.profileSurface(profile);
+    }
+    /**
+       surface by lofting profile into the center of the profile
+    */
+    public static ISurface radialSurface(IVecI[] cps, int deg, double[] knots){
+	return ISurfaceCreator.radialSurface(cps,deg,knots);
+    }
+    /**
+       surface by lofting profile into the center of the profile
+    */
+    public static ISurface radialSurface(ICurveI profile){
+	return ISurfaceCreator.radialSurface(profile);
+    }
+    /**
+       surface by lofting profile into the specified point
+    */
+    public static ISurface pointLoft(IVecI[] cps, int deg, double[] knots, IVecI center){
+	return ISurfaceCreator.pointLoft(cps,deg,knots,center);
+    }
+    /**
+       surface by lofting profile into the specified point
+    */
+    public static ISurface pointLoft(ICurveI profile, IVecI center){
+	return ISurfaceCreator.pointLoft(profile,center);
+    }    
+    
+    
+    
     /*********************************************************
      * creating vector 
      ********************************************************/

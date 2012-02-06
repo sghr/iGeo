@@ -709,7 +709,7 @@ public class ISurfaceCreator{
     }
     
     /**
-       orienting profile points by matching profCenter with railPt, profNml with railDir,
+       Orienting profile points by matching profCenter with railPt, profNml with railDir,
        profDir with railNml.
     */
     public static IVecI[] orient(IVecI[] profile,
@@ -1249,7 +1249,7 @@ public class ISurfaceCreator{
     }
     
     // sphere, cylinder, cone,  ruled surf, loft, extrusion, rect, planarSurf
-
+    
     public static ISurface flatten(ISurfaceI surface, IVecI planeDir, IVecI planePt){
 	IVecI[][] cpts = new IVecI[surface.unum()][surface.vnum()];
 	for(int i=0; i<surface.unum(); i++)
@@ -1285,4 +1285,176 @@ public class ISurfaceCreator{
 	for(int i=0; i<surface.vknotNum(); i++) vk[i] = surface.vknot(i);
 	return surface(cpts,surface.udeg(),surface.vdeg(),uk,vk,0.0,1.0,0.0,1.0);
     }
+    
+
+    /** cap a surface which is cyclically closed in u or v direction. */
+    public static IBrep cap(ISurfaceI surface){
+	
+	boolean uclosed=surface.isUClosed();
+	boolean vclosed=surface.isVClosed();
+	
+	if(uclosed&&vclosed){ // no need to cap
+	    IOut.debug(20, "both u and v are closed. no need to cap. returning null.");
+	    return null;
+	}
+	
+	if(!uclosed&&!vclosed){ // no way to cap
+	    IOut.err("both u and v are open. one of them needs to be closed to be capped. returning null.");
+	    return null;
+	}
+	
+	if(uclosed){
+	    int num = surface.unum();
+	    if(num<4) return null; // if u is closed, this should not happen
+	    
+	    ISurfaceGeo capSurf1=null, capSurf2=null;
+	    
+	    int deg = surface.udeg();
+	    if(deg==1 && num<=5){ // triangular or rectangular cap
+		if(num==4){ // triangle as trimmed planar
+		    capSurf1 = new ISurfaceGeo(new IVecI[]{ surface.cp(0,0),surface.cp(2,0),
+							    surface.cp(1,0) });
+		    capSurf2 = new ISurfaceGeo(new IVecI[]{ surface.cp(0,surface.vnum()-1),
+							    surface.cp(1,surface.vnum()-1),
+							    surface.cp(2,surface.vnum()-1) });
+		}
+		else{
+		    capSurf1 = new ISurfaceGeo(surface.cp(0,0),surface.cp(3,0),
+					       surface.cp(2,0),surface.cp(1,0));
+		    capSurf2 = new ISurfaceGeo(surface.cp(0,surface.vnum()-1),
+					       surface.cp(1,surface.vnum()-1),
+					       surface.cp(2,surface.vnum()-1),
+					       surface.cp(3,surface.vnum()-1));
+		}
+	    }
+	    else{
+		IVecI[] cps1 = new IVecI[num];
+		for(int i=0; i<num; i++){ cps1[i] = surface.cp(num-1-i,0); }
+		capSurf1 = profileSurfaceGeo(cps1, deg, surface.uknots());
+		
+		IVecI[] cps2 = new IVecI[num];
+		for(int i=0; i<num; i++){ cps2[i] = surface.cp(i,surface.vnum()-1); }
+		capSurf2 = profileSurfaceGeo(cps2, deg, INurbsGeo.invertKnots(surface.uknots()));
+	    }
+	    
+	    if(capSurf1==null || capSurf2==null) return null;
+	    IBrep brep = new IBrep(server,new ISurfaceGeo[]{ surface.get(), capSurf1, capSurf2});
+	    brep.solid = true; // !!
+	    return brep;
+	}
+	
+	// vclosed
+	int num = surface.vnum();
+	if(num<4) return null; // if u is closed, this should not happen
+	
+	ISurfaceGeo capSurf1=null, capSurf2=null;
+	
+	int deg = surface.vdeg();
+	if(deg==1 && num<=5){ // triangular or rectangular cap
+	    if(num==4){ // triangle as trimmed planar
+		capSurf1 = new ISurfaceGeo(new IVecI[]{ surface.cp(0,0),surface.cp(0,2),
+							surface.cp(0,1)});
+		capSurf2 = new ISurfaceGeo(new IVecI[]{ surface.cp(surface.unum()-1,0),
+							surface.cp(surface.unum()-1,1),
+							surface.cp(surface.unum()-1,2)});
+	    }
+	    else{
+		capSurf1 = new ISurfaceGeo(surface.cp(0,0),surface.cp(0,3),
+					   surface.cp(0,2),surface.cp(0,1));
+		capSurf2 = new ISurfaceGeo(surface.cp(surface.unum()-1,0),
+					   surface.cp(surface.unum()-1,1),
+					   surface.cp(surface.unum()-1,2),
+					   surface.cp(surface.unum()-1,3));
+	    }
+	}
+	else{
+	    IVecI[] cps1 = new IVecI[num];
+	    for(int i=0; i<num; i++){ cps1[i] = surface.cp(0,num-1-i); }
+	    capSurf1 = profileSurfaceGeo(cps1, deg, surface.vknots());
+	    
+	    IVecI[] cps2 = new IVecI[num];
+	    for(int i=0; i<num; i++){ cps2[i] = surface.cp(surface.unum()-1,i); }
+	    capSurf2 = profileSurfaceGeo(cps2, deg, INurbsGeo.invertKnots(surface.vknots()));
+	}
+	
+	if(capSurf1==null || capSurf2==null) return null;
+	IBrep brep = new IBrep(server,new ISurfaceGeo[]{ surface.get(), capSurf1, capSurf2});
+	brep.solid = true; // !!
+	return brep;
+    }
+    
+    
+    /**
+       surface defined by closed profile.if the profile is flat, planar surface is created.
+       if not lofting profile into the center of the profile
+    */
+    public static ISurfaceGeo profileSurfaceGeo(IVecI[] cps, int deg, double[] knots){
+	if(IVec.isFlat(cps)) return new ISurfaceGeo(cps,deg,knots); // planar surface
+	return radialSurfaceGeo(cps,deg,knots);
+    }
+    /**
+       surface defined by closed profile.if the profile is flat, planar surface is created.
+       if not lofting profile into the center of the profile
+    */
+    public static ISurface profileSurface(IVecI[] cps, int deg, double[] knots){
+	if(IVec.isFlat(cps)) return surface(cps,deg,knots); // planar surface
+	return radialSurface(cps,deg,knots);
+    }
+    /**
+       surface defined by closed profile.if the profile is flat, planar surface is created.
+       if not lofting profile into the center of the profile
+    */
+    public static ISurface profileSurface(ICurveI profile){
+	return profileSurface(profile.cps(),profile.deg(),profile.knots());
+    }
+    /**
+       surface by lofting profile into the center of the profile
+    */
+    public static ISurfaceGeo radialSurfaceGeo(IVecI[] cps, int deg, double[] knots){
+	return pointLoftGeo(cps,deg,knots,IVec.center(cps));
+    }
+    /**
+       surface by lofting profile into the center of the profile
+    */
+    public static ISurface radialSurface(IVecI[] cps, int deg, double[] knots){
+	return pointLoft(cps,deg,knots,IVec.center(cps));
+    }
+    /**
+       surface by lofting profile into the center of the profile
+    */
+    public static ISurface radialSurface(ICurveI profile){
+	return radialSurface(profile.cps(),profile.deg(),profile.knots());
+    }
+    /**
+       surface by lofting profile into the specified point
+    */
+    public static ISurfaceGeo pointLoftGeo(IVecI[] cps, int deg, double[] knots, IVecI center){
+	int num = cps.length;
+	IVecI[][] cps2 = new IVecI[num][2];
+	IVec cnt = center.get();
+	for(int i=0; i<num; i++){
+	    cps2[i][0] = cps[i];
+	    cps2[i][1] = cnt.dup();
+	}
+	return new ISurfaceGeo(cps2, deg, 1, knots, INurbsGeo.createKnots(1,2));
+    }
+    /**
+       surface by lofting profile into the specified point
+    */
+    public static ISurface pointLoft(IVecI[] cps, int deg, double[] knots, IVecI center){
+	int num = cps.length;
+	IVecI[][] cps2 = new IVecI[num][2];
+	IVec cnt = center.get();
+	for(int i=0; i<num; i++){
+	    cps2[i][0] = cps[i];
+	    cps2[i][1] = cnt.dup();
+	}
+	return new ISurface(cps2, deg, 1, knots, INurbsGeo.createKnots(1,2));
+    }
+    /**
+       surface by lofting profile into the specified point
+    */
+    public static ISurface pointLoft(ICurveI profile, IVecI center){
+	return pointLoft(profile.cps(),profile.deg(),profile.knots(),center);
+    }    
 }

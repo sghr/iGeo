@@ -4140,17 +4140,43 @@ public class IRhino3dm{
 	public void getTrimLoops(ISurfaceGeo srf,
 				 ArrayList<ArrayList<ITrimCurve>> trimLoops,
 				 ArrayList<BrepLoop.Type> loopType){
-	    
+
 	    //if(!srf.hasOuterTrim() && srf.hasInnerTrim()){
 	    if(!srf.hasOuterTrim()){ // in brep, every surface needs trim curve
 		// adding default outer trim
-		ArrayList<ITrimCurve> defaultLoop = new ArrayList<ITrimCurve>();
-		defaultLoop.add(new ITrimCurve(new IVec(0.,0.,0.),new IVec(1.,0.,0.)).surface(srf));
-		defaultLoop.add(new ITrimCurve(new IVec(1.,0.,0.),new IVec(1.,1.,0.)).surface(srf));
-		defaultLoop.add(new ITrimCurve(new IVec(1.,1.,0.),new IVec(0.,1.,0.)).surface(srf));
-		defaultLoop.add(new ITrimCurve(new IVec(0.,1.,0.),new IVec(0.,0.,0.)).surface(srf));
-		trimLoops.add(defaultLoop);
-		loopType.add(BrepLoop.Type.Outer);
+		boolean uclose = srf.isUClosed();
+		boolean vclose = srf.isVClosed();
+		if(!uclose && !uclose){
+		    ArrayList<ITrimCurve> defaultLoop = new ArrayList<ITrimCurve>();
+		    defaultLoop.add(new ITrimCurve(new IVec(0.,0.,0.),new IVec(1.,0.,0.)).surface(srf));
+		    defaultLoop.add(new ITrimCurve(new IVec(1.,0.,0.),new IVec(1.,1.,0.)).surface(srf));
+		    defaultLoop.add(new ITrimCurve(new IVec(1.,1.,0.),new IVec(0.,1.,0.)).surface(srf));
+		    defaultLoop.add(new ITrimCurve(new IVec(0.,1.,0.),new IVec(0.,0.,0.)).surface(srf));
+		    trimLoops.add(defaultLoop);
+		    loopType.add(BrepLoop.Type.Outer);
+		}
+		else if(uclose){
+		    ArrayList<ITrimCurve> loop1 = new ArrayList<ITrimCurve>();
+		    loop1.add(new ITrimCurve(new IVec(0.,0.,0.),new IVec(1.,0.,0.)).surface(srf));
+		    trimLoops.add(loop1);
+		    loopType.add(BrepLoop.Type.Outer);
+		    
+		    ArrayList<ITrimCurve> loop2 = new ArrayList<ITrimCurve>();
+		    loop2.add(new ITrimCurve(new IVec(1.,1.,0.),new IVec(0.,1.,0.)).surface(srf));
+		    trimLoops.add(loop2);
+		    loopType.add(BrepLoop.Type.Outer);
+		}
+		else if(vclose){
+		    ArrayList<ITrimCurve> loop1 = new ArrayList<ITrimCurve>();
+		    loop1.add(new ITrimCurve(new IVec(1.,0.,0.),new IVec(1.,1.,0.)).surface(srf));
+		    trimLoops.add(loop1);
+		    loopType.add(BrepLoop.Type.Outer);
+		    
+		    ArrayList<ITrimCurve> loop2 = new ArrayList<ITrimCurve>();
+		    loop2.add(new ITrimCurve(new IVec(0.,1.,0.),new IVec(0.,0.,0.)).surface(srf));
+		    trimLoops.add(loop2);
+		    loopType.add(BrepLoop.Type.Outer);
+		}
 	    }
 	    
 	    for(int i=0; i<srf.outerTrimLoopNum(); i++){

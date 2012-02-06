@@ -202,5 +202,11 @@ public class INurbsGeo extends IParameterObject{
 	}
 	return true;
     }
+
+    public static double[] invertKnots(double[] knots){
+	double[] knots2 = new double[knots.length];
+	for(int i=0; i<knots.length; i++){ knots2[i] = 1.0 - knots[knots.length-1-i]; }
+	return knots2;
+    }
     
 }

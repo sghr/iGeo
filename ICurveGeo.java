@@ -698,7 +698,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     // not tested; test this
     public boolean isClosed(){
 	// check if start and end of parameter match with knots[0] and knots[knots.length-1]
-	boolean knotsEndMatch=true;
+	//boolean knotsEndMatch=true;
 	/*
 	if(IConfig.normalizeKnots){
 	    if(knots[0] != 0.0 || knots[knots.length-1] != 1.0) knotsEndMatch=false;
@@ -707,9 +707,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	    if(knots[0] != ustart || knots[knots.length-1] != uend) knotsEndMatch=false;
 	}
 	*/
-	if(knots[0] != 0.0 || knots[knots.length-1] != 1.0) knotsEndMatch=false;
+	//if(knots[0] != 0.0 || knots[knots.length-1] != 1.0) knotsEndMatch=false;
 	
-	if(knotsEndMatch){
+	if(knots[0] != 0.0 || knots[knots.length-1] != 1.0){
 	    // check by cp
 	    if(cp(0).eq(cp(cpNum()-1))) return true;
 	    return false;

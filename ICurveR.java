@@ -161,7 +161,7 @@ public class ICurveR extends IObject implements ICurveI{
     public boolean isClosed(){ return curve.isClosed(); }
     //public IBoolI isClosedR(){ return curve.isClosedR(); }
     public boolean isClosed(ISwitchE e){ return isClosed(); }
-    public IBoolI isClosed(ISwitchR r){ return curve.isClosed(r); }
+    public IBoolI isClosed(ISwitchR r){ return curve.isClosed(r); } // should be new IsClosd(surface) ?
     
     public ICurveR rev(){ curve.rev(); return this; }
     
@@ -369,5 +369,13 @@ public class ICurveR extends IObject implements ICurveI{
     public ICurveR setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public ICurveR setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    
+    
+    static public class IsClosed extends IParameterObject implements IBoolOp{
+        public ICurveOp crv;
+        public IsClosed(ICurveOp c){ crv=c; }
+        public boolean x(){ return crv.get().isClosed(); }
+        public IBool get(){ return crv.get().isClosed((Ir)null); }
+    }
     
 }
