@@ -198,7 +198,7 @@ public class IFace{
 	    return v1.cross(v2).len()/2;
 	}
 	
-	ArrayList<Object> edgesAndFaces = triangulate(true, new IMeshCreator());
+	ArrayList<Object> edgesAndFaces = triangulate(true, new IMeshType());
 	double area=0;
 	for(int i=0; i<edgesAndFaces.size(); i++){
 	    if(edgesAndFaces.get(i) instanceof IFace){
@@ -255,7 +255,7 @@ public class IFace{
     }
     
     
-    public ArrayList<Object> triangulate(boolean triangulateDirection, IMeshCreator creator){
+    public ArrayList<Object> triangulate(boolean triangulateDirection, IMeshType creator){
 	if(vertices.length==3) return null;
 	
 	int idx1=0;
@@ -330,7 +330,7 @@ public class IFace{
     
     
     
-    public ArrayList<Object> triangulateAtCenter(IMeshCreator creator){
+    public ArrayList<Object> triangulateAtCenter(IMeshType creator){
 	
 	if(vertices.length==3) return null;
 	

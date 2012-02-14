@@ -128,7 +128,7 @@ public class ITrimLoopGraphic{
 	polyline2.removeDuplicatedPoints(); 
 	
 	// remove points on straigt lines (necessary for calculation of intersection later in IPolyline2D)
-	
+	// but if straight lines on 2d become curve in 3d, no way to points in-between. to be solved later.
 	polyline2.removeStraightPoints(); 
 	
 	// normal positive means counter clockwise
@@ -241,6 +241,9 @@ public class ITrimLoopGraphic{
 	
 	
 	if(surface.udeg()==1 && surface.vdeg()==1 && surface.ucpNum()==2 && surface.vcpNum()==2 &&
+	   // needs to be parallelogram
+	   Math.abs(surface.cp(0,0).dist(surface.cp(1,0)) - surface.cp(0,1).dist(surface.cp(1,1)))<=IConfig.tolerance &&
+	   Math.abs(surface.cp(0,0).dist(surface.cp(0,1)) - surface.cp(1,0).dist(surface.cp(1,1)))<=IConfig.tolerance &&
 	   surface.isFlat()){
 	    // copy polyline2
 	    if(polyline2==null) setup2D();

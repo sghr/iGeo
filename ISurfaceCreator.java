@@ -115,6 +115,12 @@ public class ISurfaceCreator{
     
     // planar surface with trim
     public static ISurface surface(ICurveI trimCurve){ return new ISurface(server, trimCurve); }
+    public static ISurface surface(ICurveI trimCurve, ICurveI[] innerTrimCurves){
+	return new ISurface(server, trimCurve, innerTrimCurves);
+    }
+    public static ISurface surface(ICurveI trimCurve, ICurveI innerTrimCurve){
+	return new ISurface(server, trimCurve, innerTrimCurve);
+    }
     public static ISurface surface(ICurveI[] trimCurves){ return new ISurface(server, trimCurves); }
     public static ISurface surface(IVecI[] trimCrvPts){ return new ISurface(server, trimCrvPts); }
     public static ISurface surface(IVecI[] trimCrvPts, int trimCrvDeg){ return new ISurface(server, trimCrvPts, trimCrvDeg); }
@@ -1015,9 +1021,11 @@ public class ISurfaceCreator{
 	if(hdir.eq(new IVec(0,0,0))) wdir=new IVec(0,1,0);
 	IVec[] profile = new IVec[5];
 	profile[0] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(bottom));
-	profile[1] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
+	//profile[1] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
+	profile[1] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
 	profile[2] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(top));
-	profile[3] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
+	//profile[3] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
+	profile[3] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
 	profile[4] = profile[0].cp();
 	double[] profKnots = INurbsGeo.createClosedKnots(1,profile.length);
 	//return sweep(profile, 1, profKnots, center, rail, deg, knots);
@@ -1340,6 +1348,7 @@ public class ISurfaceCreator{
 	    if(capSurf1==null || capSurf2==null) return null;
 	    IBrep brep = new IBrep(server,new ISurfaceGeo[]{ surface.get(), capSurf1, capSurf2});
 	    brep.solid = true; // !!
+	    if(surface instanceof IObject){ brep.clr(((IObject)surface).clr()); }
 	    return brep;
 	}
 	
@@ -1380,6 +1389,7 @@ public class ISurfaceCreator{
 	if(capSurf1==null || capSurf2==null) return null;
 	IBrep brep = new IBrep(server,new ISurfaceGeo[]{ surface.get(), capSurf1, capSurf2});
 	brep.solid = true; // !!
+	if(surface instanceof IObject){ brep.clr(((IObject)surface).clr()); }
 	return brep;
     }
     

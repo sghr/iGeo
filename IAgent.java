@@ -194,7 +194,7 @@ public class IAgent extends IObject implements IDynamics{
 	//if(parent!=null) parent.updateGraphic(); // did anything change?
     }
     
-    synchronized public void postupdate(){} // not used
+    synchronized public void postupdate(){ updateTarget(); }
     
     
     /**************************************

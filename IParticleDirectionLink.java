@@ -150,13 +150,13 @@ public class IParticleDirectionLink extends IDynamicsBase{
 	    p.pos.set(p.pos.projectToLine(center, avrgDir));
 	    
 	    //if(p.parent!=null) p.parent.updateGraphic();
-	    p.updateTarget();
+	    p.updateTarget(); // necessary?
 	    
 	    p.frc.zero();
 	}
 	
 	//if(parent!=null) parent.updateGraphic();
-	updateTarget();
+	//updateTarget();// moved to IDynamicsBase.postUpdate()
     }
     
         

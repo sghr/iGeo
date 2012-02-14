@@ -96,6 +96,9 @@ public class IPointR extends IObject implements IVecI{
     
     
     public IVec get(){ return pos.get(); }
+    /** passing position field */
+    public IVecI pos(){ return pos; }
+
     
     public IPointR dup(){ return new IPointR(this); }
     

@@ -111,6 +111,11 @@ public class IVectorObject extends IObject implements IVecI{
     
     public IVec get(){ return vec.get(); }
     
+    /** passing position field (vec) */
+    public IVecI pos(){ return vec; }
+    
+    
+    
     public IVectorObject dup(){ return new IVectorObject(this); }
     
     public IVec2I to2d(){ return vec.to2d(); }

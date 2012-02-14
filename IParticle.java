@@ -207,7 +207,7 @@ public class IParticle extends IDynamicsBase implements IParticleI, IVecI{
 	frc.zero();
 	//if(parent!=null) parent.updateGraphic(); // graphic update
 	//super.update();
-	updateTarget();
+	//updateTarget(); //moved to IDynamics.postUpdate()
     }
     
     

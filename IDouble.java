@@ -134,4 +134,6 @@ public class IDouble extends IParameterObject implements IDoubleI, IEntityParame
 	return true;
     }
     
+    //public static boolean eq(double v1, double v2){ return eq(v1,v2,IConfig.tolerance); }
+    //public static boolean eq(double v1, double v2, double resolution){ return Math.abs(v1-v2)<=resolution; }
 }

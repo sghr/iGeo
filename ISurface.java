@@ -116,6 +116,12 @@ public class ISurface extends IObject implements ISurfaceI{
     public ISurface(ICurveI trimCurve){
 	surface = new ISurfaceGeo(trimCurve); initSurface(null);
     }
+    public ISurface(ICurveI trimCurve, ICurveI[] innerTrimCurves){
+	surface = new ISurfaceGeo(trimCurve, innerTrimCurves);
+    }
+    public ISurface(ICurveI trimCurve, ICurveI innerTrimCurve){
+	surface = new ISurfaceGeo(trimCurve, innerTrimCurve);
+    }
     public ISurface(ICurveI[] trimCurves){
 	surface = new ISurfaceGeo(trimCurves); initSurface(null);
     }
@@ -219,6 +225,12 @@ public class ISurface extends IObject implements ISurfaceI{
     
     public ISurface(IServerI s, ICurveI trimCurve){
 	super(s); surface = new ISurfaceGeo(trimCurve); initSurface(s);
+    }
+    public ISurface(IServerI s, ICurveI trimCurve, ICurveI[] innerTrimCurves){
+	super(s); surface = new ISurfaceGeo(trimCurve, innerTrimCurves);
+    }
+    public ISurface(IServerI s, ICurveI trimCurve, ICurveI innerTrimCurve){
+	super(s); surface = new ISurfaceGeo(trimCurve, innerTrimCurve);
     }
     public ISurface(IServerI s, ICurveI[] trimCurves){
 	super(s); surface = new ISurfaceGeo(trimCurves); initSurface(s);

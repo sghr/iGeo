@@ -100,7 +100,7 @@ public class IParticleDistanceLink extends IDynamicsBase{
 	//if(particle.parent!=null) particle.parent.updateGraphic();
 	particle.updateTarget();
 	//if(parent!=null) parent.updateGraphic();
-	updateTarget();
+	//updateTarget();// moved to IDynamicsBase.postUpdate()
     }
     
         

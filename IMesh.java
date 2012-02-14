@@ -52,10 +52,10 @@ public class IMesh extends IObject implements IMeshI{
     }
     public IMesh(ArrayList<ICurveI> lines){ this((IServerI)null,lines); }
     
-    public IMesh(IServerI s, ArrayList<ICurveI> lines, IMeshCreator creator){
+    public IMesh(IServerI s, ArrayList<ICurveI> lines, IMeshType creator){
         super(s); mesh = new IMeshGeo(lines,creator); initMesh(s);
     }
-    public IMesh(ArrayList<ICurveI> lines, IMeshCreator creator){
+    public IMesh(ArrayList<ICurveI> lines, IMeshType creator){
 	this((IServerI)null,lines,creator);
     }
     
@@ -71,10 +71,10 @@ public class IMesh extends IObject implements IMeshI{
 	this((IServerI)null, matrix,triangulateDir);
     }
     
-    public IMesh(IServerI s, IVec[][] matrix, boolean triangulateDir, IMeshCreator creator){
+    public IMesh(IServerI s, IVec[][] matrix, boolean triangulateDir, IMeshType creator){
 	super(s); mesh = new IMeshGeo(matrix,triangulateDir,creator); initMesh(s);
     }
-    public IMesh(IVec[][] matrix, boolean triangulateDir, IMeshCreator creator){
+    public IMesh(IVec[][] matrix, boolean triangulateDir, IMeshType creator){
 	this((IServerI)null, matrix,triangulateDir,creator);
     }
     
@@ -86,10 +86,10 @@ public class IMesh extends IObject implements IMeshI{
     }
     
     public IMesh(IServerI s, IVec[][] matrix, int unum, int vnum, boolean triangulateDir,
-		 IMeshCreator creator){
+		 IMeshType creator){
 	super(s); mesh = new IMeshGeo(matrix,unum,vnum,triangulateDir,creator); initMesh(s);
     }
-    public IMesh(IVec[][] matrix, int unum, int vnum, boolean triangulateDir, IMeshCreator creator){
+    public IMesh(IVec[][] matrix, int unum, int vnum, boolean triangulateDir, IMeshType creator){
 	this((IServerI)null, matrix,unum,vnum,triangulateDir,creator);
     }    
     
@@ -99,6 +99,11 @@ public class IMesh extends IObject implements IMeshI{
     public IMesh(ArrayList<IVertex> v, ArrayList<IEdge> e, ArrayList<IFace> f){
 	this((IServerI)null,v,e,f);
     }
+    
+    public IMesh(IServerI s, IVertex[] vtx, IEdge[] edg,IFace[] fcs){
+	super(s); mesh = new IMeshGeo(vtx,edg,fcs); 
+    }
+    public IMesh(IVertex[] vtx, IEdge[] edg,IFace[] fcs){ this((IServerI)null,vtx,edg,fcs); }
     
     public IMesh(IServerI s, IVec[] vert){ // single face mesh
 	super(s); mesh = new IMeshGeo(vert); initMesh(s);
@@ -122,6 +127,11 @@ public class IMesh extends IObject implements IMeshI{
 	this((IServerI)null,v1,v2,v3,v4);
     }
 
+    public IMesh(IServerI s, IVecI v1, IVecI v2, IVecI v3){
+	super(s); mesh = new IMeshGeo(v1,v2,v3); initMesh(s);
+    }
+    public IMesh(IVecI v1, IVecI v2, IVecI v3){ this((IServerI)null,v1,v2,v3); }
+    
     public IMesh(IServerI s, IVecI v1, IVecI v2, IVecI v3, IVecI v4){
 	super(s); mesh = new IMeshGeo(v1,v2,v3,v4); initMesh(s);
     }
@@ -279,5 +289,9 @@ public class IMesh extends IObject implements IMeshI{
 	return new IMesh(vertices, edges, faces);
     }
     
+    
+    /** only setting value to closed. checking no connection of mesh */
+    public IMesh close(){ mesh.close(); return this; }
+    public boolean isClosed(){ return mesh.isClosed(); }
     
 }

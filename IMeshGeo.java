@@ -35,25 +35,27 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public ArrayList<IEdge> edges;
     public ArrayList<IFace> faces;
     
+    public boolean closed=false;
+    
     public IMeshGeo(ArrayList<ICurveI> lines){
-        init(lines, new IMeshCreator());
+        init(lines, new IMeshType());
     }
     
-    public IMeshGeo(ArrayList<ICurveI> lines, IMeshCreator creator){
+    public IMeshGeo(ArrayList<ICurveI> lines, IMeshType creator){
         init(lines, creator);
     }
     
-    //public IMeshGeo(ArrayList<IEdge> edges, IMeshCreator creator){
+    //public IMeshGeo(ArrayList<IEdge> edges, IMeshType creator){
     //    initWithEdges(edges, creator);
     //}
 
     public IMeshGeo(IVec[][] matrix){
-	this(matrix,true,new IMeshCreator());
+	this(matrix,true,new IMeshType());
     }
     public IMeshGeo(IVec[][] matrix, boolean triangulateDir){
-	this(matrix,triangulateDir,new IMeshCreator());
+	this(matrix,triangulateDir,new IMeshType());
     }
-    public IMeshGeo(IVec[][] matrix, boolean triangulateDir, IMeshCreator creator){
+    public IMeshGeo(IVec[][] matrix, boolean triangulateDir, IMeshType creator){
         vertices = new ArrayList<IVertex>();
         faces = new ArrayList<IFace>();
         edges = new ArrayList<IEdge>();
@@ -61,10 +63,10 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     public IMeshGeo(IVec[][] matrix, int unum, int vnum, boolean triangulateDir){
-	this(matrix,unum,vnum,triangulateDir,new IMeshCreator());
+	this(matrix,unum,vnum,triangulateDir,new IMeshType());
     }
     public IMeshGeo(IVec[][] matrix, int unum, int vnum, boolean triangulateDir,
-		    IMeshCreator creator){
+		    IMeshType creator){
         vertices = new ArrayList<IVertex>();
         faces = new ArrayList<IFace>();
         edges = new ArrayList<IEdge>();
@@ -85,6 +87,14 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
         faces = f;
     }
     
+    public IMeshGeo(IVertex[] vtx, IEdge[] edg,IFace[] fcs){
+        vertices = new ArrayList<IVertex>();
+        faces = new ArrayList<IFace>();
+        edges = new ArrayList<IEdge>();
+	for(int i=0; i<vtx.length; i++) vertices.add(vtx[i]);
+	for(int i=0; i<edg.length; i++) edges.add(edg[i]);
+	for(int i=0; i<fcs.length; i++) faces.add(fcs[i]);
+    }
     
     
     public IMeshGeo(IVec[] vert){ // single face mesh
@@ -169,7 +179,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
-    public void init(ArrayList<ICurveI> lines, IMeshCreator creator){
+    public void init(ArrayList<ICurveI> lines, IMeshType creator){
 	
         //boolean fixAllPoints=true; //false;
         
@@ -307,13 +317,13 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
-    static IMeshGeo createMeshWithEdges(ArrayList<IEdge> edges, IMeshCreator creator){
+    static IMeshGeo createMeshWithEdges(ArrayList<IEdge> edges, IMeshType creator){
 	IMeshGeo mesh = new IMeshGeo();
 	mesh.initWithEdges(edges,creator);
 	return mesh;
     }
     
-    public void initWithEdges(ArrayList<IEdge> edges, IMeshCreator creator){
+    public void initWithEdges(ArrayList<IEdge> edges, IMeshType creator){
 	
 	for(int i=0; i<edges.size(); i++){
 	    if(!vertices.contains(edges.get(i).vertices[0]))
@@ -365,7 +375,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public void initWithPointMatrix(IVec[][] matrix,
 				    int unum, int vnum,
 				    boolean triangulateDir,
-				    IMeshCreator creator){
+				    IMeshType creator){
 	
 	IVertex[][] vmatrix = new IVertex[unum][vnum];
 	
@@ -487,7 +497,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     
     
     // returns actual inserted vertex
-    public IVertex insertVertex(IFace f, IVertex v, IMeshCreator creator){
+    public IVertex insertVertex(IFace f, IVertex v, IMeshType creator){
 	
 	// check vertex
 	for(int i=0; i<f.vertices.length; i++){
@@ -551,7 +561,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     
     
     public void replaceEdge(IFace f, IEdge oldEdge, IEdge newEdge1, IEdge newEdge2,
-			    IVertex vertexOnEdge, IMeshCreator creator){
+			    IVertex vertexOnEdge, IMeshType creator){
 	int edgeIdx = f.indexOf(oldEdge);
 	
 	if(edgeIdx<0){
@@ -597,7 +607,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     
     
     // ratio:0-1: 0 -> e.vertices[0], 1->e.vertices[1]
-    public void divideEdge(IEdge e, double ratio, IMeshCreator creator){
+    public void divideEdge(IEdge e, double ratio, IMeshType creator){
 	
 	IVertex v1 = e.vertices[0];
 	IVertex v2 = e.vertices[1];
@@ -651,7 +661,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     
     // ratio:0-1: 0 -> e.vertices[0], 1->e.vertices[1]
     public void divideFace(IFace f, IEdge e1, IVertex nv1, IEdge e2, IVertex nv2,
-			   IMeshCreator creator){
+			   IMeshType creator){
 	
 	if( !f.contains(e1) || !f.contains(e2) ){
 	    IOut.err("edges are not included in the face");
@@ -726,7 +736,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
-    public void triangulate(IFace f, boolean triangulateDirection, IMeshCreator creator){
+    public void triangulate(IFace f, boolean triangulateDirection, IMeshType creator){
 	
 	ArrayList<IFace> newFaces = new ArrayList<IFace>();
 	ArrayList<IEdge> newEdges = new ArrayList<IEdge>();
@@ -745,7 +755,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	for(int i=0; i<newFaces.size(); i++) faces.add(newFaces.get(i));
     }
     
-    public void triangulateAll(boolean triangulateDirection, IMeshCreator creator){
+    public void triangulateAll(boolean triangulateDirection, IMeshType creator){
 	
 	ArrayList<IFace> newFaces = new ArrayList<IFace>();
 	ArrayList<IEdge> newEdges = new ArrayList<IEdge>();
@@ -771,7 +781,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
-    public void triangulateAtCenter(IMeshCreator creator){
+    public void triangulateAtCenter(IMeshType creator){
 	
 	ArrayList<IFace> newFaces = new ArrayList<IFace>();
 	ArrayList<IEdge> newEdges = new ArrayList<IEdge>();
@@ -828,4 +838,10 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	for(int i=0; i<faces.size(); i++) fcs[i] = faces.get(i);
 	return new IMeshGeo(fcs);
     }
+    
+
+    /** only setting value to closed. checking no connection of mesh */
+    public IMeshGeo close(){ closed=true; return this; } 
+    public boolean isClosed(){ return closed; }
+
 }

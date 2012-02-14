@@ -328,6 +328,9 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	initialized=true;
 	
 	if(surface!=null && surface.unum()==2 && surface.vnum()==2 &&
+	   // need to be parallelogram
+	   Math.abs(surface.cp(0,0).dist(surface.cp(1,0))-surface.cp(0,1).dist(surface.cp(1,1)))<=IConfig.tolerance &&
+	   Math.abs(surface.cp(0,0).dist(surface.cp(0,1))-surface.cp(1,0).dist(surface.cp(1,1)))<=IConfig.tolerance &&
 	   surface.isFlat()){ simpleFlat=true; }
 	else{ simpleFlat=false; }
     }

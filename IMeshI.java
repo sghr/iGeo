@@ -57,4 +57,7 @@ public interface IMeshI{
     public IFace face(IIntegerI i);
     
     
+    public IMeshI close();
+    public boolean isClosed();
+
 }

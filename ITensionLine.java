@@ -43,7 +43,7 @@ public class ITensionLine extends ICurve implements ITensionI{
 	super(p1.pos(), p2.pos());
 	initTensionLine(p1,p2,tension);
     }
-    
+    /*
     public ITensionLine(IParticle p1, IParticle p2){
 	super(p1.pos(), p2.pos());
 	initTensionLine(p1,p2);
@@ -73,7 +73,7 @@ public class ITensionLine extends ICurve implements ITensionI{
 	super(p1, p2);
 	initTensionLine(new IParticle(p1),new IParticle(p2),tension);
     }
-    
+    */    
     public ITensionLine(IVecI p1, IVecI p2){
 	super(p1, p2);
 	initTensionLine(new IParticle(p1.get()),new IParticle(p2.get()));

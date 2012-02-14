@@ -348,8 +348,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	IVec2[][] innerPts = null;
 	if(intrims!=null){
 	    innerPts = new IVec2[intrims.length][];
-	    for(int i=0; i<intrims.length; i++)
+	    for(int i=0; i<intrims.length; i++){
 		innerPts[i] = intrims[i].getPolyline2D().get();
+	    }
 	}
 	
 	IVec2[][] triangles2D = ISurfaceMesh.getTriangles(surfPts,outerPts,innerPts);

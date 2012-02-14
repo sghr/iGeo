@@ -138,6 +138,6 @@ public class IDynamicsBase implements IDynamics{
     public void preinteract(ArrayList<IDynamics> dynamics){}
     public void postinteract(ArrayList<IDynamics> dynamics){}
     public void preupdate(){}
-    public void postupdate(){}
+    public void postupdate(){ updateTarget(); }
     
 }

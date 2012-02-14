@@ -37,13 +37,16 @@ public class PIConfig{
     */
     public static boolean drawBeforeProcessing=true;
     
+    /**
+       A boolean flag to switch for PIGraphicsGL to clear OpenGL's GL_DEPTH_BUFFER_BIT
+       before drawing iGeo's geometries. Default is true.
+    */
+    public static boolean resetGLDepthBefore=true;
     
     /**
-       A boolean flag to switch for PIGraphicsGL to clear OpenGL's GL_DEPTH_BUFFER_BIT.
-       Default is true.
-       If you want to mix the depth of processing's 3D objects and iGeo's,
-       turn this to false and turn drawBeforeProcessing to false.
+       A boolean flag to switch for PIGraphicsGL to clear OpenGL's GL_DEPTH_BUFFER_BIT
+       after drawing iGeo's geometries. Default is true.
     */
-    public static boolean resetGLDepth=true;
+    public static boolean resetGLDepthAfter=true;
     
 }

@@ -25,12 +25,12 @@ package igeo;
 import java.util.ArrayList;
 
 /**
-   Class of IDynamics to simulate tension force between two particles.
+   Class of IDynamics to simulate spring force between two particles with specified length.
    
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ITension extends IDynamicsBase implements ITensionI{
+public class ISpring extends IDynamicsBase implements ITensionI{
     //public static double defaultTension=1.0;
     
     public IParticleI pt1, pt2;
@@ -40,110 +40,93 @@ public class ITension extends IDynamicsBase implements ITensionI{
 	Only direction of force changes. But if the distance is zero, force is also zero. */
     public boolean constantTension = false;
     
-    public ITension(IParticleI p1, IParticleI p2, double tension, IObject parent){
+    public double length;
+    
+    public ISpring(IParticleI p1, IParticleI p2, double tension, double length, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
 	this.tension = tension;
-    }
-    /*
-    public ITension(IParticle p1, IParticle p2, double tension, IObject parent){
-	super(parent);
-	pt1=p1; pt2=p2;
-	this.tension = tension;
+	this.length = length;
     }
     
-    public ITension(IParticleAgent p1, IParticleAgent p2, double tension, IObject parent){
-	super(parent);
-	pt1=p1; pt2=p2;
-	this.tension = tension;
-    }
-    public ITension(IVec p1, IVec p2, double tension, IObject parent){
-	super(parent);
-	pt1 = new IParticle(p1); pt2=new IParticle(p2);
-	this.tension = tension;
-    }
-    */
-    
-    public ITension(IVecI p1, IVecI p2, double tension, IObject parent){
+    public ISpring(IVecI p1, IVecI p2, double tension, double length, IObject parent){
 	super(parent);
 	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
 	this.tension = tension;
+	this.length = length;
+    }
+    
+    public ISpring(IParticleI p1, IParticleI p2, double tension, IObject parent){
+	super(parent);
+	pt1=p1; pt2=p2;
+	this.tension = tension;
+	length(p1,p2);
+    }
+    
+    public ISpring(IVecI p1, IVecI p2, double tension, IObject parent){
+	super(parent);
+	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	this.tension = tension;
+	length(p1,p2);
+    }
+    
+    public ISpring(IParticleI p1, IParticleI p2, IObject parent){
+	super(parent);
+	pt1=p1; pt2=p2;
+	length(p1,p2);
+    }
+    
+    public ISpring(IVecI p1, IVecI p2, IObject parent){
+	super(parent);
+	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	length(p1,p2);
     }
         
-    public ITension(IParticleI p1, IParticleI p2, IObject parent){
-	super(parent);
-	pt1=p1; pt2=p2;
-    }
-    /*
-    public ITension(IParticle p1, IParticle p2, IObject parent){
-	super(parent);
-	pt1=p1; pt2=p2;
-    }
-    
-    public ITension(IParticleAgent p1, IParticleAgent p2, IObject parent){
-	super(parent);
-	pt1=p1; pt2=p2;
-    }
-    public ITension(IVec p1, IVec p2, IObject parent){
-	super(parent);
-	pt1 = new IParticle(p1); pt2=new IParticle(p2);
-    }
-    */
-    
-    public ITension(IVecI p1, IVecI p2, IObject parent){
-	super(parent);
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
-    }
-    
-    public ITension(IParticleI p1, IParticleI p2, double tension){
+    public ISpring(IParticleI p1, IParticleI p2, double tension, double length){
 	super();
 	pt1=p1; pt2=p2;
 	this.tension = tension;
-    }
-    /*
-    public ITension(IParticle p1, IParticle p2, double tension){
-	super();
-	pt1=p1; pt2=p2;
-	this.tension = tension;
+	this.length = length;
     }
     
-    public ITension(IParticleAgent p1, IParticleAgent p2, double tension){
-	super();
-	pt1=p1; pt2=p2;
-	this.tension = tension;
-    }
-    
-    public ITension(IVec p1, IVec p2, double tension){
-	super();
-	pt1 = new IParticle(p1); pt2=new IParticle(p2);
-	this.tension = tension;
-    }
-    */
-    
-    public ITension(IVecI p1, IVecI p2, double tension){
+    public ISpring(IVecI p1, IVecI p2, double tension, double length){
 	super();
 	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
 	this.tension = tension;
+	this.length = length;
     }
     
-    public ITension(IParticleI p1, IParticleI p2){ super(); pt1=p1; pt2=p2; }
-    /*
-    public ITension(IParticle p1, IParticle p2){ super(); pt1=p1; pt2=p2; }
+    public ISpring(IParticleI p1, IParticleI p2, double tension){
+	super();
+	pt1=p1; pt2=p2;
+	this.tension = tension;
+	length(p1,p2);
+    }
     
-    public ITension(IParticleAgent p1, IParticleAgent p2){ super(); pt1=p1; pt2=p2; }
+    public ISpring(IVecI p1, IVecI p2, double tension){
+	super();
+	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	this.tension = tension;
+	length(p1,p2);
+    }
     
-    public ITension(IVec p1, IVec p2){ super(); pt1 = new IParticle(p1); pt2=new IParticle(p2); }
-    */
-    public ITension(IVecI p1, IVecI p2){
-	super(); pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+    public ISpring(IParticleI p1, IParticleI p2){ super(); pt1=p1; pt2=p2; length(p1,p2); }
+    
+    public ISpring(IVecI p1, IVecI p2){
+	super(); pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get()); length(p1,p2);
     }
     
     
     public double tension(){ return tension; }
-    public ITension tension(double tension){ this.tension = tension; return this; }
+    public ISpring tension(double tension){ this.tension = tension; return this; }
     
     public boolean constant(){ return constantTension; }
-    public ITension constant(boolean cnst){ constantTension = cnst; return this; }
+    public ISpring constant(boolean cnst){ constantTension = cnst; return this; }
+    
+    public double length(){ return length; }
+    public ISpring length(double length){ this.length = length; return this; }
+    public ISpring length(IVecI p1, IVecI p2){ length = p1.dist(p2); return this; }
+    
     
     /** getting end point. i==0 or i==1. if i is other value, returns first point. */
     public IParticleI pt(int i){ if(i==1){ return pt2; } return pt1; }
@@ -157,25 +140,25 @@ public class ITension extends IDynamicsBase implements ITensionI{
     public IParticleI pt2(){ return pt2; }
     /** alias of pt2() */
     public IParticleI pos2(){ return pt2(); }
-
     
-    public ITension parent(IObject par){ super.parent(par); return this; }
-    public ITension target(IObject targetObj){ super.target(targetObj); return this; }
-    public ITension removeTarget(int i){ super.removeTarget(i); return this; }
-    public ITension removeTarget(IObject obj){ super.removeTarget(obj); return this; }
+    
+    public ISpring parent(IObject par){ super.parent(par); return this; }
+    public ISpring target(IObject targetObj){ super.target(targetObj); return this; }
+    public ISpring removeTarget(int i){ super.removeTarget(i); return this; }
+    public ISpring removeTarget(IObject obj){ super.removeTarget(obj); return this; }
     
     synchronized public void interact(ArrayList<IDynamics> dynamics){
 	IVec dif = pt2.pos().dif(pt1.pos());
 	// excludes the case direction cannot be defined
+	double dist = dif.len();
 	if(constantTension){
-	    if(dif.len2()>0){
-		dif.len(tension);
-		pt1.push(dif);
-		pt2.pull(dif); // opposite dir
-	    }
+	    if(dist>length){ dif.len(tension); }
+	    else{ dif.len(-tension); }
+	    pt1.push(dif);
+	    pt2.pull(dif); // opposite dir
 	}
-	else{
-	    dif.mul(tension);
+	else if(dist>0){
+	    dif.mul(tension*(dist-length)/dist);
 	    pt1.push(dif);
 	    pt2.pull(dif); // opposite dir
 	}

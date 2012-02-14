@@ -126,6 +126,6 @@ public class IStraightener extends IDynamicsBase implements ITensionI{
 	pt3.addForce(dif);
     }
     
-    synchronized public void update(){ updateTarget(); }
+    //synchronized public void update(){ updateTarget(); }// moved to IDynamicsBase.postUpdate()
     
 }

@@ -91,6 +91,19 @@ public /*interface*/ class IConfig{
        3D curve is approximated with sampled points in this resolution. 
     */
     public static int trim3dCurveInterpolationResolution = 20;
+
+
+    
+    /*****************************
+     * polygon mesh properties
+     *****************************/
+    
+    /**
+       number to facet circle to approximate it in polygon mesh.
+    */
+    public static int meshCircleResolution = 24; 
+    
+
     
     /*****************************
      * dynamics properties

@@ -199,7 +199,7 @@ public class IEdge{
 	return false;
     }
     
-    public IFace[] createFace(IMeshCreator creator){
+    public IFace[] createFace(IMeshType creator){
 	
 	ArrayList<ArrayList<IEdge>> loops = traceEdge(creator.getMaxVertexNum());
 	if(loops.size()==0) return null;

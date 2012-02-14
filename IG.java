@@ -212,6 +212,7 @@ public class IG implements IServerI{
 	// default server for geometry creator
 	ICurveCreator.server(ig);
 	ISurfaceCreator.server(ig);
+	IMeshCreator.server(ig);
     }
     
     public static void setCurrent(IPanel owner){
@@ -1526,6 +1527,12 @@ public class IG implements IServerI{
     public static ISurface surface(ICurveI trimCurve){
 	return ISurfaceCreator.surface(trimCurve);
     }
+    public static ISurface surface(ICurveI outerTrimCurve, ICurveI[] innerTrimCurves){
+	return ISurfaceCreator.surface(outerTrimCurve, innerTrimCurves);
+    }
+    public static ISurface surface(ICurveI outerTrimCurve, ICurveI innerTrimCurve){
+	return ISurfaceCreator.surface(outerTrimCurve, innerTrimCurve);
+    }
     public static ISurface surface(ICurveI[] trimCurves){
 	return ISurfaceCreator.surface(trimCurves);
     }
@@ -1622,6 +1629,12 @@ public class IG implements IServerI{
     
     /** planar surface with trim */
     public static ISurface srf(ICurveI trimCurve){ return surface(trimCurve); }
+    public static ISurface srf(ICurveI outerTrimCurve, ICurveI[] innerTrimCurves){
+	return surface(outerTrimCurve, innerTrimCurves);
+    }
+    public static ISurface srf(ICurveI outerTrimCurve, ICurveI innerTrimCurve){
+	return surface(outerTrimCurve, innerTrimCurve);
+    }
     public static ISurface srf(ICurveI[] trimCurves){ return surface(trimCurves); }
     public static ISurface srf(IVecI[] trimCrvPts){ return surface(trimCrvPts); }
     public static ISurface srf(IVecI[] trimCrvPts, int trimCrvDeg){

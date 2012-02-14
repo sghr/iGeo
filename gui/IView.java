@@ -486,9 +486,7 @@ public class IView{
     */
     public boolean convert(IVecI orig, IVec2 dest){
 	synchronized(this){
-	    
 	    IVec trans = glTransformMatrix.transform(orig);
-	    
 	    if(axonometric){
 		trans.div(axonRatio);
 		dest.x=screenWidth/2 + trans.x;
@@ -496,12 +494,37 @@ public class IView{
 	    }
 	    else{
 		trans.z = -trans.z;
-		
 		if(trans.z < near) return false;
-		
 		double r = screenHeight*near/trans.z/glHeight;
 		dest.x = screenWidth/2 + trans.x*r;
 		dest.y = screenHeight/2 - trans.y*r;
+	    }
+	    if(dest.x < 0 || dest.x > screenWidth ||
+	       dest.y < 0 || dest.y > screenHeight) return false;
+	    return true;
+	}
+    }
+    
+    
+    /**
+       converts 3d coordinates to 2d coordinates of screen whose unit is
+       pixels and whose origin is top left corner and positive Y is downward
+       @return returns if result is inside screen
+    */
+    public boolean convert(IVecI orig, IVec2f dest){
+	synchronized(this){
+	    IVec trans = glTransformMatrix.transform(orig);
+	    if(axonometric){
+		trans.div(axonRatio);
+		dest.x = (float)(screenWidth/2 + trans.x);
+		dest.y = (float)(screenHeight/2 - trans.y);
+	    }
+	    else{
+		trans.z = -trans.z;
+		if(trans.z < near) return false;
+		float r = (float)(screenHeight*near/trans.z/glHeight);
+		dest.x = (float)screenWidth/2 + ((float)trans.x)*r;
+		dest.y = (float)screenHeight/2 - ((float)trans.y)*r;
 	    }
 	    if(dest.x < 0 || dest.x > screenWidth ||
 	       dest.y < 0 || dest.y > screenHeight) return false;
@@ -516,9 +539,7 @@ public class IView{
     */
     public boolean convert(IVecI orig, IVec dest){
 	synchronized(this){
-	    
 	    IVec trans = glTransformMatrix.transform(orig);
-	    
 	    trans.z = -trans.z;
 	    if(axonometric){
 		trans.div(axonRatio);
@@ -531,7 +552,6 @@ public class IView{
 		dest.x = screenWidth/2 + trans.x*r;
 		dest.y = screenHeight/2 - trans.y*r;
 		dest.z = trans.z;
-		
 		if(trans.z < near) return false;
 	    }
 	    if(dest.x < 0 || dest.x > screenWidth ||
@@ -539,6 +559,30 @@ public class IView{
 	    return true;
 	}
     }
+    
+    
+    /**
+       converts 3d coordinates to 2d. Putting depth in z component of the return vector. no check if it's inside screen
+       @return 3d vector whose x and y are 2d coordinates in screen and z is depth
+    */
+    public IVec convert(IVecI orig){
+	synchronized(this){
+	    IVec trans = glTransformMatrix.transform(orig);
+	    trans.z = -trans.z;
+	    if(axonometric){
+		trans.div(axonRatio);
+		trans.x += screenWidth/2;
+		trans.y = screenHeight/2 - trans.y;
+		return trans;
+	    }
+	    // perspective
+	    double r = screenHeight*near/trans.z/glHeight;
+	    trans.x = screenWidth/2 + trans.x*r;
+	    trans.y = screenHeight/2 - trans.y*r;
+	    return trans;
+	}
+    }
+    
     
     
     //public void drawBG(IGraphics g){}
@@ -587,43 +631,9 @@ public class IView{
 	// background
 	
 	drawBG(gl);
-	/*
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-	gl.glPushMatrix();
-	gl.glLoadIdentity();
-	gl.glMatrixMode(GL.GL_PROJECTION);
-	gl.glPushMatrix();
-	gl.glLoadIdentity();
-	gl.glDisable(GL.GL_DEPTH_TEST);
-	//if(mode.isLight()) gl.glDisable(GL.GL_LIGHTING);
-	gl.glBegin(GL.GL_QUADS);
-	//gl.glColor3d(0.3,0.5,0.7);
-	gl.glColor3dv(glBGColor[0][1],0);
-	gl.glVertex3d(-1.,-1.,0);
-	gl.glColor3dv(glBGColor[1][1],0);
-	gl.glVertex3d(1.,-1.,0);
-	//gl.glColor3d(1.,1.,1.);
-	gl.glColor3dv(glBGColor[1][0],0);
-	gl.glVertex3d(1.,1.,0);
-	//gl.glColor3d(0.9,0.9,0.9);
-	gl.glColor3dv(glBGColor[0][0],0);
-	gl.glVertex3d(-1.,1.,0);
-	gl.glEnd();
-	gl.glEnable(GL.GL_DEPTH_TEST);
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-	gl.glPopMatrix();
-	gl.glMatrixMode(GL.GL_PROJECTION);
-	gl.glPopMatrix();
-	*/
-	
-	
-	//gl.glClearColor(1f,1f,1f,1f);
-	//if(IGRandom.percent(1)) gl.glClearColor(IGRandom.getf(),IGRandom.getf(),IGRandom.getf(),1f); //
 	
 	//gl.glDisable(GL.GL_DEPTH_TEST); // !! for transparency
 	//gl.glEnable(GL.GL_DEPTH_TEST);
-	
-	
 	
 	// default light
 	if(mode.isLight()){
@@ -631,15 +641,6 @@ public class IView{
 	    gl.glMatrixMode(GL.GL_MODELVIEW);
 	    gl.glPushMatrix();
 	    gl.glLoadIdentity();
-	    
-	    
-	    //gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, new float[]{0f,0f,1f,0f}, 0);
-	    //gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, new float[]{.1f,.1f,.1f,1.0f}, 0);
-	    ////gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, new float[]{.3f,.3f,.3f}, 0);
-	    ////gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, new float[]{1f,1f,1f}, 0);
-	    ////gl.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, new float[]{1f,1f,1f}, 0);
-	    //gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, new float[]{.01f,.01f,.01f,1f}, 0);
-	    //gl.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, new float[]{.0f,.0f,.0f,1f}, 0);
 	    
 	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, defaultGLLightPosition, 0);
 	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, defaultGLAmbientLight, 0);
@@ -655,17 +656,13 @@ public class IView{
 	    
 	    gl.glEnable(GL.GL_LIGHT1);
 	    gl.glEnable(GL.GL_LIGHTING);
-	    
-	    	    
+	    	    	    
 	    gl.glPopMatrix();
-	    
 	}
-	
 	
 	gl.glMatrixMode(GL.GL_PROJECTION);
 	gl.glLoadIdentity();
 	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-	
 	
 	if(axonometric)
 	    gl.glOrtho(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,near,far);
@@ -676,7 +673,6 @@ public class IView{
 	//gl.glTranslated(-x,-y,-z);
 	
 	gl.glLoadMatrixd(glTransformArray,0);
-	
 	
     }
     
@@ -696,9 +692,9 @@ public class IView{
 		rot.invert();
 		
 		// coordinates conversion to openGL coordinates
-		IMatrix3 conv = new IMatrix3(0,-1,0,
-					     0,0,1,
-					     -1,0,0);
+		IMatrix3 conv = new IMatrix3( 0,-1, 0,
+					      0, 0, 1,
+					     -1, 0, 0);
 		conv = conv.mul(rot);
 		
 		glTransformMatrix.setId();
@@ -798,7 +794,8 @@ public class IView{
 	setLocation(x,y,z);
 	setAngle(yaw,pitch,true);
 	perspective();
-	setPerspectiveRatio(defaultPersRatio);
+	//setPerspectiveRatio(defaultPersRatio); // keep the original perspective ratio
+	update();
     }
     
     public void setPerspective(double perspectiveAngle){

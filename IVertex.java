@@ -101,6 +101,10 @@ public class IVertex implements IVecI{
     
     public IVec get(){ return pos.get(); }
     
+    /** passing position field */
+    public IVecI pos(){ return pos; }
+
+    
     public IVertex dup(){ return new IVertex(this); }
     
     /*

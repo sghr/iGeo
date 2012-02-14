@@ -111,6 +111,9 @@ public class IPoint extends IObject implements IVecI{
     //public IVec get(){ return pos.get(); } // when pos is IVecI
     public IVec get(){ return pos; }
     
+    /** passing position field */
+    public IVec pos(){ return pos; }
+    
     public IPoint dup(){ return new IPoint(this); }
     
     public IVec2 to2d(){ return pos.to2d(); }

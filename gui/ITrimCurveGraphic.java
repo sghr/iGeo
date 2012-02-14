@@ -79,7 +79,14 @@ public class ITrimCurveGraphic{
     */
     
     public void setup2D(int reso){
-	if(curve.deg()==1){
+	if(curve.deg()==1 &&
+	   // if surface is flat but skewed, line needs to be a curve
+	   (surface.udeg()>1 || surface.vdeg()>1  ||
+	    surface.udeg()==1 && surface.vdeg()==1 && 
+	    surface.ucpNum()==2 && surface.vcpNum()==2 &&
+	    Math.abs(surface.cp(0,0).dist(surface.cp(1,0))-surface.cp(0,1).dist(surface.cp(1,1)))<=IConfig.tolerance &&
+	    Math.abs(surface.cp(0,0).dist(surface.cp(0,1))-surface.cp(1,0).dist(surface.cp(1,1)))<=IConfig.tolerance ) // this condition needs to be elaborated
+	   ){
 	    int num = curve.cpNum();
 	    polyline2 = new IPolyline2D(num);
 	    for(int i=0; i<num; i++){
@@ -98,7 +105,6 @@ public class ITrimCurveGraphic{
 		    if(pt.x<0.) pt.x=0.; else if(pt.x>1.) pt.x=1.;
 		    if(pt.y<0.) pt.y=0.; else if(pt.y>1.) pt.y=1.;
 		    polyline2.set(i*reso+j, pt);
-		    //IOut.p("curve.u at<"+i+", "+j+"> = "+curve.u(i,(double)j/reso));
 		}
 	    }
 	}
@@ -109,6 +115,9 @@ public class ITrimCurveGraphic{
 	if(polyline2==null) setup2D(reso);
 	
 	if(surface.udeg()==1 && surface.vdeg()==1 &&
+	   // needs to be parallelogram
+	   Math.abs(surface.cp(0,0).dist(surface.cp(1,0))-surface.cp(0,1).dist(surface.cp(1,1)))<=IConfig.tolerance &&
+	   Math.abs(surface.cp(0,0).dist(surface.cp(0,1))-surface.cp(1,0).dist(surface.cp(1,1)))<=IConfig.tolerance &&
 	   surface.ucpNum()==2 && surface.vcpNum()==2 && surface.isFlat()){
 	    // if curve.deg()==1, uvpts.length == cpNum
 	    polyline = new IPolyline(polyline2.num());

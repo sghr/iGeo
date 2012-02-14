@@ -84,7 +84,7 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
 	frc = particle.frc;
 	addDynamics(particle);
     }
-
+    
     /**************************************
      * IParticleI API
      **************************************/

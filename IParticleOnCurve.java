@@ -203,7 +203,7 @@ public class IParticleOnCurve extends IParticle implements IParticleOnCurveI{
 	ufrc=0; // also reset ufrc
 	
 	//if(parent!=null) parent.updateGraphic();
-	updateTarget();
+	//updateTarget(); //moved to IDynamics.postUpdate()
     }
     
     

@@ -158,7 +158,7 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPushMatrix();
 	
-	if(PIConfig.resetGLDepth) gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+	if(PIConfig.resetGLDepthBefore) gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
 	
 	//gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 	
@@ -183,7 +183,7 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
 		
 	panel.draw(igg);
 	
-	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT); // necessary?
+	if(PIConfig.resetGLDepthAfter) gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
 	
 	gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPopMatrix();

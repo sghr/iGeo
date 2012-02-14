@@ -5179,6 +5179,8 @@ public class IRhino3dm{
 	    packedTextureDomain[1] = new Interval(0.,1.);
 	    packedTextureRotate = false;
 	    
+	    closed = mesh.isClosed()?1:0;
+	    
 	    vbox = new float[2][3];
 	    nbox = new float[2][3];
 	    tbox = new float[2][2];
