@@ -1366,7 +1366,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    IOut.err("trim loop is not closed");
 	    return false;
 	}
-	return true; 
+	return true;
     }
     
     public boolean checkTrimLoop(ITrimCurve loop){
@@ -1420,35 +1420,36 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	return addInnerTrimLoop(trimLoop);
     }
     public ISurfaceGeo addInnerTrimLoop(ITrimCurve[] loop){
-	if(!checkTrimLoop(loop)) return this;
+	for(int i=0; loop!=null&&i<loop.length; i++) loop[i].surface(this);
 	
-	if(innerTrimLoop==null)
-	    innerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
-	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
-	for(int i=0;loop!=null&&i<loop.length;i++) l.add(loop[i].surface(this));
-	innerTrimLoop.add(l);
-	closeInnerTrim();
-	return this;
-    }
-    public ISurfaceGeo addInnerTrimLoop(ITrimCurveI loop){
-	return addInnerTrimLoop(loop.get());
-    }
-    public ISurfaceGeo addInnerTrimLoop(ITrimCurve loop){
 	if(!checkTrimLoop(loop)) return this;
-	
-	if(innerTrimLoop==null)
-	    innerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
+	if(innerTrimLoop==null) innerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
-	if(!loop.isClosed()){ IOut.err("trim loop is not closed"); } 
-	l.add(loop.surface(this));
+	//for(int i=0;loop!=null&&i<loop.length;i++) l.add(loop[i].surface(this));
+	for(int i=0;loop!=null&&i<loop.length;i++) l.add(loop[i]);
 	innerTrimLoop.add(l);
 	closeInnerTrim();
 	return this;
     }
     
-    public ISurfaceGeo addInnerTrimLoop(ICurveI[] trim){
-	return addInnerTrimLoop(trim,true);
+    public ISurfaceGeo addInnerTrimLoop(ITrimCurveI loop){ return addInnerTrimLoop(loop.get()); }
+    
+    public ISurfaceGeo addInnerTrimLoop(ITrimCurve loop){
+	if(loop!=null) loop.surface(this);
+	
+	if(!checkTrimLoop(loop)) return this;
+	if(innerTrimLoop==null) innerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
+	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
+	if(!loop.isClosed()){ IOut.err("trim loop is not closed"); } 
+	//l.add(loop.surface(this));
+	l.add(loop);
+	innerTrimLoop.add(l);
+	closeInnerTrim();
+	return this;
     }
+    
+    public ISurfaceGeo addInnerTrimLoop(ICurveI[] trim){ return addInnerTrimLoop(trim,true); }
+    
     public ISurfaceGeo addInnerTrimLoop(ICurveI[] trim, boolean deleteInput){
 	if(trim==null || trim.length==0){ IOut.err("no trim input"); return this; }
 	ITrimCurve[] trimCrvs = new ITrimCurve[trim.length];
@@ -1458,17 +1459,19 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return addInnerTrimLoop(trimCrvs);
     }
-    public ISurfaceGeo addInnerTrimLoop(ICurveI trim){
-	return addInnerTrimLoop(trim,true);
-    }
+    
+    public ISurfaceGeo addInnerTrimLoop(ICurveI trim){ return addInnerTrimLoop(trim,true); }
+    
     public ISurfaceGeo addInnerTrimLoop(ICurveI trim, boolean deleteInput){
 	if(trim==null){ IOut.err("no trim input"); return this; }
 	ITrimCurve trimCrv =new ITrimCurve(trim).surface(this);
 	if(deleteInput && trim instanceof IObject) ((IObject)trim).del();
 	return addInnerTrimLoop(trimCrv);
     }
-        
+    
     public ISurfaceGeo addInnerTrim(ITrimCurve trimCrv){
+	if(trimCrv!=null) trimCrv.surface(this);
+	
 	if(!checkTrim(trimCrv)) return this;
 	
 	if(innerTrimLoop==null){
@@ -1479,9 +1482,11 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    innerTrimLoop.add(new ArrayList<ITrimCurve>());
 	    innerTrimClosed=false;
 	}
-	innerTrimLoop.get(innerTrimLoop.size()-1).add(trimCrv.surface(this));
+	//innerTrimLoop.get(innerTrimLoop.size()-1).add(trimCrv.surface(this));
+	innerTrimLoop.get(innerTrimLoop.size()-1).add(trimCrv);
 	return this;
     }
+    
     
     public ISurfaceGeo closeInnerTrim(){ innerTrimClosed=true; return this; }
     
@@ -1504,34 +1509,36 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	return addOuterTrimLoop(trimLoop);
     }
     public ISurfaceGeo addOuterTrimLoop(ITrimCurve[] loop){
+	for(int i=0; loop!=null&&i<loop.length; i++) loop[i].surface(this);
+	
 	if(!checkTrimLoop(loop)) return this;
-	if(outerTrimLoop==null)
-	    outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
+	if(outerTrimLoop==null) outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
-	for(int i=0;loop!=null&&i<loop.length;i++) l.add(loop[i].surface(this));
+	//for(int i=0;loop!=null&&i<loop.length;i++) l.add(loop[i].surface(this));
+	for(int i=0;loop!=null&&i<loop.length;i++) l.add(loop[i]);
 	outerTrimLoop.add(l);
 	closeOuterTrim();
 	return this;
     }
     
-    public ISurfaceGeo addOuterTrimLoop(ITrimCurveI loop){
-	return addOuterTrimLoop(loop.get());
-    }
+    public ISurfaceGeo addOuterTrimLoop(ITrimCurveI loop){ return addOuterTrimLoop(loop.get()); }
+    
     public ISurfaceGeo addOuterTrimLoop(ITrimCurve loop){
-	if(!checkTrimLoop(loop)) return this;
-	if(outerTrimLoop==null)
-	    outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
+	if(loop!=null) loop.surface(this);
+	
+	if(!checkTrimLoop(loop)){ return this; }
+	if(outerTrimLoop==null) outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
 	if(!loop.isClosed()){ IOut.err("trim loop is not closed"); } 
-	l.add(loop.surface(this));
+	//l.add(loop.surface(this));
+	l.add(loop);
 	outerTrimLoop.add(l);
 	closeOuterTrim();
 	return this;
     }
     
-    public ISurfaceGeo addOuterTrimLoop(ICurveI[] trim){
-	return addOuterTrimLoop(trim,true);
-    }
+    public ISurfaceGeo addOuterTrimLoop(ICurveI[] trim){ return addOuterTrimLoop(trim,true); }
+    
     public ISurfaceGeo addOuterTrimLoop(ICurveI[] trim, boolean deleteInput){
 	if(trim==null || trim.length==0){ IOut.err("no trim input"); return this; }
 	ITrimCurve[] trimCrvs = new ITrimCurve[trim.length];
@@ -1541,9 +1548,9 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return addOuterTrimLoop(trimCrvs);
     }
-    public ISurfaceGeo addOuterTrimLoop(ICurveI trim){
-	return addOuterTrimLoop(trim,true);
-    }
+    
+    public ISurfaceGeo addOuterTrimLoop(ICurveI trim){ return addOuterTrimLoop(trim,true); }
+    
     public ISurfaceGeo addOuterTrimLoop(ICurveI trim, boolean deleteInput){
 	if(trim==null){ IOut.err("no trim input"); return this; }
 	ITrimCurve trimCrv =new ITrimCurve(trim).surface(this);
@@ -1552,6 +1559,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     
     public ISurfaceGeo addOuterTrim(ITrimCurve trimCrv){
+	if(trimCrv!=null) trimCrv.surface(this);
+	
 	if(!checkTrim(trimCrv)) return this;
 	if(outerTrimLoop==null){
 	    outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
@@ -1561,7 +1570,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    outerTrimLoop.add(new ArrayList<ITrimCurve>());
 	    outerTrimClosed=false;
 	}
-	outerTrimLoop.get(outerTrimLoop.size()-1).add(trimCrv.surface(this));
+	//outerTrimLoop.get(outerTrimLoop.size()-1).add(trimCrv.surface(this));
+	outerTrimLoop.get(outerTrimLoop.size()-1).add(trimCrv);
 	return this;
     }
     

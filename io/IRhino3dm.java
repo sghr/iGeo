@@ -86,8 +86,8 @@ public class IRhino3dm{
     public static final int tcodePropertiesTable  = (tcodeTable | 0x0014);
 	
     public static final int tcodeSettingsTable    = (tcodeTable | 0x0015);
-	
-	
+    
+    
     public static final int tcodeBitmapTable     = (tcodeTable | 0x0016);
     public static final int tcodeUserTable       = (tcodeTable | 0x0017);
 	
@@ -155,41 +155,41 @@ public class IRhino3dm{
     public static final int tcodeViewName              = (tcodeTableRec | tcodeCRC   | 0x0A3B);
     public static final int tcodeViewPosition          = (tcodeTableRec | tcodeCRC   | 0x0B3B);
     
-	
+    
     public static final int tcodeViewAttributes       = (tcodeTableRec | tcodeCRC   | 0x0C3B);
-
+    
     public static final int tcodeViewViewportUserData = (tcodeTableRec | tcodeCRC   | 0x0D3B);
-	
+    
     public static final int tcodeBitmapRecord = (tcodeTableRec | tcodeCRC | 0x0090);
     
     public static final int tcodeMaterialRecord = (tcodeTableRec | tcodeCRC | 0x0040);
-	
+    
     public static final int tcodeLayerRecord    = (tcodeTableRec | tcodeCRC | 0x0050);
     
     public static final int tcodeLightRecord            = (tcodeTableRec | tcodeCRC | 0x0060);
     public static final int tcodeLightRecordAttributes = (tcodeInterface | tcodeCRC   | 0x0061);
     public static final int tcodeLightRecordAttributesUserData = (tcodeInterface | 0x0062);
-	
+    
     public static final int tcodeLightRecordEnd        = (tcodeInterface | tcodeShort | 0x006F);
-
+    
     public static final int tcodeUserTableUUID          = (tcodeTableRec | tcodeCRC | 0x0080);
     public static final int tcodeUserTableRecordHeader = (tcodeTableRec | tcodeCRC | 0x0082);
     
     public static final int tcodeUserRecord              = (tcodeTableRec | 0x0081) ;
-	
-	
+    
+    
     public static final int tcodeGroupRecord             = (tcodeTableRec  | tcodeCRC   | 0x0073);
-	
+    
     public static final int tcodeFontRecord             = (tcodeTableRec  | tcodeCRC   | 0x0074);
-	
+    
     public static final int tcodeDimStyleRecord          = (tcodeTableRec  | tcodeCRC   | 0x0075);
-	
+    
     public static final int tcodeInstanceDefinitionRecord  = (tcodeTableRec  | tcodeCRC   | 0x0076);
-	
+    
     public static final int tcodeHatchPatternRecord  = (tcodeTableRec  | tcodeCRC   | 0x0077);
     
     public static final int tcodeLineTypeRecord  = (tcodeTableRec  | tcodeCRC   | 0x0078);
-
+    
     public static final int tcodeObsoleteLayerSetRecord  = (tcodeTableRec  | tcodeCRC   | 0x0079);
     
     public static final int tcodeTextureMappingRecord  = (tcodeTableRec  | tcodeCRC   | 0x007A);
@@ -211,10 +211,10 @@ public class IRhino3dm{
     public static final int tcodeOpenNurbsClassUserData = (tcodeOpenNurbsObject               | 0x7FFD);
     public static final int tcodeOpenNurbsClassUserDataHeader = (tcodeOpenNurbsObject | tcodeCRC | 0x7FF9);
     public static final int tcodeOpenNurbsClassEnd      = (tcodeOpenNurbsObject | tcodeShort | 0x7FFF);;;
-		
-	
+    
+    
     public static final int tcodeAnnotationSettings = (tcodeAnnotation | 0x0001);
-	
+    
     public static final int tcodeTextBlock          = (tcodeAnnotation | 0x0004);
     public static final int tcodeAnnotationLeader   = (tcodeAnnotation | 0x0005);
     public static final int tcodeLinearDimension    = (tcodeAnnotation | 0x0006);
@@ -252,9 +252,9 @@ public class IRhino3dm{
     public static final int tcodeLegacyPNTStuff     = (tcodeLegacyGeometry | tcodeStuff | tcodeLegacyPNT);
     
     public static final int tcodeRhPoint            = (tcodeGeometry | 0x0001);
-	
+    
     public static final int tcodeRhSpotLight         = (tcodeRender   | 0x0001);
-	
+    
     public static final int tcodeOldRhTrimesh          = (tcodeGeometry | 0x0011);
     public static final int tcodeOldMeshVertexNormals  = (tcodeGeometry | 0x0012);
     public static final int tcodeOldMeshUV             = (tcodeGeometry | 0x0013);
@@ -267,15 +267,15 @@ public class IRhino3dm{
     public static final int tcodeName                = (tcodeInterface | 0x0001);
     public static final int tcodeView                = (tcodeInterface | 0x0002);
     public static final int tcodeCPlane              = (tcodeInterface | 0x0003);
-	
+    
     public static final int tcodeNamedCPlane         = (tcodeInterface | 0x0004);
     public static final int tcodeNamedView           = (tcodeInterface | 0x0005);
     public static final int tcodeViewport            = (tcodeInterface | 0x0006);
-	
+    
     public static final int tcodeShowGrid            = (tcodeShort | tcodeInterface | 0x0007);
     public static final int tcodeShowGridAxes        = (tcodeShort | tcodeInterface | 0x0008);
     public static final int tcodeShowWorldAxes       = (tcodeShort | tcodeInterface | 0x0009);
-	
+    
     public static final int tcodeViewportPosition   = (tcodeInterface | 0x000A);
     public static final int tcodeViewportTraceInfo  = (tcodeInterface | 0x000B);
     public static final int tcodeSnapSide           = (tcodeInterface | 0x000C);
@@ -287,16 +287,16 @@ public class IRhino3dm{
     
     public static final int tcodeMaximizedViewport  = (tcodeShort | tcodeInterface | 0x0011);
     public static final int tcodeViewportWallPaper  = (tcodeInterface | 0x0012);
-	
-
+    
+    
     public static final int tcodeSummary             = (tcodeInterface | 0x0013);
     public static final int tcodeBitmapPreview       = (tcodeInterface | 0x0014);
     public static final int tcodeViewportDisplayMode = (tcodeShort | tcodeInterface | 0x0015);
-	
-	
+    
+    
     //public static final int tcodeLayerTable          = (tcodeShort   | tcodeTable    | 0x0001) ;
     public static final int tcodeLayerRef            = (tcodeShort   | tcodeTableRec | 0x0001);
-	
+    
     public static final int tcodeXData               = (tcodeUser | 0x0001);
     
     public static final int tcodeRGB                 = (tcodeShort   | tcodeDisplay | 0x0001);
@@ -308,16 +308,16 @@ public class IRhino3dm{
     public static final int tcodeRenderMaterialID    = (tcodeDisplay | 0x0007);
     public static final int tcodeLayer               = (tcodeDisplay | 0x0010);
     
-	
+    
     public static final int tcodeLayerObselete1    = (tcodeShort   | tcodeDisplay | 0x0013);
     public static final int tcodeLayerObselete2    = (tcodeShort   | tcodeDisplay | 0x0014);
     public static final int tcodeLayerObselete3    = (tcodeShort   | tcodeDisplay | 0x0015);
-	
-	
+    
+    
     public static final int tcodeLayerOn             = (tcodeShort   | tcodeDisplay | 0x0016);
     public static final int tcodeLayerThawed         = (tcodeShort   | tcodeDisplay | 0x0017);
     public static final int tcodeLayerLocked         = (tcodeShort   | tcodeDisplay | 0x0018);
-	
+    
     
     public static final int tcodeLayerVisible        = (tcodeShort   | tcodeDisplay | 0x0012);
     public static final int tcodeLayerPickable       = (tcodeShort   | tcodeDisplay | 0x0030);
@@ -347,8 +347,8 @@ public class IRhino3dm{
     public static final int tcodeDictionaryEntry    = (tcodeUser | tcodeCRC   | 0x0012);
     public static final int tcodeDictionaryEnd      = (tcodeUser | tcodeShort | 0x0013);
     
-
-
+    
+    
     public enum Endian{ LittleEndian, BigEndian }
     public static Endian endian(int i){ return (i<=0)?Endian.LittleEndian:Endian.BigEndian; }
     public static Endian endian(){
@@ -2949,7 +2949,7 @@ public class IRhino3dm{
 	    //return new ITrimCurve(srf, cir);
 	    return new ITrimCurve(cir);
 	}
-    
+	
     }
     public static class Extrusion extends Surface{
 	public static final String uuid = "36F53175-72B8-4d47-BF1F-B4E6FC24F4B9";
@@ -3325,7 +3325,7 @@ public class IRhino3dm{
 	    IOut.debug(200, "type = "+type);
 	    IOut.debug(200, "iso = "+iso);
 	    IOut.debug(200, "loopIndex = "+loopIndex);
-	    IOut.debug(200, "tolerance = "+tolerance); 
+	    IOut.debug(200, "tolerance = "+tolerance[0]+", "+tolerance[1]); 
 	    
 	}
 	
@@ -3842,12 +3842,14 @@ public class IRhino3dm{
 	public BrepLoopArray loops;
 	public BrepFaceArray faces;
 	
+	
 	public BoundingBox bbox;
 	public int isSolid;
 	
-	public ArrayList<ICurveGeo> icurves3; // to check joined trim edge
+	//public ArrayList<ICurveGeo> icurves3; // to check joined trim edge
+	public ArrayList<ArrayList<ICurveGeo>> icurves3; // to check joined trim edge; icurves per surface
 	//public ArrayList<IVec> ivertices; // to check shared vertices
-	
+	public ArrayList<ISurfaceGeo> isurfaces; 
 	
 	public Brep(){}
 	
@@ -3864,13 +3866,15 @@ public class IRhino3dm{
 	    
 	    bbox = new BoundingBox();
 	    
-	    icurves3 = new ArrayList<ICurveGeo>();
+	    //icurves3 = new ArrayList<ICurveGeo>();
+	    icurves3 = new ArrayList<ArrayList<ICurveGeo>>();
 	    //ivertices = new ArrayList<ICurveGeo>();
+	    isurfaces = new ArrayList<ISurfaceGeo>();
 	    
 	    if(brep.solid) isSolid=1;
 	    else isSolid=0;
 	    
-	    IBoundingBox ibbox = new IBoundingBox();
+	    IBounds ibbox = new IBounds();
 	    
 	    if(brep.surfaces!=null){
 		for(int i=0; i<brep.surfaces.length; i++){ addSurface(brep.surfaces[i], ibbox); }
@@ -3905,10 +3909,12 @@ public class IRhino3dm{
 	    bbox = new BoundingBox();
 	    isSolid=0;
 	    
-	    icurves3 = new ArrayList<ICurveGeo>();
+	    //icurves3 = new ArrayList<ICurveGeo>();
+	    icurves3 = new ArrayList<ArrayList<ICurveGeo>>();
 	    //ivertices = new ArrayList<IVec>();
+	    isurfaces = new ArrayList<ISurfaceGeo>();
 	    
-	    IBoundingBox ibbox = new IBoundingBox();
+	    IBounds ibbox = new IBounds();
 	    
 	    addSurface(srf, ibbox);
 	    
@@ -4203,20 +4209,32 @@ public class IRhino3dm{
 	}
 	
 	public boolean isEdgeTouching(ICurveGeo crv1, ICurveGeo crv2, double reso){
-	    // check only start point and end point (!) (too rough?)
+	    // check only start point and end point (!) (too rough?) // and midpoint (would it match?)
 	    IVec pt1a = crv1.start();
 	    IVec pt1b = crv1.end();
+	    IVec pt1m = crv1.pt(0.5); //
 	    IVec pt2a = crv2.start();
 	    IVec pt2b = crv2.end();
+	    IVec pt2m = crv2.pt(0.5); //
+	    //if(pt1a.eq(pt2a,reso) && pt1b.eq(pt2b,reso)) return true;
+	    //if(pt1a.eq(pt2b,reso) && pt1b.eq(pt2a,reso)) return true;
+	    if(!pt1m.eq(pt2m,reso)) return false; // added 20120215
 	    if(pt1a.eq(pt2a,reso) && pt1b.eq(pt2b,reso)) return true;
 	    if(pt1a.eq(pt2b,reso) && pt1b.eq(pt2a,reso)) return true;
 	    return false;
 	}
 	
-	public ICurveGeo getSharedICurve(ICurveGeo crv){
+	//public ICurveGeo getSharedICurve(ICurveGeo crv){
+	public ICurveGeo getSharedICurve(ICurveGeo crv, ISurfaceGeo currentSrf){
 	    if(icurves3==null || icurves3.size()==0) return null;
+	    int idx = -1;
+	    if(currentSrf!=null) idx = isurfaces.indexOf(currentSrf);
 	    for(int i=0; i<icurves3.size(); i++){
-		if(isEdgeTouching(crv, icurves3.get(i))) return icurves3.get(i);
+		if(i != idx){ // check only other surfaces' trim curves
+		    for(int j=0; j<icurves3.get(i).size(); j++){
+			if(isEdgeTouching(crv, icurves3.get(i).get(j))) return icurves3.get(i).get(j);
+		    }
+		}
 	    }
 	    return null;
 	}
@@ -4257,10 +4275,13 @@ public class IRhino3dm{
 	    return null;
 	}
 	
-	public void addSurface(ISurfaceGeo srf, IBoundingBox ibbox){
+	public void addSurface(ISurfaceGeo srf, IBounds ibbox){
 	    
 	    NurbsSurface nsrf = new NurbsSurface(srf);
 	    surfaces.add(nsrf);
+	    
+	    isurfaces.add(srf); //
+	    icurves3.add(new ArrayList<ICurveGeo>()); //
 	    
 	    BrepFace face = new BrepFace(faces.size(),surfaces.size()-1,nsrf,this);
 	    faces.add(face);
@@ -4272,7 +4293,7 @@ public class IRhino3dm{
 	    ArrayList<BrepLoop.Type> loopType = new ArrayList<BrepLoop.Type>();
 	    
 	    getTrimLoops(srf, trimLoops, loopType);
-	    	    
+	    
 	    for(int i=0; i<trimLoops.size(); i++){
 		BrepLoop loop =
 		    new BrepLoop(loops.size(),faces.size()-1,loopType.get(i), this);
@@ -4289,11 +4310,14 @@ public class IRhino3dm{
 		    
 		    ICurveGeo trim3d = trim2d.get3d();
 		    
-		    ICurveGeo sharedICurve = getSharedICurve(trim3d);
+		    //ICurveGeo sharedICurve = getSharedICurve(trim3d, srf);
+		    ICurveGeo sharedICurve = null; // shared edge algorithm not really working yet. skipped for the moment.
 		    Curve sharedCurve3 = null;
 		    BrepEdge sharedEdge = null;
 		    
 		    if(sharedICurve!=null){
+			//IOut.err("("+i+","+j+"): sharedICurve!!!!"); //
+			
 			sharedCurve3 = getCurve3(sharedICurve);
 			if(sharedCurve3!=null){
 			    sharedEdge = getBrepEdge(sharedCurve3);
@@ -4303,7 +4327,8 @@ public class IRhino3dm{
 		    
 		    if(sharedEdge==null){ // new edge
 			
-			icurves3.add(trim3d);
+			//icurves3.add(trim3d);
+			icurves3.get(icurves3.size()-1).add(trim3d);
 			
 			NurbsCurve ncrv3 = new NurbsCurve(trim3d);
 			curves3.add(ncrv3);
@@ -4359,9 +4384,10 @@ public class IRhino3dm{
 			BrepVertex vtx1 = vertices.get(sharedEdge.vertexIndex[0]);
 			BrepVertex vtx2 = vertices.get(sharedEdge.vertexIndex[1]);
 						
-			IVec pt1 = trim3d.start();
+			//IVec pt1 = trim3d.start();
 			boolean reverse=false;
-			if(pt1.dist(vtx1.point) > pt1.dist(vtx2.point)){
+			//if(pt1.dist(vtx1.point) > pt1.dist(vtx2.point)){
+			if(!trim3d.start().eq(sharedICurve.start())){
 			    //vtx1 = vertices.get(sharedEdge.vertexIndex[1]);
 			    //vtx2 = vertices.get(sharedEdge.vertexIndex[0]);
 			    reverse=true;
@@ -4391,7 +4417,7 @@ public class IRhino3dm{
 	}
 	
 	
-	public void addSingleSurface(ISurfaceGeo srf, IBoundingBox ibbox){
+	public void addSingleSurface(ISurfaceGeo srf, IBounds ibbox){
 	    
 	    NurbsSurface nsrf = new NurbsSurface(srf);
 	    surfaces.add(nsrf);
@@ -4451,7 +4477,8 @@ public class IRhino3dm{
 		    curves2.add(ncrv);
 		    ICurveGeo trim3d = trim2d.get3d();
 		    
-		    icurves3.add(trim3d);
+		    //icurves3.add(trim3d);
+		    icurves3.get(icurves3.size()-1).add(trim3d);
 		    
 		    
 		    NurbsCurve ncrv3 = new NurbsCurve(trim3d);
@@ -4790,6 +4817,7 @@ public class IRhino3dm{
 		BrepFace face = faces.get(i);
 		
 		if(face.faceIndex>=0 && face.faceIndex<surfaces.size()){
+		    IOut.debug(100, "creating surface "+i+"/"+faces.size()); //
 		    ISurfaceGeo surf = surfaces.get(face.faceIndex).createIGeometry(context,s);
 		    if(surf != null){
 			BrepLoopArray faceLoop = getLoopsForFace(face.faceIndex);
@@ -4797,13 +4825,14 @@ public class IRhino3dm{
 			    ArrayList<ITrimCurve> trimCrvs =
 				getTrimCurvesForLoop(faceLoop.get(j),context,s,surf);
 			    if(trimCrvs.size()>0){
+				IOut.debug(100, trimCrvs.size()+" trim curves found"); //
 				switch(faceLoop.get(j).type){
 				case Inner:
-				    //IOut.err("adding inner trim loop"); //
+				    IOut.debug(100, "adding inner trim loop"); //
 				    surf.addInnerTrimLoop(trimCrvs.toArray(new ITrimCurve[trimCrvs.size()]));
 				    break;
 				case Outer:
-				    //IOut.err("adding outer trim loop"); //
+				    IOut.debug(100, "adding outer trim loop"); //
 				    surf.addOuterTrimLoop(trimCrvs.toArray(new ITrimCurve[trimCrvs.size()]));
 				    break;
 				default:
@@ -6227,7 +6256,6 @@ public class IRhino3dm{
 	    }
 	    else{
 	    }
-
 	    return true; 
 	}
     }
@@ -6472,13 +6500,15 @@ public class IRhino3dm{
 	    double[] uknot = getIGUKnots();
 	    double[] vknot = getIGVKnots();
 	    
-	    double ustart=0, uend=0;
+	    //double ustart=0, uend=0;
+	    double ustart=0, uend=1; // 20120215
 	    if(knot[0].length>order[0]-2){
 		ustart = knot[0][order[0]-2];
 		uend = knot[0][knot[0].length-1-(order[0]-2)];
 	    }
 	    
-	    double vstart=0, vend=0;
+	    //double vstart=0, vend=0;
+	    double vstart=0, vend=1; // 20120215
 	    if(knot[1].length>order[1]-2){
 		vstart = knot[1][order[1]-2];
 		vend = knot[1][knot[1].length-1-(order[1]-2)];
@@ -6525,7 +6555,8 @@ public class IRhino3dm{
 		uend = knot[0][knot[0].length-1-(order[0]-2)];
 	    }
 	    
-	    double vstart=0, vend=0;
+	    //double vstart=0, vend=0;
+	    double vstart=0, vend=1; // 20120215
 	    if(knot[1].length>order[1]-2){
 		vstart = knot[1][order[1]-2];
 		vend = knot[1][knot[1].length-1-(order[1]-2)];
@@ -7086,11 +7117,14 @@ public class IRhino3dm{
 	}
 	
 	public ISurface createIObject(Rhino3dmFile context, IServerI s){
+
+	    
 	    ISurfaceGeo surf = createIGeometry(context,s);
 	    return new ISurface(s,surf);
 	}
 	
 	public ISurfaceGeo createIGeometry(Rhino3dmFile context, IServerI s){
+	    
 	    IVec axisCenter = axis.from;
 	    IVec axisDir = axis.to.diff(axis.from);
 	    

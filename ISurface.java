@@ -79,8 +79,7 @@ public class ISurface extends IObject implements ISurfaceI{
 	surface = new ISurfaceGeo(pt1,pt2,pt3,pt4); initSurface(null); 
     }
     
-    /** triangle
-     */
+    /** triangle */
     public ISurface(IVecI pt1, IVecI pt2, IVecI pt3){
 	surface = new ISurfaceGeo(pt1,pt2,pt3,pt1); initSurface(null); 
     }
@@ -256,7 +255,7 @@ public class ISurface extends IObject implements ISurfaceI{
 	//surface = new ISurfaceGeo(srf.surface.get());
 	surface = srf.surface.dup();
 	initSurface(srf.server);
-	setColor(srf.getColor());
+	//setColor(srf.getColor());
     }
     
     public ISurface(IServerI s, ISurface srf){
@@ -264,7 +263,7 @@ public class ISurface extends IObject implements ISurfaceI{
 	//surface = new ISurfaceGeo(srf.surface.get());
 	surface = srf.surface.dup();
 	initSurface(s);
-	setColor(srf.getColor());
+	//setColor(srf.getColor());
     }
     
     public void initSurface(IServerI s){

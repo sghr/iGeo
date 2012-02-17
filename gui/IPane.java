@@ -144,16 +144,16 @@ public class IPane extends IComponent{
     
     /** Focus view on objects */
     public void focus(){
-	//if(parent.getBoundingBox()==null) parent.setBoundingBox();
+	//if(parent.getBounds()==null) parent.setBounds();
 	
 	// parent is checking if bounding box is needed to be updated or not.
-	parent.setBoundingBox();
-	view.focus(parent.getBoundingBox());
+	parent.setBounds();
+	view.focus(parent.getBounds());
     }
     
     /** Focus view on objects */
     public void focus(ArrayList<IObject> e){
-	IBoundingBox bb = new IBoundingBox();
+	IBounds bb = new IBounds();
 	bb.setObjects(e);
 	view.focus(bb);
     }

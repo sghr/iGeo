@@ -44,7 +44,7 @@ import igeo.io.*;
    @see IPanel
    
    @author Satoru Sugihara
-   @version 0.7.2.8
+   @version 0.7.6.2
 */
 public class IG implements IServerI{
     
@@ -2238,11 +2238,173 @@ public class IG implements IServerI{
     }    
     
     
+    /*********************************************************
+     * creating mesh
+     ********************************************************/
+    
+    /** set mesh type (class of vertex, edge, face) */
+    public static void meshType(IMeshType type){ IMeshCreator.meshType(type); }
+    
+    /** get the current mesh type (class of vertex, edge, face) */
+    public static IMeshType meshType(){ return IMeshCreator.meshType(); }
+        
+    public static IMesh mesh(){ return IMeshCreator.mesh(); }
+    public static IMesh mesh(IMeshGeo m){ return IMeshCreator.mesh(m); }
+    public static IMesh mesh(IMesh m){ return IMeshCreator.mesh(m); }
+    public static IMesh mesh(ArrayList<ICurveI> lines){ return IMeshCreator.mesh(lines); }
+    public static IMesh mesh(IVec[][] matrix){ return IMeshCreator.mesh(matrix); }
+    public static IMesh mesh(IVec[][] matrix, boolean triangulateDir){
+	return IMeshCreator.mesh(matrix,triangulateDir); 
+    }
+    public static IMesh mesh(IVec[][] matrix, int unum, int vnum, boolean triangulateDir){
+	return IMeshCreator.mesh(matrix,triangulateDir); 
+    }
+    public static IMesh mesh(ArrayList<IVertex> v, ArrayList<IEdge> e, ArrayList<IFace> f){
+	return IMeshCreator.mesh(v,e,f);
+    }
+    public static IMesh mesh(IVertex[] vtx, IEdge[] edg,IFace[] fcs){
+	return IMeshCreator.mesh(vtx,edg,fcs);
+    }
+    public static IMesh mesh(IVec[] vert){ return IMeshCreator.mesh(vert); }
+    public static IMesh mesh(IVertex[] vert){ return IMeshCreator.mesh(vert); }
+    public static IMesh mesh(IVertex v1, IVertex v2, IVertex v3){ return IMeshCreator.mesh(v1,v2,v3); }
+    public static IMesh mesh(IVertex v1, IVertex v2, IVertex v3, IVertex v4){
+	return IMeshCreator.mesh(v1,v2,v3,v4);
+    }
+    public static IMesh mesh(IVecI v1, IVecI v2, IVecI v3){ return IMeshCreator.mesh(v1,v2,v3); }
+    public static IMesh mesh(IVecI v1, IVecI v2, IVecI v3, IVecI v4){
+	return IMeshCreator.mesh(v1,v2,v3,v4);
+    }
+    public static IMesh mesh(double x1, double y1, double z1, double x2, double y2, double z2,
+			     double x3, double y3, double z3){
+	return IMeshCreator.mesh(x1,y1,z1,x2,y2,z2,x3,y3,z3);
+    }
+    public static IMesh mesh(double x1, double y1, double z1, double x2, double y2, double z2,
+			     double x3, double y3, double z3, double x4, double y4, double z4){
+        return IMeshCreator.mesh(x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4);
+    }
+    public static IMesh mesh(IFace[] fcs){ return IMeshCreator.mesh(fcs); }
+    
+    
+
+
+    /*********************************************************
+     * creating solid mesh
+     ********************************************************/
+    
+    /*********************************************************
+     * creating mesh box
+     ********************************************************/
+    public static IMesh meshBox(double x, double y, double z, double size){
+	return IMeshCreator.box(x,y,z,size);
+    }
+    public static IMesh meshBox(double x, double y, double z, double width, double height, double depth){
+        return IMeshCreator.box(x,y,z,width,height,depth);
+    }
+    public static IMesh meshBox(IVecI origin, double size){ return IMeshCreator.box(origin,size); }
+    public static IMesh meshBox(IVecI origin, double width, double height, double depth){
+        return IMeshCreator.box(origin,width,height,depth);
+    }
+    public static IMesh meshBox(IVecI origin, IVecI xvec, IVecI yvec, IVecI zvec){
+	return IMeshCreator.box(origin,xvec,yvec,zvec);
+    }
+    public static IMesh meshBox(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4,
+				IVecI pt5, IVecI pt6, IVecI pt7, IVecI pt8 ){
+	return IMeshCreator.box(pt1,pt2,pt3,pt4,pt5,pt6,pt7,pt8);
+    }
+    public static IMesh meshBox(IVecI[][][] corners){ return IMeshCreator.box(corners); }
+    public static IMesh meshBox(IVertex[][][] corners){ return IMeshCreator.box(corners); }
+    
+    public static IMesh meshRectStick(IVecI pt1, IVecI pt2, IVecI udir, IVecI vdir){
+	return IMeshCreator.rectStick(pt1,pt2,udir,vdir);
+    }
+    /**
+       creating closed mesh stick with 2 points and with and height
+       @param heightDir it provides reference to the direction of height but actual direction is re-calculated to be perpendicular to pt1-pt2 direction.
+    */
+    public static IMesh meshRectStick(IVecI pt1, IVecI pt2, double width, double height, IVecI heightDir){
+	return IMeshCreator.rectStick(pt1,pt2,width,height,heightDir);
+    }
+    /** creating closed mesh stick. height direction is z axis */
+    public static IMesh meshRectStick(IVecI pt1, IVecI pt2, double width, double height){
+	return IMeshCreator.rectStick(pt1,pt2,width,height);
+    }
+    /**
+       creating closed mesh stick.
+       @param heightDir it provides reference to the direction of height but actual direction is re-calculated to be perpendicular to pt1-pt2 direction.
+    */
+    public static IMesh meshSquareStick(IVecI pt1, IVecI pt2, double width, IVecI heightDir){
+	return IMeshCreator.squareStick(pt1,pt2,width,heightDir);
+    }
+    /** creating closed mesh stick. height direction is z axis */
+    public static IMesh meshSquareStick(IVecI pt1, IVecI pt2, double width){
+	return IMeshCreator.squareStick(pt1,pt2,width);
+    }
+    /**
+       creates closed mesh stick with polygon profile
+       @param pt1 center of one side of a stick
+       @param pt2 center of another side of a stick
+       @param polygonVertexNum number of vertex of profile polygon
+    */
+    public static IMesh meshPolygonStick(IVecI pt1, IVecI pt2, double radius, int polygonVertexNum){
+	return IMeshCreator.polygonStick(pt1,pt2,radius,polygonVertexNum);
+    }
+    /**
+       creates closed mesh stick with polygon profile
+       @param pt1 center of one side of a stick
+       @param pt2 center of another side of a stick
+       @param polygonVertexNum number of vertex of profile polygon
+       @param heightDir reference vector to locate one of vertex of polygon aligned with this direction
+    */
+    public static IMesh meshPolygonStick(IVecI pt1, IVecI pt2, double radius, int polygonVertexNum,
+					 IVecI heightDir){
+	return IMeshCreator.polygonStick(pt1,pt2,radius,polygonVertexNum,heightDir);
+    }
+    
+    /**
+       creates closed mesh stick with polygon profile
+       @param pt1 center of one side of a stick
+       @param pt2 center of another side of a stick
+       @param polygonVertexNum number of vertex of profile polygon
+    */
+    public static IMesh meshPolygonStick(IVecI pt1, IVecI pt2, double radius1, double radius2,
+					 int polygonVertexNum){
+	return IMeshCreator.polygonStick(pt1,pt2,radius1,radius2,polygonVertexNum);
+    }
+    /**
+       creates closed mesh stick with polygon profile
+       @param pt1 center of one side of a stick
+       @param pt2 center of another side of a stick
+       @param polygonVertexNum number of vertex of profile polygon
+       @param heightDir reference vector to locate one of vertex of polygon aligned with this direction
+    */
+    public static IMesh meshPolygonStick(IVecI pt1, IVecI pt2, double radius1, double radius2,
+					 int polygonVertexNum, IVecI heightDir){
+	return IMeshCreator.polygonStick(pt1,pt2,radius1,radius2,polygonVertexNum,heightDir);
+    }
+    /** round stick */
+    public static IMesh meshStick(IVecI pt1, IVecI pt2, double radius){
+	return IMeshCreator.stick(pt1,pt2,radius);
+    }
+    /** round stick */
+    public static IMesh meshStick(IVecI pt1, IVecI pt2, double radius1, double radius2){
+	return IMeshCreator.stick(pt1,pt2,radius1,radius2);
+    }
+    /** round stick (alias of stick()) */
+    public static IMesh meshRoundStick(IVecI pt1, IVecI pt2, double radius){
+	return IMeshCreator.roundStick(pt1,pt2,radius);
+    }
+    /** round stick (alias of stick()) */
+    public static IMesh meshRoundStick(IVecI pt1, IVecI pt2, double radius1, double radius2){
+	return IMeshCreator.roundStick(pt1,pt2,radius1,radius2);
+    }
+    
     
     /*********************************************************
      * creating vector 
      ********************************************************/
-    
+
+    public static IVec vec(){ return v(); }
     public static IVec vec(double x, double y, double z){ return v(x,y,z); }
     public static IVec vec(double x, double y){ return v(x,y); }
     public static IVec vec(IVec v){ return v(v); }
@@ -2255,6 +2417,7 @@ public class IG implements IServerI{
      * vector shorter name 
      ********************************************************/
     
+    public static IVec v(){ return new IVec(); }
     public static IVec v(double x, double y, double z){ return new IVec(x,y,z); }
     public static IVec v(double x, double y){ return new IVec(x,y); }
     public static IVec v(IVec v){ return new IVec(v); }
@@ -2268,6 +2431,7 @@ public class IG implements IServerI{
     /*********************************************************
      * vector longer name
      ********************************************************/
+    public static IVec vector(){ return v(); }
     public static IVec vector(double x, double y, double z){ return v(x,y,z); }
     public static IVec vector(double x, double y){ return v(x,y); }
     public static IVec vector(IVec v){ return v(v); }
@@ -2281,6 +2445,7 @@ public class IG implements IServerI{
     /*********************************************************
      * creating 4 dimensional vector with weight
      ********************************************************/
+    public static IVec4 vec4(){ return v4(); }
     public static IVec4 vec4(double x, double y, double z, double w){ return v4(x,y,z,w); }
     public static IVec4 vec4(IVec v, double w){ return v4(v,w); }
     public static IVec4 vec4(IVec4 v){ return v4(v); }
@@ -2293,6 +2458,7 @@ public class IG implements IServerI{
      * 4d vector shorter name 
      ********************************************************/
     
+    public static IVec4 v4(){ return new IVec4(); }
     public static IVec4 v4(double x, double y, double z, double w){ return new IVec4(x,y,z,w); }
     public static IVec4 v4(IVec v, double w){ return new IVec4(v,w); }
     public static IVec4 v4(IVec4 v){ return new IVec4(v); }
@@ -2306,6 +2472,7 @@ public class IG implements IServerI{
     /*********************************************************
      * 4d vector longer name
      ********************************************************/
+    public static IVec4 vector4(){ return v4(); }
     public static IVec4 vector4(double x, double y, double z, double w){ return v4(x,y,z,w); }
     public static IVec4 vector4(IVec v, double w){ return v4(v,w); }
     public static IVec4 vector4(IVec4 v){ return v4(v); }
@@ -2318,6 +2485,7 @@ public class IG implements IServerI{
      * creating 2 dimensional vector 
      ********************************************************/
     
+    public static IVec2 vec2(){ return v2(); }
     public static IVec2 vec2(double x, double y){ return v2(x,y); }
     public static IVec2 vec2(IVec2 v){ return v2(v); }
     public static IVec2 vec2(IVecI v){ return v2(v); }
@@ -2327,6 +2495,7 @@ public class IG implements IServerI{
      * 2d vector  shorter name
      ********************************************************/
     
+    public static IVec2 v2(){ return new IVec2(); }
     public static IVec2 v2(double x, double y){ return new IVec2(x,y); }
     public static IVec2 v2(IVec2 v){ return new IVec2(v); }
     public static IVec2 v2(IVecI v){ return new IVec2(v); }
@@ -2336,6 +2505,7 @@ public class IG implements IServerI{
      * 2d vector  longer name
      ********************************************************/
     
+    public static IVec2 vector2(){ return v2(); }
     public static IVec2 vector2(double x, double y){ return v2(x,y); }
     public static IVec2 vector2(IVec2 v){ return v2(v); }
     public static IVec2 vector2(IVecI v){ return v2(v); }

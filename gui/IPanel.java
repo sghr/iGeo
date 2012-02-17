@@ -48,7 +48,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     //public IPane fullScreenPane=null;
     //public int fullPaneOrigX, fullPaneOrigY, fullPaneOrigWidth, fullPaneOrigHeight;
     
-    public IBoundingBox boundingBox;
+    public IBounds bounds;
     public int serverStateCount=-1;
     
     public boolean startDynamicServer=true;
@@ -229,7 +229,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	}
 	/*
 	else if(key==KeyEvent.VK_F && shift &&!control){
-	    setBoundingBox();
+	    setBounds();
 	    currentMousePane.focus();
 	}
 	*/
@@ -339,14 +339,14 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     public void componentShown(ComponentEvent e){
     }
     
-    public IBoundingBox getBoundingBox(){ return boundingBox; } 
+    public IBounds getBounds(){ return bounds; } 
     
-    public void setBoundingBox(){
-	if(boundingBox==null) boundingBox = new IBoundingBox();
+    public void setBounds(){
+	if(bounds==null) bounds = new IBounds();
 	if(ig.server().stateCount()!=serverStateCount){
-	    boundingBox.setObjects(ig.server());
+	    bounds.setObjects(ig.server());
 	    serverStateCount = ig.server().stateCount();
-	    //IOut.err("boundingBox Updated: "+boundingBox); //
+	    //IOut.err("bounds Updated: "+bounds); //
 	}
     }
     

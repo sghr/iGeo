@@ -418,7 +418,7 @@ public class IView{
 	return v;
     }
     
-    public void focus(IBoundingBox bb){
+    public void focus(IBounds bb){
 	if(bb==null || bb.min==null || bb.max==null) return;
 	IVec center = bb.min.mid(bb.max);
 	IVec dir = frontDirection();

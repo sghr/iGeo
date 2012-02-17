@@ -56,14 +56,14 @@ public class IPoint extends IObject implements IVecI{
 	super(p);
 	pos = p.pos.dup();
 	initPoint(p.server);
-	setColor(p.getColor());
+	//setColor(p.getColor());
     }
     
     public IPoint(IServerI s, IPoint p){
 	super(s,p);
 	pos = p.pos.dup();
 	initPoint(s);
-	setColor(p.getColor());
+	//setColor(p.getColor());
     }
     
     protected void initPoint(IServerI s){

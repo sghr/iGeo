@@ -83,11 +83,11 @@ public class IParticleDistanceLink extends IDynamicsBase{
 	
 	// taking care of the whole update of particle here.
 	IVec dir = particle.pos.diff(center);
-	particle.frc.set(particle.frc.perpendicularVectorToVector(dir)); // cancelling force along dir
+	particle.frc.set(particle.frc.perpendicularVecToLine(dir).neg()); // cancelling force along dir // need to flip? (20120215)
 	particle.frc.mul(IConfig.updateRate/particle.mass);
 	particle.vel.add(particle.frc).mul(1.0-particle.friction);
 	
-	particle.vel.set(particle.vel.perpendicularVectorToVector(dir)); // cancelling vel along dir
+	particle.vel.set(particle.vel.perpendicularVecToLine(dir).neg()); // cancelling vel along dir // need to flip? (20120215)
 	
 	particle.pos.add(particle.vel.dup().mul(IConfig.updateRate));
 	

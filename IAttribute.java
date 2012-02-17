@@ -55,7 +55,21 @@ public class IAttribute{
     
     /** visibility switch of the object */
     public boolean visible=true;
+
+    public IAttribute(){}
     
+    public IAttribute(IAttribute attr){
+	//id=-1;
+	//name;
+	layer = attr.layer;
+	color = attr.color;
+	size = attr.size;
+	weight = attr.weight;
+	material = attr.material;
+	visible = attr.visible;
+    }
+    
+    public IAttribute dup(){ return new IAttribute(this); }
     
     public Color clr(){ return color; }
     public IAttribute clr(Color c){ color = c; return this; }

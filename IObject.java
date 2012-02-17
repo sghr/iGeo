@@ -64,12 +64,14 @@ public class IObject{
 	initObject(e.server);
 	// geometry might not be ready in subclass
 	//if(graphics!=null){ initGraphic(e.server); setColor(e.getColor()); }
+	if(e.attribute!=null){ attribute = e.attribute.dup(); }
     }
     
     public IObject(IServerI holder, IObject e){
 	initObject(holder);
 	// geometry might not be ready in subclass
 	//if(graphics!=null){ initGraphic(holder); setColor(e.getColor()); }
+	if(e.attribute!=null){ attribute = e.attribute.dup(); }
     }
     /** duplicate object */
     public IObject dup(){ return new IObject(this); }
@@ -203,6 +205,7 @@ public class IObject{
 		if(gr.isDrawable(m)) return gr;
 	}
 	IGraphicObject gr = createGraphic(m);
+	if(attribute!=null) gr.setAttribute(attribute);
 	if(gr!=null) graphics.add(gr);
 	return gr;
 	//return null;

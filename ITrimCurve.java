@@ -157,7 +157,7 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 
 	/* this should not happen
 	// default trim edges
-	if(this.cpNum()==5){
+	if(this.num()==5){
 	    IVecI[] cps1 = new IVecI[4];
 	    cps1[0] = cp(0); cps1[1] = cp(1); cps1[2] = cp(2); cps1[3] = cp(3);
 	    if(IVec.isArrayEqual(cps1, new IVec[]{ new IVec(0,0,0), new IVec(1.0,0,0),
@@ -168,7 +168,7 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	*/
 	
 	// default trim edges
-	if(this.cpNum()==2){
+	if(this.num()==2){
 	    IVec p00 = new IVec(0.,0,0);
 	    IVec p10 = new IVec(1.,0,0);
 	    IVec p01 = new IVec(0,1.,0);
@@ -232,22 +232,39 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	    }
 	}
 	
-	// when surface is planar & deg is 1
+	// when surface is planar & deg is 1 & parallelogram (if skew, straight line become curve)
 	if(surface.udeg()==1 && surface.vdeg()==1 &&
 	   surface.unum()==2 && surface.vnum()==2 &&
+	   Math.abs(surface.cp(0,0).dist(surface.cp(1,0)) -
+		    surface.cp(0,1).dist(surface.cp(1,1))) < IConfig.tolerance &&
+	   Math.abs(surface.cp(0,0).dist(surface.cp(0,1)) -
+		    surface.cp(1,0).dist(surface.cp(1,1))) < IConfig.tolerance &&
 	   surface.isFlat()){
-	
-	    IVec[] cpts = new IVec[this.num()];
-	    for(int i=0; i<cpts.length; i++){
-		IVecI cp = this.cp(i);
+	    
+	    IVecI[] cpts2 = this.cps();
+	    
+	    if(cpts2.length==2 || IVec.isStraight(cpts2)){
+		IVec cp2_1 = cpts2[0].get();
+		IVec cp2_2 = cpts2[cpts2.length-1].get();
+		IVec p1 = surface.pt(cp2_1.x,cp2_1.y).get();
+		IVec p2 = surface.pt(cp2_2.x,cp2_2.y).get();
+		return new ICurveGeo(p1,p2);
+	    }
+	    
+	    IVec[] cpts = new IVec[cpts2.length];
+	    for(int i=0; i<cpts2.length; i++){
+		//IVecI cp = this.cp(i);
 		if(this.defaultWeights[i]){
-		    IVec cp2 = cp.get();
+		    //IVec cp2 = cp.get();
+		    IVec cp2 = cpts2[i].get();
 		    cpts[i] = surface.pt(cp2.x,cp2.y).get();
 		}
 		else{
-		    IVec cp2 = cp.get();
+		    //IVec cp2 = cp.get();
+		    IVec cp2 = cpts2[i].get();
 		    IVec4 cp4 = surface.pt(cp2.x,cp2.y).to4d().get();
-		    if(cp instanceof IVec4I) cp4.w = ((IVec4I)cp).w();
+		    //if(cp instanceof IVec4I) cp4.w = ((IVec4I)cp).w();
+		    if(cpts2[i] instanceof IVec4I) cp4.w = ((IVec4I)cpts2[i]).w();
 		    else cp4.w = 1.0;
 		    cpts[i] = cp4;
 		}
@@ -261,14 +278,20 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	    double ustart = this.ustart();
 	    double uend = this.uend();
 	    
-	    return new ICurveGeo(cpts, deg, knots, ustart, uend);
+	    //return new ICurveGeo(cpts, deg, knots, ustart, uend);
+	    // avoid normalizing knots
+	    ICurveGeo crv3 = new ICurveGeo(cpts, deg, knots, 0., 1.);
+	    crv3.ustart = ustart;
+	    crv3.uend = uend;
+	    
+	    return crv3;
 	}
 	
 	// when surface is not planar
 	// approximation with polyline
 	
-	int uepnum = surface.uepNum();
-	int vepnum = surface.vepNum();
+	int uepnum = surface.unum(); //surface.ucpNum();
+	int vepnum = surface.vnum(); //surface.vcpNum();
 	
 	// when trim curve is deg 1
 	if(deg()==1){
@@ -279,7 +302,7 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	    pts.add(surface.pt(cp2.x,cp2.y).get());
 	    IVec prevCp2=cp2;
 	    
-	    for(int i=1; i<cpNum(); i++){
+	    for(int i=1; i<num(); i++){
 		cp2 = cp(i).get();
 		
 		double urange = Math.abs(cp2.x-prevCp2.x);
@@ -302,7 +325,7 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	
 	// check boundary by control points
 	double minu=1., minv=1., maxu=0., maxv=0.;
-	for(int i=0; i<cpNum(); i++){
+	for(int i=0; i<num(); i++){
 	    IVec cp = cp(i).get();
 	    if(cp.x < minu){ minu = cp.x; }
 	    if(cp.x > maxu){ maxu = cp.x; }
@@ -357,39 +380,54 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	retval.set(surface.pt(uv.x,uv.y));
     }
     
-    /**
-       it returns uv coordinates.
-    */
-    public void pt2d(double u, IVec2 retval){
+    /** it returns uv coordinates. */
+    public void pt2(double u, IVec2 retval){
 	IVec uv=new IVec();
 	super.pt(u,uv);
 	retval.set(uv.x,uv.y);
     }
+    /** alias */
+    public void pt2d(double u, IVec2 retval){ pt2(u,retval); }
     
-    public IVec2I pt2d(double u){
+    public IVec2I pt2(double u){
 	IVec2 retval = new IVec2();
 	pt2d(u,retval);
 	return retval;
     }
+    /** alias */
+    public IVec2I pt2d(double u){ return pt2(u); }
     
-    public IVec2I pt2d(IDoubleI u){
+    public IVec2I pt2(IDoubleI u){
 	IVec2 retval = new IVec2();
 	pt2d(u.x(),retval);
 	return retval;
     }
+    /** alias */
+    public IVec2I pt2d(IDoubleI u){ return pt2(u); }
     
-    public IVec2 start2d(){
+    public IVec2 start2(){
 	IVec p = new IVec();
 	super.pt(0.,p);
 	return new IVec2(p);
     }
-    public IVec2 end2d(){
+    /** alias */
+    public IVec2 start2d(){ return start2(); }
+    
+    public IVec2 end2(){
 	IVec p = new IVec();
 	super.pt(1.,p);
 	return new IVec2(p);	
     }
-    public IVec2 startCP2d(){ return new IVec2(cp(0)); }
-    public IVec2 endCP2d(){ return new IVec2(cp(num()-1)); }
+    /** alias */
+    public IVec2 end2d(){ return end2(); }
+    
+    public IVec2 startCP2(){ return new IVec2(cp(0)); }
+    /** alias */
+    public IVec2 startCP2d(){ return startCP2(); }
+    
+    public IVec2 endCP2(){ return new IVec2(cp(num()-1)); }
+    /** alias */
+    public IVec2 endCP2d(){ return endCP2(); }
     
     
     public void tan(double u, IVec retval){
@@ -410,7 +448,7 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
         if(knots[0] != 0.0 || knots[knots.length-1] != 1.0) knotsEndMatch=false;
         if(knotsEndMatch){
             // check by cp
-            if(cp(0).eq(cp(cpNum()-1))) return true;
+            if(cp(0).eq(cp(num()-1))) return true;
             return false;
         }
 	// check by pt

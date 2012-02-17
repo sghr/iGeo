@@ -40,24 +40,36 @@ public interface ITrimCurveI extends ICurveI{
 
     
     public ITrimCurve get();
-
-    /** get trim curve in 3d space mapped via the surface
-     */
+    
+    /** get trim curve in 3d space mapped via the surface */
     public ICurveGeo get3d();
-
-    /**
-       it returns uv coordinates.
-    */
+    
+    // get3() ?
+    
+    /** it returns uv coordinates. */
+    public IVec2I pt2(double u);
+    /** alias */ // should this be deleted?
     public IVec2I pt2d(double u);
     
-    /**
-       it returns uv coordinates.
-    */
+    /** it returns uv coordinates. */
+    public IVec2I pt2(IDoubleI u);
+    /** alias */ // should this be deleted?
     public IVec2I pt2d(IDoubleI u);
     
+    public IVec2I start2();
+    /** alias */ // should this be deleted?
     public IVec2I start2d();
+    
+    public IVec2I end2();
+    /** alias */ // should this be deleted?
     public IVec2I end2d();
+    
+    public IVec2I startCP2();
+    /** alias */ // should this be deleted?
     public IVec2I startCP2d();
+    
+    public IVec2I endCP2();
+    /** alias */ // should this be deleted?
     public IVec2I endCP2d();
     
     public ITrimCurveI rev();

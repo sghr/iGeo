@@ -49,9 +49,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     //    initWithEdges(edges, creator);
     //}
 
-    public IMeshGeo(IVec[][] matrix){
-	this(matrix,true,new IMeshType());
-    }
+    public IMeshGeo(IVec[][] matrix){ this(matrix,true,new IMeshType()); }
     public IMeshGeo(IVec[][] matrix, boolean triangulateDir){
 	this(matrix,triangulateDir,new IMeshType());
     }
@@ -843,5 +841,312 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     /** only setting value to closed. checking no connection of mesh */
     public IMeshGeo close(){ closed=true; return this; } 
     public boolean isClosed(){ return closed; }
+    
+    
+    
+    /*************************************************
+     * ITransformable methods
+     ************************************************/
+
+
+    public IMeshGeo add(double x, double y, double z){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).add(x,y,z);
+	return this;
+    }
+    public IMeshGeo add(IDoubleI x, IDoubleI y, IDoubleI z){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).add(x,y,z);
+	return this;
+    }
+    public IMeshGeo add(IVecI v){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).add(v);
+	return this;
+    }
+    public IMeshGeo sub(double x, double y, double z){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).sub(x,y,z);
+	return this;
+    }
+    public IMeshGeo sub(IDoubleI x, IDoubleI y, IDoubleI z){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).sub(x,y,z);
+	return this;
+    }
+    public IMeshGeo sub(IVecI v){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).sub(v);
+	return this;
+    }
+    public IMeshGeo mul(IDoubleI v){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).mul(v);
+	return this;
+    }
+    public IMeshGeo mul(double v){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).mul(v);
+	return this;
+    }
+    public IMeshGeo div(IDoubleI v){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).div(v);
+	return this;
+    }
+    public IMeshGeo div(double v){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).div(v);
+	return this;
+    }
+    
+    public IMeshGeo neg(){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).neg();
+	return this;
+    }
+    /** alias of neg */
+    public IMeshGeo rev(){ return neg(); }
+    /** alias of neg */
+    public IMeshGeo flip(){ return neg(); }
+    
+    
+    
+    /** scale add */
+    public IMeshGeo add(IVecI v, double f){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).add(v,f);
+	return this;
+    }
+    /** scale add */
+    public IMeshGeo add(IVecI v, IDoubleI f){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).add(v,f);
+	return this;
+    }
+    /** scale add alias */
+    public IMeshGeo add(double f, IVecI v){ return add(v,f); }
+    /** scale add alias */
+    public IMeshGeo add(IDoubleI f, IVecI v){ return add(v,f); }
+    
+    /** rotation around z-axis and origin */
+    public IMeshGeo rot(IDoubleI angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot(angle);
+	return this;
+    }
+    public IMeshGeo rot(double angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot(angle);
+	return this;
+    }
+    
+    /** rotation around axis vector */
+    public IMeshGeo rot(IVecI axis, IDoubleI angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot(axis,angle);
+	return this;
+    }
+    public IMeshGeo rot(IVecI axis, double angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot(axis,angle);
+	return this;
+    }
+    
+    /** rotation around axis vector and center */
+    public IMeshGeo rot(IVecI center, IVecI axis, IDoubleI angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot(center,axis,angle);
+	return this;
+    }
+    public IMeshGeo rot(IVecI center, IVecI axis, double angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot(center,axis,angle);
+	return this;
+    }
+    
+    /** rotate to destination direction vector */
+    public IMeshGeo rot(IVecI axis, IVecI destDir){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot(axis,destDir);
+	return this;
+    }
+    /** rotate to destination point location */    
+    public IMeshGeo rot(IVecI center, IVecI axis, IVecI destPt){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot(center,axis,destPt);
+	return this;
+    }
+    
+    
+    /** rotation on xy-plane around origin; same with rot(IDoubleI) */
+    public IMeshGeo rot2(IDoubleI angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot2(angle);
+	return this;
+    }
+    /** rotation on xy-plane around origin; same with rot(double) */
+    public IMeshGeo rot2(double angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot2(angle);
+	return this;
+    }
+    
+    /** rotation on xy-plane around center */
+    public IMeshGeo rot2(IVecI center, IDoubleI angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot2(center,angle);
+	return this;
+    }
+    public IMeshGeo rot2(IVecI center, double angle){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot2(center,angle);
+	return this;
+    }
+    
+    /** rotation on xy-plane to destination direction vector */
+    public IMeshGeo rot2(IVecI destDir){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot2(destDir);
+	return this;
+    }
+    /** rotation on xy-plane to destination point location */    
+    public IMeshGeo rot2(IVecI center, IVecI destPt){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).rot2(center,destPt);
+	return this;
+    }
+    
+    
+    
+    /** alias of mul */
+    public IMeshGeo scale(IDoubleI f){ return mul(f); }
+    public IMeshGeo scale(double f){ return mul(f); }
+    public IMeshGeo scale(IVecI center, IDoubleI f){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).scale(center,f);
+	return this;
+    }
+    public IMeshGeo scale(IVecI center, double f){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).scale(center,f);
+	return this;
+    }
+    
+    
+    /** scale only in 1 direction */
+    public IMeshGeo scale1d(IVecI axis, double f){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).scale1d(axis,f);
+	return this;
+    }
+    public IMeshGeo scale1d(IVecI axis, IDoubleI f){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).scale1d(axis,f);
+	return this;
+    }
+    public IMeshGeo scale1d(IVecI center, IVecI axis, double f){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).scale1d(center,axis,f);
+	return this;
+    }
+    public IMeshGeo scale1d(IVecI center, IVecI axis, IDoubleI f){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).scale1d(center,axis,f);
+	return this;
+    }
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public IMeshGeo ref(IVecI planeDir){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).ref(planeDir);
+	return this;
+    }
+    public IMeshGeo ref(IVecI center, IVecI planeDir){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).ref(center,planeDir);
+	return this;
+    }
+    /** mirror is alias of ref */
+    public IMeshGeo mirror(IVecI planeDir){ return ref(planeDir); }
+    public IMeshGeo mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
+    
+    /** shear operation */
+    public IMeshGeo shear(double sxy, double syx, double syz,
+			  double szy, double szx, double sxz){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shear(sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public IMeshGeo shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			  IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shear(sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public IMeshGeo shear(IVecI center, double sxy, double syx, double syz,
+			  double szy, double szx, double sxz){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shear(center,sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public IMeshGeo shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+			  IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shear(center,sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    
+    public IMeshGeo shearXY(double sxy, double syx){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearXY(sxy,syx);
+	return this;
+    }
+    public IMeshGeo shearXY(IDoubleI sxy, IDoubleI syx){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearXY(sxy,syx);
+	return this;
+    }
+    public IMeshGeo shearXY(IVecI center, double sxy, double syx){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearXY(center,sxy,syx);
+	return this;
+    }
+    public IMeshGeo shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearXY(center,sxy,syx);
+	return this;
+    }
+    
+    public IMeshGeo shearYZ(double syz, double szy){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearYZ(syz,szy);
+	return this;
+    }
+    public IMeshGeo shearYZ(IDoubleI syz, IDoubleI szy){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearYZ(syz,szy);
+	return this;
+    }
+    public IMeshGeo shearYZ(IVecI center, double syz, double szy){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearYZ(center,syz,szy);
+	return this;
+    }
+    public IMeshGeo shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearYZ(center,syz,szy);
+	return this;
+    }
+    
+    public IMeshGeo shearZX(double szx, double sxz){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearZX(szx,sxz);
+	return this;
+    }
+    public IMeshGeo shearZX(IDoubleI szx, IDoubleI sxz){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearZX(szx,sxz);
+	return this;
+    }
+    public IMeshGeo shearZX(IVecI center, double szx, double sxz){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearZX(center,szx,sxz);
+	return this;
+    }
+    public IMeshGeo shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).shearZX(center,szx,sxz);
+	return this;
+    }
+    
+    /** mv() is alias of add() */
+    public IMeshGeo mv(double x, double y, double z){ return add(x,y,z); }
+    public IMeshGeo mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IMeshGeo mv(IVecI v){ return add(v); }
+    
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public IMeshGeo cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IMeshGeo cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public IMeshGeo cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IMeshGeo cp(IVecI v){ return dup().add(v); }
+    
+    
+    /** translate() is alias of add() */
+    public IMeshGeo translate(double x, double y, double z){ return add(x,y,z); }
+    public IMeshGeo translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IMeshGeo translate(IVecI v){ return add(v); }
+    
+    
+    public IMeshGeo transform(IMatrix3I mat){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).transform(mat);
+	return this;
+    }
+    public IMeshGeo transform(IMatrix4I mat){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).transform(mat);
+	return this;
+    }
+    public IMeshGeo transform(IVecI xvec, IVecI yvec, IVecI zvec){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).transform(xvec,yvec,zvec);
+	return this;
+    }
+    public IMeshGeo transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
+	for(int i=0; i<vertices.size(); i++) vertices.get(i).transform(xvec,yvec,zvec,translate);
+	return this;
+    }
 
 }

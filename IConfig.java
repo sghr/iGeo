@@ -221,7 +221,7 @@ public /*interface*/ class IConfig{
     /**
        Minimum size to create bounding box and to zoom into.
     */
-    public static double minimumBoundingBox = 0.002;
+    public static double minimumBounds = 0.002;
     
     
     /**

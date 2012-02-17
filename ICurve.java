@@ -76,7 +76,7 @@ public class ICurve extends IObject implements ICurveI{
         //curve = new ICurveGeo(crv.get());
 	curve = crv.curve.dup();
 	initCurve(crv.server); //?
-	setColor(crv.getColor());
+	//setColor(crv.getColor());
     }
     
     
@@ -134,7 +134,7 @@ public class ICurve extends IObject implements ICurveI{
         //curve = new ICurveGeo(crv.get());
 	curve = crv.curve.dup();
 	initCurve(s); //?
-	setColor(crv.getColor());
+	//setColor(crv.getColor());
     }
     
     /*

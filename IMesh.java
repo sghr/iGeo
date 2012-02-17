@@ -294,4 +294,156 @@ public class IMesh extends IObject implements IMeshI{
     public IMesh close(){ mesh.close(); return this; }
     public boolean isClosed(){ return mesh.isClosed(); }
     
+    
+    /*******************************************************
+     * ITransformable methods
+     ******************************************************/
+    
+    public IMesh add(double x, double y, double z){ mesh.add(x,y,z); return this; }
+    public IMesh add(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.add(x,y,z); return this; }
+    public IMesh add(IVecI v){ mesh.add(v); return this; }
+    public IMesh sub(double x, double y, double z){ mesh.sub(x,y,z); return this; }
+    public IMesh sub(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.sub(x,y,z); return this; }
+    public IMesh sub(IVecI v){ mesh.sub(v); return this; }
+    public IMesh mul(IDoubleI v){ mesh.mul(v); return this; }
+    public IMesh mul(double v){ mesh.mul(v); return this; }
+    public IMesh div(IDoubleI v){ mesh.div(v); return this; }
+    public IMesh div(double v){ mesh.div(v); return this; }
+    
+    public IMesh neg(){ mesh.neg(); return this; }
+    /** alias of neg */
+    public IMesh rev(){ return neg(); }
+    /** alias of neg */
+    public IMesh flip(){ return neg(); }
+    
+    
+    /** scale add */
+    public IMesh add(IVecI v, double f){ mesh.add(v,f); return this; }
+    /** scale add */
+    public IMesh add(IVecI v, IDoubleI f){ mesh.add(v,f); return this; }
+    /** scale add alias */
+    public IMesh add(double f, IVecI v){ return add(v,f); }
+    /** scale add alias */
+    public IMesh add(IDoubleI f, IVecI v){ return add(v,f); }
+    
+    /** rotation around z-axis and origin */
+    public IMesh rot(IDoubleI angle){ mesh.rot(angle); return this; }
+    public IMesh rot(double angle){ mesh.rot(angle); return this; }
+    
+    /** rotation around axis vector */
+    public IMesh rot(IVecI axis, IDoubleI angle){ mesh.rot(axis,angle); return this; }
+    public IMesh rot(IVecI axis, double angle){ mesh.rot(axis,angle); return this; }
+    
+    /** rotation around axis vector and center */
+    public IMesh rot(IVecI center, IVecI axis, IDoubleI angle){ mesh.rot(center,axis,angle); return this; }
+    public IMesh rot(IVecI center, IVecI axis, double angle){ mesh.rot(center,axis,angle); return this; }
+    
+    /** rotate to destination direction vector */
+    public IMesh rot(IVecI axis, IVecI destDir){ mesh.rot(axis,destDir); return this; }
+    /** rotate to destination point location */
+    public IMesh rot(IVecI center, IVecI axis, IVecI destPt){ mesh.rot(center,axis,destPt); return this; }
+    
+    
+    /** rotation on xy-plane around origin; same with rot(IDoubleI) */
+    public IMesh rot2(IDoubleI angle){ mesh.rot2(angle); return this; }
+    /** rotation on xy-plane around origin; same with rot(double) */
+    public IMesh rot2(double angle){ mesh.rot2(angle); return this; }
+    
+    /** rotation on xy-plane around center */
+    public IMesh rot2(IVecI center, IDoubleI angle){ mesh.rot2(center,angle); return this; }
+    public IMesh rot2(IVecI center, double angle){ mesh.rot2(center,angle); return this; }
+    
+    /** rotation on xy-plane to destination direction vector */
+    public IMesh rot2(IVecI destDir){ mesh.rot2(destDir); return this; }
+    /** rotation on xy-plane to destination point location */
+    public IMesh rot2(IVecI center, IVecI destPt){ mesh.rot2(center,destPt); return this; }
+        
+    
+    /** alias of mul */
+    public IMesh scale(IDoubleI f){ return mul(f); }
+    public IMesh scale(double f){ return mul(f); }
+    public IMesh scale(IVecI center, IDoubleI f){ mesh.scale(center,f); return this; }
+    public IMesh scale(IVecI center, double f){ mesh.scale(center,f); return this; }
+
+    
+    /** scale only in 1 direction */
+    public IMesh scale1d(IVecI axis, double f){ mesh.scale1d(axis,f); return this; }
+    public IMesh scale1d(IVecI axis, IDoubleI f){ mesh.scale1d(axis,f); return this; }
+    public IMesh scale1d(IVecI center, IVecI axis, double f){ mesh.scale1d(center,axis,f); return this; }
+    public IMesh scale1d(IVecI center, IVecI axis, IDoubleI f){ mesh.scale1d(center,axis,f); return this; }
+    
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    public IMesh ref(IVecI planeDir){ mesh.ref(planeDir); return this; }
+    public IMesh ref(IVecI center, IVecI planeDir){ mesh.ref(center,planeDir); return this; }
+    /** mirror is alias of ref */
+    public IMesh mirror(IVecI planeDir){ return ref(planeDir); }
+    public IMesh mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    
+    
+    /** shear operation */
+    public IMesh shear(double sxy, double syx, double syz,
+		       double szy, double szx, double sxz){
+	mesh.shear(sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public IMesh shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+		       IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	mesh.shear(sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public IMesh shear(IVecI center, double sxy, double syx, double syz,
+		       double szy, double szx, double sxz){
+	mesh.shear(center,sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    public IMesh shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+		       IDoubleI szy, IDoubleI szx, IDoubleI sxz){
+	mesh.shear(center,sxy,syx,syz,szy,szx,sxz);
+	return this;
+    }
+    
+    public IMesh shearXY(double sxy, double syx){ mesh.shearXY(sxy,syx); return this; }
+    public IMesh shearXY(IDoubleI sxy, IDoubleI syx){ mesh.shearXY(sxy,syx); return this; }
+    public IMesh shearXY(IVecI center, double sxy, double syx){ mesh.shearXY(center,sxy,syx); return this; }
+    public IMesh shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){ mesh.shearXY(center,sxy,syx); return this; }
+    
+    public IMesh shearYZ(double syz, double szy){ mesh.shearYZ(syz,szy); return this; }
+    public IMesh shearYZ(IDoubleI syz, IDoubleI szy){ mesh.shearYZ(syz,szy); return this; }
+    public IMesh shearYZ(IVecI center, double syz, double szy){ mesh.shearYZ(center,syz,szy); return this; }
+    public IMesh shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){ mesh.shearYZ(center,syz,szy); return this; }
+    
+    public IMesh shearZX(double szx, double sxz){ mesh.shearZX(szx,sxz); return this; }
+    public IMesh shearZX(IDoubleI szx, IDoubleI sxz){ mesh.shearZX(szx,sxz); return this; }
+    public IMesh shearZX(IVecI center, double szx, double sxz){ mesh.shearZX(center,szx,sxz); return this; }
+    public IMesh shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){ mesh.shearZX(center,szx,sxz); return this; }
+    
+    /** mv() is alias of add() */
+    public IMesh mv(double x, double y, double z){ return add(x,y,z); }
+    public IMesh mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IMesh mv(IVecI v){ return add(v); }
+    
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */ 
+    public IMesh cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IMesh cp(double x, double y, double z){ return dup().add(x,y,z); }
+    public IMesh cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    public IMesh cp(IVecI v){ return dup().add(v); }
+    
+    
+    /** translate() is alias of add() */
+    public IMesh translate(double x, double y, double z){ return add(x,y,z); }
+    public IMesh translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    public IMesh translate(IVecI v){ return add(v); }
+    
+    
+    public IMesh transform(IMatrix3I mat){ mesh.transform(mat); return this; }
+    public IMesh transform(IMatrix4I mat){ mesh.transform(mat); return this; }
+    public IMesh transform(IVecI xvec, IVecI yvec, IVecI zvec){ mesh.transform(xvec,yvec,zvec); return this; }
+    public IMesh transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){ mesh.transform(xvec,yvec,zvec,translate); return this; }
+    
+    
 }

@@ -79,6 +79,8 @@ public class ITrimCurveGraphic{
     */
     
     public void setup2D(int reso){
+	//IOut.p("curve="+curve);
+	//IOut.p("surface="+surface);
 	if(curve.deg()==1 &&
 	   // if surface is flat but skewed, line needs to be a curve
 	   (surface.udeg()>1 || surface.vdeg()>1  ||

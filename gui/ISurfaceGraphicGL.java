@@ -67,12 +67,18 @@ public class ISurfaceGraphicGL extends IGraphicObject{
 	fill = new ISurfaceGraphicFillGL(obj,srf);
     }
     
+    public void setAttribute(IAttribute attr){
+	super.setAttribute(attr);
+	if(fill!=null) fill.setAttribute(attr);
+	if(wireframe!=null) wireframe.setAttribute(attr);
+    }
+    
     public void setColor(Color c){
 	super.setColor(c);
 	if(fill!=null) fill.setColor(c);
 	if(wireframe!=null) wireframe.setColor(c);
     }
-
+    
     @Override public void update(){
 	if(fill!=null) fill.update();
 	if(wireframe!=null) wireframe.update();

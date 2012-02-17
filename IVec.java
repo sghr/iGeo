@@ -91,8 +91,8 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     /** getting z component */
     public IDouble z(ISwitchR r){ return new IDouble(z); }
     
-
-
+    
+    
     public IVec get(){ return this; }
     //public IVec get(){ return new IVec(x,y,z); }
     
@@ -876,16 +876,18 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
     
     public boolean isParallel(IVecI v){ return isParallel(v, IConfig.angleTolerance); }
-    public boolean isParallel(IVecI v, double angleReso){
-        return Math.abs(dot(v.get())/(len()*v.get().len())) > Math.cos(angleReso);
-	
+    public boolean isParallel(IVecI v, double angleTolerance){
+        return Math.abs(dot(v.get())/(len()*v.get().len())) > Math.cos(angleTolerance);
     }
     
     public boolean isStraight(IVecI v1, IVecI v2){
-        return isStraight(v1,v2,IConfig.angleTolerance);
+        //return isStraight(v1,v2,IConfig.angleTolerance);
+	return isStraight(v1,v2,IConfig.tolerance);
     }
-    public boolean isStraight(IVecI v1, IVecI v2, double angleReso){
-        return v1.get().dif(this).isParallel(v2.get().dif(v1),angleReso);
+    
+    public boolean isStraight(IVecI v1, IVecI v2, double tolerance){
+        //return v1.get().dif(this).isParallel(v2.get().dif(v1),angleReso);
+	return distToLine(v1,v2)<tolerance; // should it calculate mean line dir, not only v1&v2?
     }
     
     
@@ -1039,7 +1041,19 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     }
     
     
-    public double distanceToPlane(IVecI planeDir, IVecI planePt){
+    /** distance to a line */
+    public double distToLine(IVecI lineDir, IVecI linePt){
+	return perpendicularVecToLine(lineDir,linePt).len();
+    }
+    
+    /** distance to a line dir */
+    public double distToLine(IVecI lineDir){
+	return perpendicularVecToLine(lineDir).len();
+    }
+    
+    /** distance to a plane */
+    //public double distanceToPlane(IVecI planeDir, IVecI planePt){
+    public double distToPlane(IVecI planeDir, IVecI planePt){
 	//return Math.abs(this.dif(planePt).dotP(planeDir.get())/planeDir.get().len());
 	return Math.abs(dif(planePt).dot(planeDir)/planeDir.len());
     }
@@ -1047,18 +1061,21 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     /**
        create a new vector from this point to the line in parpendicular direction.
     */
-    public IVec perpendicularVectorToLine(IVecI lineDir, IVecI linePt){
+    public IVec perpendicularVecToLine(IVecI lineDir, IVecI linePt){
 	IVec ldir = lineDir.get().dup();
-	IVec diff = linePt.dif(this).get();
-	return ldir.mul(-ldir.dot(diff)/ldir.len2()).add(diff);
+	//IVec diff = linePt.dif(this).get();
+	//return ldir.mul(-ldir.dot(diff)/ldir.len2()).add(diff);
+	IVec dif = dif(linePt);
+	return ldir.mul(ldir.dot(dif)/ldir.len2()).sub(dif);
     }
     
     /**
-       create a new vector from line to this point perpendicular to the axis
+       create a new vector from line to this point perpendicular to the line dir
     */
-    public IVec perpendicularVectorToVector(IVecI axisDir){
-	IVec ldir = axisDir.get().dup();
-	return ldir.mul(-ldir.dot(this)/ldir.len2()).add(this);
+    public IVec perpendicularVecToLine(IVecI lineDir){
+	IVec ldir = lineDir.get().dup();
+	//return ldir.mul(-ldir.dot(this)/ldir.len2()).add(this);
+	return ldir.mul(ldir.dot(this)/ldir.len2()).sub(this);
     }
     
     
@@ -1072,7 +1089,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return isOnPlane(getNormal(planePt1,planePt2,planePt3),planePt1,tolerance);
     }
     public boolean isOnPlane(IVecI planeDir, IVecI planePt, double tolerance){
-	return distanceToPlane(planeDir,planePt)<tolerance;
+	return distToPlane(planeDir,planePt)<tolerance;
     }
     
     
@@ -1102,6 +1119,25 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     /*************************************************************
      * static methods
      *************************************************************/
+    
+    public static boolean isStraight(IVecI[] pts, double tolerance){
+	if(pts==null || pts.length<3 ){
+	    IOut.err("input points should be >= 3. currently "+pts==null?0:pts.length);
+	    return false;
+	}
+	IVec p0 = pts[0].get();
+	int idx=pts.length-1;
+	for(; idx>=0 && p0.eq(pts[idx],tolerance); idx--); // not idential with p0
+	if(idx<=0){ return false; } // when all points are same location, let's say it's not straight
+	
+	IVec dir = pts[idx].get().dif(p0); // from start point to end point
+	for(int i=1; i<idx-1; i++){ // should it calculate mean line dir?
+	    if(pts[i].get().distToLine(dir, p0) >= tolerance) return false;
+	} 
+	return true;
+    }
+    
+    public static boolean isStraight(IVecI[] pts){ return isStraight(pts, IConfig.tolerance); }
     
     public static boolean isFlat(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4){
 	return pt1.get().isOnPlane(pt2,pt3,pt4);

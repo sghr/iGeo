@@ -34,9 +34,9 @@ import igeo.gui.*;
 abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobject, IGraphicI{
     
     // should be synchronized with color range in processing when used in processing
-    public static float defaultRed = .5f; //1f;
-    public static float defaultGreen = .5f; //1f;
-    public static float defaultBlue = .5f; //1f;
+    public static float defaultRed = .4f; //.5f; //1f;
+    public static float defaultGreen = .4f; //.5f; //1f;
+    public static float defaultBlue = .4f; //.5f; //1f;
     public static float defaultAlpha = 1f;
     
     static int colorRange1i = 255;  
@@ -88,7 +88,12 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     
     /** updating graphic when geometry change. actual update happens when it's drawn.*/
     public void update(){ update=true; }
-        
+
+    public void setAttribute(IAttribute attr){
+	color = attr.color;
+	visible = attr.visible; //
+    }
+    
     public void setColor(Color c){ color=c; }
     
     public Color getColor(){ return color; }
