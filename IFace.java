@@ -217,8 +217,16 @@ public class IFace{
 	return area;
     }
     
-    // average normal
+    /** returns normal. if null, calculate average normal */
+    public IVec nml(){
+	if(normal==null) calcNormal();
+	return normal;
+    }
+    /** alias of nml() */
+    public IVec normal(){ return nml(); }
     
+    
+    /** average normal */
     public IVec getAverageNormal(){
 	int n = vertices.length;
 	IVec nrm = new IVec();

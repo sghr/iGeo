@@ -76,7 +76,13 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
     
     public ITrimCurve(ICurveI crv){ this(crv.get()); }
     
-    public ITrimCurve(ITrimCurve crv){ super(crv);surface=crv.surface; }
+    public ITrimCurve(ITrimCurve crv){
+	super(crv);surface=crv.surface;
+    }
+    
+    public ITrimCurve(ITrimCurve crv, ISurfaceI surf){
+	super(crv);surface=surf;
+    }
     
     
     // now ISurfaceI is set after instantiated inside surface when it's added to surface 

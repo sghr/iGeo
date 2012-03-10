@@ -97,11 +97,13 @@ public class IGraphicMode{
     public boolean isFill(){ return fill; }
     public boolean isTransparent(){ return transparent; }
     
+    public boolean isNone(){ return !wireframe&&!fill&&!transparent; }
+    
     public boolean isLight(){ return light; }
     
     public boolean isTransparentWireframe(){ return transparentWireframe; }
     public boolean isLightWireframe(){ return lightWireframe; }
-
+    
     public void setDrawMode(boolean wireframe, boolean fill, boolean transparent){
 	this.wireframe=wireframe;
 	this.fill=fill;

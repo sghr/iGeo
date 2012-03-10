@@ -63,14 +63,22 @@ public class ITensionLineOnCurve extends ICurve implements ITensionI{
     /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i){ return tension.pt(i); }
     /** alias of pt(int) */
-    public IParticleI pos(int i){ return pt(i); }
+    public IParticleI particle(int i){ return pt(i); }
+    /** position of particle(i) */
+    public IVec pos(int i){ return tension.pos(i); }
+    
     /** getting end point1. */
     public IParticleI pt1(){ return tension.pt1(); }
     /** alias of pt1() */
-    public IParticleI pos1(){ return pt1(); }
+    public IParticleI particle1(){ return pt1(); }
+    /** position of particle1 */
+    public IVec pos1(){ return tension.pos1(); }
+    
     /** getting end point2. */
     public IParticleI pt2(){ return tension.pt2(); }
     /** alias of pt2() */
-    public IParticleI pos2(){ return pt2(); }
+    public IParticleI particle2(){ return pt2(); }
+    /** position of particle1 */
+    public IVec pos2(){ return tension.pos2(); }
     
 }

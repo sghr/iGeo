@@ -256,7 +256,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    for(int i=0; i<srf.innerTrimLoop.size(); i++){
 		ArrayList<ITrimCurve> loop = new ArrayList<ITrimCurve>();
 		for(int j=0; j<srf.innerTrimLoop.get(i).size(); j++){
-		    loop.add(new ITrimCurve(srf.innerTrimLoop.get(i).get(j)).surface(this));
+		    loop.add(new ITrimCurve(srf.innerTrimLoop.get(i).get(j),this));
 		}
 		innerTrimLoop.add(loop);
 	    }
@@ -266,7 +266,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    for(int i=0; i<srf.outerTrimLoop.size(); i++){
 		ArrayList<ITrimCurve> loop = new ArrayList<ITrimCurve>();
 		for(int j=0; j<srf.outerTrimLoop.get(i).size(); j++){
-		    loop.add(new ITrimCurve(srf.outerTrimLoop.get(i).get(j)).surface(this));
+		    loop.add(new ITrimCurve(srf.outerTrimLoop.get(i).get(j),this));
 		}
 		outerTrimLoop.add(loop);
 	    }
@@ -1705,7 +1705,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	if(uknots[0] != 0.0 || uknots[uknots.length-1] != 1.0){
             // check by cp
 	    for(int v=0; v<vnum; v++){
-		if(!cp(0,v).eq(cp(ucpNum()-1, v))) return false;
+		//if(!cp(0,v).eq(cp(ucpNum()-1, v))) return false;
+		if(!cp(0,v).eq(cp(ucpNum()-udegree, v))) return false; // added 20120310
 	    }
 	    return true;
         }
@@ -1726,7 +1727,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	if(vknots[0] != 0.0 || vknots[vknots.length-1] != 1.0){
             // check by cp
 	    for(int u=0; u<unum; u++){
-		if(!cp(u,0).eq(cp(u, vcpNum()-1))) return false;
+		//if(!cp(u,0).eq(cp(u, vcpNum()-1))) return false;
+		if(!cp(u,0).eq(cp(u, vcpNum()-vdegree))) return false; // added 20120310
 	    }
 	    return true;
         }

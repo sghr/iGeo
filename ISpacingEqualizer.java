@@ -91,20 +91,31 @@ public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
 	if(i==2) return pt3; if(i==1) return pt2; return pt1;
     }
     /** alias of pt(int) */
-    public IParticleI pos(int i){ return pt(i); }
+    public IParticleI particle(int i){ return pt(i); }
+    /** position of particle(int i) */
+    public IVec pos(int i){ return pt(i).pos(); }
+    
     /** getting end point1. */
     public IParticleI pt1(){ return pt1; }
     /** alias of pt1() */
-    public IParticleI pos1(){ return pt1(); }
+    public IParticleI particle1(){ return pt1(); }
+    /** position of particle1 */
+    public IVec pos1(){ return pt1().pos(); }
+    
     /** getting end point2. */
     public IParticleI pt2(){ return pt2; }
     /** alias of pt2() */
-    public IParticleI pos2(){ return pt2(); }
+    public IParticleI particle2(){ return pt2(); }
+    /** position of particle2 */
+    public IVec pos2(){ return pt2().pos(); }
+    
     /** getting end point2. */
     public IParticleI pt3(){ return pt3; }
     /** alias of pt2() */
-    public IParticleI pos3(){ return pt3(); }
-
+    public IParticleI particle3(){ return pt3(); }
+    /** position of particle3 */
+    public IVec pos3(){ return pt3().pos(); }
+    
     
     public ISpacingEqualizer parent(IObject par){ super.parent(par); return this; }
     public ISpacingEqualizer target(IObject targetObj){ super.target(targetObj); return this; }

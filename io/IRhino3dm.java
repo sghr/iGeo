@@ -501,15 +501,15 @@ public class IRhino3dm{
 	public byte[] content = null;
 	//public Chunk chunk = null;
 	
+	public ArrayList<byte[]> contents = null; // for test. not really used yet
+	
 	public CRC32 crc;
 	
 	//boolean enableCRC=true; //false;
 	
 	
 	//public Chunk(byte[] h, byte[] b){
-	public Chunk(int h, int b){
-	    header = h; body = b;
-	}
+	public Chunk(int h, int b){ header = h; body = b; }
 	
 	public Chunk(int h, int b, byte[] c, CRC32 crc){
 	    header = h; body = b; content = c; this.crc = crc;
@@ -534,7 +534,7 @@ public class IRhino3dm{
 	    header = h; content = str.getBytes(); body = content.length;
 	    if(doCRC()){ crc = new CRC32(); crc.update(content); }
 	}
-
+	
 	/*
 	public Chunk(int h, Chunk c){
 	    header = h;
@@ -552,6 +552,49 @@ public class IRhino3dm{
 	    if(doCRC()){ crc = new CRC32(); crc.update(content); }
 	}
 	
+	
+	public Chunk(int h, int b, ArrayList<byte[]> c, CRC32 crc){
+	    //header = h; body = b; contents = c; this.crc = crc;
+	    header = h; body = b;
+	    /*
+	    int len=0;
+	    for(int i=0; c!=null && i<c.size(); i++) len+=c.get(i).length;
+	    contents = new byte[len];
+	    for(int i=0, idx=0; i<c.size(); i++){
+		byte[] buf = c.get(i);
+	    }
+	    */
+	    contents = c;
+	    this.crc = crc;
+	}
+	
+	public Chunk(int h, int b, ArrayList<byte[]> c){
+	    header = h; body = b; contents = c;
+	    if(doCRC()){
+		crc = new CRC32();
+		for(int i=0; c!=null && i<c.size(); i++) crc.update(c.get(i));
+	    }
+	}
+	
+	public Chunk(int h, ArrayList<byte[]> c, CRC32 crc){
+	    header = h; contents = c;
+	    body=0;
+	    for(int i=0; c!=null && i<c.size(); i++) body+=c.get(i).length;
+	    this.crc = crc;
+	}
+	
+	public Chunk(int h, ArrayList<byte[]> c){
+	    header = h; contents = c;
+	    body=0;
+	    for(int i=0; c!=null && i<c.size(); i++) body+=c.get(i).length;
+	    if(doCRC()){
+		crc = new CRC32();
+		for(int i=0; c!=null && i<c.size(); i++) crc.update(c.get(i));
+	    }
+	}
+	
+	
+	
 	public void setContentLength(){
 	    if(content!=null) body = content.length;
 	    else body = 0;
@@ -560,14 +603,25 @@ public class IRhino3dm{
 	public int getHeader(){ return header; }
 	public int getBody(){ return body; }
 	public byte[] getContent(){ return content; }
-	public int contentLength(){ return content.length; }
+	//public int contentLength(){ return content.length; }
+	public int contentLength(){
+	    if(contents!=null){
+		int len = 0;
+		for(int i=0; i<contents.size(); i++) len+=contents.get(i).length;
+		return len;
+	    }
+	    if(content!=null) return content.length;
+	    return 0;
+	}
+	
+	public ArrayList<byte[]> getContents(){ return contents; }
 	
 	public int chunkLength(){
 	    int sz= 8; // 4 byte int header + 4 byte int body
 	    if(content!=null) sz += content.length;
 	    return sz;
 	}
-		
+	
 	public byte[] getBytes(){
 	    byte[] b=null;
 	    
@@ -595,7 +649,7 @@ public class IRhino3dm{
 	//public void enableCRC(){ enableCRC=true; }
 	//public void disableCRC(){ enableCRC=false; }
 	//public boolean doCRC(){ return enableCRC; }
-
+	
 	public void setCRC(CRC32 crc){ this.crc = crc; }
 	
 	public int getCRC(){ return (int)crc.getValue(); }
@@ -622,15 +676,20 @@ public class IRhino3dm{
 	    }
 	    return str;
 	}
-	
 	//public void print(){ IOut.print(toString()); } // debug
 	
+	public void clear(){ content = null; }
+	
     }
+    
     
     public static class ChunkTable extends Chunk{
 	public ArrayList<Chunk> chunks;
 	public int endTCode = tcodeEndOfTable;
 	public boolean serialized=false;
+
+	// to use IRandomAccessOutputStream
+	public long bodyPointer=-1;
 	
 	public ChunkTable(int tcode, int endTCode){
 	    super(tcode,0);
@@ -658,6 +717,30 @@ public class IRhino3dm{
 	}
 	
 	public boolean doCRC(){ return false; } // ?
+	
+	
+	// to use IRandomAccessOutputStream instead of using serialize
+	public void writeTableHeader(IRandomAccessOutputStream ros)throws IOException{
+	    writeInt32(ros,header,null);
+	    bodyPointer = ros.pointer(); // record to seek later
+	    writeInt32(ros,body,null); // body (content length) is not set yet. 0 is written here temporarily.
+	}
+	
+	public void writeTableEntry(IRandomAccessOutputStream ros, Chunk c)throws IOException{
+	    writeChunk(ros, c);
+	}
+	
+	public void writeTableEnd(IRandomAccessOutputStream ros)throws IOException{
+	    writeChunk(ros,new Chunk(endTCode,0));
+	    if(doCRC()) writeInt32(ros,getCRC(),null); // ever do this?
+	    long currentPointer = ros.pointer();
+	    body = (int)(currentPointer - bodyPointer - 4); // excludes 4byte of body itself
+	    ros.seek(bodyPointer);
+	    writeInt32(ros,body,null); // seek and write the length of content
+	    ros.seek(currentPointer);
+	}
+	
+	
     }
     
     
@@ -2443,7 +2526,7 @@ public class IRhino3dm{
 	    writeInt32(os, materialIndex, crc);
 	    writeColor(os, color, crc);
 	    
-	    short s = (short)objectDecoration;
+	    short s = /*(short)*/objectDecoration;
 	    writeInt16(os, s, crc);
 	    s = 0;
 	    writeInt16(os, s, crc);
@@ -2468,7 +2551,8 @@ public class IRhino3dm{
 	    writeArrayDisplayMaterialRef(context, os, dmref, crc);
 	    
 	    
-	    writeInt32(os, (int)objectDecoration, crc);
+	    //writeInt32(os, (int)objectDecoration, crc);
+	    writeInt32(os, objectDecoration&0xFFFF, crc);
 	    writeByte(os, plotColorSource, crc);
 	    writeColor(os, plotColor, crc);
 	    writeByte(os, plotWeightSource, crc);
@@ -4816,9 +4900,11 @@ public class IRhino3dm{
 	    for(int i=0; i<faces.size(); i++){
 		BrepFace face = faces.get(i);
 		
-		if(face.faceIndex>=0 && face.faceIndex<surfaces.size()){
+		//if(face.faceIndex>=0 && face.faceIndex<surfaces.size()){
+		if(face.surfaceIndex>=0 && face.surfaceIndex<surfaces.size()){
 		    IOut.debug(100, "creating surface "+i+"/"+faces.size()); //
-		    ISurfaceGeo surf = surfaces.get(face.faceIndex).createIGeometry(context,s);
+		    //ISurfaceGeo surf = surfaces.get(face.faceIndex).createIGeometry(context,s);
+		    ISurfaceGeo surf = surfaces.get(face.surfaceIndex).createIGeometry(context,s);
 		    if(surf != null){
 			BrepLoopArray faceLoop = getLoopsForFace(face.faceIndex);
 			for(int j=0; j<faceLoop.size(); j++){
@@ -4853,11 +4939,13 @@ public class IRhino3dm{
 			isurfgeo.add(surf);
 		    }
 		    else{
-			IOut.err("failed to instantiate: @ "+surfaces.get(face.faceIndex));
+			//IOut.err("failed to instantiate: @ "+surfaces.get(face.faceIndex));
+			IOut.err("failed to instantiate: @ "+surfaces.get(face.surfaceIndex));
 		    }
 		}
 		else{
-		    IOut.err("BrepFace faceIndex is out of range: " + face.faceIndex);
+		    IOut.err("BrepFace surfaceIndex("+face.surfaceIndex+") of face ("+face.faceIndex+
+			     ") is out of range(" +surfaces.size()+")" );
 		}
 		
 	    }
@@ -5484,7 +5572,8 @@ public class IRhino3dm{
 		for(int i=0; i<fcount; i++){
 		    cvi[0] = readByte(is); cvi[1] = readByte(is);
 		    cvi[2] = readByte(is); cvi[3] = readByte(is);
-		    faces.add(new MeshFace((int)cvi[0],(int)cvi[1],(int)cvi[2],(int)cvi[3]));
+		    //faces.add(new MeshFace((int)cvi[0],(int)cvi[1],(int)cvi[2],(int)cvi[3]));
+		    faces.add(new MeshFace(cvi[0]&0xFF, cvi[1]&0xFF, cvi[2]&0xFF, cvi[3]&0xFF));
 		}
 		break;
 	    case 2:
@@ -5492,7 +5581,8 @@ public class IRhino3dm{
 		for(int i=0; i<fcount; i++){
 		    svi[0] = readShort(is); svi[1] = readShort(is);
 		    svi[2] = readShort(is); svi[3] = readShort(is);
-		    faces.add(new MeshFace((int)svi[0],(int)svi[1],(int)svi[2],(int)svi[3]));
+		    //faces.add(new MeshFace((int)svi[0],(int)svi[1],(int)svi[2],(int)svi[3]));
+		    faces.add(new MeshFace(svi[0]&0xFFFF,svi[1]&0xFFFF,svi[2]&0xFFFF,svi[3]&0xFFFF));
 		}
 		break;
 	    case 4:
@@ -5500,7 +5590,7 @@ public class IRhino3dm{
 		for(int i=0; i<fcount; i++){
 		    vi[0] = readInt(is); vi[1] = readInt(is);
 		    vi[2] = readInt(is); vi[3] = readInt(is);
-		    faces.add(new MeshFace((int)vi[0],(int)vi[1],(int)vi[2],(int)vi[3]));
+		    faces.add(new MeshFace(vi[0],vi[1],vi[2],vi[3]));
 		}
 		break;
 	    }
@@ -5605,7 +5695,7 @@ public class IRhino3dm{
 	    //if(meshParameters!=null) b=1;
 	    
 	    writeByte(os, b, crc);
-
+	    
 	    /* // ignored
 	    if(meshParameters!=null){
 		ChunkOutputStream cos = new ChunkOutputStream(tcodeAnonymousChunk);
@@ -5649,7 +5739,7 @@ public class IRhino3dm{
 	    // ignored...
 	    
 	}
-
+	
 	
 	public void write1(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
 	    writeArrayPoint3f(os, vertices, crc);

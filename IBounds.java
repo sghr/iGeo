@@ -76,54 +76,56 @@ public class IBounds{
     }
     
     public void compare(IObject e){
-	if(e instanceof IPoint){
-	    IPoint p = (IPoint)e;
-	    compare(p.get());
-	}
-	else if(e instanceof IPointR){
-	    IPointR p = (IPointR)e;
-	    compare(p.get());
-	}
-	else if(e instanceof ICurve){
-	    ICurve c = (ICurve)e;
-	    for(int i=0; i<c.num(); i++) compare(c.cp(i).get());
-	}
-	else if(e instanceof ICurveR){
-	    ICurveR c = (ICurveR)e;
-	    for(int i=0; i<c.num(); i++) compare(c.cp(i).get());
-	}
-	else if(e instanceof ISurface){
-	    ISurface s = (ISurface)e;
-	    for(int i=0; i<s.unum(); i++){
-		for(int j=0; j<s.vnum(); j++){ compare(s.cp(i,j).get()); }
+	synchronized(e){
+	    if(e instanceof IPoint){
+		IPoint p = (IPoint)e;
+		compare(p.get());
 	    }
-	}
-	else if(e instanceof ISurfaceR){
-	    ISurfaceR s = (ISurfaceR)e;
-	    for(int i=0; i<s.unum(); i++){
-		for(int j=0; j<s.vnum(); j++){ compare(s.cp(i,j).get()); }
+	    else if(e instanceof IPointR){
+		IPointR p = (IPointR)e;
+		compare(p.get());
 	    }
-	}
-	else if(e instanceof IMesh){
-	    IMesh m = (IMesh)e;
-	    for(int i=0; i<m.vertexNum(); i++) compare(m.vertex(i).get());
-	}
-	else if(e instanceof IMeshR){
-	    IMeshR m = (IMeshR)e;
-	    for(int i=0; i<m.vertexNum(); i++){ compare(m.vertex(i).get()); }
-	}
-	else if(e instanceof IBrep){
-	    IBrep b = (IBrep)e;
-	    for(int i=0; i<b.surfaces.length; i++){
-		for(int j=0; j<b.surfaces[i].unum(); j++){
-		    for(int k=0; k<b.surfaces[i].vnum(); k++){ compare(b.surfaces[i].cp(j,k).get()); }
+	    else if(e instanceof ICurve){
+		ICurve c = (ICurve)e;
+		for(int i=0; i<c.num(); i++) compare(c.cp(i).get());
+	    }
+	    else if(e instanceof ICurveR){
+		ICurveR c = (ICurveR)e;
+		for(int i=0; i<c.num(); i++) compare(c.cp(i).get());
+	    }
+	    else if(e instanceof ISurface){
+		ISurface s = (ISurface)e;
+		for(int i=0; i<s.unum(); i++){
+		    for(int j=0; j<s.vnum(); j++){ compare(s.cp(i,j).get()); }
 		}
 	    }
-	}
-	else if(e instanceof IVectorObject){
-	    IVectorObject vobj = (IVectorObject)e;
-	    compare(vobj.vec.get());
-	    compare(vobj.root.get());
+	    else if(e instanceof ISurfaceR){
+		ISurfaceR s = (ISurfaceR)e;
+		for(int i=0; i<s.unum(); i++){
+		    for(int j=0; j<s.vnum(); j++){ compare(s.cp(i,j).get()); }
+		}
+	    }
+	    else if(e instanceof IMesh){
+		IMesh m = (IMesh)e;
+		for(int i=0; i<m.vertexNum(); i++) compare(m.vertex(i).get());
+	    }
+	    else if(e instanceof IMeshR){
+		IMeshR m = (IMeshR)e;
+		for(int i=0; i<m.vertexNum(); i++){ compare(m.vertex(i).get()); }
+	    }
+	    else if(e instanceof IBrep){
+		IBrep b = (IBrep)e;
+		for(int i=0; i<b.surfaces.length; i++){
+		    for(int j=0; j<b.surfaces[i].unum(); j++){
+			for(int k=0; k<b.surfaces[i].vnum(); k++){ compare(b.surfaces[i].cp(j,k).get()); }
+		    }
+		}
+	    }
+	    else if(e instanceof IVectorObject){
+		IVectorObject vobj = (IVectorObject)e;
+		compare(vobj.vec.get());
+		compare(vobj.root.get());
+	    }
 	}
     }
     

@@ -33,7 +33,7 @@ import igeo.gui.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IMesh extends IObject implements IMeshI{
+public class IMesh extends IGeometry implements IMeshI{
     
     public IMeshGeo mesh;
     //public IMeshI mesh;
@@ -174,6 +174,7 @@ public class IMesh extends IObject implements IMeshI{
     }
     
     public IGraphicObject createGraphic(IGraphicMode m){
+	if(m.isNone()) return null;
         if(m.isGL()) return new IMeshGraphicGL(this); 
         return null;
     }

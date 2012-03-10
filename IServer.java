@@ -324,6 +324,19 @@ public class IServer implements IServerI{
     /** alias of breps */
     public IBrep[] getBreps(){ return breps(); }
     
+    /** Returns all geometry objects contained in objects. */
+    public IGeometry[] geometries(){
+	ArrayList<IGeometry> geoms = new ArrayList<IGeometry>();
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IGeometry)
+		    geoms.add((IGeometry)objects.get(i));
+	}
+	return geoms.toArray(new IGeometry[geoms.size()]);
+    }
+    /** alias of breps */
+    public IGeometry[] getGeometries(){ return breps(); }
+    
     /** Returns all objects of specified class contained in objects.
      */
     public IObject[] objects(Class cls){
@@ -420,7 +433,22 @@ public class IServer implements IServerI{
     /** alias of brep(int) */
     public IBrep getBrep(int i){ return brep(i); }
     
-    /** Returns i-th IBrep object contained in objects or null if not found.
+    
+    /** Returns i-th IGeometry object contained in objects or null if not found.
+    */
+    public IGeometry geometry(int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(objects.get(j) instanceof IGeometry)
+		    if(i==curIdx++) return (IGeometry)objects.get(j);
+	}
+	return null;
+    }
+    /** alias of geometry(int) */
+    public IGeometry getGeometry(int i){ return geometry(i); }
+    
+    /** Returns i-th object contained in objects or null if not found.
     */
     public IObject object(Class cls, int i){
 	int curIdx=0;
@@ -498,6 +526,18 @@ public class IServer implements IServerI{
     /** alias of brepNum() */
     public int getBrepNum(){ return brepNum(); }
     
+    /** number of the IGeometry in objects */
+    public int geometryNum(){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IGeometry) num++;
+	}
+	return num;
+    }
+    /** alias of geometryNum() */
+    public int getGeometryNum(){ return geometryNum(); }
+    
     /** number of the specified class in objects */
     public int objectNum(Class cls){
 	int num=0;
@@ -530,8 +570,10 @@ public class IServer implements IServerI{
 	//add(l); // layer is added in constractor of IObject
     }
     
-    public void removeLayer(String layerName){
+    public void deleteLayer(String layerName){
 	for(ILayer l:layers) if(l.name().equals(layerName)) remove(l);
     }
+    public void deleteLayer(int i){ remove(layers.get(i)); }
+    
     
 }

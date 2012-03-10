@@ -45,14 +45,20 @@ public interface ITensionI{
     /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i);
     /** alias of pt(int) */
-    public IParticleI pos(int i);
+    public IParticleI particle(int i);
+    /** position of particle(i) */
+    public IVec pos(int i);
     /** getting end point1. */
     public IParticleI pt1();
     /** alias of pt1() */
-    public IParticleI pos1();
+    public IParticleI particle1();
+    /** position of particle1 */
+    public IVec pos1();
     /** getting end point2. */
     public IParticleI pt2();
     /** alias of pt2() */
-    public IParticleI pos2();
+    public IParticleI particle2();
+    /** position of particle1 */
+    public IVec pos2();
     
 }

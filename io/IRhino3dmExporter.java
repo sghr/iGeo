@@ -79,13 +79,16 @@ public class IRhino3dmExporter extends IRhino3dm{
     */
     public static boolean write(File file, IServerI server){
 	try{
-	    FileOutputStream fos = new FileOutputStream(file);
+	    //FileOutputStream fos = new FileOutputStream(file);
+	    
+	    IRandomAccessOutputStream fos = new IRandomAccessOutputStream(file);
 	    boolean retval = write(fos, server);
 	    if(fos!=null) fos.close();
 	    return retval;
 	}catch(IOException e){ e.printStackTrace(); }
 	return false;
     }
+    
     
     public static boolean write(OutputStream os, IServerI server) throws IOException{
 	IRhino3dmExporter exporter = new IRhino3dmExporter(os,server);
@@ -298,22 +301,56 @@ public class IRhino3dmExporter extends IRhino3dm{
 	//writeChunkTable(tcodeObjectTable);
 	
 	ChunkTable objectTable = new ChunkTable(tcodeObjectTable);
-	for(int i=0; i<server.server().objectNum(); i++){
+	
+	IRandomAccessOutputStream raostream = null;
+	
+	if(ostream instanceof IRandomAccessOutputStream){
+	    raostream = (IRandomAccessOutputStream)ostream;
+	    objectTable.writeTableHeader(raostream);
+	}
+	
+	int objectNum = server.server().objectNum();
+	
+	IOut.debug(0, "writing " + objectNum + "objects");
+	
+	int objCount=0;
+	for(int i=0; i<objectNum; i++){
 	    
-	    if(i%100==0&&i>0){ IOut.debug(1, "object #"+i+"/"+server.server().objectNum()); } //
+	    //if(i%100==0&&i>0){ IOut.debug(1, "object #"+i+"/"+objectNum); } //
+	    if(i%100==0&&i>0){ IOut.debug(0, "object #"+i+"/"+objectNum); } //
 	    
 	    IObject obj = server.server().getObject(i);
 	    if(obj.isValid()){
 		Chunk objChunk = getObjectChunk(server.server().getObject(i));
-		if(objChunk!=null) objectTable.add(objChunk);
+		
+		if(obj instanceof IMesh){ // somehow this prevent saving meshes from crashing. why!? timing of GC?
+		    IOut.debug(100,i+": chunk ="+objChunk); //
+		    if(objChunk!=null) IOut.debug(100,i+": chunk size="+objChunk.contentLength()); //
+		}
+		
+		if(objChunk!=null){
+		    if(raostream!=null){
+			objectTable.writeTableEntry(raostream,objChunk);
+			objChunk.clear();
+			objChunk = null;
+		    }
+		    else{ objectTable.add(objChunk); }
+		    
+		    objCount++;
+		}
 	    }
 	    else{
 		IOut.err("invalid object " + obj + " is skipped.");
 	    }
 	}
-	IOut.debug(1, objectTable.chunks.size() + " objects are wrote"); //
-	objectTable.serialize();
-	writeChunkTable(objectTable);
+	if(raostream!=null){
+	    objectTable.writeTableEnd(raostream);
+	}
+	else{
+	    objectTable.serialize();
+	    writeChunkTable(objectTable);
+	}
+	IOut.debug(1, objCount + " objects are wrote"); //
     }
     
     static public RhinoObject getRhinoObject(IObject e, Rhino3dmFile context){
@@ -880,109 +917,5 @@ public class IRhino3dmExporter extends IRhino3dm{
 	    return new Chunk(header, content, crc);
 	}
     }
-    
-        
-    // for debug
-    public static void main(String[] args){
-	if(args.length>0){
-	    IOut.p("saving "+args[0]);
-	    IG.init();
-	    
-	    //IG.current().server().getLayer("Default").setColor(Color.red);
-	    //IG.current().server().getLayer("Layer 01"); //.setColor(Color.orange);
-	    //IG.current().server().getLayer("layer2").setColor(Color.blue);
-	    //IG.current().server().getLayer("layer03").setColor(Color.yellow);
-	    //IG.current().server().getLayer("layer 4").setColor(Color.pink);
-
-	    /*
-	    ILayer l0 = IG.layer("Default").setColor(Color.red);
-	    ILayer l1= IG.layer("Layer 01"); //.setColor(Color.orange);
-	    ILayer l2 = IG.layer("layer2").setColor(Color.blue);
-	    ILayer l3 = IG.layer("layer03").setColor(Color.orange);
-	    ILayer l4 = IG.layer("layer 4").setColor(Color.pink);
-	    */
-	    
-	    /*
-	    //new IPoint(0,0,0);
-	    new IPoint(0,0,0).layer(l0);
-	    new IPoint(10,0,0).layer(l1).setColor(Color.blue);
-	    new IPoint(10,10,0).layer(l2).setColor(Color.cyan);
-	    new IPoint(10,10,10).layer(l3);
-	    new IPoint(50,10,10).layer(l4);
-	    
-	    new ICurve(0,0,0,100,10,10).layer(l4);
-	    
-	    //ICircle cir = new ICircle(new IVec(0,0,0),new IVec(0,0,1),10).layer(l3);
-	    //ICircle cir = new ICircle(new IVec(0,0,0),new IVec(0,0,1),10,false);
-	    ICircle cir = new ICircle(0,0,0,10);
-	    */
-	    
-	    /*
-	      new ICurve(new IVec4[]{
-			   new IVec4(0,0,0,1),
-			   new IVec4(10,0,0,.5),
-			   new IVec4(10,10,0,.5),
-			   new IVec4(0,10,0,1),
-			   new IVec4(0,0,0)
-		       }, 3);
-	    */
-	    //double[][] cpts = {{0,0,0,1},{10,0,0,.5},{10,10,10,.5},{0,10,0,1}};
-	    //new ICurve(cpts,3,true);
-	    /*
-	    double[][] cpts = {{0,0,0,1},{10,0,0,.5},{10,10,10,.5},{0,10,0,1}};
-	    new ICurve(new double[][]{{0,0,0,1},{10,0,0,.5},{10,10,10,.5},{0,10,0,1}},
-		       3,true);
-	    */
-	    
-	    /*
-	    new ISurface(new double[][][]{
-			     { {0,0}, {10,0}, {10,10}, {0,10} },
-			     { {-5,-5}, {15,-5}, {15,15}, {-5,15} },
-			     { {-5,-5,10,}, {15,-5,10}, {15,15,10}, {-5,15,10} },
-			 }, 2, 3, true, true);
-	    */
-	    
-	    //ISurface srf = new ISurface(0,0,0,10,0,0,10,10,10,0,10,0);
-	    ISurface srf = new ISurface(0,0,0,10,0,0,10,10,0,0,10,0);
-	    
-	    //ITrimCurve trim1 = new ITrimCurve(new double[][]{ {0,0}, {1.0,0.2}, {0.8,0.8}, {0.2,1.0}}, true);
-	    ITrimCurve trim1 = new ITrimCurve(new double[][]{ {0.001,0.001}, {0.9999,0.2}, {0.8,0.8}, {0.2,0.9999}}, true);
-	    //ITrimCurve trim1 = new ITrimCurve(new double[][]{ {0.2,0.2}, {0.8,0.2}, {0.8,0.8}, {0.2,0.8}}, 3, true);
-	    //ITrimCurve trim1 = new ITrimCurve(new double[][]{ {0.2,0.2}, {0.2,0.8}, {0.8,0.8}, {0.8,0.2}}, true);
-	    //ITrimCurve trim1 = new ITrimCurve(new double[][]{ {0.2,0.2}, {0.2,0.8},{0.8,0.8},{0.8,0.2}, }, true);
-	    //ITrimCurve trim0 = new ITrimCurve(new double[][]{ {0,0,0.0}, {0.0,1.0},{1.,1},{1,0}, }, true);
-	    ITrimCurve trim0 = new ITrimCurve(new double[][]{ {0,0}, {1,0},{1,1},{0,1}, },1, true);
-	    //ITrimCurve trim0 = new ITrimCurve(new double[][]{ {0,0}, {0,1},{1,1},{1,0}, },3, true);
-	    //srf.addOuterTrimLoop(trim1);
-	    
-	    srf.addOuterTrimLoop(trim0);
-	    srf.addInnerTrimLoop(trim1);
-	    
-	    //ITrimCurve trim1 = new ITrimCurve(srf,new double[][]{ {0.2,0.2}, {0.2,0.8} });
-	    //ITrimCurve trim2 = new ITrimCurve(srf,new double[][]{ {0.2,0.8}, {0.8,0.8} });
-	    //ITrimCurve trim3 = new ITrimCurve(srf,new double[][]{ {0.8,0.8}, {0.8,0.2} });
-	    //ITrimCurve trim4 = new ITrimCurve(srf,new double[][]{ {0.2,0.8}, {0.2,0.2} });
-	    //srf.addInnerTrimLoop(new ITrimCurve[]{ trim1, trim2, trim3, trim4 });
-	    //ITrimCurve trim1 = new ITrimCurve(srf,new double[][]{ {0,0}, {1,0} });
-	    //ITrimCurve trim2 = new ITrimCurve(srf,new double[][]{ {1,0}, {2./3,1./3}, {1./3,2./3},{0,1} },3);
-	    //ITrimCurve trim3 = new ITrimCurve(srf,new double[][]{ {0,1}, {0,0} });
-	    //srf.addInnerTrimLoop(new ITrimCurve[]{ trim1, trim2, trim3 });
-	    //srf.addOuterTrimLoop(new ITrimCurve[]{ trim2, trim3, trim1 });
-	    
-	    
-	    //for(double z=0; z<10; z+=0.1)new ICircle(new IVec(0,0,z),new IVec(0,0,1),Math.sin(z)*10).layer(l1);
-	    
-	    try{
-		IRhino3dmExporter.write(new File(args[0]),IG.current());
-		//IObjectFileExporter.write(new File(args[0]),IG.current());
-	    }catch(Exception e){ e.printStackTrace(); }
-	    
-	    
-	    //IOut.p("circle cp = ");
-	    //for(int i=0; i<cir.num(); i++) IOut.p(cir.cp(i));
-	    
-	}
-    }
-    
     
 }

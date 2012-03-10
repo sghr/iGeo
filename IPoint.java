@@ -32,7 +32,7 @@ import igeo.gui.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IPoint extends IObject implements IVecI{
+public class IPoint extends IGeometry implements IVecI{
     //public IVecI pos;
     public IVec pos;
     
@@ -83,6 +83,7 @@ public class IPoint extends IObject implements IVecI{
     }
     
     public IGraphicObject createGraphic(IGraphicMode m){
+	if(m.isNone()) return null;
 	return new IPointGraphic(this);
     }
     

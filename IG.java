@@ -50,9 +50,9 @@ public class IG implements IServerI{
     
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 7; }
-    public static int buildVersion(){ return 3; }
-    public static int revisionVersion(){ return 1; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2011, 10, 24); }
+    public static int buildVersion(){ return 6; }
+    public static int revisionVersion(){ return 2; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2012, 02, 25); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -341,6 +341,13 @@ public class IG implements IServerI{
     public static IBrep[] breps(){
 	IG ig = cur(); return ig==null?null:ig.getBreps();
     }
+    /** get all breps in the current server */
+    public static IGeometry[] geometries(){
+	IG ig = cur(); return ig==null?null:ig.getGeometries();
+    }
+    /** get all breps in the current server */
+    public static IGeometry[] geos(){ return geometries(); }
+    
     /** get all objects of the specified class in the current server */
     public static IObject[] objects(Class cls){
 	IG ig = cur(); return ig==null?null:ig.getObjects(cls);
@@ -386,6 +393,13 @@ public class IG implements IServerI{
 	IG ig = cur(); return ig==null?null:ig.getBrep(i);
     }
 
+    /** get a geometry in the current server */
+    public static IGeometry geometry(int i){
+	IG ig = cur(); return ig==null?null:ig.getGeometry(i);
+    }
+    /** get a geometry in the current server */
+    public static IGeometry geo(int i){ return geometry(i); }
+    
     /** get a object of the specified class in the current server */
     public static IObject object(Class cls, int i){
 	IG ig = cur(); return ig==null?null:ig.getObject(cls,i);
@@ -429,6 +443,13 @@ public class IG implements IServerI{
     public static int brepNum(){
 	IG ig = cur(); return ig==null?0:ig.getBrepNum();
     }
+    /** number of geometries in the cubrrent server */
+    public static int geometryNum(){
+	IG ig = cur(); return ig==null?0:ig.getGeometryNum();
+    }
+    /** alias of geometryNum() */
+    public static int geoNum(){ return geometryNum(); }
+    
     /** number of objects of the specified class in the current server */
     public static int objectNum(Class cls){
 	IG ig = cur(); return ig==null?0:ig.getObjectNum(cls);
@@ -450,6 +471,11 @@ public class IG implements IServerI{
 	if(ig==null) return null;
 	return ig.getLayer(layerName);
     }
+    public static ILayer layer(int i){
+	IG ig = cur();
+	if(ig==null) return null;
+	return ig.getLayer(i);
+    }
     public static ILayer[] layers(){
 	IG ig = cur();
 	if(ig==null) return null;
@@ -458,7 +484,12 @@ public class IG implements IServerI{
     public static void delLayer(String layerName){
 	IG ig = cur();
 	if(ig==null) return;
-	ig.removeLayer(layerName);
+	ig.deleteLayer(layerName);
+    }
+    public static int layerNum(){
+	IG ig = cur();
+	if(ig==null) return 0;
+	return ig.getLayerNum();
     }
     
     public static void focus(){
@@ -528,6 +559,14 @@ public class IG implements IServerI{
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,true,true));
     }
+    
+    public static void noGraphic(){
+	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
+	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
+	graphicMode(new IGraphicMode(gtype,false,false,false));
+    }
+    
+    
     
     public static IView view(int paneIndex){
 	IG ig = cur(); if(ig==null) return null;
@@ -1031,15 +1070,17 @@ public class IG implements IServerI{
     public String setBasePath(String path){ return basePath=path; }
     
     public ILayer getLayer(String layerName){ return server.getLayer(layerName); }
+    public ILayer getLayer(int i){ return server.getLayer(i); }
     public ILayer[] getAllLayers(){ return server.getAllLayers(); }
-    public void removeLayer(String layerName){ server.removeLayer(layerName); }
-    
+    public void deleteLayer(String layerName){ server.deleteLayer(layerName); }
+    public int getLayerNum(){ return server.layerNum(); }
     
     public IPoint[] getPoints(){ return server.points(); }
     public ICurve[] getCurves(){ return server.curves(); }
     public ISurface[] getSurfaces(){ return server.surfaces(); }
     public IMesh[] getMeshes(){ return server.meshes(); }
     public IBrep[] getBreps(){ return server.breps(); }
+    public IGeometry[] getGeometries(){ return server.geometries(); }
     public IObject[] getObjects(Class cls){ return server.objects(cls); }
     public IObject[] getObjects(){ return server.objects(); }
     
@@ -1048,6 +1089,7 @@ public class IG implements IServerI{
     public ISurface getSurface(int i){ return server.surface(i); }
     public IMesh getMesh(int i){ return server.mesh(i); }
     public IBrep getBrep(int i){ return server.brep(i); }
+    public IGeometry getGeometry(int i){ return server.geometry(i); }
     public IObject getObject(Class cls,int i){ return server.object(cls,i); }
     public IObject getObject(int i){ return server.object(i); }
     
@@ -1056,6 +1098,7 @@ public class IG implements IServerI{
     public int getSurfaceNum(){ return server.surfaceNum(); }
     public int getMeshNum(){ return server.meshNum(); }
     public int getBrepNum(){ return server.brepNum(); }
+    public int getGeometryNum(){ return server.geometryNum(); }
     public int getObjectNum(Class cls){ return server.objectNum(cls); }
     public int getObjectNum(){ return server.objectNum(); }
     
@@ -2382,6 +2425,16 @@ public class IG implements IServerI{
 					 int polygonVertexNum, IVecI heightDir){
 	return IMeshCreator.polygonStick(pt1,pt2,radius1,radius2,polygonVertexNum,heightDir);
     }
+
+    public static IMesh meshPolygonStick(ICurveI railCurve, double radius, int polygonVertexNum,
+					 int railSegmentNum){
+	return IMeshCreator.polygonStick(railCurve,radius,polygonVertexNum,railSegmentNum);
+    }
+    
+    public static IMesh meshPolygonStick(ICurveI railCurve, double radius, int polygonVertexNum){
+	return IMeshCreator.polygonStick(railCurve,radius,polygonVertexNum);
+    }
+    
     /** round stick */
     public static IMesh meshStick(IVecI pt1, IVecI pt2, double radius){
 	return IMeshCreator.stick(pt1,pt2,radius);
@@ -2390,6 +2443,15 @@ public class IG implements IServerI{
     public static IMesh meshStick(IVecI pt1, IVecI pt2, double radius1, double radius2){
 	return IMeshCreator.stick(pt1,pt2,radius1,radius2);
     }
+    /** round stick */
+    public static IMesh meshStick(ICurveI railCurve, double radius, int railSegmentNum){
+	return IMeshCreator.roundStick(railCurve,radius,railSegmentNum);
+    }
+    /** round stick */
+    public static IMesh meshStick(ICurveI railCurve, double radius){
+	return IMeshCreator.roundStick(railCurve,radius);
+    }
+    
     /** round stick (alias of stick()) */
     public static IMesh meshRoundStick(IVecI pt1, IVecI pt2, double radius){
 	return IMeshCreator.roundStick(pt1,pt2,radius);
@@ -2398,6 +2460,25 @@ public class IG implements IServerI{
     public static IMesh meshRoundStick(IVecI pt1, IVecI pt2, double radius1, double radius2){
 	return IMeshCreator.roundStick(pt1,pt2,radius1,radius2);
     }
+    /** round stick */
+    public static IMesh meshRoundStick(ICurveI railCurve, double radius, int railSegmentNum){
+	return IMeshCreator.roundStick(railCurve,radius,railSegmentNum);
+    }
+    /** round stick */
+    public static IMesh meshRoundStick(ICurveI railCurve, double radius){
+	return IMeshCreator.roundStick(railCurve,radius);
+    }
+    
+    /** round stick */
+    public static IMesh meshSquareStick(ICurveI railCurve, double radius, int railSegmentNum){
+	return IMeshCreator.squareStick(railCurve,radius,railSegmentNum);
+    }
+    /** round stick */
+    public static IMesh meshSquareStick(ICurveI railCurve, double radius){
+	return IMeshCreator.squareStick(railCurve,radius);
+    }
+    
+    
     
     
     /*********************************************************

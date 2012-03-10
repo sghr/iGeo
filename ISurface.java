@@ -33,7 +33,7 @@ import igeo.gui.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ISurface extends IObject implements ISurfaceI{
+public class ISurface extends IGeometry implements ISurfaceI{
     public ISurfaceGeo surface;
     //public ISurfaceI surface; // public?
     
@@ -274,6 +274,7 @@ public class ISurface extends IObject implements ISurfaceI{
     }
     
     public IGraphicObject createGraphic(IGraphicMode m){
+	if(m.isNone()) return null;
         if(m.isGL()){
 	    return new ISurfaceGraphicGL(this);
 	    //if(m.isFill()) return new ISurfaceGraphicGL(this);

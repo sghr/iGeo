@@ -92,6 +92,9 @@ public class ILayer extends IObject{
     }
     /** alias of points() */
     public IPoint[] getPoints(){ return points(); }
+    /** alias of points() */
+    public IPoint[] pts(){ return points(); }
+    
     
     /** Returns all curve objects contained in a layer.
         ICurveR objects are not included.
@@ -107,6 +110,8 @@ public class ILayer extends IObject{
     }
     /** alias of curves() */
     public ICurve[] getCurves(){ return curves(); }
+    /** alias of curves() */
+    public ICurve[] crvs(){ return curves(); }
     
     /** Returns all surface objects contained in a layer.
         ISurfaceR objects are not included.
@@ -122,6 +127,8 @@ public class ILayer extends IObject{
     }
     /** alias of surfaces() */
     public ISurface[] getSurfaces(){ return surfaces(); }
+    /** alias of surfaces() */
+    public ISurface[] srfs(){ return surfaces(); }
     
     
     /** Returns all mesh objects contained in a layer.
@@ -153,6 +160,22 @@ public class ILayer extends IObject{
     /** alias of breps() */
     public IBrep[] getBreps(){ return breps(); }
     
+    /** Returns all brep objects contained in a layer.
+     */
+    public IGeometry[] geometries(){
+        ArrayList<IGeometry> geos = new ArrayList<IGeometry>();
+        synchronized(server){
+            for(int i=0; i<objects.size(); i++)
+                if(objects.get(i) instanceof IGeometry)
+                    geos.add((IGeometry)objects.get(i));
+        }
+        return geos.toArray(new IGeometry[geos.size()]);
+    }
+    /** alias of geometries() */
+    public IGeometry[] getGeometries(){ return geometries(); }
+    /** alias of geometries() */
+    public IGeometry[] geos(){ return geometries(); }
+    
     /** Returns all objects of specified class contained in a layer.
      */
     public IObject[] objects(Class cls){
@@ -165,6 +188,8 @@ public class ILayer extends IObject{
     }
     /** alias of objects(Class) */
     public IObject[] getObjects(Class cls){ return objects(cls); }
+    /** alias of objects(Class) */
+    public IObject[] objs(Class cls){ return objects(cls); }
     
     /** Returns all objects contained in a layer.
      */
@@ -173,6 +198,8 @@ public class ILayer extends IObject{
     }
     /** alias of objects() */
     public IObject[] getObjects(){ return objects(); }
+    /** alias of objects() */
+    public IObject[] objs(){ return objects(); }
     
     
     
@@ -188,6 +215,8 @@ public class ILayer extends IObject{
     }
     /** alias of point(int) */
     public IPoint getPoint(int i){ return point(i); }
+    /** alias of point(int) */
+    public IPoint pt(int i){ return point(i); }
     
     
     /** Returns i-th ICurve object contained in objects or null if not found.
@@ -202,6 +231,8 @@ public class ILayer extends IObject{
     }
     /** alias of curve(int) */
     public ICurve getCurve(int i){ return curve(i); }
+    /** alias of curve(int) */
+    public ICurve crv(int i){ return curve(i); }
     
     /** Returns i-th ISurface object contained in objects or null if not found.
         ISurfaceR objects are not included.
@@ -215,6 +246,8 @@ public class ILayer extends IObject{
     }
     /** alias of surface(int) */
     public ISurface getSurface(int i){ return surface(i); }
+    /** alias of surface(int) */
+    public ISurface srf(int i){ return surface(i); }
     
     
     /** Returns i-th IMesh object contained in objects or null if not found.
@@ -242,7 +275,20 @@ public class ILayer extends IObject{
     /** alias of brep(int) */
     public IBrep getBrep(int i){ return brep(i); }
     
-    /** Returns i-th IBrep object contained in objects or null if not found.
+    /** Returns i-th IGeometries object contained in objects or null if not found.
+    */
+    public synchronized IGeometry geometry(int i){
+        int curIdx=0;
+	for(int j=0; j<objects.size(); j++)
+	    if(objects.get(j) instanceof IGeometry)
+		if(i==curIdx++) return (IGeometry)objects.get(j);
+        return null;
+    }
+    /** alias of geometry(int) */
+    public IGeometry getGeometry(int i){ return geometry(i); }
+    public IGeometry geo(int i){ return geometry(i); }
+    
+    /** Returns i-th object contained in objects or null if not found.
     */
     public synchronized IObject object(Class cls, int i){
         int curIdx=0;
@@ -253,14 +299,18 @@ public class ILayer extends IObject{
     }
     /** alias of object(Class,int) */
     public IObject getObject(Class cls, int i){ return object(cls,i); }
+    /** alias of object(Class,int) */
+    public IObject obj(Class cls, int i){ return object(cls,i); }
     
-    /** Returns i-th IBrep object contained in objects or null if not found.
+    /** Returns i-th object contained in objects or null if not found.
     */
     public synchronized IObject object(int i){
 	return i<0||i>=objects.size()?null:objects.get(i);
     }
     /** alias of object(Class,int) */
     public IObject getObject(int i){ return object(i); }
+    /** alias of object(Class,int) */
+    public IObject obj(int i){ return object(i); }
     
     
     
@@ -273,6 +323,8 @@ public class ILayer extends IObject{
     }
     /** alias of pointsNum() */
     public int getPointNum(){ return pointNum(); }
+    /** alias of pointsNum() */
+    public int ptNum(){ return pointNum(); }
     
     /** number of ICurve in objects */
     public synchronized int curveNum(){
@@ -283,6 +335,8 @@ public class ILayer extends IObject{
     }
     /** alias of curveNum() */
     public int getCurveNum(){ return curveNum(); }
+    /** alias of curveNum() */
+    public int crvNum(){ return curveNum(); }
     
     
     /** number of ISurface in objects */
@@ -294,6 +348,8 @@ public class ILayer extends IObject{
     }
     /** alias of surfaceNum() */
     public int getSurfaceNum(){ return surfaceNum(); }
+    /** alias of surfaceNum() */
+    public int srfNum(){ return surfaceNum(); }
     
     /** number of IMesh in objects */
     public synchronized int meshNum(){
@@ -315,6 +371,18 @@ public class ILayer extends IObject{
     /** alias of brepNum() */
     public int getBrepNum(){ return brepNum(); }
     
+    /** number of IBrep in objects */
+    public synchronized int geometryNum(){
+        int num=0;
+	for(int i=0; i<objects.size(); i++)
+	    if(objects.get(i) instanceof IGeometry) num++;
+        return num;
+    }
+    /** alias of geometryNum() */
+    public int getGeometryNum(){ return geometryNum(); }
+    /** alias of geometryNum() */
+    public int geoNum(){ return geometryNum(); }
+    
     /** number of the specified class in objects */
     public synchronized int objectNum(Class cls){
         int num=0;
@@ -324,11 +392,15 @@ public class ILayer extends IObject{
     }
     /** alias of objectNum(Class) */
     public int getObjectNum(Class cls){ return objectNum(cls); }
+    /** alias of objectNum(Class) */
+    public int objNum(Class cls){ return objectNum(cls); }
     
     /** number of the specified class in objects */
     public synchronized int objectNum(){ return objects.size(); }
     /** alias of objectNum() */
     public int getObjectNum(){ return objectNum(); }
+    /** alias of objectNum() */
+    public int objNum(){ return objectNum(); }
     
     
     

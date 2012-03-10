@@ -59,7 +59,7 @@ public class ITensileNet{
     
     /** strength of tension to straighten lines */
     public static double straightenerTension = 1.0;
-
+    
     /** strength of tension to straighten lines */
     public static void straightenerTension(double t){ straightenerTension=t; }
     
@@ -76,7 +76,6 @@ public class ITensileNet{
     public static void constantTension(boolean c){ constantTension = c; }
     public static void enableConstantTension(){ constantTension = true; }
     public static void disableConstantTension(){ constantTension = false; }
-    
     
     
     
@@ -97,83 +96,198 @@ public class ITensileNet{
     public static Color pointColor = new Color(255,255,255);
     /** color of node points */
     public static void pointColor(Color c){ pointColor = c; }
+    /** color of node points */
+    public static void pointColor(int r, int g, int b, int a){ pointColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of node points */
+    public static void pointColor(int r, int g, int b){ pointColor = IGraphicObject.getColor(r,g,b); }
+    /** color of node points */
+    public static void pointColor(int gray, int a){ pointColor = IGraphicObject.getColor(gray,a); }
+    /** color of node points */
+    public static void pointColor(int gray){ pointColor = IGraphicObject.getColor(gray); }
+    /** color of node points */
+    public static void pointColor(float r, float g, float b, float a){ pointColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of node points */
+    public static void pointColor(float r, float g, float b){ pointColor = IGraphicObject.getColor(r,g,b); }
+    /** color of node points */
+    public static void pointColor(float gray, float a){ pointColor = IGraphicObject.getColor(gray,a); }
+    /** color of node points */
+    public static void pointColor(float gray){ pointColor = IGraphicObject.getColor(gray); }
+    
     
     /** color of node points on rail curve */
     public static Color railPointColor = new Color(192,192,192);
     /** color of node points on rail curve */
     public static void railPointColor(Color c){ railPointColor = c; }
+    /** color of node points on rail curve */
+    public static void railPointColor(int r, int g, int b, int a){ railPointColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of node points on rail curve */
+    public static void railPointColor(int r, int g, int b){ railPointColor = IGraphicObject.getColor(r,g,b); }
+    /** color of node points on rail curve */
+    public static void railPointColor(int gray, int a){ railPointColor = IGraphicObject.getColor(gray,a); }
+    /** color of node points on rail curve */
+    public static void railPointColor(int gray){ railPointColor = IGraphicObject.getColor(gray); }
+    /** color of node points on rail curve */
+    public static void railPointColor(float r, float g, float b, float a){ railPointColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of node points on rail curve */
+    public static void railPointColor(float r, float g, float b){ railPointColor = IGraphicObject.getColor(r,g,b); }
+    /** color of node points on rail curve */
+    public static void railPointColor(float gray, float a){ railPointColor = IGraphicObject.getColor(gray,a); }
+    /** color of node points on rail curve */
+    public static void railPointColor(float gray){ railPointColor = IGraphicObject.getColor(gray); }
+    
     
     /** color of fixed node points */
     public static Color fixedPointColor = new Color(255,255,0);
     /** color of fixed node points */
-    public static void fixedPointColor(Color c){ fixedPointColor=c; }
+    public static void fixedPointColor(Color c){ fixedPointColor = c; }
+    /** color of fixed node points */
+    public static void fixedPointColor(int r, int g, int b, int a){ fixedPointColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of fixed node points */
+    public static void fixedPointColor(int r, int g, int b){ fixedPointColor = IGraphicObject.getColor(r,g,b); }
+    /** color of fixed node points */
+    public static void fixedPointColor(int gray, int a){ fixedPointColor = IGraphicObject.getColor(gray,a); }
+    /** color of fixed node points */
+    public static void fixedPointColor(int gray){ fixedPointColor = IGraphicObject.getColor(gray); }
+    /** color of fixed node points */
+    public static void fixedPointColor(float r, float g, float b, float a){ fixedPointColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of fixed node points */
+    public static void fixedPointColor(float r, float g, float b){ fixedPointColor = IGraphicObject.getColor(r,g,b); }
+    /** color of fixed node points */
+    public static void fixedPointColor(float gray, float a){ fixedPointColor = IGraphicObject.getColor(gray,a); }
+    /** color of fixed node points */
+    public static void fixedPointColor(float gray){ fixedPointColor = IGraphicObject.getColor(gray); }
+    
+
     
     /** color of straightener curve */
     public static Color straightenerColor = new Color(255,128,0);
-    
     /** color of straightener curve */
     public static void straightenerColor(Color c){ straightenerColor = c; }
+    /** color of straightener curve */
+    public static void straightenerColor(int r, int g, int b, int a){ straightenerColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of straightener curve */
+    public static void straightenerColor(int r, int g, int b){ straightenerColor = IGraphicObject.getColor(r,g,b); }
+    /** color of straightener curve */
+    public static void straightenerColor(int gray, int a){ straightenerColor = IGraphicObject.getColor(gray,a); }
+    /** color of straightener curve */
+    public static void straightenerColor(int gray){ straightenerColor = IGraphicObject.getColor(gray); }
+    /** color of straightener curve */
+    public static void straightenerColor(float r, float g, float b, float a){ straightenerColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of straightener curve */
+    public static void straightenerColor(float r, float g, float b){ straightenerColor = IGraphicObject.getColor(r,g,b); }
+    /** color of straightener curve */
+    public static void straightenerColor(float gray, float a){ straightenerColor = IGraphicObject.getColor(gray,a); }
+    /** color of straightener curve */
+    public static void straightenerColor(float gray){ straightenerColor = IGraphicObject.getColor(gray); }
     
     
+    /** color of tension curve; default (null) is the original color of an input geometry */
+    public static Color tensionColor = null;
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(Color c){ tensionColor = c; }
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(int r, int g, int b, int a){ tensionColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(int r, int g, int b){ tensionColor = IGraphicObject.getColor(r,g,b); }
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(int gray, int a){ tensionColor = IGraphicObject.getColor(gray,a); }
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(int gray){ tensionColor = IGraphicObject.getColor(gray); }
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(float r, float g, float b, float a){ tensionColor = IGraphicObject.getColor(r,g,b,a); }
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(float r, float g, float b){ tensionColor = IGraphicObject.getColor(r,g,b); }
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(float gray, float a){ tensionColor = IGraphicObject.getColor(gray,a); }
+    /** color of tension curve; default is the original color of an input geometry */
+    public static void tensionColor(float gray){ tensionColor = IGraphicObject.getColor(gray); }
+    
+    
+    /** layer to put node points */
     public static String pointLayer = "nodes";
+    /** layer to put node points */
     public static void pointLayer(String l){ pointLayer = l; }
     
+    /** layer to put fixed node points */
     public static String fixedPointLayer = "fixedNodes";
+    /** layer to put fixed node points */
     public static void fixedPointLayer(String l){ fixedPointLayer = l; }
-    
+
+    /** layer to put straighterner lines */
     public static String straightenerLayer = "straightener";
+    /** layer to put straighterner lines */
     public static void straightenerLayer(String l){ straightenerLayer = l; }
     
+    /** layer to put equalizer lines */
     public static String equalizerLayer = "equalizer";
+    /** layer to put equalizer lines */
     public static void equalizerLayer(String l){ equalizerLayer = l; }
+    
+    /** layer to put tension lines; default (when null) is to put the original layer of an input geometry  */
+    public static String tensionLayer = null;
+    /** layer to put tension lines; default (when null) is to put the original layer of an input geometry  */
+    public static void tensionLayer(String l){ tensionLayer = l; }
     
     
     // boolean options for create() methods
     /** boolean switch to fix open end points of lines which are not connected any other line */
-    public static boolean fixOpenLinePoint=true;
+    //public static boolean fixOpenLinePoint=true;
+    public static boolean fixOpenEnd=true;
     /** boolean switch to fix open end points of lines which are not connected any other line */
-    public static void fixOpenLinePoint(boolean f){ fixOpenLinePoint=f; }
+    public static void fixOpenEnd(boolean f){ fixOpenEnd=f; }
     /** boolean switch to fix open end points of lines which are not connected any other line */
-    public static void enableFixOpenLinePoint(){ fixOpenLinePoint=true; }
+    public static void enableFixOpenEnd(){ fixOpenEnd=true; }
     /** boolean switch to fix open end points of lines which are not connected any other line */
-    public static void disableFixOpenLinePoint(){ fixOpenLinePoint=false; }
+    public static void disableFixOpenEnd(){ fixOpenEnd=false; }
     
     /** boolean switch to delete input lines */
     public static boolean deleteInputLine=true;
     /** boolean switch to delete input lines */
     public static void deleteInputLine(boolean f){ deleteInputLine=f; }
-    /** boolean switch to fix open end points of lines which are not connected any other line */
+    /** boolean switch to delete input lines */
     public static void enableDeleteInputLine(){ deleteInputLine=true; }
-    /** boolean switch to fix open end points of lines which are not connected any other line */
+    /** boolean switch to delete input lines */
     public static void disableDeleteInputLine(){ deleteInputLine=false; }
     
+    /** boolean switch to delete input fix points */
+    public static boolean deleteInputPoint=true;
+    /** boolean switch to delete input fix points */
+    public static void deleteInputPoint(boolean f){ deleteInputPoint=f; }
+    /** boolean switch to delete input fix points */
+    public static void enableDeleteInputPoint(){ deleteInputPoint=true; }
+    /** boolean switch to delete input fix points */
+    public static void disableDeleteInputPoint(){ deleteInputPoint=false; }
+    
     /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
-    public static boolean tensionOnSameRail=true;
+    //public static boolean tensionOnSameRail=true;
+    public static boolean tensionOnRail=true;
     /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
-    public static void tensionOnSameRail(boolean f){ tensionOnSameRail=f; }
+    public static void tensionOnRail(boolean f){ tensionOnRail=f; }
     /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
-    public static void enableTensionOnSameRail(){ tensionOnSameRail=true; }
+    public static void enableTensionOnRail(){ tensionOnRail=true; }
     /** in case with rail curves, boolean switch to put tension between points on the same rail curve */
-    public static void disableTensionOnSameRail(){ tensionOnSameRail=false; }
+    public static void disableTensionOnRail(){ tensionOnRail=false; }
     
     
     /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
-    public static boolean fixPointOnRailEnd=true;
+    //public static boolean fixPointOnRailEnd=true;
+    public static boolean fixAtRailEnd=true;
     /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
-    public static void fixPointOnRailEnd(boolean f){ fixPointOnRailEnd=f; }
+    public static void fixAtRailEnd(boolean f){ fixAtRailEnd=f; }
     /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
-    public static void enableFixPointOnRailEnd(){ fixPointOnRailEnd=true; }
+    public static void enableFixAtRailEnd(){ fixAtRailEnd=true; }
     /** in case with rail curves, boolean switch to fix points which are on end points of rail curves */
-    public static void disableFixPointOnRailEnd(){ fixPointOnRailEnd=false; }
+    public static void disableFixAtRailEnd(){ fixAtRailEnd=false; }
     
     /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
-    public static boolean fixPointNotOnRail=true;
+    //public static boolean fixPointNotOnRail=true;
+    public static boolean fixPointOffRail=true;
     /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
-    public static void fixPointNotOnRail(boolean f){ fixPointNotOnRail=f; }
+    public static void fixPointOffRail(boolean f){ fixPointOffRail=f; }
     /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
-    public static void enableFixPointNotOnRail(boolean f){ fixPointNotOnRail=true; }
+    public static void enableFixPointOffRail(boolean f){ fixPointOffRail=true; }
     /** in case with rail curves, boolean switch to fix points which are not on any rail curves */
-    public static void disableFixPointNotOnRail(boolean f){ fixPointNotOnRail=false; }
+    public static void disableFixPointOffRail(boolean f){ fixPointOffRail=false; }
     
     
     /** boolean switch to put straightening force on connected lines */
@@ -344,7 +458,7 @@ public class ITensileNet{
 	    }
 	}
 	
-	if(fixOpenLinePoint){
+	if(fixOpenEnd){
 	    // cheking naked end point
 	    ArrayList<IVecI> openPts = new ArrayList<IVecI>();
 	    for(int i=0; i<uniquePts.size(); i++){
@@ -450,6 +564,9 @@ public class ITensileNet{
 			    }
 			}
 		    }
+		    if(deleteInputPoint && fixedPoints[i] instanceof IObject){
+			((IObject)fixedPoints[i]).del();
+		    }
 		}
 	    }
 	    
@@ -484,8 +601,11 @@ public class ITensileNet{
 			    if(tnsn!=null){
 				if(tnsn instanceof IObject){
 				    
-				    if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
-				    if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
+				    if(tensionColor!=null) ((IObject)tnsn).clr(tensionColor);
+				    else if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
+				    
+				    if(tensionLayer!=null) ((IObject)tnsn).layer(tensionLayer);
+				    else if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
 			    }
 				tnsn.tension(tension);
 				tnsn.constant(constantTension);
@@ -495,8 +615,11 @@ public class ITensileNet{
 			
 			if(tnsn==null){
 			    ITensionLine tl = new ITensionLine(pa1, pa2, tension);
-			    if(lineColors[i]!=null) tl.clr(lineColors[i]);
-			    if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
+			    if(tensionColor!=null) tl.clr(tensionColor);
+			    else if(lineColors[i]!=null) tl.clr(lineColors[i]);
+			    
+			    if(tensionLayer!=null) tl.layer(tensionLayer);
+			    else if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
 			    
 			    tl.tension(tension);
 			    tl.constant(constantTension);
@@ -1079,12 +1202,12 @@ public class ITensileNet{
     
     public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints,
-				     boolean tensionOnSameRail,
+				     boolean tensionOnRail,
 				     boolean fixOpenEndLinkPoint,
 				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines){
 	return create(railCurves,linkLines,fixedPoints,
-		      tensionOnSameRail, fixOpenEndLinkPoint, fixOpenEndRailPoint,
+		      tensionOnRail, fixOpenEndLinkPoint, fixOpenEndRailPoint,
 		      deleteLines,IConfig.tolerance);
     }
     */
@@ -1094,7 +1217,7 @@ public class ITensileNet{
        @param railCurves curves on which all the points sit.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param tensionOnRail when this is true, tension between points on the same curve is created.
        @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
        @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
        @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
@@ -1103,13 +1226,13 @@ public class ITensileNet{
     /*
     public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints,
-				     boolean tensionOnSameRail,
+				     boolean tensionOnRail,
 				     boolean fixOpenEndLinkPoint,
 				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines,
 				     double connectionTolerance ){
 	return create(railCurves,linkLines,fixedPoints,
-		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      tensionOnRail,fixOpenEndLinkPoint,
 		      true, deleteLines, connectionTolerance);
     }
     */
@@ -1119,23 +1242,23 @@ public class ITensileNet{
        @param railCurves curves on which all the points sit.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param tensionOnRail when this is true, tension between points on the same curve is created.
        @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
        @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
-       @param fixPointNotOnRail fix points which are not on the rail curve
+       @param fixPointOffRail fix points which are not on the rail curve
        @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
     */
     /*
     public static ITensileNet create(ICurveI[] railCurves,
 				     ICurveI[] linkLines, IVecI[] fixedPoints,
-				     boolean tensionOnSameRail,
+				     boolean tensionOnRail,
 				     boolean fixOpenEndLinkPoint,
 				     boolean fixOpenEndRailPoint,
-				     boolean fixPointNotOnRail,
+				     boolean fixPointOffRail,
 				     boolean deleteLines){
 	return create(railCurves,linkLines,fixedPoints,
-		      tensionOnSameRail,fixOpenEndLinkPoint,
-		      fixPointNotOnRail, deleteLines, IConfig.tolerance);
+		      tensionOnRail,fixOpenEndLinkPoint,
+		      fixPointOffRail, deleteLines, IConfig.tolerance);
     }
     */
     /**
@@ -1143,10 +1266,10 @@ public class ITensileNet{
        @param railCurves curves on which all the points sit.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param tensionOnRail when this is true, tension between points on the same curve is created.
        @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
        @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
-       @param fixPointNotOnRail fix points which are not on the rail curve
+       @param fixPointOffRail fix points which are not on the rail curve
        @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
        @param connectionTolerance tolerance to if two end points are connected or not
     */
@@ -1159,8 +1282,8 @@ public class ITensileNet{
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed. this can be null.
     */
     public static ITensileNet create(ICurveI[] railCurves, ICurveI[] linkLines, IVecI[] fixedPoints){
-	//boolean tensionOnSameRail, boolean fixOpenEndLinkPoint, boolean fixOpenEndRailPoint,
-	//boolean fixPointNotOnRail, boolean deleteLines, double connectionTolerance ){
+	//boolean tensionOnRail, boolean fixOpenEndLinkPoint, boolean fixOpenEndRailPoint,
+	//boolean fixPointOffRail, boolean deleteLines, double connectionTolerance ){
 	
 	if(railCurves==null || railCurves.length==0){
 	    //IOut.err("no rail curve input found");
@@ -1198,6 +1321,14 @@ public class ITensileNet{
 	    }
 	}
 	
+	if(deleteInputPoint){
+	    for(int i=0; i<fixedPoints.length; i++){
+		if(fixedPoints[i] instanceof IObject){
+		    ((IObject)fixedPoints[i]).del();
+		}
+	    }
+	}
+	
 	if(server==null){ server = IG.current().server(); }
 	
 	// find connection and remove duplicates
@@ -1230,7 +1361,7 @@ public class ITensileNet{
 	
 	
 	ArrayList<IVecI> openPts = null;
-	if(fixOpenLinePoint){
+	if(fixOpenEnd){
 	    // cheking naked end point
 	    openPts = new ArrayList<IVecI>();
 	    for(int i=0; i<uniquePts.size(); i++){
@@ -1262,7 +1393,7 @@ public class ITensileNet{
 	ArrayList<IParticleOnCurveI>[] particleOnRail = null;
 	
 	
-	if(tensionOnSameRail || spacingEqualizer){
+	if(tensionOnRail || spacingEqualizer){
 	    // !!!
 	    @SuppressWarnings("unchecked")
 		ArrayList<IParticleOnCurveI>[] pos = new ArrayList[railCurves.length];
@@ -1326,8 +1457,8 @@ public class ITensileNet{
 			if(ptcl!=null){
 			    ptcl.fric(friction);
 			    
-			    if(fixPointNotOnRail ||
-			       fixOpenLinePoint &&openPts!=null && openPts.contains(uniquePts.get(i))){ // in case the point is open point and fixOpenLinePoint is true.
+			    if(fixPointOffRail ||
+			       fixOpenEnd &&openPts!=null && openPts.contains(uniquePts.get(i))){ // in case the point is open point and fixOpenEnd is true.
 				ptcl.fix(); // if not on the curve, fixed.
 				
 				if(ptcl instanceof IObject){
@@ -1348,8 +1479,8 @@ public class ITensileNet{
 			IParticleAgent pa = new IParticleAgent(uniquePts.get(i));
 			pa.fric(friction);
 			
-			if(fixPointNotOnRail ||
-			   fixOpenLinePoint &&openPts!=null && openPts.contains(uniquePts.get(i))){ // in case the point is open point and fixOpenLinePoint is true.
+			if(fixPointOffRail ||
+			   fixOpenEnd &&openPts!=null && openPts.contains(uniquePts.get(i))){ // in case the point is open point and fixOpenEnd is true.
 			    pa.fix(); // if not on the curve, fixed.
 			    pa.clr(fixedPointColor);
 			    if(fixedPointLayer!=null) pa.layer(IG.layer(fixedPointLayer).clr(fixedPointColor));
@@ -1377,7 +1508,7 @@ public class ITensileNet{
 		}
 		
 		if(poc!=null){
-		    if(tensionOnSameRail || spacingEqualizer){
+		    if(tensionOnRail || spacingEqualizer){
 			// put particle on each list of rail
 			int sectIdx = -1;
 			for(int j=0; j<railCurves.length && sectIdx<0; j++){
@@ -1386,7 +1517,7 @@ public class ITensileNet{
 			if(sectIdx>=0){ particleOnRail[sectIdx].add(poc); }
 		    }
 		    
-		    if(fixPointOnRailEnd){
+		    if(fixAtRailEnd){
 			if(poc.upos()<IConfig.parameterTolerance ||
 			   poc.upos()>1.0-IConfig.parameterTolerance){
 			    poc.fix();
@@ -1429,8 +1560,11 @@ public class ITensileNet{
 			    tnsn = getTensionInstance(pa1,pa2);
 			    if(tnsn!=null){
 				if(tnsn instanceof IObject){
-				    if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
-				    if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
+				    if(tensionColor!=null) ((IObject)tnsn).clr(tensionColor);
+				    else if(lineColors[i]!=null) ((IObject)tnsn).clr(lineColors[i]);
+				    
+				    if(tensionLayer!=null) ((IObject)tnsn).layer(tensionLayer);
+				    else if(lineLayer[i]!=null) ((IObject)tnsn).layer(lineLayer[i]);
 				}
 				tnsn.tension(tension);
 				tnsn.constant(constantTension);
@@ -1440,8 +1574,12 @@ public class ITensileNet{
 			
 			if(tnsn==null){
 			    ITensionLine tl = new ITensionLine(pa1, pa2, tension);
-			    if(lineColors[i]!=null) tl.clr(lineColors[i]);
-			    if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
+			    if(tensionColor!=null) tl.clr(tensionColor);
+			    else if(lineColors[i]!=null) tl.clr(lineColors[i]);
+			    
+			    if(tensionLayer!=null) tl.layer(tensionLayer);
+			    else if(lineLayer[i]!=null) tl.layer(lineLayer[i]);
+			    
 			    tl.tension(tension);
 			    tl.constant(constantTension);
 			    tlines.add(tl);
@@ -1454,7 +1592,7 @@ public class ITensileNet{
 		}
 	    }
 	    
-	    if(tensionOnSameRail || spacingEqualizer){
+	    if(tensionOnRail || spacingEqualizer){
 		// sort particleoncurve and create tension
 		
 		for(int i=0; i<railCurves.length; i++){
@@ -1463,7 +1601,7 @@ public class ITensileNet{
 			
 			boolean closed=railCurves[i].isClosed();
 			
-			if(tensionOnSameRail){
+			if(tensionOnRail){
 			    for(int j=0; !closed && j<particleOnRail[i].size()-1 ||
 				    closed && j<particleOnRail[i].size(); j++){
 				//new ITensionLineOnCurve(particleOnRail[i].get(j),particleOnRail[i].get(j+1),onRailTension).clr(IRand.clr());
@@ -1585,11 +1723,11 @@ public class ITensileNet{
 				     ICurveI[] linkLines,
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints,
-				     boolean tensionOnSameRail,
+				     boolean tensionOnRail,
 				     boolean fixOpenEndLinkPoint,
 				     boolean fixOpenEndRailPoint){
 	return create(railCurves,linkLines,fixedLines,fixedPoints,
-		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      tensionOnRail,fixOpenEndLinkPoint,
 		      fixOpenEndRailPoint,true,IConfig.tolerance);
     }
     
@@ -1597,12 +1735,12 @@ public class ITensileNet{
 				     ICurveI[] linkLines,
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints,
-				     boolean tensionOnSameRail,
+				     boolean tensionOnRail,
 				     boolean fixOpenEndLinkPoint,
 				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines){
 	return create(railCurves,linkLines,fixedLines,fixedPoints,
-		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      tensionOnRail,fixOpenEndLinkPoint,
 		      fixOpenEndRailPoint,deleteLines,IConfig.tolerance);
     }
     */
@@ -1612,7 +1750,7 @@ public class ITensileNet{
        @param railCurves curves on which all the points sit.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param tensionOnRail when this is true, tension between points on the same curve is created.
        @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
        @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
        @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
@@ -1623,13 +1761,13 @@ public class ITensileNet{
 				     ICurveI[] linkLines,
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints,
-				     boolean tensionOnSameRail,
+				     boolean tensionOnRail,
 				     boolean fixOpenEndLinkPoint,
 				     boolean fixOpenEndRailPoint,
 				     boolean deleteLines,
 				     double connectionTolerance ){
 	return create(railCurves,linkLines,fixedLines,fixedPoints,
-		      tensionOnSameRail,fixOpenEndLinkPoint,
+		      tensionOnRail,fixOpenEndLinkPoint,
 		      fixOpenEndRailPoint,true,deleteLines,connectionTolerance);
     }
     */
@@ -1638,10 +1776,10 @@ public class ITensileNet{
        @param railCurves curves on which all the points sit.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param tensionOnRail when this is true, tension between points on the same curve is created.
        @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
        @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
-       @param fixPointNotOnRail fix points which are not on the rail curve
+       @param fixPointOffRail fix points which are not on the rail curve
        @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
 */
     /*
@@ -1649,15 +1787,15 @@ public class ITensileNet{
 				     ICurveI[] linkLines,
 				     ICurveI[] fixedLines,
 				     IVecI[] fixedPoints,
-				     boolean tensionOnSameRail,
+				     boolean tensionOnRail,
 				     boolean fixOpenEndLinkPoint,
 				     boolean fixOpenEndRailPoint,
-				     boolean fixPointNotOnRail,
+				     boolean fixPointOffRail,
 				     boolean deleteLines ){
 	
 	return create(railCurves,linkLines,fixedLines,fixedPoints,
-		      tensionOnSameRail,fixOpenEndLinkPoint,
-		      fixOpenEndRailPoint,fixPointNotOnRail,deleteLines,IConfig.tolerance);
+		      tensionOnRail,fixOpenEndLinkPoint,
+		      fixOpenEndRailPoint,fixPointOffRail,deleteLines,IConfig.tolerance);
     }
     */
     
@@ -1666,10 +1804,10 @@ public class ITensileNet{
        @param railCurves curves on which all the points sit.
        @param linkLines lines to create tension line. if it's curve, it's simplified to line.
        @param fixedPoints if those points are on the end point of linkLines, those end points of tension line are fixed.
-       @param tensionOnSameRail when this is true, tension between points on the same curve is created.
+       @param tensionOnRail when this is true, tension between points on the same curve is created.
        @param fixOpenEndLinkPoint when this is true open end of link lines are fixed
        @param fixOpenEndRailPoint when this is true points on the end of rail are fixed
-       @param fixPointNotOnRail fix points which are not on the rail curve
+       @param fixPointOffRail fix points which are not on the rail curve
        @param deleteLines when this is true and if lines are subclass of IObject, lines are deleted.
        @param connectionTolerance tolerance to if two end points are connected or not
     */
@@ -1682,9 +1820,9 @@ public class ITensileNet{
     */
     public static ITensileNet create(ICurveI[] railCurves, ICurveI[] linkLines,
 				     ICurveI[] fixedLines,IVecI[] fixedPoints){
-	// //boolean tensionOnSameRail,
+	// //boolean tensionOnRail,
 	//boolean fixOpenEndLinkPoint, boolean fixOpenEndRailPoint,
-	// boolean fixPointNotOnRail, boolean deleteLines,double  connectionTolerance ){
+	// boolean fixPointOffRail, boolean deleteLines,double  connectionTolerance ){
 		
 	ArrayList<IVecI> fixedPts = new ArrayList<IVecI>();
 	
@@ -1709,7 +1847,7 @@ public class ITensileNet{
 	}
 	
 	return create(railCurves,linkLines,fixedPts.toArray(new IVecI[fixedPts.size()]));
-	//tensionOnSameRail,fixOpenEndLinkPoint,fixOpenEndRailPoint,fixPointNotOnRail,deleteLines,
+	//tensionOnRail,fixOpenEndLinkPoint,fixOpenEndRailPoint,fixPointOffRail,deleteLines,
 	//connectionTolerance);
     }
     

@@ -131,15 +131,23 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     /** getting end point. i==0 or i==1. if i is other value, returns first point. */
     public IParticleI pt(int i){ if(i==1){ return pt2; } return pt1; }
     /** alias of pt(int) */
-    public IParticleI pos(int i){ return pt(i); }
+    public IParticleI particle(int i){ return pt(i); }
+    /** position of particle(int i) */
+    public IVec pos(int i){ return pt(i).pos(); }
+    
     /** getting end point1. */
     public IParticleI pt1(){ return pt1; }
     /** alias of pt1() */
-    public IParticleI pos1(){ return pt1(); }
+    public IParticleI particle1(){ return pt1(); }
+    /** position of particle1 */
+    public IVec pos1(){ return pt1().pos(); }
+    
     /** getting end point2. */
     public IParticleI pt2(){ return pt2; }
     /** alias of pt2() */
-    public IParticleI pos2(){ return pt2(); }
+    public IParticleI particle2(){ return pt2(); }
+    /** position of particle2 */
+    public IVec pos2(){ return pt2().pos(); }
     
     
     public ISpring parent(IObject par){ super.parent(par); return this; }

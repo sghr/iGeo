@@ -34,7 +34,7 @@ import java.awt.Color;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IBrep extends IObject implements ITransformable{
+public class IBrep extends IGeometry implements ITransformable{
     //public ArrayList<ISurface> surfaces;
     //public ArrayList<ISurfaceGeo> surfaces;
     public ISurfaceGeo[] surfaces;
@@ -103,6 +103,7 @@ public class IBrep extends IObject implements ITransformable{
     }
     
     public IGraphicObject createGraphic(IGraphicMode m){
+	if(m.isNone()) return null;
         if(m.isGL()) return new IBrepGraphicGL(this);
         return null;
     }

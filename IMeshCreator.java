@@ -419,7 +419,7 @@ public class IMeshCreator{
 	
 	IEdge[] radialEdges1 = null;
 	IEdge[] radialEdges2 = null;
-
+	
 	if(num>4){
 	    radialEdges1 = new IEdge[num];
 	    radialEdges2 = new IEdge[num];
@@ -483,8 +483,143 @@ public class IMeshCreator{
 	mesh.close();
 	return mesh;
     }
+    
+    
+    public static IMesh stick(IVecI[][] pts){ return stick(pts, false); }
+    
+    /**
+       creates closed mesh stick with matrix of points
+       @param pts control point matrix whose u is stick direction and v is wrapped by connecting the first and the last in v.
+       @param closeU if true, connect the end and the beginning in U direction
+    */
+    public static IMesh stick(IVecI[][] pts, boolean closeU){
+	if(pts==null){
+	    IOut.err("pts is null");
+	    return null;
+	}
+	if(pts.length<=1){
+	    IOut.err("pts unum needs to be more than 2");
+	    return null;
+	}
+	if(pts[0].length<=2){
+	    IOut.err("pts unum needs to be more than 3");
+	    return null;
+	}
+	
+	int unum = pts.length;
+	int vnum = pts[0].length;
+	
+	IVertex[][] vtx = new IVertex[unum][vnum];
+	for(int i=0; i<unum; i++)
+	    for(int j=0; j<vnum; j++) vtx[i][j] = type.createVertex(pts[i][j]);
+	
+	IVertex vertex1=null, vertex2=null;
+	IEdge[] radialEdges1 = null;
+	IEdge[] radialEdges2 = null;
+	
+	if(!closeU && vnum>4){
+	
+	    IVec center1 = new IVec();
+	    IVec center2 = new IVec();
+	    
+	    for(int i=0; i<vnum; i++){
+		center1.add(pts[0][i]);
+		center2.add(pts[unum-1][i]);
+	    }
+	    center1.div(vnum);
+	    center2.div(vnum);
+	
+	    vertex1 = type.createVertex(center1);
+	    vertex2 = type.createVertex(center2);
 
-
+	    radialEdges1 = new IEdge[vnum];
+	    radialEdges2 = new IEdge[vnum];
+	    for(int i=0; i<vnum; i++){
+		radialEdges1[i] = type.createEdge(vertex1, vtx[0][i]);
+		radialEdges2[i] = type.createEdge(vertex2, vtx[unum-1][i]);
+	    }
+	}
+	
+	IEdge[][] uedges = null;
+	IEdge[][] vedges = new IEdge[unum][vnum];
+	
+	if(closeU){ uedges = new IEdge[unum][vnum]; }
+	else{ uedges = new IEdge[unum-1][vnum]; }
+	
+	for(int i=0; i<unum; i++){
+	    for(int j=0; j<vnum; j++){
+		if(closeU || i<unum-1) uedges[i][j] = type.createEdge(vtx[i][j],vtx[(i+1)%unum][j]);
+		vedges[i][j] =  type.createEdge(vtx[i][j],vtx[i][(j+1)%vnum]);
+	    }
+	}
+	
+	IFace[] capFaces1 = null; // top faces at pt1
+	IFace[] capFaces2 = null; // bottom faces at pt2
+	
+	if(!closeU){
+	    if(vnum==3){
+		capFaces1 = new IFace[1];
+		capFaces2 = new IFace[1];
+		capFaces1[0] = type.createFace(vedges[0][0],vedges[0][1],vedges[0][2]);
+		capFaces2[0] = type.createFace(vedges[unum-1][0],vedges[unum-1][1],vedges[unum-1][2]);
+	    }
+	    else if(vnum==4){
+		capFaces1 = new IFace[1];
+		capFaces2 = new IFace[1];
+		capFaces1[0] = type.createFace(vedges[0][0],vedges[0][1],vedges[0][2],vedges[0][3]);
+		capFaces2[0] = type.createFace(vedges[unum-1][0],vedges[unum-1][1],vedges[unum-1][2],vedges[unum-1][3]);
+	    }
+	    else{
+		capFaces1 = new IFace[vnum];
+		capFaces2 = new IFace[vnum];
+		for(int i=0; i<vnum; i++){
+		    capFaces1[i] = type.createFace(radialEdges1[(i+1)%vnum], vedges[0][i], radialEdges1[i]);
+		    capFaces2[i] = type.createFace(radialEdges2[i], vedges[unum-1][i], radialEdges2[(i+1)%vnum]);
+		}
+	    }
+	}
+	
+	IFace[][] sideFaces = null;
+	if(closeU) sideFaces = new IFace[unum][vnum];
+	else sideFaces = new IFace[unum-1][vnum];
+	for(int i=0; i<unum; i++){
+	    for(int j=0; j<vnum; j++){
+		if(closeU || i<unum-1){
+		    sideFaces[i][j] = type.createFace(uedges[i][j], vedges[i][j],
+						      uedges[i][(j+1)%vnum],
+						      vedges[(i+1)%unum][j]);
+		}
+	    }
+	}
+	
+	ArrayList<IVertex> vertexArray = new ArrayList<IVertex>();
+	ArrayList<IEdge> edgeArray = new ArrayList<IEdge>();
+	ArrayList<IFace> faceArray = new ArrayList<IFace>();
+	
+	if(vertex1!=null){ vertexArray.add(vertex1); }
+	if(vertex2!=null){ vertexArray.add(vertex2); }
+	for(int i=0; i<unum; i++)
+	    for(int j=0; j<vnum; j++) vertexArray.add(vtx[i][j]);
+	
+	for(int i=0; i<uedges.length; i++)
+	    for(int j=0; j<uedges[i].length; j++) edgeArray.add(uedges[i][j]);
+	for(int i=0; i<vedges.length; i++)
+	    for(int j=0; j<vedges[i].length; j++) edgeArray.add(vedges[i][j]);
+	if(radialEdges1!=null){ for(int i=0; i<vnum; i++) edgeArray.add(radialEdges1[i]); }
+	if(radialEdges2!=null){ for(int i=0; i<vnum; i++) edgeArray.add(radialEdges2[i]); }
+	
+	if(capFaces1!=null){ for(int i=0; i<capFaces1.length; i++) faceArray.add(capFaces1[i]); }
+	if(capFaces2!=null){ for(int i=0; i<capFaces2.length; i++) faceArray.add(capFaces2[i]); }
+	for(int i=0; i<sideFaces.length; i++)
+	    for(int j=0; j<sideFaces[i].length; j++) faceArray.add(sideFaces[i][j]);
+	
+	IMesh mesh = new IMesh(vertexArray,edgeArray,faceArray);
+	mesh.close();
+	return mesh;
+    }
+    
+    
+    
     /** round stick */
     public static IMesh stick(IVecI pt1, IVecI pt2, double radius){
 	return polygonStick(pt1,pt2,radius,IConfig.meshCircleResolution);
@@ -507,6 +642,80 @@ public class IMeshCreator{
     // pipe, cylinder
     // rectPipe, squarePipe, polygonPipe
     // stick, roundStick(==stick), rectStick, squareStick, polygonStick
+    
+
+    public static IVec[] polygonProfile(IVecI center, IVecI normal, IVecI rollDir,
+					double radius, int vertexNum){
+	IVec rdir = rollDir.get().dup().len(radius);
+	IVec[] pts = new IVec[vertexNum];
+	double angle = Math.PI*2/vertexNum;
+	for(int i=0; i<vertexNum; i++){
+	    pts[i] = rdir.cp(center);
+	    rdir.rot(normal, angle);
+	}
+	return pts;
+    }
+    
+    public static IMesh polygonStick(ICurveI crv, double radius, int polygonVertexNum, int railSegmentNum){
+	IVecI[] cps = crv.cps();
+	IVec n = IVec.averageNormal(cps);
+	IVec dir = cps[1].get().dif(cps[0]);
+	IVec center = cps[0].get();
+	if(n.isParallel(dir)){
+	    n = IG.zaxis;
+	    if(n.isParallel(dir)){ n = IG.yaxis; }
+	}
+	IVec roll = dir.cross(n);
+	IVec[] profilePts = polygonProfile(center, dir, roll, radius, polygonVertexNum);
+	
+	boolean closed=crv.isClosed();
+	IVecI[] railPts=null;
+	if(crv.deg()==1){
+	    if(closed){ railPts = new IVec[crv.cpNum()-1]; }
+	    else{ railPts = new IVec[crv.cpNum()]; }
+	    for(int i=0; i<railPts.length; i++) railPts[i] = crv.cp(i);
+	}
+	else{
+	    if(closed){ railPts = new IVec[railSegmentNum]; }
+	    else{ railPts = new IVec[railSegmentNum+1]; }
+	    for(int i=0; i<railPts.length; i++) railPts[i] = crv.pt((double)i/railSegmentNum);
+	}
+	
+	IVecI[][] pts = ISurfaceCreator.sweepPoints(profilePts,1,center,roll,railPts,1);
+	
+	return stick(pts, closed);
+    }
+    
+    public static IMesh polygonStick(ICurveI crv, double radius, int polygonVertexNum){
+	int railSegmentNum = crv.epNum()*IConfig.curveGraphicResolution;
+	return polygonStick(crv,radius,polygonVertexNum,railSegmentNum);
+    }
+    
+    public static IMesh roundStick(ICurveI crv, double radius, int railSegmentNum){
+	return polygonStick(crv,radius,IConfig.meshCircleResolution,railSegmentNum);
+    }
+    
+    public static IMesh roundStick(ICurveI crv, double radius){
+	int railSegmentNum = crv.epNum()*IConfig.curveGraphicResolution;
+	return polygonStick(crv,radius,IConfig.meshCircleResolution,railSegmentNum);
+    }
+    
+    public static IMesh stick(ICurveI crv, double radius, int railSegmentNum){
+	return roundStick(crv,radius,railSegmentNum);
+    }
+    
+    public static IMesh stick(ICurveI crv, double radius){
+	return roundStick(crv,radius);
+    }
+
+    public static IMesh squareStick(ICurveI crv, double radius, int railSegmentNum){
+	return polygonStick(crv,radius,4,railSegmentNum);
+    }
+    
+    public static IMesh squareStick(ICurveI crv, double radius){
+	int railSegmentNum = crv.epNum()*IConfig.curveGraphicResolution;
+	return polygonStick(crv,radius,4,railSegmentNum);
+    }
     
     
 }

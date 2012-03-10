@@ -711,7 +711,8 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	
 	if(knots[0] != 0.0 || knots[knots.length-1] != 1.0){
 	    // check by cp
-	    if(cp(0).eq(cp(cpNum()-1))) return true;
+	    //if(cp(0).eq(cp(cpNum()-1))) return true;
+	    if(cp(0).eq(cp(cpNum()-degree))) return true; // added 20120310
 	    return false;
 	}
 	

@@ -32,7 +32,7 @@ import igeo.gui.*;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class ICurve extends IObject implements ICurveI{
+public class ICurve extends IGeometry implements ICurveI{
     public ICurveGeo curve;
     //public ICurveI curve; // public?
     
@@ -193,6 +193,7 @@ public class ICurve extends IObject implements ICurveI{
     }
     
     public IGraphicObject createGraphic(IGraphicMode m){
+	if(m.isNone()) return null;
 	if(m.isGL()) return new ICurveGraphicGL(this); 
 	return null;
     }
