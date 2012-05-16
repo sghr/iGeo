@@ -119,7 +119,7 @@ public class IRhino3dm{
     public static final int tcodePropertiesOpenNurbsVersion = (tcodeTableRec | tcodeShort | 0x0026);
 	
     public static final int tcodeSettingsPluginList             = (tcodeTableRec | tcodeCRC   | 0x0135);
-    public static final int tcodeSettingsUnitStandTols          = (tcodeTableRec | tcodeCRC   | 0x0031);
+    public static final int tcodeSettingsUnitsAndTols          = (tcodeTableRec | tcodeCRC   | 0x0031);
     public static final int tcodeSettingsRenderMesh             = (tcodeTableRec | tcodeCRC   | 0x0032);
     public static final int tcodeSettingsAnalysisMesh           = (tcodeTableRec | tcodeCRC   | 0x0033);
     public static final int tcodeSettingsAnnotation             = (tcodeTableRec | tcodeCRC   | 0x0034);
@@ -776,6 +776,9 @@ public class IRhino3dm{
 	public Rhino3dmFile(){}
 	public Rhino3dmFile(int ver, int openNurbsVer, IServerI serv){
 	    version = ver; openNurbsVersion = openNurbsVer; server = serv;
+	    
+	    settings = new Settings(serv);
+	    
 	}
 	
 	
@@ -1789,69 +1792,531 @@ public class IRhino3dm{
 	public void setCompressedPreviewImage(Chunk c){ compressedPreviewImage=c.content; }
 	public void setRevisionHistory(Chunk c){ revisionHistory=c.content; }
     }
+
+
+    public static class UnitSystem{
+	
+	
+	/**********************************************************************
+	 * unit types (int)
+	 **********************************************************************/
+	
+	public final static int no_unit_system =  0;
+	// atomic distances
+	public final static int angstroms = 12;  // 1.0e-10 meters
+	
+	// SI units
+	public final static int nanometers = 13;  // 1.0e-9 meters
+	public final static int microns = 1;  // 1.0e-6 meters
+	public final static int millimeters = 2;  // 1.0e-3 meters
+	public final static int centimeters = 3;  // 1.0e-2 meters
+	public final static int decimeters = 14;  // 1.0e-1 meters
+	public final static int meters = 4;
+	public final static int dekameters = 15;  // 1.0e+1 meters
+	public final static int hectometers = 16;  // 1.0e+2 meters
+	public final static int kilometers = 5;  // 1.0e+3 meters
+	public final static int megameters = 17;  // 1.0e+6 meters
+	public final static int gigameters = 18;  // 1.0e+9 meters
+	
+	// english distances
+	public final static int microinches = 6;  //    2.54e-8 meters (1.0e-6 inches)
+	public final static int mils = 7;  //    2.54e-5 meters (0.001 inches)
+	public final static int inches = 8;  //    0.0254  meters
+	public final static int feet = 9;  //    0.3408  meters (12 inches)
+	public final static int yards = 19;  //    0.9144  meters (36 inches)
+	public final static int miles = 10;  // 1609.344   meters (5280 feet)
+	
+	// printer distances
+	public final static int printer_point = 20;  // 1/72 inches (computer points)
+	public final static int printer_pica = 21;  // 1/6 inches  (computer picas)
+	
+	// terrestrial distances
+	public final static int nautical_mile = 22; // 1852 meters
+	// astronomical distances
+	public final static int astronomical = 23; // 1.4959787e+11 // http://en.wikipedia.org/wiki/Astronomical_unit
+	public final static int lightyears = 24; // 9.4607304725808e+15 // http://en.wikipedia.org/wiki/Light_year
+	public final static int parsecs = 25; // 3.08567758e+16  // http://en.wikipedia.org/wiki/Parsec
+	// Custom unit systems
+	public final static int custom_unit_system = 11; // x meters with x defined in ON_3dmUnitsAndTolerances.m_custom_unit_sca
+	
+
+
+	/**********************************************************************
+	 * unit scale
+	 **********************************************************************/
+	
+	public final static double no_unit_system_scale =  1.0; //?
+	// atomic distances
+	public final static double angstroms_scale = 1.0E-10;  // 1.0e-10 meters
+	
+	// SI units
+	public final static double nanometers_scale = 1.0E-9;  // 1.0e-9 meters
+	public final static double microns_scale = 1.0E-6;  // 1.0e-6 meters
+	public final static double millimeters_scale = 1.0E-3;  // 1.0e-3 meters
+	public final static double centimeters_scale = 1.0E-2;  // 1.0e-2 meters
+	public final static double decimeters_scale = 1.0E-1;  // 1.0e-1 meters
+	public final static double meters_scale = 1.0;
+	public final static double dekameters_scale = 1.0E1;  // 1.0e+1 meters
+	public final static double hectometers_scale = 1.0E2;  // 1.0e+2 meters
+	public final static double kilometers_scale = 1.0E3;  // 1.0e+3 meters
+	public final static double megameters_scale = 1.0E6;  // 1.0e+6 meters
+	public final static double gigameters_scale = 1.0E9;  // 1.0e+9 meters
+	
+	// english distances
+	public final static double microinches_scale = 2.54E-8;  //    2.54e-8 meters (1.0e-6 inches)
+	public final static double mils_scale = 2.54E-5;  //    2.54e-5 meters (0.001 inches)
+	public final static double inches_scale = 0.0254;  //    0.0254  meters
+	public final static double feet_scale = 0.3408;  //    0.3408  meters (12 inches)
+	public final static double yards_scale = 0.9144;  //    0.9144  meters (36 inches)
+	public final static double miles_scale = 1609.344;  // 1609.344   meters (5280 feet)
+	
+	// printer distances
+	public final static double printer_point_scale = 0.0254/72;  // 1/72 inches (computer points)
+	public final static double printer_pica_scale = 0.0254/6;  // 1/6 inches  (computer picas)
+	
+	// terrestrial distances
+	public final static double nautical_mile_scale = 1852; // 1852 meters
+	// astronomical distances
+	public final static double astronomical_scale = 1.4959787e+11; // 1.4959787e+11 // http://en.wikipedia.org/wiki/Astronomical_unit
+	public final static double lightyears_scale = 9.4607304725808e+15; // 9.4607304725808e+15 // http://en.wikipedia.org/wiki/Light_year
+	public final static double parsecs_scale = 3.08567758e+16; // 3.08567758e+16  // http://en.wikipedia.org/wiki/Parsec
+	// Custom unit systems
+	public final static double custom_unit_system_scale = 1; // x meters with x defined in ON_3dmUnitsAndTolerances.m_custom_unit_sca
+	
+	
+	
+	/**********************************************************************
+	 * unit name
+	 **********************************************************************/
+	public final static String no_unit_system_name = "No Unit";
+	// atomic distances
+	public final static String angstroms_name = "Angstroms";  // 1.0e-10 meters
+	
+	// SI units
+	public final static String nanometers_name = "Nanometers";  // 1.0e-9 meters
+	public final static String microns_name = "Microns";  // 1.0e-6 meters
+	public final static String millimeters_name = "Millimeters";  // 1.0e-3 meters
+	public final static String centimeters_name = "Centimeters";  // 1.0e-2 meters
+	public final static String decimeters_name = "Decimeters";  // 1.0e-1 meters
+	public final static String meters_name = "Meters";
+	public final static String dekameters_name = "Dekameters";  // 1.0e+1 meters
+	public final static String hectometers_name = "Hectometers";  // 1.0e+2 meters
+	public final static String kilometers_name = "Kilometers";  // 1.0e+3 meters
+	public final static String megameters_name = "Megameters";  // 1.0e+6 meters
+	public final static String gigameters_name = "Gigameters";  // 1.0e+9 meters
+	
+	// english distances
+	public final static String microinches_name = "Microinches";  //    2.54e-8 meters (1.0e-6 inches)
+	public final static String mils_name = "Mils";  //    2.54e-5 meters (0.001 inches)
+	public final static String inches_name = "Inches";  //    0.0254  meters
+	public final static String feet_name = "Feet";  //    0.3408  meters (12 inches)
+	public final static String yards_name = "Yards";  //    0.9144  meters (36 inches)
+	public final static String miles_name = "Miles";  // 1609.344   meters (5280 feet)
+	
+	// printer distances
+	public final static String printer_point_name = "Points";  // 1/72 inches (computer points)
+	public final static String printer_pica_name = "Picas";  // 1/6 inches  (computer picas)
+	
+	// terrestrial distances
+	public final static String nautical_mile_name = "Nautical miles"; // 1852 meters
+	// astronomical distances
+	public final static String astronomical_name = "Astronomical units"; // 1.4959787e+11 // http://en.wikipedia.org/wiki/Astronomical_unit
+	public final static String lightyears_name = "Lightyears"; // 9.4607304725808e+15 // http://en.wikipedia.org/wiki/Light_year
+	public final static String parsecs_name = "Parsecs"; // 3.08567758e+16  // http://en.wikipedia.org/wiki/Parsec
+	// Custom unit systems
+	public final static String custom_unit_system_name = "Custom units"; // x meters with x defined in ON_3dmUnitsAndTolerances.m_custom_unit_scale
+	
+	
+	public static String getName(int unitType){
+	    switch(unitType){
+	    case no_unit_system: return no_unit_system_name;
+	    case angstroms: return angstroms_name;
+	    case nanometers: return nanometers_name;
+	    case microns: return microns_name;
+	    case millimeters: return millimeters_name;
+	    case centimeters: return centimeters_name;
+	    case decimeters: return decimeters_name;
+	    case meters: return meters_name;
+	    case dekameters: return dekameters_name;
+	    case hectometers: return hectometers_name;
+	    case kilometers: return kilometers_name;
+	    case megameters: return megameters_name;
+	    case gigameters: return gigameters_name;
+	    case microinches: return microinches_name;
+	    case mils: return mils_name;
+	    case inches: return inches_name;
+	    case feet: return feet_name;
+	    case yards: return yards_name;
+	    case miles: return miles_name;
+	    case printer_point: return printer_point_name;
+	    case printer_pica: return printer_pica_name;
+	    case nautical_mile: return nautical_mile_name;
+	    case astronomical: return astronomical_name;
+	    case lightyears: return lightyears_name;
+	    case parsecs: return parsecs_name;
+	    case custom_unit_system: return custom_unit_system_name;
+	    }
+	    
+	    IOut.err("no such unit system type "+unitType);
+	    //custom_unit_system
+	    return custom_unit_system_name;
+	}
+	
+	public static double getScale(int unitType){
+	    switch(unitType){
+	    case no_unit_system: return no_unit_system_scale;
+	    case angstroms: return angstroms_scale;
+	    case nanometers: return nanometers_scale;
+	    case microns: return microns_scale;
+	    case millimeters: return millimeters_scale;
+	    case centimeters: return centimeters_scale;
+	    case decimeters: return decimeters_scale;
+	    case meters: return meters_scale;
+	    case dekameters: return dekameters_scale;
+	    case hectometers: return hectometers_scale;
+	    case kilometers: return kilometers_scale;
+	    case megameters: return megameters_scale;
+	    case gigameters: return gigameters_scale;
+	    case microinches: return microinches_scale;
+	    case mils: return mils_scale;
+	    case inches: return inches_scale;
+	    case feet: return feet_scale;
+	    case yards: return yards_scale;
+	    case miles: return miles_scale;
+	    case printer_point: return printer_point_scale;
+	    case printer_pica: return printer_pica_scale;
+	    case nautical_mile: return nautical_mile_scale;
+	    case astronomical: return astronomical_scale;
+	    case lightyears: return lightyears_scale;
+	    case parsecs: return parsecs_scale;
+	    case custom_unit_system: return custom_unit_system_scale;
+	    }
+	    
+	    IOut.err("no such unit system type "+unitType);
+	    //custom_unit_system
+	    return custom_unit_system_scale;
+	}
+
+	
+	public static int getType(IUnit unit){
+	    switch(unit.type){
+	    case NoUnit: return no_unit_system;
+	    case Angstroms: return angstroms;
+	    case Nanometers: return nanometers;
+	    case Microns: return microns;
+	    case Millimeters: return millimeters;
+	    case Centimeters: return centimeters;
+	    case Decimeters: return decimeters;
+	    case Meters: return meters;
+	    case Dekameters: return dekameters;
+	    case Hectometers: return hectometers;
+	    case Kilometers: return kilometers;
+	    case Megameters: return megameters;
+	    case Gigameters: return gigameters;
+	    case Microinches: return microinches;
+	    case Mils: return mils;
+	    case Inches: return inches;
+	    case Feet: return feet;
+	    case Yards: return yards;
+	    case Miles: return miles;
+	    case Points: return printer_point;
+	    case Picas: return printer_pica;
+	    case NauticalMiles: return nautical_mile;
+	    case AstronomicalUnits: return astronomical;
+	    case Lightyears: return lightyears;
+	    case Parsecs: return parsecs;
+	    case CustomUnit: return custom_unit_system;
+	    }
+	    
+	    IOut.err("no such unit system type "+unit.type);
+	    //custom_unit_system
+	    return millimeters; // default
+	}
+	
+	public static IUnit.Type getIUnitType(int type){
+	    switch(type){
+	    case no_unit_system: return IUnit.Type.NoUnit;
+	    case angstroms: return IUnit.Type.Angstroms;
+	    case nanometers: return IUnit.Type.Nanometers;
+	    case microns: return IUnit.Type.Microns;
+	    case millimeters: return IUnit.Type.Millimeters;
+	    case centimeters: return IUnit.Type.Centimeters;
+	    case decimeters: return IUnit.Type.Decimeters;
+	    case meters: return IUnit.Type.Meters;
+	    case dekameters: return IUnit.Type.Dekameters;
+	    case hectometers: return IUnit.Type.Hectometers;
+	    case kilometers: return IUnit.Type.Kilometers;
+	    case megameters: return IUnit.Type.Megameters;
+	    case gigameters: return IUnit.Type.Gigameters;
+	    case microinches: return IUnit.Type.Microinches;
+	    case mils: return IUnit.Type.Mils;
+	    case inches: return IUnit.Type.Inches;
+	    case feet: return IUnit.Type.Feet;
+	    case yards: return IUnit.Type.Yards;
+	    case miles: return IUnit.Type.Miles;
+	    case printer_point: return IUnit.Type.Points;
+	    case printer_pica: return IUnit.Type.Picas;
+	    case nautical_mile: return IUnit.Type.NauticalMiles;
+	    case astronomical: return IUnit.Type.AstronomicalUnits;
+	    case lightyears: return IUnit.Type.Lightyears;
+	    case parsecs: return IUnit.Type.Parsecs;
+	    case custom_unit_system: return IUnit.Type.CustomUnit;
+	    }
+	    
+	    IOut.err("no such unit system type "+type);
+	    //custom_unit_system
+	    return IUnit.Type.CustomUnit;
+	}
+	
+	public int unitSystem;
+	public double customUnitScale;
+	public String customUnitName;
+	
+	
+	public UnitSystem(){
+	    unitSystem = millimeters; // default
+	    customUnitScale=1.0;
+	    //customUnitName = getName(unitSystem); // should it have regular name in custom unit?
+	}
+	
+	public UnitSystem(int unit_sys){
+	    unitSystem = unit_sys;
+	    customUnitScale = getScale(unitSystem);
+	    //customUnitName = getName(unitSystem); // should it have regular name in custom unit?
+	}
+	
+	public UnitSystem(IUnit unit){
+	    unitSystem = getType(unit);
+	    customUnitScale = getScale(unitSystem);
+	    //customUnitName = getName(unitSystem); // should it have regular name in custom unit?
+	}
+	
+	public IUnit.Type getIUnitType(){
+	    return getIUnitType(unitSystem);
+	}
+	
+	public void read(Rhino3dmFile context, InputStream is)throws IOException{
+	    
+	    Chunk chunk = readChunk(is);
+	    if(chunk.header != tcodeAnonymousChunk) throw new IOException("invalid type code = "+hex(chunk.header));
+	    
+	    is = new ByteArrayInputStream(chunk.content);
+	    int[] version = readChunkVersion(is);
+	    int majorVersion = version[0];
+	    int minorVersion = version[1];
+	    if(majorVersion==1){
+		
+		unitSystem = readInt(is);
+		
+		customUnitScale = readDouble(is);
+		customUnitName = readString(is);
+		
+	    }
+	}
+	
+	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
+	    ChunkOutputStream cos = new ChunkOutputStream(tcodeAnonymousChunk);
+	    writeChunkVersion(cos, 1, 0, cos.getCRC());
+	    
+	    writeInt(cos,unitSystem,cos.getCRC());
+	    writeDouble(cos,customUnitScale,cos.getCRC());
+	    writeString(cos,customUnitName,cos.getCRC());
+	    
+	    writeChunk(os, cos.getChunk());
+	}
+
+	
+	public String toString(){ return getName(unitSystem); }
+	
+	
+    }
     
+    public static class UnitsAndTolerances{
+	UnitSystem unitSystem;
+	
+	double absoluteTolerance = 0.001; // default
+	double angleTolerance = Math.PI/180; // default
+	double relativeTolerance = 0.01; // default
+	
+	static final int distanceDisplayModeDecimal = 0;
+	static final int distanceDisplayModeFractional = 1;
+	static final int distanceDisplayModeFeetInches = 2;
+	
+	int distanceDisplayMode = distanceDisplayModeDecimal; // default
+	int distanceDisplayPrecision = 3; // default
+	
+	public UnitsAndTolerances(){
+	    
+	}
+	
+	
+	public UnitsAndTolerances(IServerI srv){
+	    
+	    unitSystem = new UnitSystem(srv.server().unit);
+	    absoluteTolerance = IConfig.tolerance;
+	    angleTolerance = IConfig.angleTolerance;
+	    relativeTolerance = IConfig.parameterTolerance;
+	    
+	}
+	
+	
+	
+	public void read(Rhino3dmFile context, InputStream is)throws IOException{
+	    
+	    int version = readInt(is);
+	    
+	    if(version >=100 && version < 200){
+		
+		int us = readInt(is);
+		
+		unitSystem = new UnitSystem(us);
+
+
+		IOut.debug(20, "unit system = "+unitSystem);
+		
+		absoluteTolerance = readDouble(is);
+		angleTolerance = readDouble(is);
+		relativeTolerance = readDouble(is);
+		
+		if(version>=101){
+		    
+		    distanceDisplayMode = readInt(is);
+		    if(distanceDisplayMode < 0 || distanceDisplayMode > 2 )
+			distanceDisplayMode = distanceDisplayModeDecimal;
+		    
+		    distanceDisplayPrecision = readInt(is);
+		    
+		    if(distanceDisplayPrecision < 0 || distanceDisplayPrecision > 20 ){
+			distanceDisplayPrecision = 3;
+		    }
+		    
+		    if(version >= 102){
+			unitSystem.customUnitScale = readDouble(is);
+			unitSystem.customUnitName = readString(is);
+		    }
+		}
+	    }
+	}
+	
+	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
+
+	    int version = 102;
+	    
+	    writeInt(os, version, crc);
+	    writeInt(os, unitSystem.unitSystem, crc);
+	    writeDouble(os, absoluteTolerance, crc);
+	    writeDouble(os, angleTolerance, crc);
+	    writeDouble(os, relativeTolerance, crc);
+	    
+	    writeInt(os, distanceDisplayMode, crc);
+	    
+	    if(distanceDisplayPrecision < 0 || distanceDisplayPrecision > 20 ){
+		distanceDisplayPrecision = 3;
+	    }
+	    writeInt(os, distanceDisplayPrecision, crc);
+	    
+	    writeDouble(os, unitSystem.customUnitScale, crc);
+	    writeString(os, unitSystem.customUnitName, crc);
+	    
+	    //IOut.err("customUnitName = "+unitSystem.customUnitName); //
+	    
+	}
+	
+    }
     
     public static class Settings{
 	
-	public void setPluginList(Chunk c){
+	public UnitsAndTolerances unitsAndTolerances;
+	public UnitsAndTolerances pageUnitsAndTolerances;
+
+	
+	public Settings(){
+	    
+	    unitsAndTolerances = new UnitsAndTolerances();
+	    pageUnitsAndTolerances = unitsAndTolerances;
+	    
+	}
+	
+	public Settings(IServerI serv){
+	    
+	    unitsAndTolerances = new UnitsAndTolerances(serv);
+	    pageUnitsAndTolerances = unitsAndTolerances;
+	    
+	}
+	
+	public void setPluginList(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setPluginList: " + c);
 	}
-	public void setUnitStandTols(Chunk c){
-	    //IOut.p("setUnitStandTols: " + c);
+	public void setUnitsAndTols(Rhino3dmFile file, Chunk c) throws IOException{
+	    //IOut.p("setUnitsAndTols: " + c);
+	    
+	    ByteArrayInputStream bais = new ByteArrayInputStream(c.content);
+	    
+	    unitsAndTolerances = new UnitsAndTolerances(file.server.server());
+	    unitsAndTolerances.read(file, bais);
+	    
+	    if(unitsAndTolerances.unitSystem!=null){
+		
+		if(file.server!=null){
+		    file.server.server().unit.type =
+			unitsAndTolerances.unitSystem.getIUnitType();
+		}
+		
+	    }
+	    
 	}
-	public void setRenderMesh(Chunk c){
+	public void setRenderMesh(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setRenderMesh: " + c);
 	}
-	public void setAnalysisMesh(Chunk c){
+	public void setAnalysisMesh(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setAnalysisMesh: " + c);
 	}
-	public void setAnnotation(Chunk c){
+	public void setAnnotation(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setAnnotation: " + c);
 	}
-	public void setNamedCPlaneList(Chunk c){
+	public void setNamedCPlaneList(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setNamedCPlaneList: " + c);
 	}
-	public void setNamedViewList(Chunk c){
+	public void setNamedViewList(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setNamedViewList: " + c);
 	}
-	public void setViewList(Chunk c){
+	public void setViewList(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setViewList: " + c);
 	}
-	public void setCurrentLayerIndex(Chunk c){
+	public void setCurrentLayerIndex(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setCurrentLayerIndex: " + c);
 	}
-	public void setCurrentFontIndex(Chunk c){
+	public void setCurrentFontIndex(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setCurrentFontIndex: " + c);
 	}
-	public void setCurrentDimStyleIndex(Chunk c){
+	public void setCurrentDimStyleIndex(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setCurrentDimStyleIndex: " + c);
 	}
-	public void setCurrentMaterialIndex(Chunk c){
+	public void setCurrentMaterialIndex(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setCurrentMaterialIndex: " + c);
 	}
-	public void setCurrentColor(Chunk c){
+	public void setCurrentColor(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setCurrentColor: " + c);
 	}
-	public void setCurrentWireDensity(Chunk c){
+	public void setCurrentWireDensity(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setCurrentWireDensity: " + c);
 	}
-	public void setRender(Chunk c){
+	public void setRender(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setRender: " + c);
 	}
-	public void setGridDefaults(Chunk c){
+	public void setGridDefaults(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setGridDefaults: " + c);
 	}
-	public void setModelURL(Chunk c){
+	public void setModelURL(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setModelURL: " + c);
 	}
-	public void setAttributes(Chunk c){
+	public void setAttributes(Rhino3dmFile file, Chunk c) throws IOException{
 	    //IOut.p("setAttributes: " + c);
 	}
 	
 	
 	// classes for settings
-	public static class UnitAndTolerances{
-	}
+	//public static class UnitsAndTolerances{}
 	public static class AnnotationSettings{
 	}
 	public static class ConstructionPlaneGridDefaults{
@@ -3347,7 +3812,7 @@ public class IRhino3dm{
 	    }
 	    return unknown;
 	}
-
+	
 	public boolean reverse(){
 	    super.reverse();
 	    rev3d=!rev3d;
@@ -3976,6 +4441,15 @@ public class IRhino3dm{
 	    
 	    bbox.min = ibbox.min;
 	    bbox.max = ibbox.max;
+
+	    if(bbox.min==null){ // this should not happen. should be excluded by isValid beforehand
+		IOut.err("minimum range of boundary box is null");
+		bbox.min=new IVec();
+	    }
+	    if(bbox.max==null){ // this should not happen. should be excluded by isValid beforehand
+		IOut.err("maximum range of boundary box is null");
+		bbox.max=new IVec();
+	    }
 	}
 	
 	// trimmed surface
@@ -4004,6 +4478,16 @@ public class IRhino3dm{
 	    
 	    bbox.min = ibbox.min;
 	    bbox.max = ibbox.max;
+
+	    if(bbox.min==null){ // this should not happen. should be excluded by isValid beforehand
+		IOut.err("minimum range of boundary box is null");
+		bbox.min=new IVec();
+	    }
+	    if(bbox.max==null){ // this should not happen. should be excluded by isValid beforehand
+		IOut.err("maximum range of boundary box is null");
+		bbox.max=new IVec();
+	    }
+
 	    
 	    /*
 	    NurbsSurface nsrf = new NurbsSurface(srf);

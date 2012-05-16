@@ -383,7 +383,10 @@ public class ICurve extends IGeometry implements ICurveI{
     /** reverse self curve ; not creating a new object
      */
     public ICurve rev(){ curve.rev(); return this; }
-
+    
+    public ICurve revU(){ return rev(); }
+    public ICurve flipU(){ return rev(); }
+    
 
     /******************************************************************************
      * transformation methods; API of ITransformable interface
@@ -548,6 +551,9 @@ public class ICurve extends IGeometry implements ICurveI{
     
     public ICurve name(String nm){ super.name(nm); return this; }
     public ICurve layer(ILayer l){ super.layer(l); return this; }
+    public ICurve layer(String l){ super.layer(l); return this; }
+
+    public ICurve attr(IAttribute at){ super.attr(at); return this; }
     
     
     public ICurve hide(){ super.hide(); return this; }

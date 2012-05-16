@@ -301,7 +301,7 @@ public class IMeshCreator{
     public static IMesh rectStick(IVecI pt1, IVecI pt2, double width, double height){
 	IVec dir = pt2.get().dif(pt1);
 	IVec udir = dir.cross(IVec.zaxis);
-	if(udir.len2()>0) udir = dir.cross(IVec.xaxis); // if parallel, use x axis
+	if(udir.len2()<IConfig.tolerance) udir = dir.cross(IVec.xaxis); // if parallel, use x axis
 	IVec vdir = udir.cross(dir);
 	udir.len(width);
 	vdir.len(height);

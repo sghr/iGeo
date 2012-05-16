@@ -207,6 +207,10 @@ public class IMesh extends IGeometry implements IMeshI{
     
     public IMesh name(String nm){ super.name(nm); return this; }
     public IMesh layer(ILayer l){ super.layer(l); return this; }
+    public IMesh layer(String l){ super.layer(l); return this; }
+
+    public IMesh attr(IAttribute at){ super.attr(at); return this; }
+
         
     public IMesh hide(){ super.hide(); return this; }
     public IMesh show(){ super.show(); return this; }

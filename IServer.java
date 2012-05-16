@@ -53,6 +53,9 @@ public class IServer implements IServerI{
     public int stateCount=0; // incremented when any change happens in the state
     
     
+    public IUnit unit;
+    
+    
     // non graphic mode
     public IServer(IG ig){
 	this.ig =ig;
@@ -62,6 +65,8 @@ public class IServer implements IServerI{
 	//graphicServer = new IGraphicServer(this);
 	dynamicServer = new IDynamicServer(this);
 	layers = new ArrayList<ILayer>();
+	
+	unit = new IUnit(); // default
     }
     
     // graphic mode
@@ -74,12 +79,20 @@ public class IServer implements IServerI{
 	graphicServer = new IGraphicServer(this, panel);
 	dynamicServer = new IDynamicServer(this);
 	layers = new ArrayList<ILayer>();
+	
+	unit = new IUnit(); // default
     }
     
     public IServer server(){ return this; }
     public IDynamicServer dynamicServer(){ return dynamicServer; }
     
     public IGraphicServer graphicServer(){ return graphicServer; }
+    
+    
+    public IUnit unit(){ return unit; }
+    public void unit(IUnit u){ unit = u; }
+    public void unit(String unitName){ unit = new IUnit(unitName); }
+    
     
     public void add(IObject e){
 	//synchronized(IG.lock){

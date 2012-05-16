@@ -291,6 +291,21 @@ public class IG implements IServerI{
     public static double speed(){ return updateRate(); }
     
     
+    /** getting unit of current IG server */
+    public static IUnit unit(){
+	IG ig=cur(); if(ig!=null) return ig.server().unit(); 
+	return null;
+    }
+    /** setting unit of current IG server */
+    public static void unit(IUnit u){
+	IG ig=cur(); if(ig!=null) ig.server().unit(u); 
+    }
+    /** setting unit of current IG server */
+    public static void unit(String unitName){
+	IG ig=cur(); if(ig!=null) ig.server().unit(unitName); 
+    }
+    
+    
     /** to set the name first and save later (likely by key event) */
     public static void outputFile(String filename){
 	IG ig = cur();
@@ -2368,12 +2383,12 @@ public class IG implements IServerI{
     public static IMesh meshRectStick(IVecI pt1, IVecI pt2, double width, double height, IVecI heightDir){
 	return IMeshCreator.rectStick(pt1,pt2,width,height,heightDir);
     }
-    /** creating closed mesh stick. height direction is z axis */
+    /** creating closed mesh stick. reference height direction is z axis */
     public static IMesh meshRectStick(IVecI pt1, IVecI pt2, double width, double height){
 	return IMeshCreator.rectStick(pt1,pt2,width,height);
     }
     /**
-       creating closed mesh stick.
+       creating closed mesh stick with square profile. 
        @param heightDir it provides reference to the direction of height but actual direction is re-calculated to be perpendicular to pt1-pt2 direction.
     */
     public static IMesh meshSquareStick(IVecI pt1, IVecI pt2, double width, IVecI heightDir){
@@ -2469,11 +2484,11 @@ public class IG implements IServerI{
 	return IMeshCreator.roundStick(railCurve,radius);
     }
     
-    /** round stick */
+    /** square stick */
     public static IMesh meshSquareStick(ICurveI railCurve, double radius, int railSegmentNum){
 	return IMeshCreator.squareStick(railCurve,radius,railSegmentNum);
     }
-    /** round stick */
+    /** square stick */
     public static IMesh meshSquareStick(ICurveI railCurve, double radius){
 	return IMeshCreator.squareStick(railCurve,radius);
     }
@@ -3925,5 +3940,8 @@ public class IG implements IServerI{
 	return array3(length2,length3,vals); 
     }
     */
+    
+    public static boolean eq(double v1, double v2){ return Math.abs(v1-v2)<=IConfig.tolerance; } 
+    public static boolean eq(double v1, double v2, double tolerance){ return Math.abs(v1-v2)<=tolerance; } 
     
 }

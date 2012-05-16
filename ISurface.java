@@ -451,6 +451,15 @@ public class ISurface extends IGeometry implements ISurfaceI{
     public ISurface revUV(){ surface.revUV(); return this; }
     /** reverse normal direction by reversing V direction (UV and normal is dependent */
     public ISurface revN(){ surface.revN(); return this; }
+    /** alias of revU() */
+    public ISurface flipU(){ return revU(); }
+    /** alias of revV() */
+    public ISurface flipV(){ return revV(); }
+    /** alias of revUV() */
+    public ISurface flipUV(){ return revUV(); }
+    /** alias of flipN() */
+    public ISurface flipN(){ return revN(); }
+    
     /** swap U and V parameter */
     public ISurface swapUV(){ surface.swapUV(); return this; }
     
@@ -737,6 +746,10 @@ public class ISurface extends IGeometry implements ISurfaceI{
     
     public ISurface name(String nm){ super.name(nm); return this; }
     public ISurface layer(ILayer l){ super.layer(l); return this; }
+    public ISurface layer(String l){ super.layer(l); return this; }
+
+    public ISurface attr(IAttribute at){ super.attr(at); return this; }
+
 
     public ISurface hide(){ super.hide(); return this; }
     public ISurface show(){ super.show(); return this; }

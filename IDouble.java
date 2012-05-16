@@ -109,7 +109,7 @@ public class IDouble extends IParameterObject implements IDoubleI, IEntityParame
     //public IBool eqR(IDoubleI v){ return new IBool(eq(v.get(),IConfig.tolerance)); }
     public boolean eq(ISwitchE e, IDoubleI v){ return eq(v); }
     public IBool eq(ISwitchR r, IDoubleI v){ return new IBool(eq(v)); }
-
+    
     public boolean eq(double v, double resolution){ return Math.abs(x-v)<=resolution; }
     public boolean eq(IDouble v, double resolution){ return Math.abs(x-v.x)<=resolution; }
     public boolean eq(IDoubleI v, double resolution){ return Math.abs(x-v.x())<=resolution; }
@@ -134,6 +134,6 @@ public class IDouble extends IParameterObject implements IDoubleI, IEntityParame
 	return true;
     }
     
-    //public static boolean eq(double v1, double v2){ return eq(v1,v2,IConfig.tolerance); }
-    //public static boolean eq(double v1, double v2, double resolution){ return Math.abs(v1-v2)<=resolution; }
+    //public static boolean eq(double v1, double v2){ return eq(v1,v2,IConfig.tolerance); } //--> IG.java
+    //public static boolean eq(double v1, double v2, double resolution){ return Math.abs(v1-v2)<=resolution; } //->IG.java
 }

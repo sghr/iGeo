@@ -1068,7 +1068,7 @@ public class IRhino3dmImporter extends IRhino3dm{
     }
     
     
-    public void readSettingsTable(Chunk chunk){
+    public void readSettingsTable(Chunk chunk) throws IOException{
 	IOut.debug(10,"Rhino3dmImporter.readSettings"); //
 	
 	Chunk[] chunks = readChunkTable(chunk);
@@ -1084,61 +1084,61 @@ public class IRhino3dmImporter extends IRhino3dm{
 	    
 	    switch(ck.header){
 	    case tcodeSettingsPluginList:
-		settings.setPluginList(ck);
+		settings.setPluginList(file,ck);
 		break;
-	    case tcodeSettingsUnitStandTols:
-		settings.setUnitStandTols(ck);
+	    case tcodeSettingsUnitsAndTols:
+		settings.setUnitsAndTols(file,ck);
 		break;
 	    case tcodeSettingsRenderMesh:
-		settings.setRenderMesh(ck);
+		settings.setRenderMesh(file,ck);
 		break;
 	    case tcodeSettingsAnalysisMesh:
-		settings.setAnalysisMesh(ck);
+		settings.setAnalysisMesh(file,ck);
 		break;
 	    case tcodeSettingsAnnotation:
-		settings.setAnnotation(ck);
+		settings.setAnnotation(file,ck);
 		break;
 	    case tcodeSettingsNamedCPlaneList:
-		settings.setNamedCPlaneList(ck);
+		settings.setNamedCPlaneList(file,ck);
 		break;
 	    case tcodeSettingsNamedViewList:
-		settings.setNamedViewList(ck);
+		settings.setNamedViewList(file,ck);
 		break;
 	    case tcodeSettingsViewList:
-		settings.setViewList(ck);
+		settings.setViewList(file,ck);
 		break;
 	    case tcodeSettings_Never_Use_This:
 		// do nothing
 		break;
 	    case tcodeSettingsCurrentLayerIndex:
-		settings.setCurrentLayerIndex(ck);
+		settings.setCurrentLayerIndex(file,ck);
 		break;
 	    case tcodeSettingsCurrentFontIndex:
-		settings.setCurrentFontIndex(ck);
+		settings.setCurrentFontIndex(file,ck);
 		break;
 	    case tcodeSettingsCurrentDimStyleIndex:
-		settings.setCurrentDimStyleIndex(ck);
+		settings.setCurrentDimStyleIndex(file,ck);
 		break;
 	    case tcodeSettingsCurrentMaterialIndex:
-		settings.setCurrentMaterialIndex(ck);
+		settings.setCurrentMaterialIndex(file,ck);
 		break;
 	    case tcodeSettingsCurrentColor:
-		settings.setCurrentColor(ck);
+		settings.setCurrentColor(file,ck);
 		break;
 	    case tcodeSettingsCurrentWireDensity:
-		settings.setCurrentWireDensity(ck);
+		settings.setCurrentWireDensity(file,ck);
 		break;
 	    case tcodeSettingsRender:
-		settings.setRender(ck);
+		settings.setRender(file,ck);
 		break;
 	    case tcodeSettingsGridDefaults:
-		settings.setGridDefaults(ck);
+		settings.setGridDefaults(file,ck);
 		break;
 	    case tcodeSettingsModelURL:
-		settings.setModelURL(ck);
+		settings.setModelURL(file,ck);
 		break;
 	    case tcodeSettingsAttributes:
-		settings.setAttributes(ck);
+		settings.setAttributes(file,ck);
 		break;
 	    default:
 		IOut.err("unknown type code: "+hex(ck.header));

@@ -188,10 +188,12 @@ public interface ICurveI extends ICurveOp, ITransformable{
     public boolean isClosed(ISwitchE e);
     public IBoolI isClosed(ISwitchR r);
     
-    /** reverse self curve ; not creating a new object
-     */
+    /** reverse U coordintates direction of curve, without creating a new object */
     public ICurveI rev();
-    
+    /** alias of rev() */
+    public ICurveI revU();
+    /** alias of rev() */
+    public ICurveI flipU();
     
     
     /***************************************************************************

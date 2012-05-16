@@ -188,8 +188,23 @@ public class IRhino3dmExporter extends IRhino3dm{
 	writeChunkTable(tcodePropertiesTable, chunks);
     }
     
+    
     public void writeSettings() throws IOException{
-	writeChunkTable(tcodeSettingsTable);
+
+	if(file!=null && file.settings!=null && file.settings.unitsAndTolerances!=null &&
+	   file.settings.unitsAndTolerances.unitSystem!=null){
+	    
+	    Chunk[] chunks = new Chunk[1];
+	    
+	    ChunkOutputStream cos = new ChunkOutputStream(tcodeSettingsUnitsAndTols);
+	    file.settings.unitsAndTolerances.write(file, cos, cos.getCRC());
+	    chunks[0] = cos.getChunk();
+	    
+	    writeChunkTable(tcodeSettingsTable, chunks);
+	}
+	else{
+	    writeChunkTable(tcodeSettingsTable);
+	}
     }
     
     public void writeBitmapTable() throws IOException{

@@ -130,6 +130,16 @@ public class IBrep extends IGeometry implements ITransformable{
     
     @Override public IBrep dup(){ return new IBrep(this); }
     
+    
+    /** checking parameters validity. */
+    public boolean isValid(){
+	if(surfaces==null || surfaces.length==0) return false;
+	for(int i=0; i<surfaces.length; i++){
+	    if(!surfaces[i].isValid()) return false;
+	}
+	return true;
+    }
+    
     /*
     @Override public void del(){
 	super.del();
@@ -139,6 +149,9 @@ public class IBrep extends IGeometry implements ITransformable{
     
     public IBrep name(String nm){ super.name(nm); return this; }
     public IBrep layer(ILayer l){ super.layer(l); return this; }
+    public IBrep layer(String l){ super.layer(l); return this; }
+    
+    public IBrep attr(IAttribute at){ super.attr(at); return this; }
     
     public IBrep hide(){ super.hide(); return this; }
     public IBrep show(){ super.show(); return this; }

@@ -762,7 +762,11 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	return this;
     }
     
-    
+    /** alias of rev() */
+    public ICurveGeo revU(){ return rev(); }
+    /** alias of rev() */
+    public ICurveGeo flipU(){ return rev(); }
+        
     
     /********************************************************************************
      * transformation methods

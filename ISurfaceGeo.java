@@ -1212,6 +1212,16 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     /** reverse normal direction. just reversing V direction. the normal direction is not
 	independent from U and V direction. */
     public ISurfaceGeo revN(){ return revV(); }
+
+    
+    /** alias of revU() */
+    public ISurfaceGeo flipU(){ return revU(); }
+    /** alias of revV() */
+    public ISurfaceGeo flipV(){ return revV(); }
+    /** alias of revUV() */
+    public ISurfaceGeo flipUV(){ return revUV(); }
+    /** alias of flipN() */
+    public ISurfaceGeo flipN(){ return revN(); }
     
     
     /** swap U and V parameter */

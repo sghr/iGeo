@@ -164,6 +164,11 @@ public class ICurveR extends IObject implements ICurveI{
     public IBoolI isClosed(ISwitchR r){ return curve.isClosed(r); } // should be new IsClosd(surface) ?
     
     public ICurveR rev(){ curve.rev(); return this; }
+    /** alias of rev() */
+    public ICurveR revU(){ return rev(); }
+    /** alias of rev() */
+    public ICurveR flipU(){ return rev(); }
+    
     
     
     /******************************************************************************

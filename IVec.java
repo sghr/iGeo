@@ -937,6 +937,10 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public IVec getNormal(IVec pt2, IVec pt3){ return nml(pt2,pt3); }
     
     
+    public IVec projectToPlane(IVecI planeNormal){
+        return projectToPlane(planeNormal,planeNormal);
+    }
+
     public IVec projectToPlane(IVecI projectDir, IVecI planeNormal){
 	double ipRatio = dot(planeNormal)/projectDir.dot(planeNormal);
 	x -= ipRatio*projectDir.x();

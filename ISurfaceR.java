@@ -220,6 +220,15 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public ISurfaceR revUV(){ surface.revUV(); return this; }
     /** reverse normal direction by reversing V direction (UV and normal is dependent */
     public ISurfaceR revN(){ surface.revN(); return this; }
+    /** alias of revU() */
+    public ISurfaceR flipU(){ return revU(); }
+    /** alias of revV() */
+    public ISurfaceR flipV(){ return revV(); }
+    /** alias of revUV() */
+    public ISurfaceR flipUV(){ return revUV(); }
+    /** alias of flipN() */
+    public ISurfaceR flipN(){ return revN(); }
+        
     /** swap U and V parameter */
     public ISurfaceR swapUV(){ surface.swapUV(); return this; }
     

@@ -374,6 +374,13 @@ public class IObject{
 	syncColor();
 	return this;
     }
+    /** to set color, with alpha value overwritten */
+    public IObject clr(Color c, float alpha){
+	if(attribute==null) attribute = new IAttribute();
+	attribute.clr(c,alpha);
+	syncColor();
+	return this;
+    }
     public IObject clr(int gray){
 	if(attribute==null) attribute = new IAttribute();
 	attribute.clr(gray);

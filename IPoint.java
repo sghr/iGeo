@@ -497,6 +497,10 @@ public class IPoint extends IGeometry implements IVecI{
     
     public IPoint name(String nm){ super.name(nm); return this; }
     public IPoint layer(ILayer l){ super.layer(l); return this; }
+    public IPoint layer(String l){ super.layer(l); return this; }
+
+    public IPoint attr(IAttribute at){ super.attr(at); return this; }
+
     
     public IPoint hide(){ super.hide(); return this; }
     public IPoint show(){ super.show(); return this; }

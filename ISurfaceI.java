@@ -190,12 +190,24 @@ public interface ISurfaceI extends ISurfaceOp, ITransformable{
     public ISurfaceI revU();
     /** reverse V parameter internally without creating a new instance */
     public ISurfaceI revV();
-    /** reverse U and V parameter internally without creating a new instance */
+    /** reverse both U and V parameter internally without creating a new instance */
     public ISurfaceI revUV();
     /** reverse normal direction by reversing V direction (UV and normal is dependent */
     public ISurfaceI revN();
+    
+    /** alias of revU() */
+    public ISurfaceI flipU();
+    /** alias of revV() */
+    public ISurfaceI flipV();
+    /** alias of revUV() */
+    public ISurfaceI flipUV();
+    /** alias of flipN() */
+    public ISurfaceI flipN();
+    
     /** swap U and V parameter */
     public ISurfaceI swapUV();
+    
+    
     
     
     // trim

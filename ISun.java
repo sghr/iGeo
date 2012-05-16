@@ -1257,6 +1257,14 @@ public class ISun {
 	return this;
     }
     
+    public double hourAt(int year, int month, int day, boolean daylightSavingTime,
+			 IVec azimuthDir, IVec northDir){
+	//project onto xy plane
+	double az = -azimuthDir.cp().z(0).angle(northDir.cp().z(0), IVec.zaxis);
+	az *= 180/Math.PI;
+	if(az < 0) az+=360;
+	return hourAt(year,month,day,daylightSavingTime,az);
+    }
     
     /** search hour in the specified date when sun comes in the direction of azimuth */
     public double hourAt(int year, int month, int day, boolean daylightSavingTime, double azimuth){

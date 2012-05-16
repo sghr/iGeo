@@ -465,7 +465,10 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
     
     public ITrimCurve rev(){ super.rev(); return this; }
     
-    
+    /** alias of rev() */
+    public ITrimCurve revU(){ return rev(); }
+    /** alias of rev() */
+    public ITrimCurve flipU(){ return rev(); }
     
     
     /********************************************************************************
