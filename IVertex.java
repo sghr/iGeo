@@ -44,9 +44,15 @@ public class IVertex implements IVecI{
     
     public IVertex(){ pos = new IVec(); init(); }
     public IVertex(double x, double y, double z){ pos = new IVec(x,y,z); init(); }
-    public IVertex(IVec p){ pos=p; init(); }
-    public IVertex(IVec4 p){ pos=p; init(); }
-    public IVertex(IVecI p){ pos=p; init(); }
+
+    //public IVertex(IVec p){ pos=p; init(); }
+    //public IVertex(IVec4 p){ pos=p; init(); }
+    //public IVertex(IVecI p){ pos=p; init(); }
+    
+    // 20120614 cp() is added to avoid redundant transformation on different vertices but sharing same IVecI pos. 
+    public IVertex(IVec p){ pos=p.cp(); init(); }
+    public IVertex(IVec4 p){ pos=p.cp(); init(); }
+    public IVertex(IVecI p){ pos=p.cp(); init(); }
     
     public IVertex(IVertex v){
 	edges = new ArrayList<IEdge>();
@@ -417,9 +423,9 @@ public class IVertex implements IVecI{
     
     /** alias of cross. (not unitized ... ?) returns IVecI */
     //public IVertex nml(IVecI v){ return cross(v); }
-    public IVecI nml(IVecI v){ return pos.nml(v); }
-    // IVertex.nml is different function from what IVecI intend
-    //public IVecI nml(double vx, double vy, double vz){ return pos.nml(vx,vy,vz); }
+    public IVecI nml(IVecI v){ return pos.nml(v); } // coliding with nml(IVec) setting normal dir of vertex !!!!!!!!!!!!!!
+    // IVertex.nml is different function from what IVecI intend - updated ; nml -> setNml
+    public IVecI nml(double vx, double vy, double vz){ return pos.nml(vx,vy,vz); }
     /** create normal vector from 3 points of self, pt1 and pt2 */
     //public IVertex nml(IVecI pt1, IVecI pt2){ return this.diff(pt1).cross(this.diff(pt2)).unit(); }
     public IVecI nml(IVecI pt1, IVecI pt2){ return pos.nml(pt1,pt2); }
@@ -441,25 +447,38 @@ public class IVertex implements IVecI{
     public void calcNormal(){
 	normal = getAverageNormal();
     }
-    /** getting normal */
+    
+    /** getting normal (alias) */
     public IVecI normal(){ return nml(); }
     /** getting normal */
-    public IVecI nrml(){ return nml(); }
+    //public IVecI nrml(){ return nml(); }
     /** getting normal */
     public IVecI nml(){
 	if(normal==null) calcNormal();
 	return normal;
     }
+    /** getting normal (alias) */
+    public IVecI getNormal(){ return nml(); }
+    /** getting normal (alias) */
+    public IVecI getNml(){ return nml(); }
+    
+    
     //public IVecI nrml(){ return normal.dup(); } //1. why dup? 2. crash if normal is null.
     
-    public IVertex normal(IVec n){ return nml(n); }
-    public IVertex normal(double x, double y, double z){ return nml(x,y,z); }
-    public IVertex nrml(IVec n){ return nml(n); }
-    public IVertex nrml(double x, double y, double z){ return nml(x,y,z); }
+    // setting normal : nml(IVecI) is taken by IVecI. instead setNml(IVecI) or setNormal(IVecI)
+    public IVertex setNormal(IVecI n){ return setNml(n); }
+    public IVertex setNormal(double x, double y, double z){ return setNml(x,y,z); }
+    public IVertex setNml(IVecI n){ normal = n; return this; }
+    public IVertex setNml(double x, double y, double z){ return setNml(new IVec(x,y,z)); }
+    
+    //public IVertex normal(IVec n){ return nml(n); }
+    //public IVertex normal(double x, double y, double z){ return nml(x,y,z); }
+    //public IVertex nrml(IVec n){ return nml(n); }
+    //public IVertex nrml(double x, double y, double z){ return nml(x,y,z); }
     /** setting normal; this nml has different function from IVecI's nml */
-    public IVertex nml(IVec n){ normal = n; return this; }
+    //public IVertex nml(IVec n){ normal = n; return this; }
     /** setting normal; this nml has different function from IVecI's nml */
-    public IVertex nml(double x, double y, double z){ return nml(new IVec(x,y,z)); }
+    //public IVertex nml(double x, double y, double z){ return nml(new IVec(x,y,z)); }
     
     
     public boolean isValid(){ if(pos==null){ return false; } return pos.isValid(); }

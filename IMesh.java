@@ -175,7 +175,7 @@ public class IMesh extends IGeometry implements IMeshI{
     
     public IGraphicObject createGraphic(IGraphicMode m){
 	if(m.isNone()) return null;
-        if(m.isGL()) return new IMeshGraphicGL(this); 
+        if(m.isGraphic3D()) return new IMeshGraphicGL(this); 
         return null;
     }
     
@@ -202,6 +202,20 @@ public class IMesh extends IGeometry implements IMeshI{
     
     // necessary? shold this be here?
     public IMesh addFace(IFace f){ mesh.addFace(f); return this; }
+    
+    // OpenGL way of adding mesh faces
+    public IMesh addTriangles(IVertex[] v){ mesh.addTriangles(v); resetGraphic(); return this; }
+    public IMesh addTriangles(IVec[] v){ mesh.addTriangles(v); resetGraphic(); return this; }
+    public IMesh addQuads(IVertex[] v){ mesh.addQuads(v); resetGraphic(); return this; }
+    public IMesh addQuads(IVec[] v){ mesh.addQuads(v); resetGraphic(); return this; }
+    public IMesh addPolygon(IVertex[] v){ mesh.addPolygon(v); resetGraphic(); return this; }
+    public IMesh addPolygon(IVec[] v){ mesh.addPolygon(v); resetGraphic(); return this; }
+    public IMesh addTriangleStrip(IVertex[] v){ mesh.addTriangleStrip(v); resetGraphic(); return this; }
+    public IMesh addTriangleStrip(IVec[] v){ mesh.addTriangleStrip(v); resetGraphic(); return this; }
+    public IMesh addQuadStrip(IVertex[] v){ mesh.addQuadStrip(v); resetGraphic(); return this; }
+    public IMesh addQuadStrip(IVec[] v){ mesh.addQuadStrip(v); resetGraphic(); return this; }
+    public IMesh addTriangleFan(IVertex[] v){ mesh.addTriangleFan(v); resetGraphic(); return this; }
+    public IMesh addTriangleFan(IVec[] v){ mesh.addTriangleFan(v); resetGraphic(); return this; }
     
     
     
@@ -253,7 +267,9 @@ public class IMesh extends IGeometry implements IMeshI{
     public IMesh setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IMesh setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
-
+    public IMesh weight(double w){ super.weight(w); return this; }
+    public IMesh weight(float w){ super.weight(w); return this; }
+    
 
     /*************************************************************************************
      * static mesh geometry operations
@@ -440,9 +456,9 @@ public class IMesh extends IGeometry implements IMeshI{
     
     
     /** translate() is alias of add() */
-    public IMesh translate(double x, double y, double z){ return add(x,y,z); }
-    public IMesh translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
-    public IMesh translate(IVecI v){ return add(v); }
+    public IMesh translate(double x, double y, double z){ mesh.translate(x,y,z); return this; }
+    public IMesh translate(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.translate(x,y,z); return this; }
+    public IMesh translate(IVecI v){ mesh.translate(v); return this; }
     
     
     public IMesh transform(IMatrix3I mat){ mesh.transform(mat); return this; }

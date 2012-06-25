@@ -217,8 +217,8 @@ public class ITrimCurveGraphic{
 	if(idx>=surf.uepNum()-1) return null; // nothing to fill
 	if(!(surf.u(idx,0)<=min && surf.u(idx+1,0)>=min) ) return null;
 	
-	int reso = IConfig.surfaceIsoparmResolution*
-	    IConfig.surfaceWireframeResolution;
+	int reso =
+	    (IConfig.isoparmResolution>0?IConfig.isoparmResolution:1)*IConfig.segmentResolution;
 	
 	ArrayList<Double> ulist = new ArrayList<Double>();
 	for(; idx<surf.uepNum() && surf.u(idx,0)<max; idx++){
@@ -262,8 +262,8 @@ public class ITrimCurveGraphic{
 	if(idx>=surf.vepNum()-1){ return null; } // nothing to fill
 	if(!(surf.v(idx,0)<=min && surf.v(idx+1,0)>=min) ){ return null; }
 	
-	int reso = IConfig.surfaceIsoparmResolution*
-	    IConfig.surfaceWireframeResolution;
+	int reso =
+	    (IConfig.isoparmResolution>0?IConfig.isoparmResolution:1)*IConfig.segmentResolution;
 	
 	ArrayList<Double> vlist = new ArrayList<Double>();
 	for(; idx<surf.vepNum() && surf.v(idx,0)<max; idx++){
@@ -293,7 +293,7 @@ public class ITrimCurveGraphic{
     }
     
     public IVec2[] createUVPoints(){
-	int reso = IConfig.surfaceIsoparmResolution*IConfig.surfaceWireframeResolution;
+	int reso = IConfig.isoparmResolution*IConfig.segmentResolution;
 	if(curve.deg()==1){
 	    int num = curve.cpNum();
 	    uvpts = new IVec2[num];
@@ -316,7 +316,7 @@ public class ITrimCurveGraphic{
     }
     
     public IVec[] createPoints(){
-	int reso = IConfig.surfaceIsoparmResolution*IConfig.surfaceWireframeResolution;
+	int reso = IConfig.isoparmResolution*IConfig.segmentResolution;
 	if(uvpts==null) createUVPoints();
 
 	if(curve.surface.udeg()==1 && curve.surface.vdeg()==1 &&

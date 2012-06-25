@@ -63,15 +63,21 @@ public class IG implements IServerI{
      ************************************/
     public static final Object lock = new Object();
     
-    public static final String GL = "igeo.p.PIGraphicsGL"; // for processing graphics
-    //public static final String JAVA = "igeo.p.PIGraphicsJava"; // for processing graphics
+    /** Processing Graphics using OpenGL to be put in size() method in Processing */
+    public static final String GL = "igeo.p.PIGraphicsGL"; 
+    
+    /** Processing Graphics using P3D to be put in size() method in Processing; under development. do not use yet. */
+    public static final String P3D = "igeo.p.PIGraphics3D";
+    
+    /** Processing Graphics using JAVA to be put in size() method in Processing; to be implemented */
+    //public static final String JAVA = "igeo.p.PIGraphicsJava";
     
     /** multiple IG instances are stored in iglist and switched by IG static methods
 	in case of applet execution or other occasion but handling of multiple IG
 	instances and switching are not really tested. */
     protected static ArrayList<IG> iglist=null;
     protected static int currentId = -1;
-
+    
     
     /************************************
      * static geometry variables
@@ -104,7 +110,10 @@ public class IG implements IServerI{
     /*protected*/ public String outputFile;
     
     /** base file path for file I/O */
-    public String basePath = ".";
+    public String basePath = null; //".";
+
+    /** wrapping inputs in different environment. replacing basePath. */
+    public IInputWrapper inputWrapper=null;
     
     /* *
        initialize whole IG system with IServer and graphical components
@@ -533,14 +542,16 @@ public class IG implements IServerI{
     
     /** set wireframe graphic mode */
     public static void wireframe(){
-	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
+	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.J2D;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,false,true,false));
     }
+    /** alias of wireframe() */
+    public static void wire(){ wireframe(); }
     
     /** set fill graphic mode */
     public static void fill(){
-	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
+	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.J2D;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,false,false));
     }
@@ -550,33 +561,47 @@ public class IG implements IServerI{
     /** set fill+wireframe graphic mode */
     public static void fillWireframe(){ wireframeFill(); }
     /** set fill+wireframe graphic mode */
+    public static void fillWire(){ wireframeFill(); }
+    /** set fill+wireframe graphic mode */
     public static void wireframeFill(){
-	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
+	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.J2D;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,true,false));
     }
+    /** set fill+wireframe graphic mode */
+    public static void wireFill(){ wireframeFill(); }
     
     /** set transparent fill graphic mode */
     public static void transparentFill(){ transparent(); }
     /** set transparent fill graphic mode */
+    public static void transFill(){ transparent(); }
+    /** set transparent fill graphic mode */
     public static void transparent(){
-	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
+	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.J2D;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,false,true));
     }
+    /** alias of transparent() */
+    public static void trans(){ transparent(); }
+    
     /** set transparent fill+wireframe graphic mode */
     public static void transparentFillWithWireframe(){ wireframeTransparent(); }
     /** set transparent fill+wireframe graphic mode */
     public static void transparentWireframe(){ wireframeTransparent(); }
     /** set transparent fill+wireframe graphic mode */
     public static void wireframeTransparent(){
-	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
+	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.J2D;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,true,true,true));
     }
+    /** alias of wireframeTransparent() */
+    public static void wireTrans(){ wireframeTransparent(); }
+    /** alias of wireframeTransparent() */
+    public static void transWire(){ wireframeTransparent(); }
+    
     
     public static void noGraphic(){
-	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.JAVA;
+	IGraphicMode.GraphicType gtype = IGraphicMode.GraphicType.J2D;
 	if(isGL()) gtype = IGraphicMode.GraphicType.GL;
 	graphicMode(new IGraphicMode(gtype,false,false,false));
     }
@@ -638,7 +663,10 @@ public class IG implements IServerI{
     /** put top view on the full screen inside the window */
     public static void top(){
 	IPane pane = topPane();
-	if(pane!=null){ pane.getView().setTop(); }
+	if(pane!=null){
+	    pane.getView().setTop();
+	    pane.focus(); // added 20120615
+	}
     }
     public static void top(double x, double y){
 	IPane pane = topPane();
@@ -662,7 +690,10 @@ public class IG implements IServerI{
     /** put bottom view on the full screen inside the window */
     public static void bottom(){
 	IPane pane = bottomPane();
-	if(pane!=null){ pane.getView().setBottom(); }
+	if(pane!=null){
+	    pane.getView().setBottom();
+	    pane.focus(); // added 20120615
+	}
     }
     public static void bottom(double x, double y){
 	IPane pane = bottomPane();
@@ -685,7 +716,10 @@ public class IG implements IServerI{
     /** put perspective view on the full screen inside the window */
     public static void perspective(){
 	IPane pane = perspectivePane();
-	if(pane!=null){ pane.getView().setPerspective(); }
+	if(pane!=null){
+	    pane.getView().setPerspective();
+	    pane.focus(); // added 20120615
+	}
     }
     public static void perspective(double x, double y, double z){
 	IPane pane = perspectivePane();
@@ -748,7 +782,10 @@ public class IG implements IServerI{
     /** put axonometric view on the full screen inside the window */
     public static void axonometric(){
 	IPane pane = axonometricPane();
-	if(pane!=null){ pane.getView().setAxonometric(); }
+	if(pane!=null){
+	    pane.getView().setAxonometric();
+	    pane.focus(); // added 20120615
+	}
     }
     public static void axonometric(double x, double y, double z){
 	IPane pane = axonometricPane();
@@ -799,7 +836,10 @@ public class IG implements IServerI{
     /** put front view on the full screen inside the window */
     public static void front(){
 	IPane pane = frontPane();
-	if(pane!=null){ pane.getView().setFront(); }
+	if(pane!=null){
+	    pane.getView().setFront();
+	    pane.focus(); // added 20120615
+	}
     }
     public static void front(double x, double z){
 	IPane pane = frontPane();
@@ -821,7 +861,10 @@ public class IG implements IServerI{
     /** put back view on the full screen inside the window */
     public static void back(){
 	IPane pane = backPane();
-	if(pane!=null){ pane.getView().setBack(); }
+	if(pane!=null){
+	    pane.getView().setBack();
+	    pane.focus(); // added 20120615
+	}
     }
     public static void back(double x, double z){
 	IPane pane = backPane();
@@ -843,7 +886,10 @@ public class IG implements IServerI{
     /** put right view on the full screen inside the window */
     public static void right(){
 	IPane pane = rightPane();
-	if(pane!=null){ pane.getView().setRight(); }
+	if(pane!=null){
+	    pane.getView().setRight();
+	    pane.focus(); // added 20120615
+	}
     }
     public static void right(double y, double z){
 	IPane pane = rightPane();
@@ -865,7 +911,10 @@ public class IG implements IServerI{
     /** put left view on the full screen inside the window */
     public static void left(){
 	IPane pane = leftPane();
-	if(pane!=null){ pane.getView().setLeft(); }
+	if(pane!=null){
+	    pane.getView().setLeft();
+	    pane.focus(); // added 20120615
+	}
     }
     public static void left(double y, double z){
 	IPane pane = leftPane();
@@ -1044,9 +1093,13 @@ public class IG implements IServerI{
     }
     
     public boolean openFile(String file){
-	File f = new File(file);
-	if(!f.isAbsolute() && basePath!=null) file = basePath + File.separator + file;
-	boolean retval = IIO.open(file,this);
+	boolean retval = false;
+	if(inputWrapper!=null){ retval = IIO.open(file,this,inputWrapper); }
+	else{
+	    File f = new File(file);
+	    if(!f.isAbsolute() && basePath!=null) file = basePath + File.separator + file;
+	    retval = IIO.open(file,this);
+	}
 	server.updateState(); // update server status
 	inputFile = file;
 	focusView();
@@ -1083,6 +1136,8 @@ public class IG implements IServerI{
     
     public String getBasePath(){ return basePath; }
     public String setBasePath(String path){ return basePath=path; }
+    
+    public void setInputWrapper(IInputWrapper wrapper){ inputWrapper = wrapper; }
     
     public ILayer getLayer(String layerName){ return server.getLayer(layerName); }
     public ILayer getLayer(int i){ return server.getLayer(i); }

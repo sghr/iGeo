@@ -143,5 +143,7 @@ public class ISphere extends ISurface{
     public ISphere setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public ISphere setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public ISphere weight(double w){ super.weight(w); return this; }
+    public ISphere weight(float w){ super.weight(w); return this; }
     
 }

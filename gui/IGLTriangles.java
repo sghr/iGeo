@@ -35,7 +35,7 @@ import igeo.*;
 */
 public class IGLTriangles extends IGLElement{
     
-    public IGLTriangles(IVec[][] triangles){
+    private IGLTriangles(IVec[][] triangles){
 	super(triangles.length*3);
 	for(int i=0; i<triangles.length; i++){
 	    pts[i*3] = triangles[i][0];
@@ -44,7 +44,7 @@ public class IGLTriangles extends IGLElement{
 	}
     }
     
-    public IGLTriangles(IVec[][] triangles, IVec[][] normals){
+    private IGLTriangles(IVec[][] triangles, IVec[][] normals){
 	super(triangles.length*3);
 	setNormalNum(triangles.length*3);
 	for(int i=0; i<triangles.length; i++){

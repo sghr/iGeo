@@ -62,9 +62,8 @@ public class IIsoparmGraphic{
     }
     
     public void init(ISurfaceI surface, double param, boolean uOrV){
-	int reso = IConfig.surfaceIsoparmResolution*
-	    IConfig.surfaceWireframeResolution;
-		
+	int reso = IConfig.isoparmResolution*IConfig.segmentResolution;
+	
 	// polyline2 is not created
 	polyline2 = new IPolyline2D[1];
 	polyline = new IPolyline[1];
@@ -128,8 +127,7 @@ public class IIsoparmGraphic{
 	
 	if(outtrims==null && intrims==null){ init(surface,param,uOrV); return; }
 	
-	int reso = IConfig.surfaceIsoparmResolution*
-	    IConfig.surfaceWireframeResolution;
+	int reso = IConfig.isoparmResolution * IConfig.segmentResolution;
 	
 	IPolyline2D[] outline = null;
 	if(outtrims!=null){

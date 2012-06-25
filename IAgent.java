@@ -225,6 +225,9 @@ public class IAgent extends IObject implements IDynamics{
     public IAgent hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
     public IAgent hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public IAgent hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
+
+    public IAgent weight(float w){ super.weight(w); return this; }
+    public IAgent weight(double w){ super.weight(w); return this; }
     
     public IAgent setColor(Color c){ super.setColor(c); return this; }
     public IAgent setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }

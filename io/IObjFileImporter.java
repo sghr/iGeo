@@ -497,7 +497,7 @@ public class IObjFileImporter {
 		for(int i=0; i<num; i++){
 		    vtx[i] = (IVertex)v[i].getVertex();
 		    if(vt[i]!=null) vtx[i].texture(vt[i].getVertex().to2d());
-		    if(vn[i]!=null) vtx[i].normal(vn[i].getVertex());
+		    if(vn[i]!=null) vtx[i].setNormal(vn[i].getVertex());
 		}
 		
 		IEdge[] edg = new IEdge[num];
@@ -1240,6 +1240,17 @@ public class IObjFileImporter {
         try{ return IObjFileImporter.read(new FileReader(file), server); }
         catch(IOException e){ e.printStackTrace(); }
 	return null; 
+    }
+    
+    /**
+       Reading an OBJ file and creating objects in a server.
+       The main entry of the importer class.
+       @param stream An input stream.
+       @param server A server interface to put imported objects in. 
+       @return ArrayList of created IObject.
+    */
+    static public ArrayList<IObject> read(InputStream stream, IServerI server){
+        return IObjFileImporter.read(new InputStreamReader(stream), server);
     }
     
     /**

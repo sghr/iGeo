@@ -77,6 +77,8 @@ public class IBounds{
     
     public void compare(IObject e){
 	synchronized(e){
+	    if(!e.visible()) return; // if e is in the middle of constructor, this should be false.
+	    
 	    if(e instanceof IPoint){
 		IPoint p = (IPoint)e;
 		compare(p.get());

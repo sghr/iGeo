@@ -87,6 +87,8 @@ public class IObjFileExporter{
 	
 	IObjFileExporter export = new IObjFileExporter();
 	export.write(ps, server);
+	
+	ps.close();
 	return true;
     }
     
@@ -108,6 +110,8 @@ public class IObjFileExporter{
 	
 	IObjFileExporter export = new IObjFileExporter();
 	export.write(ps, server);
+	
+	ps.close();
 	return true;
     }
     

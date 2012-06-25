@@ -104,7 +104,23 @@ public class IRhino3dmImporter extends IRhino3dm{
     
     public static byte[] read(InputStream is, int len) throws IOException{
 	byte[] buf = new byte[len];
+	int ptr=0;
 	int res=0;
+	while(ptr<len){ // is this safe?
+	    res = is.read(buf,ptr,len-ptr);
+	    if(res<0){
+		if(ptr>0){ //if(ptr+res)<len){
+		    byte[] buf2 = new byte[ptr];
+		    System.arraycopy(buf,0,buf2,0,ptr);
+		    IOut.err("unexpected end of stream : len="+len+", ptr="+ptr+", res="+res);
+		    printAsciiOrHex(buf2,IOut.err);
+		    throw new IOException();
+		}
+		else{ throw new EOFException(); }
+	    }
+	    ptr += res;
+	}
+	/*
 	if( (res = is.read(buf,0,len)) != len ){
 	    if(res<0) throw new EOFException();
 	    else{
@@ -112,14 +128,13 @@ public class IRhino3dmImporter extends IRhino3dm{
 		    byte[] buf2 = new byte[res];
 		    System.arraycopy(buf,0,buf2,0,res);
 		    IOut.err("unexpected end of stream :");
-		    printAsciiOrHex(buf2,IOut.ps);
+		    printAsciiOrHex(buf2,IOut.err);
 		}
-		else{
-		    IOut.err("unexpected end of stream");
-		}
+		else{ IOut.err("unexpected end of stream"); }
 		throw new IOException();
 	    }
 	}
+	*/
 	return buf;
     }
     

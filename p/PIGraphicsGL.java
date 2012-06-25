@@ -45,27 +45,19 @@ import igeo.gui.*;
 public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener*/{
     
     public IPanel panel;
-    public IGraphics igg;
+    public IGraphicsGL igg;
     
-    /**
-       To draw Java2D graphic over OpenGL graphic.
-    */
+    /** To draw Java2D graphic over OpenGL graphic. */
     public Overlay overlay;
     
-    /**
-       Background color of overlay should be transparent.
-    */
+    /** Background color of overlay should be transparent. */
     static public Color overlayBG = new Color(0,0,0,0);
     
-    /**
-       To show iGeo correctly in Processing's basic mode, this needs to be true.
-    */
+    /** To show iGeo correctly in Processing's basic mode, this needs to be true. */
     public boolean overwritePAppletFinish=true;
     public boolean finished=false;
     
-    /**
-       To show iGeo correctly in Processing's basic mode, this needs to be true.
-    */
+    /** To show iGeo correctly in Processing's basic mode, this needs to be true. */
     public boolean overwritePAppletLoop=true;
     public boolean looping=true;
     
@@ -81,17 +73,22 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
     public void setParent(PApplet parent){
 	
 	super.setParent(parent);
-
+	
 	// initialize root GUI
 	panel = new IGridPanel(0,0,parent.getWidth(),parent.getHeight(),2,2);
-	panel.show();
+	panel.setVisible(true); 
 	
 	// initialize iGeo 
 	IG ig = IG.init(panel);
 	
 	ig.server().graphicServer().enableGL(); //
 	//ig.setBasePath(parent.sketchPath("")); // not sketchPath
-	ig.setBasePath(parent.dataPath("")); // for default path to read/write files
+	
+	if(!parent.online){ // only when running local
+	    ig.setBasePath(parent.dataPath("")); // for default path to read/write files
+	}
+	
+	ig.setInputWrapper(new PIInput(parent));
 	
 	parent.addMouseListener(panel);
 	parent.addMouseMotionListener(panel);
@@ -100,13 +97,17 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
 	parent.addFocusListener(panel);
 	parent.addComponentListener(panel);
 	
-	igg = new IGraphics();
+	//igg = new IGraphics();
+	igg = new IGraphicsGL();
 	
 	//noSmooth();
 	
 	if(PIConfig.drawBeforeProcessing) parent.registerPre(this);
 	else parent.registerDraw(this);
 	parent.registerPost(this);
+	
+	super.hints[DISABLE_OPENGL_2X_SMOOTH]=true;  //
+	super.hints[ENABLE_OPENGL_4X_SMOOTH]=true;  //
     }
     
     public void setGLProperties(){

@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with iGeo.  If not, see <http://www.gnu.org/licenses/>.
-
+    
 ---*/
 
 package igeo;
@@ -36,6 +36,9 @@ import igeo.gui.*;
 */
 public class IGraphicServer{
     
+    public static IGraphicMode defaultMode =
+	new IGraphicMode(IGraphicMode.GraphicType.GL, true, true, true); //
+    
     //boolean shareObjects = false;
     
     /*
@@ -48,12 +51,13 @@ public class IGraphicServer{
     HashMap<IView, ArrayList<IGraphicJavaTransparentI>> graphicsJavaTrans;
     */
     
-    
     //public ArrayList<IGraphicObject> graphicsGL;
     //public HashMap<IView, ArrayList<IGraphicObject>> graphicsJava;
     
-    public ArrayList<IGraphicI> graphicsGL;
-    public HashMap<IView, ArrayList<IGraphicI>> graphicsJava;
+    /** graphic elements keeping 3D info; no need to be sorted due to depth buffer */
+    public ArrayList<IGraphicI> graphics3D; //graphicsGL;
+    /** graphic elements already flattened in 2D; need to be sorted and vary depending on view */
+    public HashMap<IView, ArrayList<IGraphicI>> graphics2D; //graphicsJava;
     
     
     //ArrayList<IGraphicObject> graphicsGLWire;
@@ -82,7 +86,7 @@ public class IGraphicServer{
     }
     
     public void addView(IView v){ views.add(v); }
-
+    
     public IView view(int i){ return views.get(i); }
     
     public int viewNum(){ return views.size(); }
@@ -98,16 +102,16 @@ public class IGraphicServer{
     
     
     public void bg(Color c1, Color c2, Color c3, Color c4){
-	if(views!=null) for(IView v:views) v.setBGColor(c1,c2,c3,c4);
+	if(views!=null) for(IView v:views) v.bgColor(c1,c2,c3,c4);
     }
     public void background(Color c1, Color c2, Color c3, Color c4){ bg(c1,c2,c3,c4); }
     
     
     public void add(IObject e){
-	boolean isGL=false;
-	for(IView v: views) if(v.mode().isGL()) isGL=true;
+	boolean is3DGraphic=false;
+	for(IView v: views) if(v.mode().isGraphic3D()) is3DGraphic=true;
 	
-	if(isGL){
+	if(is3DGraphic){
 	    //IGraphicObject g = e.getGraphic(views.get(0).mode());
 	    IGraphicI g = e.getGraphic(views.get(0).mode());
 	    if(g!=null) add(g, views.get(0));
@@ -136,21 +140,21 @@ public class IGraphicServer{
     
     //public void add(IGraphicObject e, IView view){
     public void add(IGraphicI e, IView view){
-	if(view.mode().isGL()){
-	    //if(graphicsGL==null) graphicsGL = new ArrayList<IGraphicObject>();
-	    if(graphicsGL==null) graphicsGL = new ArrayList<IGraphicI>();
-	    graphicsGL.add(e);
+	if(view.mode().isGraphic3D()){
+	    //if(graphics3D==null) graphics3D = new ArrayList<IGraphicObject>();
+	    if(graphics3D==null) graphics3D = new ArrayList<IGraphicI>();
+	    graphics3D.add(e);
 	}
-	else if(view.mode().isJava()){
-	    if(graphicsJava==null)
-		//graphicsJava = new HashMap<IView, ArrayList<IGraphicObject>>();
-		graphicsJava = new HashMap<IView, ArrayList<IGraphicI>>();
-	    //ArrayList<IGraphicObject> objects = graphicsJava.get(view);
-	    ArrayList<IGraphicI> objects = graphicsJava.get(view);
+	else if(view.mode().isGraphic2D()){
+	    if(graphics2D==null)
+		//graphics2D = new HashMap<IView, ArrayList<IGraphicObject>>();
+		graphics2D = new HashMap<IView, ArrayList<IGraphicI>>();
+	    //ArrayList<IGraphicObject> objects = graphics2D.get(view);
+	    ArrayList<IGraphicI> objects = graphics2D.get(view);
 	    if(objects==null){
 		//objects = new ArrayList<IGraphicObject>();
 		objects = new ArrayList<IGraphicI>();
-		graphicsJava.put(view, objects);
+		graphics2D.put(view, objects);
 	    }
 	    objects.add(e);
 	}
@@ -170,7 +174,7 @@ public class IGraphicServer{
 		graphicsGLTrans.add(e);
 	    }
 	}
-	else if(view.mode().isJava()){
+	else if(view.mode().isJ2D()){
 	    if(view.mode().isWireframe()){
 		if(graphicsJavaWire==null)
 		    graphicsJavaWire = new HashMap<IView, ArrayList<IGraphicObject>>();
@@ -208,8 +212,8 @@ public class IGraphicServer{
     
     //public ArrayList<IGraphicObject> getObjects(IView view){
     public ArrayList<IGraphicI> getObjects(IView view){
-	if(view.mode().isGL()) return graphicsGL;
-	if(view.mode().isJava()) return graphicsJava.get(view);
+	if(view.mode().isGraphic3D()) return graphics3D;
+	if(view.mode().isGraphic2D()) return graphics2D.get(view);
 	return null;
 	/*
 	if(//shareObjects ||
@@ -218,7 +222,7 @@ public class IGraphicServer{
 	    if(view.mode().isFill()) return graphicsGLFill;
 	    if(view.mode().isTransparent()) return graphicsGLTrans;
 	}
-	else if(view.mode().isJava()){
+	else if(view.mode().isJ2D()){
 	    if(view.mode().isWireframe()) return graphicsJavaWire.get(view);
 	    if(view.mode().isFill()) return graphicsJavaFill.get(view);
 	    if(view.mode().isTransparent()) return graphicsJavaTrans.get(view);
@@ -234,19 +238,19 @@ public class IGraphicServer{
 	if(modes==null) modes = IGraphicMode.getAllModes();
 	for(IGraphicMode m : modes){
 	    if(g.isDrawable(m)){
-		if(m.isGL()){ graphicsGL.remove(g); }
-		else if(m.isJava()){
+		if(m.isGraphic3D()){ graphics3D.remove(g); }
+		else if(m.isGraphic2D()){
 		    for(IView v: views)
-			if(graphicsJava.get(v)!=null) graphicsJava.get(v).remove(g);
+			if(graphics2D.get(v)!=null) graphics2D.get(v).remove(g);
 		}
 		
 		/*
-		if(m.isGL()){
+		if(m.isGraphic3D()){
 		    if(m.isWireframe()) graphicsGLWire.remove(g);
 		    else if(m.isFill()) graphicsGLFill.remove(g);
 		    else if(m.isTransparent()) graphicsGLTrans.remove(g);
 		}
-		else if(m.isJava()){
+		else if(m.isGraphic2D()){
 		    if(m.isWireframe()){
 			for(IView v: views)
 			    if(graphicsJavaWire.get(v)!=null)
@@ -272,13 +276,13 @@ public class IGraphicServer{
     /** remove all the graphic objects
      */
     public void clearObjects(){
-	if(graphicsGL!=null){ graphicsGL.clear(); graphicsGL = null; }
-	if(graphicsJava!=null){
+	if(graphics3D!=null){ graphics3D.clear(); graphics3D = null; }
+	if(graphics2D!=null){
 	    for(IView v:views){
-		if(graphicsJava.get(v)!=null) graphicsJava.get(v).clear();
+		if(graphics2D.get(v)!=null) graphics2D.get(v).clear();
 	    }
-	    graphicsJava.clear();
-	    graphicsJava=null;
+	    graphics2D.clear();
+	    graphics2D=null;
 	}
 	
 	/*

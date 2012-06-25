@@ -245,6 +245,22 @@ public interface IVec2I extends IVec2Op{
     public IVec2I scale(IVec2I center, double f);
     /** scale from a center */
     public IVec2I scale(double centerX, double centerY, double f);
+
+    
+    
+    /** scale only in 1 direction */
+    public IVec2I scale1d(IVec2I axis, double f);
+    /** scale only in 1 direction */
+    public IVec2I scale1d(IVec2I axis, IDoubleI f);
+    /** scale only in 1 direction */
+    public IVec2I scale1d(double axisX, double axisY, double f);
+    /** scale only in 1 direction from a center */
+    public IVec2I scale1d(IVec2I center, IVec2I axis, double f);
+    /** scale only in 1 direction from a center */
+    public IVec2I scale1d(IVec2I center, IVec2I axis, IDoubleI f);
+    /** scale only in 1 direction from a center */
+    public IVec2I scale1d(double centerX, double centerY, double axisX, double axisY, double f);
+    
     
     /** reflect (mirror) 2 dimensionally to the other side of the line */
     public IVec2I ref(IVec2I lineDir);
@@ -264,12 +280,53 @@ public interface IVec2I extends IVec2Op{
     public IVec2I mirror(double centerX, double centerY, double lineX, double lineY);
     
     
-    //public IVec2I transform(IMatrix2I mat);
-    //public IVec2I transform(IMatrix3I mat);
+    /** shear operation on XY*/
+    public IVec2I shear(double sxy, double syx);
+    /** shear operation on XY*/
+    public IVec2I shear(IDoubleI sxy, IDoubleI syx);
+    /** shear operation on XY*/
+    public IVec2I shear(IVec2I center, double sxy, double syx);
+    /** shear operation on XY*/
+    public IVec2I shear(IVec2I center, IDoubleI sxy, IDoubleI syx);
+    
+    
+    /** alias of add() */
+    public IVec2I translate(double x, double y);
+    /** alias of add() */
+    public IVec2I translate(IDoubleI x, IDoubleI y);
+    /** alias of add() */
+    public IVec2I translate(IVec2I v);
+    
+    
+    /** transform with 2x2 transform matrix */
+    public IVec2I transform(IMatrix2I mat);
+    /** transform with 3x3 transform matrix */
+    public IVec2I transform(IMatrix3I mat);
     /** transform with transform vectors */
     public IVec2I transform(IVec2I xvec, IVec2I yvec);
     /** transform with transform vectors */
     public IVec2I transform(IVec2I xvec, IVec2I yvec, IVec2I translate);
+    
+    
+    /** mv() is alias of add() */
+    public IVec2I mv(double x, double y);
+    /** mv() is alias of add() */
+    public IVec2I mv(IDoubleI x, IDoubleI y);
+    /** mv() is alias of add() */
+    public IVec2I mv(IVec2I v);
+    
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */
+    public IVec2I cp();
+    
+    /** cp() is alias of dup().add() */
+    public IVec2I cp(double x, double y);
+    /** cp() is alias of dup().add() */
+    public IVec2I cp(IDoubleI x, IDoubleI y);
+    /** cp() is alias of dup().add() */
+    public IVec2I cp(IVec2I v);
+    
     
     
     // methods creating new instance
@@ -291,6 +348,7 @@ public interface IVec2I extends IVec2Op{
     public IVec2I sum(double vx, double vy);
     /** create a new instance of summation */
     public IVec2I sum(IVec2I... v);
+    
     /** create a new instance of bisector */
     public IVec2I bisect(IVec2I v);
     /** create a new instance of bisector */

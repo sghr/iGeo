@@ -668,5 +668,7 @@ public class IBoid extends IParticleAgent{
     public IBoid setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IBoid setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public IBoid weight(double w){ super.weight(w); return this; }
+    public IBoid weight(float w){ super.weight(w); return this; }
     
 }

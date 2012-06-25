@@ -468,6 +468,8 @@ public class ILayer extends IObject{
     public ILayer setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
     public ILayer setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
     
+    public ILayer weight(double w){ super.weight(w); return this; }
+    public ILayer weight(float w){ super.weight(w); return this; }
     
     public ILayer setMaterial(IMaterial mat){ attribute.material = mat; return this; }
     

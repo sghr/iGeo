@@ -22,7 +22,9 @@
 
 package igeo.gui;
 
-public class IFileFilter extends javax.swing.filechooser.FileFilter {
+import java.io.File;
+
+public class IFileFilter extends javax.swing.filechooser.FileFilter implements java.io.FilenameFilter{
     public String[] extensions;
     public String msg;
     
@@ -89,6 +91,15 @@ public class IFileFilter extends javax.swing.filechooser.FileFilter {
     }
     
     public String getDescription() { return msg; }
+
+    
+    
+    // for FilenameFilter, for FileDialog
+    public boolean accept(File dir, String name){
+	for(int i=0; i<extensions.length; i++) if(name.endsWith(extensions[i])) return true;
+	return false;
+    }
+    
     
 }
         

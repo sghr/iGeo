@@ -442,5 +442,7 @@ public class IParticleOnCurveAgent extends IPointAgent implements IParticleOnCur
     public IParticleOnCurveAgent setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IParticleOnCurveAgent setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public IParticleOnCurveAgent weight(double w){ super.weight(w); return this; }
+    public IParticleOnCurveAgent weight(float w){ super.weight(w); return this; }
     
 }

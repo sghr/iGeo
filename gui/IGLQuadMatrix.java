@@ -36,13 +36,13 @@ import igeo.*;
 public class IGLQuadMatrix extends IGLElement{
     public int width, height;
     
-    public IGLQuadMatrix(){}
-    public IGLQuadMatrix(int width, int height){
+    private IGLQuadMatrix(){}
+    private IGLQuadMatrix(int width, int height){
 	super(width*height);
 	this.width=width;
 	this.height=height;
     }
-    public IGLQuadMatrix(IVec[][] ptmatrix){
+    private IGLQuadMatrix(IVec[][] ptmatrix){
 	super(ptmatrix.length*ptmatrix[0].length);
 	width=ptmatrix.length;
 	height=ptmatrix[0].length;
@@ -53,7 +53,7 @@ public class IGLQuadMatrix extends IGLElement{
 	}
     }
     
-    public IGLQuadMatrix(IVec[][] ptmatrix, IVec[][] normalMatrix){
+    private IGLQuadMatrix(IVec[][] ptmatrix, IVec[][] normalMatrix){
 	super(ptmatrix.length*ptmatrix[0].length);
 	setNormalNum(ptmatrix.length*ptmatrix[0].length);
 	
@@ -65,8 +65,8 @@ public class IGLQuadMatrix extends IGLElement{
 		normal[i*width+j] = normalMatrix[j][i];
 	    }
 	}
-	
     }
+    
     
     public int width(){ return width; }
     public int height(){ return height; }

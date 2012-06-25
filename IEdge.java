@@ -67,13 +67,16 @@ public class IEdge{
 	vertices[1].edges.remove(this);
     }
     
-    public IVec nrml(double param){ // 0 - 1.0
-	return vertices[0].nrml().get().mul(1.-param).add(vertices[1].nrml().mul(param)).unit();
+    public IVec nml(double param){ // 0 - 1.0
+	//return vertices[0].nrml().get().mul(1.-param).add(vertices[1].nrml().mul(param)).unit();
+	return vertices[0].nml().get().mul(1.-param).add(vertices[1].nml().mul(param)).unit();
     }
-    public IVec normal(double param){ return nrml(param); }
+    //public IVec normal(double param){ return nrml(param); }
+    public IVec normal(double param){ return nml(param); }
     
-    public IVec nrml(){ return nrml(0.5); }
-    public IVec normal(){ return nrml(); }
+    //public IVec nrml(){ return nrml(0.5); }
+    public IVec nml(){ return nml(0.5); }
+    public IVec normal(){ return nml(); }
     
     
     public IVec getPointOnEdge(double ratio){

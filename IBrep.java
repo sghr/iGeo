@@ -104,7 +104,7 @@ public class IBrep extends IGeometry implements ITransformable{
     
     public IGraphicObject createGraphic(IGraphicMode m){
 	if(m.isNone()) return null;
-        if(m.isGL()) return new IBrepGraphicGL(this);
+        if(m.isGraphic3D()) return new IBrepGraphicGL(this);
         return null;
     }
     
@@ -193,7 +193,11 @@ public class IBrep extends IGeometry implements ITransformable{
     public IBrep setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
     public IBrep setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IBrep setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
-
+    
+    public IBrep weight(double w){ super.weight(w); return this; }
+    public IBrep weight(float w){ super.weight(w); return this; }
+        
+    
 
     /*******************************************************************************
      * implementation of ITransformable interface

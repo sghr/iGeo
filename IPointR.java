@@ -448,6 +448,10 @@ public class IPointR extends IObject implements IVecI{
     /**
        set size of dot in graphic 
     */
+    public IPointR setSize(double sz){ return weight(sz); }
+    public IPointR size(double sz){ return weight(sz); }
+    
+    /*
     public IPointR setSize(double sz){ return size(sz); }
     public IPointR size(double sz){
 	for(int i=0; graphics!=null && i<graphics.size(); i++)
@@ -455,6 +459,7 @@ public class IPointR extends IObject implements IVecI{
 		((IPointGraphic)graphics.get(i)).size(sz);
 	return this;
     }
+    */
     
     public double getSize(){ return size(); }
     public double size(){
@@ -489,6 +494,7 @@ public class IPointR extends IObject implements IVecI{
     public IPointR clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
     public IPointR clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
     public IPointR hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
+
     public IPointR hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
     public IPointR hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public IPointR hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
@@ -512,4 +518,6 @@ public class IPointR extends IObject implements IVecI{
     public IPointR setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IPointR setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public IPointR weight(double w){ super.weight(w); return this; }
+    public IPointR weight(float w){ super.weight(w); return this; }
 }

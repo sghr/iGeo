@@ -30,15 +30,12 @@ package igeo;
 */
 public class IMatrix4 extends IMatrix implements IMatrix4I{
     
-    public IMatrix4(){
-	super(4,4);
-	setZero();
-    }
+    public IMatrix4(){ super(4,4); setZero(); }
     
     public IMatrix4(double v11, double v12, double v13, double v14,
-	      double v21, double v22, double v23, double v24,
-	      double v31, double v32, double v33, double v34,
-	      double v41, double v42, double v43, double v44){
+		    double v21, double v22, double v23, double v24,
+		    double v31, double v32, double v33, double v34,
+		    double v41, double v42, double v43, double v44){
 	super(4,4);
 	set(v11,v12,v13,v14,
 	    v21,v22,v23,v24,
@@ -47,6 +44,14 @@ public class IMatrix4 extends IMatrix implements IMatrix4I{
     }
     
     public IMatrix4(IMatrix4 m){ super(4,4); set(m.val); }
+
+    public IMatrix4(IMatrix3 m, IVec t){
+	super(4,4);
+	set(m.val[0][0], m.val[0][1], m.val[0][2], t.x,
+	    m.val[1][0], m.val[1][1], m.val[1][2], t.y,
+	    m.val[2][0], m.val[2][1], m.val[2][2], t.z,
+	    0,0,0,0);
+    }
     
     public IMatrix4 get(){ return this; }
     
@@ -80,6 +85,7 @@ public class IMatrix4 extends IMatrix implements IMatrix4I{
     }
     
     public IMatrix4 dup(){ return new IMatrix4(this); }
+    public IMatrix4 cp(){ return dup(); }
     
     public double determinant(){
 	return
@@ -212,30 +218,44 @@ public class IMatrix4 extends IMatrix implements IMatrix4I{
     public IMatrix4 mul(IMatrix4I m){ return mul(m.get()); }
     
     
-    /**
-       vector is treated as vertical vector
-    */
-    public IVec4 mul(IVec4I v){
+    /** vector is treated as vertical vector */
+    public IVec4 mul(IVec4I v){ return mul(v.get()); }
+    
+    /** vector is treated as vertical vector */
+    public IVec4 mul(IVec4 v){
 	IVec4 ret = new IVec4();
-	ret.x=val[0][0]*v.x()+val[0][1]*v.y()+val[0][2]*v.z()+val[0][3]*v.w();
-	ret.y=val[1][0]*v.x()+val[1][1]*v.y()+val[1][2]*v.z()+val[1][3]*v.w();
-	ret.z=val[2][0]*v.x()+val[2][1]*v.y()+val[2][2]*v.z()+val[2][3]*v.w();
-	ret.w=val[3][0]*v.x()+val[3][1]*v.y()+val[3][2]*v.z()+val[3][3]*v.w();
+	ret.x=val[0][0]*v.x+val[0][1]*v.y+val[0][2]*v.z+val[0][3]*v.w;
+	ret.y=val[1][0]*v.x+val[1][1]*v.y+val[1][2]*v.z+val[1][3]*v.w;
+	ret.z=val[2][0]*v.x+val[2][1]*v.y+val[2][2]*v.z+val[2][3]*v.w;
+	ret.w=val[3][0]*v.x+val[3][1]*v.y+val[3][2]*v.z+val[3][3]*v.w;
 	return ret;
     }
     
-    public IVec mul(IVecI v){
+    /** vector is treated as vertical vector */
+    public IVec mul(IVecI v){ return mul(v.get()); }
+    
+    /** vector is treated as vertical vector */
+    public IVec mul(IVec v){
 	IVec ret = new IVec();
-	ret.x = val[0][0]*v.x()+val[0][1]*v.y()+val[0][2]*v.z()+val[0][3];
-	ret.y = val[1][0]*v.x()+val[1][1]*v.y()+val[1][2]*v.z()+val[1][3];
-	ret.z = val[2][0]*v.x()+val[2][1]*v.y()+val[2][2]*v.z()+val[2][3];
+	ret.x = val[0][0]*v.x+val[0][1]*v.y+val[0][2]*v.z+val[0][3];
+	ret.y = val[1][0]*v.x+val[1][1]*v.y+val[1][2]*v.z+val[1][3];
+	ret.z = val[2][0]*v.x+val[2][1]*v.y+val[2][2]*v.z+val[2][3];
 	return ret;
     }
     
-    /**
-       applying transformation matrix to 3D vector
-    */
+    /** applying transformation matrix to 3D vector */
     public IVec transform(IVecI v){ return mul(v); }
+    
+    
+    public IMatrix3 getMatrix3(){
+	return new IMatrix3(val[0][0], val[0][1], val[0][2],
+			    val[1][0], val[1][1], val[1][2],
+			    val[2][0], val[2][1], val[2][2]);
+    }
+    
+    public IVec getTranslateVector(){
+	return new IVec(val[0][3], val[1][3], val[2][3]);
+    }
     
     
     public static IMatrix4 getXRotation(double angle){

@@ -374,6 +374,8 @@ public class ICurveR extends IObject implements ICurveI{
     public ICurveR setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public ICurveR setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public ICurveR weight(double w){ super.weight(w); return this; }
+    public ICurveR weight(float w){ super.weight(w); return this; }
     
     
     static public class IsClosed extends IParameterObject implements IBoolOp{

@@ -456,5 +456,6 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
     public IPointAgent setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
     
-    
+    public IPointAgent weight(double w){ super.weight(w); return this; }
+    public IPointAgent weight(float w){ super.weight(w); return this; }
 }

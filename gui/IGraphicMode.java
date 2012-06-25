@@ -22,6 +22,8 @@
 
 package igeo.gui;
 
+import igeo.IConfig;
+
 /**
    Class to specify graphic mode of either OpenGL mode / Java mode and
    wireframe / fill / transparent fill / wireframe+fill / wireframe+transparent fill.
@@ -31,7 +33,7 @@ package igeo.gui;
 */
 public class IGraphicMode{
     
-    public enum GraphicType{ GL, JAVA };
+    public enum GraphicType{ GL, P3D, J2D };
     //public enum DisplayType{ WIREFRAME, FILL, TRANSPARENT }
     
     //public static final IGraphicMode glWire = new IGraphicMode(GraphicType.GL,DisplayType.WIREFRAME);
@@ -51,13 +53,13 @@ public class IGraphicMode{
     
     /** if transparentWireframe is false, wireframe doesn't become transparent in transparent mode
      */
-    public boolean transparentWireframe = false;
+    public boolean transparentWireframe = IConfig.transparentWireframe;
     
     /** if lightWireframe is false, wireframe doesn't use material in GL light mode
      */
-    public boolean lightWireframe = false;
+    public boolean lightWireframe = IConfig.lightWireframe;
     
-    public boolean light = true; // only in OpenGL
+    public boolean light = IConfig.useLight; // only in OpenGL
     
     
     public IGraphicMode(){}
@@ -87,7 +89,21 @@ public class IGraphicMode{
     //public DisplayType getDisplayType(){ return displayType; }
     
     public boolean isGL(){ return graphicType==GraphicType.GL; }
-    public boolean isJava(){ return graphicType==GraphicType.JAVA; }
+    //public boolean isJava(){ return graphicType==GraphicType.JAVA; }
+    public boolean isJ2D(){ return graphicType==GraphicType.J2D; }
+    public boolean isP3D(){ return graphicType==GraphicType.P3D; }
+    
+    
+    /** 3D graphic elements keeping 3D info; no need to be sorted due to depth buffer */
+    public boolean isGraphic3D(){
+	return graphicType==GraphicType.GL || graphicType==GraphicType.P3D;
+    }
+    
+    /** 2D graphic elements already flattened in 2D; need to be sorted and vary depending on view */
+    public boolean isGraphic2D(){
+	return graphicType==GraphicType.P3D;
+    }
+    
     
     //public boolean isWireframe(){ return displayType==DisplayType.WIREFRAME; }
     //public boolean isFill(){ return displayType==DisplayType.FILL; }

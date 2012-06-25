@@ -397,4 +397,7 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     public IParticleAgent setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
     
+    public IParticleAgent weight(double w){ super.weight(w); return this; }
+    public IParticleAgent weight(float w){ super.weight(w); return this; }
+    
 }

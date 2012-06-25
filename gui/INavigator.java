@@ -118,6 +118,8 @@ public class INavigator{
     
     public void setPane(IPane p){ pane = p; }
     
+    public void setView(IView v){ view = v; }
+    
     
     public void setRotationRatio(double yawRatio, double pitchRatio){
 	rotationYawRatio = yawRatio;

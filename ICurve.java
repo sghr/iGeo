@@ -194,7 +194,7 @@ public class ICurve extends IGeometry implements ICurveI{
     
     public IGraphicObject createGraphic(IGraphicMode m){
 	if(m.isNone()) return null;
-	if(m.isGL()) return new ICurveGraphicGL(this); 
+	if(m.isGraphic3D()) return new ICurveGraphicGL(this); 
 	return null;
     }
     
@@ -597,5 +597,7 @@ public class ICurve extends IGeometry implements ICurveI{
     public ICurve setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public ICurve setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public ICurve weight(double w){ super.weight(w); return this; }
+    public ICurve weight(float w){ super.weight(w); return this; }
     
 }

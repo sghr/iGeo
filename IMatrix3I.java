@@ -33,6 +33,7 @@ public interface IMatrix3I extends IMatrixI, IMatrix3Op{
     public IMatrix3 get();
     
     public IMatrix3I dup();
+    public IMatrix3I cp();
     
     public IMatrix3I set(double v11, double v12, double v13,
 			 double v21, double v22, double v23,
@@ -45,5 +46,7 @@ public interface IMatrix3I extends IMatrixI, IMatrix3Op{
     public IMatrix3I mul(IMatrix3I m);
     
     public IVecI mul(IVecI m);
+    
+    public IVec2I mul(IVec2I m);
     
 }

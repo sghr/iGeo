@@ -23,7 +23,7 @@
 package igeo.gui;
 
 import java.util.ArrayList;
-import javax.media.opengl.*;
+//import javax.media.opengl.*;
 
 import igeo.*;
 
@@ -34,20 +34,23 @@ import igeo.*;
    @version 0.7.0.0;
 */
 public class ISurfaceGraphicWireframeGL extends IGraphicObject{
-    public static float weight = 1f;
+    public static float weight = IConfig.strokeWeight; //1f;
     
-    public int isoparmNumRatio=IConfig.surfaceIsoparmResolution;
+    public int isoparmNumRatio=IConfig.isoparmResolution;
     public int isoparmNumU;
     public int isoparmNumV;
     
     public ISurfaceI surface=null;
     
-    public IGLLineStrip[] uline, vline;
-    public IGLLineLoop[] inTrim=null, outTrim=null;
+    //public IGLLineStrip[] uline, vline;
+    //public IGLLineLoop[] inTrim=null, outTrim=null;
+    
+    public IVec[][] ulinePts, vlinePts;
+    public IVec[][] inTrimPts, outTrimPts;
     
     public IPolyline2D[] uline2, vline2;
     public IPolyline2D[] inTrim2=null, outTrim2=null;
-
+    
     /** true when unum==2 && vnum==2 and flat */
     public boolean simpleFlat=false; 
     
@@ -83,18 +86,26 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     public void setIsoparmNumberRatio(int p){ isoparmNumRatio = p; }
     
     
-    public ArrayList<IGLLineStrip> getLineInsideTrim(IVec2[] uvpts,
-						      IVec2[][] outTrimUV,
-						      IVec2[][] inTrimUV){
+    public void setWeight(float w){ weight=w; }
+    public float getWeight(){ return weight; }
+    
+    /*
+    public ArrayList<IVec[]> //ArrayList<IGLLineStrip>
+	getLineInsideTrim(IVec2[] uvpts, IVec2[][] outTrimUV, IVec2[][] inTrimUV){
 	
-	ArrayList<IGLLineStrip> lines = new ArrayList<IGLLineStrip>();
-	IGLLineStrip curLine = null;
+	//ArrayList<IGLLineStrip> lines = new ArrayList<IGLLineStrip>();
+	ArrayList<IVec[]> linePts = new ArrayList<IVec[]>();
+	//IGLLineStrip curLine = null;
+	IVec[] curLinePts = null;
 	
 	if(inTrimUV==null&&outTrimUV==null){
-	    curLine = new IGLLineStrip(uvpts.length);
+	    //curLine = new IGLLineStrip(uvpts.length);
+	    curLinePts = new IVec[uvpts.length];
 	    for(int i=0; i<uvpts.length; i++)
-		curLine.setPoint(i,surface.pt(uvpts[i].x, uvpts[i].y).get());
-	    lines.add(curLine);
+		//curLine.setPoint(i,surface.pt(uvpts[i].x, uvpts[i].y).get());
+		curLinePts[i] = surface.pt(uvpts[i].x, uvpts[i].y).get();
+	    //lines.add(curLine);
+	    linePts.add(curLinePts);
 	    return lines;
 	}
 	
@@ -106,6 +117,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	    }
 	    //IOut.print("\n");
 	}
+	
 	
 	boolean prevInside=false;
 	IVec2[] prevTrimPts=null;
@@ -171,6 +183,8 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	return lines;
     }
     
+    */
+    
     /**
      //@return u lines for graphics; number depends on how it intersects with trim lines.
     **/
@@ -180,8 +194,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	int udeg = surface.udeg();
 	int unum = uepnum;
 	
-	int reso = IConfig.surfaceIsoparmResolution *
-	    IConfig.surfaceWireframeResolution;
+	int reso = IConfig.isoparmResolution * IConfig.segmentResolution;
 	
 	if(udeg>1) unum = (uepnum-1)*reso+1;
 	
@@ -209,8 +222,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	int vdeg = surface.vdeg();
 	int vnum = vepnum;
 	
-	int reso = IConfig.surfaceIsoparmResolution *
-	    IConfig.surfaceWireframeResolution;
+	int reso = IConfig.isoparmResolution * IConfig.segmentResolution;
 	
 	
 	if(vdeg>1) vnum = (vepnum-1)*reso+1;
@@ -246,35 +258,39 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	
 	if(surface.hasOuterTrim()){
 	    outtrims = new ITrimLoopGraphic[surface.outerTrimLoopNum()];
-	    outTrim = new IGLLineLoop[surface.outerTrimLoopNum()];
+	    //outTrim = new IGLLineLoop[surface.outerTrimLoopNum()];
+	    outTrimPts = new IVec[surface.outerTrimLoopNum()][];
 	    outTrim2 = new IPolyline2D[surface.outerTrimLoopNum()];
 	    
 	    for(int i=0; i<surface.outerTrimLoopNum(); i++){
 		outtrims[i] = new ITrimLoopGraphic(surface.outerTrimLoop(i),
-						   true,
-						   IConfig.surfaceWireframeResolution);
-		outTrim[i] = new IGLLineLoop(outtrims[i].getPolyline());
+						   true,IConfig.segmentResolution);
+		//outTrim[i] = new IGLLineLoop(outtrims[i].getPolyline());
+		outTrimPts[i] = outtrims[i].getPolyline().get();
 		outTrim2[i] = outtrims[i].getPolyline2D();
 	    }
 	}
 	else{
 	    outtrims = new ITrimLoopGraphic[1];
-	    outTrim = new IGLLineLoop[1];
+	    //outTrim = new IGLLineLoop[1];
+	    outTrimPts = new IVec[1][];
 	    outTrim2 = new IPolyline2D[1];
 	    outtrims[0] = new ITrimLoopGraphic(surface);
-	    outTrim[0] = new IGLLineLoop(outtrims[0].getPolyline());
+	    //outTrim[0] = new IGLLineLoop(outtrims[0].getPolyline());
+	    outTrimPts[0] = outtrims[0].getPolyline().get();
 	    outTrim2[0] = outtrims[0].getPolyline2D();
 	}
 	
 	if(surface.hasInnerTrim()){
 	    intrims = new ITrimLoopGraphic[surface.innerTrimLoopNum()];
-	    inTrim = new IGLLineLoop[surface.innerTrimLoopNum()];
+	    //inTrim = new IGLLineLoop[surface.innerTrimLoopNum()];
+	    inTrimPts = new IVec[surface.innerTrimLoopNum()][];
 	    inTrim2 = new IPolyline2D[surface.innerTrimLoopNum()];
 	    for(int i=0; i<surface.innerTrimLoopNum(); i++){
 		intrims[i] = new ITrimLoopGraphic(surface.innerTrimLoop(i),
-						  false,
-						  IConfig.surfaceWireframeResolution);
-		inTrim[i] = new IGLLineLoop(intrims[i].getPolyline());
+						  false,IConfig.segmentResolution);
+		//inTrim[i] = new IGLLineLoop(intrims[i].getPolyline());
+		inTrimPts[i] = intrims[i].getPolyline().get();
 		inTrim2[i] = intrims[i].getPolyline2D();
 	    }
 	}
@@ -282,7 +298,8 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	
 	// u isoparms
 	if(isoparmNumU>2){
-	    ArrayList<IGLLineStrip> ul = new ArrayList<IGLLineStrip>();
+	    //ArrayList<IGLLineStrip> ul = new ArrayList<IGLLineStrip>();
+	    ArrayList<IVec[]> ul = new ArrayList<IVec[]>();
 	    ArrayList<IPolyline2D> ul2 = new ArrayList<IPolyline2D>();
 	    for(int vidx=0; vidx<vepnum-1; vidx++){
 		for(int v=0; v<isoparmNumRatio; v++){
@@ -292,20 +309,23 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 			    new IIsoparmGraphic(surface, surface.v(vidx,vfrc),
 						true, outtrims, intrims);
 			for(int i=0; i<isoparm.num(); i++){
-			    ul.add(new IGLLineStrip(isoparm.getLine(i)));
+			    //ul.add(new IGLLineStrip(isoparm.getLine(i)));
+			    ul.add(isoparm.getLine(i).get());
 			    ul2.add(isoparm.getLine2D(i));
 			}
 		    }
 		}
 	    }
-	    uline = ul.toArray(new IGLLineStrip[ul.size()]);
+	    //uline = ul.toArray(new IGLLineStrip[ul.size()]);
+	    ulinePts = ul.toArray(new IVec[ul.size()][]);
 	    uline2 = ul2.toArray(new IPolyline2D[ul2.size()]);
 	}
 	
 	
 	// v isoparms
 	if(isoparmNumV>2){
-	    ArrayList<IGLLineStrip> vl = new ArrayList<IGLLineStrip>();
+	    //ArrayList<IGLLineStrip> vl = new ArrayList<IGLLineStrip>();
+	    ArrayList<IVec[]> vl = new ArrayList<IVec[]>();
 	    ArrayList<IPolyline2D> vl2 = new ArrayList<IPolyline2D>();	    
 	    for(int uidx=0; uidx<uepnum-1; uidx++){
 		for(int u=0; u<isoparmNumRatio; u++){
@@ -315,13 +335,15 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 			    new IIsoparmGraphic(surface, surface.u(uidx,ufrc),
 						false, outtrims, intrims);
 			for(int i=0; i<isoparm.num(); i++){
-			    vl.add(new IGLLineStrip(isoparm.getLine(i)));
+			    //vl.add(new IGLLineStrip(isoparm.getLine(i)));
+			    vl.add(isoparm.getLine(i).get());
 			    vl2.add(isoparm.getLine2D(i));
 			}
 		    }
 		}
 	    }
-	    vline = vl.toArray(new IGLLineStrip[vl.size()]);
+	    //vline = vl.toArray(new IGLLineStrip[vl.size()]);
+	    vlinePts = vl.toArray(new IVec[vl.size()][]);
 	    vline2 = vl2.toArray(new IPolyline2D[vl2.size()]);
 	}
 	
@@ -352,6 +374,61 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	}
 	*/
 	
+	// uline
+	if(ulinePts!=null){
+	    if(ulinePts.length!=uline2.length){ ulinePts = new IVec[uline2.length][]; }
+	    for(int i=0; i<uline2.length; i++){
+		if(ulinePts[i]==null || ulinePts[i].length!=uline2[i].num()){
+		    ulinePts[i] = new IVec[uline2[i].num()];
+		}
+		for(int j=0; j<uline2[i].num(); j++){
+		    IVec2 pt2 = uline2[i].get(j);
+		    ulinePts[i][j] = surface.pt(pt2).get();
+		}
+	    }
+	}
+	// vline
+	if(vlinePts!=null){
+	    if(vlinePts.length!=vline2.length){ vlinePts = new IVec[vline2.length][]; }
+	    for(int i=0; i<vline2.length; i++){
+		if(vlinePts[i]==null || vlinePts[i].length!=vline2[i].num()){
+		    vlinePts[i] = new IVec[vline2[i].num()];
+		}
+		for(int j=0; j<vline2[i].num(); j++){
+		    IVec2 pt2 = vline2[i].get(j);
+		    vlinePts[i][j] = surface.pt(pt2).get();
+		}
+	    }
+	}
+	// intrim
+	if(inTrimPts!=null){
+	    if(inTrimPts.length!=inTrim2.length){ inTrimPts = new IVec[inTrim2.length][]; }
+	    for(int i=0; i<inTrim2.length; i++){
+		if(inTrimPts[i]==null || inTrimPts[i].length!=inTrim2[i].num()){
+		    inTrimPts[i] = new IVec[inTrim2[i].num()];
+		}
+		for(int j=0; j<inTrim2[i].num(); j++){
+		    IVec2 pt2 = inTrim2[i].get(j);
+		    inTrimPts[i][j] = surface.pt(pt2).get();
+		}
+	    }
+	}
+	// outtrim
+	if(outTrimPts!=null){
+	    if(outTrimPts.length!=outTrim2.length){ outTrimPts = new IVec[outTrim2.length][]; }
+	    for(int i=0; i<outTrim2.length; i++){
+		if(outTrimPts[i]==null || outTrimPts[i].length!=outTrim2[i].num()){
+		    outTrimPts[i] = new IVec[outTrim2[i].num()];
+		}
+		for(int j=0; j<outTrim2[i].num(); j++){
+		    IVec2 pt2 = outTrim2[i].get(j);
+		    outTrimPts[i][j] = surface.pt(pt2).get();
+		}
+	    }
+	}
+	
+	
+	/*
 	// uline
 	if(uline!=null){
 	    if(uline.length!=uline2.length){ uline = new IGLLineStrip[uline2.length]; }
@@ -407,6 +484,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 		}
 	    }
 	}
+	*/
 	
 	/*
 	public IGLLineStrip[] uline, vline;
@@ -417,7 +495,10 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	*/
     }
     
-    public boolean isDrawable(IGraphicMode m){ return m.isGL()&&m.isWireframe(); }
+    public boolean isDrawable(IGraphicMode m){
+	//return m.isGL()&&m.isWireframe();
+	return m.isGraphic3D()&&m.isWireframe();
+    }
     
     
     public void draw(IGraphics g){
@@ -426,46 +507,110 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	if(!initialized) initSurface();
 	else if(update){ updateSurface(); update=false; }
 	
-	GL gl = g.getGL();
-	if(gl==null) return;
-	
-	float red = defaultRed;
-	float green = defaultGreen;
-	float blue = defaultBlue;
-	float alpha = defaultAlpha;
-            
-	if(color!=null){
-	    red = (float)color.getRed()/255;
-	    green = (float)color.getGreen()/255;
-	    blue = (float)color.getBlue()/255;
-	    alpha = (float)color.getAlpha()/255;
+	if(g.type() == IGraphicMode.GraphicType.GL ||
+	   g.type() == IGraphicMode.GraphicType.P3D){
+	    
+	    IGraphics3D g3d = (IGraphics3D)g;
+	    
+	    float red,green,blue,alpha;
+	    if(color!=null){
+		red = color.getRed();
+		green = color.getGreen();
+		blue = color.getBlue();
+		alpha = color.getAlpha();
+	    }
+	    else{
+		red = IConfig.objectColor.getRed();
+		green = IConfig.objectColor.getGreen();
+		blue = IConfig.objectColor.getBlue();
+		alpha = IConfig.objectColor.getAlpha();
+	    }
+	    
+	    if(!g3d.view().mode().isTransparentWireframe()){ alpha = 255; }
+	    else if(g3d.view().mode().isTransparent()){ alpha = IConfig.transparentModeAlpha; }
+	    
+	    
+	    if(g3d.view().mode().isLight() && g3d.view().mode().isLightWireframe()){
+		g3d.ambient(red,green,blue,alpha);
+		g3d.diffuse(red,green,blue,alpha);
+		//g3d.specular(red,green,blue,alpha);
+		g3d.shininess(IConfig.shininess);
+		g3d.stroke(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+	    }
+	    else{ g3d.stroke(red,green,blue,alpha); }
+	    
+	    g3d.weight(weight);
+	    
+	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe()) g3d.disableLight();
+	    
+	    if(inTrimPts!=null){
+		for(int i=0; i<inTrimPts.length; i++){ g3d.drawLineLoop(inTrimPts[i]); }
+	    }
+	    if(outTrimPts!=null){
+		for(int i=0; i<outTrimPts.length; i++){ g3d.drawLineLoop(outTrimPts[i]); }
+	    }
+	    if(ulinePts!=null){
+		for(int i=0; i<ulinePts.length; i++){ g3d.drawLineStrip(ulinePts[i]); }
+	    }
+	    if(vlinePts!=null){
+		for(int i=0; i<vlinePts.length; i++){ g3d.drawLineStrip(vlinePts[i]); }
+	    }
+	    
+	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe()) g3d.enableLight();
+	    
+	    ////
+	    
+	    /*
+	    GL gl = ((IGraphicsGL)g).getGL();
+	    //GL gl = g.getGL();
+	    
+	    if(gl==null) return;
+	    
+	    float red,green,blue,alpha;
+	    //float red = defaultRed;
+	    //float green = defaultGreen;
+	    //float blue = defaultBlue;
+	    //float alpha = defaultAlpha;
+	    if(color!=null){
+		red = (float)color.getRed()/255;
+		green = (float)color.getGreen()/255;
+		blue = (float)color.getBlue()/255;
+		alpha = (float)color.getAlpha()/255;
+	    }
+	    else{
+		red = (float)IConfig.objectColor.getRed()/255;
+		green = (float)IConfig.objectColor.getGreen()/255;
+		blue = (float)IConfig.objectColor.getBlue()/255;
+		alpha = (float)IConfig.objectColor.getAlpha()/255;
+	    }
+	    
+	    if(!g.view().mode().isTransparentWireframe()){ alpha = 1f; }
+	    else if(g.view().mode().isTransparent()){ alpha = (float)IConfig.transparentModeAlpha/255; }
+	    
+	    if(g.view().mode().isLight() && g.view().mode().isLightWireframe()){
+		float[] colorf = new float[]{ red, green, blue, alpha };
+		gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
+		gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
+		//gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
+		gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
+			       ISurfaceGraphicGL.defaultShininess);
+		gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
+	    }
+	    else{ gl.glColor4f(red,green,blue,alpha); }
+	    
+	    gl.glLineWidth(weight);
+	    
+	    if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
+		gl.glDisable(GL.GL_LIGHTING);
+	    
+	    if(inTrim!=null){ for(int i=0; i<inTrim.length; i++) inTrim[i].draw(gl); }
+	    if(outTrim!=null){ for(int i=0; i<outTrim.length; i++) outTrim[i].draw(gl); }
+	    if(uline!=null){ for(int i=0; i<uline.length; i++) uline[i].draw(gl); }
+	    if(vline!=null){ for(int i=0; i<vline.length; i++) vline[i].draw(gl); }
+	    
+	    if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
+		gl.glEnable(GL.GL_LIGHTING);
+	    */
 	}
-	
-	if(!g.view().mode().isTransparentWireframe()){ alpha = 1f; }
-	else if(g.view().mode().isTransparent()){ alpha = (float)transparentModeAlpha; }
-		
-	if(g.view().mode().isLight() && g.view().mode().isLightWireframe()){
-	    float[] colorf = new float[]{ red, green, blue, alpha };
-	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
-	    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
-	    //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
-	    gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
-			   ISurfaceGraphicGL.defaultShininess);
-	    gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
-	}
-	else{ gl.glColor4f(red,green,blue,alpha); }
-	
-	gl.glLineWidth(weight);
-	
-	if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
-	    gl.glDisable(GL.GL_LIGHTING);
-	
-	if(inTrim!=null){ for(int i=0; i<inTrim.length; i++) inTrim[i].draw(gl); }
-	if(outTrim!=null){ for(int i=0; i<outTrim.length; i++) outTrim[i].draw(gl); }
-	if(uline!=null){ for(int i=0; i<uline.length; i++) uline[i].draw(gl); }
-	if(vline!=null){ for(int i=0; i<vline.length; i++) vline[i].draw(gl); }
-	
-	if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
-	    gl.glEnable(GL.GL_LIGHTING);
     }
 }

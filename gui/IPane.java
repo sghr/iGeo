@@ -22,7 +22,7 @@
 
 package igeo.gui;
 
-import javax.media.opengl.*;
+//import javax.media.opengl.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -40,165 +40,56 @@ import igeo.*;
    @author Satoru Sugihara
    @version 0.7.1.0;
 */
-public class IPane extends IComponent{
+public interface IPane{
     
-    //IG ig;
-    public IPanel parent;
-    public IView view;
+    //public void setBounds(IComponent c);
+    public void setLocation(int x, int y);
+    public void setSize(int width, int height);
     
-    public INavigator navigator;
+    public int getX();
+    public int getY();
+    public int getWidth();
+    public int getHeight();
     
-    public float borderWidth=0f; //1f;
-    public Color borderColor = Color.gray; //Color.gray;
-    public BasicStroke borderStroke = new BasicStroke(borderWidth);
+    public boolean isVisible();
+    public void setVisible(boolean v);
+    //public void hide();
+    //public void show();
     
-    public IPane(int x, int y, int width, int height, IView view, IPanel p){
-	super(x,y,width,height);
-	this.view = view;
-	parent = p;
+    public boolean contains(int x, int y);
+    
+    public void setPanel(IPanel p);
+    public IPanel getPanel();
+    
+    public void setBorderWidth(float b);
+    public float getBorderWidth();
+    public Stroke getBorderStroke();
+    public void setBorderColor(Color c);
+    public Color getBorderColor();
+    public INavigator navigator();
+    public void setBounds(int x, int y, int w, int h);
+    public void setView(IView view);
+    public IView getView();
+    public void draw(IGraphics g);
 	
-	view.setPane(this);
-	navigator = new INavigator(view, this);
-    }
-    
-    public void setParent(IPanel p){ parent=p; }
-    public IPanel getPanel(){ return parent; }
-    //public void setIG(IG ig){ this.ig=ig; }
-    
-    public void setBorderWidth(float b){
-	borderWidth=b;
-	borderStroke=new BasicStroke(borderWidth);
-    }
-    public float getBorderWidth(){ return borderWidth; }
-    public void setBorderColor(Color c){ borderColor = c;}
-    public Color getBorderColor(){ return borderColor; }
-
-    public INavigator navigator(){ return navigator; }
-    
-    public void setBounds(int x, int y, int w, int h){
-	//IOut.debug(10,"x="+x+", y="+y+", width="+w+", height="+h); //
-	super.setBounds(x,y,w,h);
-	//view.setScreen(x,y,width,height);
-	view.setPane(this);
-    }
-    
-    public void setView(IView view){ this.view = view; }
-    
-    public IView getView(){ return view; }
-    
-    public void draw(IGraphics g){
-	
-	//if(g.mode().isGL()){
-	if(view!=null){
-	    g.setView(view);
-	    
-	    //if(objects==null) objectss = parent.ig.server().graphicServer().getObjects(view);
-	    //if(objects==null) return;
-	    
-	    // retrieved every time
-	    //ArrayList<IGraphicObject> objects = parent.ig.server().graphicServer().getObjects(view);
-	    ArrayList<IGraphicI> objects = parent.ig.server().graphicServer().getObjects(view);
-	    
-	    if(view.mode().isGL()){
-		
-		view.draw(g.getGL());
-		//parent.ig.draw(g);
-		
-		if(objects!=null)
-		    //for(IGraphicObject ge:objects){ ge.draw(g); }
-		    //for(int i=0; i<objects.size(); i++)
-		    for(int i=objects.size()-1; i>=0; i--)
-			if(objects.get(i).isVisible()) objects.get(i).draw(g);
-		
-		if(view.mode().isLight()){
-		    g.getGL().glDisable(GL.GL_LIGHTING);
-		    g.getGL().glDisable(GL.GL_LIGHT1);
-		}
-		
-		if(g.getGraphics()!=null){ // overlay
-		    Graphics2D g2 = g.getGraphics();
-		    
-		    // border
-		    if(borderWidth>0&&(parent.width!=width ||parent.height!=height)){
-			g2.setColor(borderColor);
-			g2.setStroke(borderStroke);
-			//g2.drawRect(x,y,width-1,height-1);
-			g2.drawRect(x,y,width,height);
-		    }
-		}
-		
-	    }
-	    //else if(g.mode().isJava()){
-	    else if(view.mode().isJava()){
-		//g.setView(view);
-		//parent.ig.draw(g);
-		//if(objects!=null) for(IGraphicObject go:objects){ go.draw(g); }
-		if(objects!=null) for(IGraphicI gi:objects){ gi.draw(g); }
-	    }
-	}
-	else{
-	    IOut.err("view is null"); //
-	}
-    }
-    
+    /** Focus view on objects */
+    public void focus();
     
     /** Focus view on objects */
-    public void focus(){
-	//if(parent.getBounds()==null) parent.setBounds();
-	
-	// parent is checking if bounding box is needed to be updated or not.
-	parent.setBounds();
-	view.focus(parent.getBounds());
-    }
+    public void focus(ArrayList<IObject> e);
     
-    /** Focus view on objects */
-    public void focus(ArrayList<IObject> e){
-	IBounds bb = new IBounds();
-	bb.setObjects(e);
-	view.focus(bb);
-    }
-    
-    
-    public void mousePressed(MouseEvent e){
-	navigator.mousePressed(e);
-    }
-    public void mouseReleased(MouseEvent e){
-	navigator.mouseReleased(e);
-    }
-    public void mouseClicked(MouseEvent e){
-	navigator.mouseClicked(e);
-    }
-    public void mouseEntered(MouseEvent e){
-	navigator.mouseEntered(e);
-    }
-    public void mouseExited(MouseEvent e){
-	navigator.mouseExited(e);
-    }
-    public void mouseMoved(MouseEvent e){
-	navigator.mouseMoved(e);
-    }
-    public void mouseDragged(MouseEvent e){
-	navigator.mouseDragged(e);
-    }
-    
-    public void mouseWheelMoved(MouseWheelEvent e){
-	navigator.mouseWheelMoved(e);
-    }
-    
-    public void keyPressed(KeyEvent e){
-	navigator.keyPressed(e);
-    }
-    public void keyReleased(KeyEvent e){
-	navigator.keyReleased(e);
-    }
-    public void keyTyped(KeyEvent e){
-	navigator.keyTyped(e);
-    }
-    
-    public void focusLost(FocusEvent e){
-    }
-    public void focusGained(FocusEvent e){
-    }
-    
+    public void mousePressed(MouseEvent e);
+    public void mouseReleased(MouseEvent e);
+    public void mouseClicked(MouseEvent e);
+    public void mouseEntered(MouseEvent e);
+    public void mouseExited(MouseEvent e);
+    public void mouseMoved(MouseEvent e);
+    public void mouseDragged(MouseEvent e);
+    public void mouseWheelMoved(MouseWheelEvent e);
+    public void keyPressed(KeyEvent e);
+    public void keyReleased(KeyEvent e);
+    public void keyTyped(KeyEvent e);
+    public void focusLost(FocusEvent e);
+    public void focusGained(FocusEvent e);
     
 }

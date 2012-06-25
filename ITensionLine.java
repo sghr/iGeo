@@ -23,6 +23,7 @@
 package igeo;
 
 import java.util.ArrayList;
+import java.awt.Color;
 
 /**
    Class of IDynamicObject to simulate tension force between two particles.
@@ -176,4 +177,61 @@ public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! a
     public void preupdate(){}
     public void postupdate(){ updateTarget(); }
     
+
+    /******************************************************************************
+     * IObject methods
+     ******************************************************************************/
+    
+    public ITensionLine name(String nm){ super.name(nm); return this; }
+    public ITensionLine layer(ILayer l){ super.layer(l); return this; }
+    public ITensionLine layer(String l){ super.layer(l); return this; }
+
+    public ITensionLine attr(IAttribute at){ super.attr(at); return this; }
+    
+    
+    public ITensionLine hide(){ super.hide(); return this; }
+    public ITensionLine show(){ super.show(); return this; }
+    
+    public ITensionLine clr(Color c){ super.clr(c); return this; }
+    public ITensionLine clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public ITensionLine clr(int gray){ super.clr(gray); return this; }
+    public ITensionLine clr(float fgray){ super.clr(fgray); return this; }
+    public ITensionLine clr(double dgray){ super.clr(dgray); return this; }
+    public ITensionLine clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
+    public ITensionLine clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
+    public ITensionLine clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
+    public ITensionLine clr(int r, int g, int b){ super.clr(r,g,b); return this; }
+    public ITensionLine clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
+    public ITensionLine clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
+    public ITensionLine clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
+    public ITensionLine clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
+    public ITensionLine clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
+    public ITensionLine hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
+    public ITensionLine hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
+    public ITensionLine hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
+    public ITensionLine hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
+    
+    public ITensionLine setColor(Color c){ super.setColor(c); return this; }
+    public ITensionLine setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLine setColor(int gray){ super.setColor(gray); return this; }
+    public ITensionLine setColor(float fgray){ super.setColor(fgray); return this; }
+    public ITensionLine setColor(double dgray){ super.setColor(dgray); return this; }
+    public ITensionLine setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
+    public ITensionLine setColor(float fgray, float falpha){ super.setColor(fgray,falpha); return this; }
+    public ITensionLine setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
+    public ITensionLine setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
+    public ITensionLine setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
+    public ITensionLine setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
+    public ITensionLine setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
+    public ITensionLine setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
+    public ITensionLine setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
+    public ITensionLine setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
+    public ITensionLine setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
+    public ITensionLine setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
+    public ITensionLine setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
+    
+    public ITensionLine weight(double w){ super.weight(w); return this; }
+    public ITensionLine weight(float w){ super.weight(w); return this; }
+    
+
 }

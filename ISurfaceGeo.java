@@ -1313,7 +1313,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    if(!isTrimCurveCPInsideBoundary(crv[i],u1,v1,u2,v2)) anyOutside=true;
 	if(!anyOutside) return true;
 	// outer/inner doesn't matter
-	ITrimLoopGraphic loop = new ITrimLoopGraphic(crv,true,IConfig.surfaceTrimEdgeResolution);
+	ITrimLoopGraphic loop = new ITrimLoopGraphic(crv,true,IConfig.trimSegmentResolution);
 	IPolyline2D polyline = loop.getPolyline2D();
 	IVec2 min = polyline.getMinBoundary();
 	IVec2 max = polyline.getMaxBoundary();
@@ -1329,7 +1329,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 						    double u2, double v2){
 	if(!isTrimCurveCPInsideBoundary(crv,u1,v1,u2,v2)) return false;
 	ITrimCurveGraphic crvg = new ITrimCurveGraphic(crv);
-	crvg.setup2D(IConfig.surfaceTrimEdgeResolution);
+	crvg.setup2D(IConfig.trimSegmentResolution);
 	IPolyline2D polyline = crvg.polyline2;
 	IVec2 min = polyline.getMinBoundary();
 	IVec2 max = polyline.getMaxBoundary();
