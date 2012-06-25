@@ -51,7 +51,10 @@ public class IBrepGraphicGL extends IGraphicObject{
 	for(ISurfaceGraphicGL g : surfaceGraphics) g.setColor(c);
     }
     
-    public boolean isDrawable(IGraphicMode m){ return m.isGL(); }
+    public boolean isDrawable(IGraphicMode m){
+	//return m.isGL();
+	return m.isGraphic3D();
+    }
     
     public void draw(IGraphics g){
 	for(ISurfaceGraphicGL gr : surfaceGraphics) gr.draw(g);

@@ -22,7 +22,7 @@
 
 package igeo.gui;
 
-import javax.media.opengl.*;
+//import javax.media.opengl.*;
 
 import igeo.*;
 
@@ -33,50 +33,161 @@ import igeo.*;
    @version 0.7.0.0;
 */
 public class IVectorGraphic extends IGraphicObject{
-    public static double defaultSize = 2; //1; //5; //1.0;
-    public static float defaultWeight = 1f;
+    //public static double defaultSize = 2; //1; //5; //1.0;
+    //public static float defaultWeight = 1f;
 
     public static IVec arrowHeadNormal = new IVec(0,0,1);
     public static IVec arrowHeadNormal2 = new IVec(0,1,0);
     
     public IVectorObject vec=null;
     
-    public double size=defaultSize;
-    public float weight=defaultWeight;
+    public float size= IConfig.arrowSize; //defaultSize;
+    public float weight=IConfig.strokeWeight; //defaultWeight;
     
     public IVectorGraphic(IVectorObject v){
 	super(v);
 	vec = v;
     }
-    
-    public void size(double sz){ size=sz; }
+
+    /** set arrow head size */
+    public void size(double sz){ size=(float)sz; }
+    /** get arrow head size */
     public double size(){ return size; }
+
+    /** set arrow line weight */
+    public void setWeight(float w){ weight=w; }
+    /** get arrow line weight */
+    public float getWeight(){ return weight; }
     
     public void draw(IGraphics g){
 	
 	if(vec==null) return;
 	
-	if(g.view().mode().isGL()){
+	//if(g.view().mode().isGL()){
+	if(g.type() == IGraphicMode.GraphicType.GL ||
+	   g.type() == IGraphicMode.GraphicType.P3D){
 	    
-	    GL gl = g.getGL();
+	    
+	    IVec rt = vec.root.get();
+	    IVec v = vec.vec.get();
+	    IVec t = null;
+	    
+	    if(v.angle(arrowHeadNormal)<IConfig.angleTolerance)
+		t = v.cross(arrowHeadNormal2);
+	    else t = v.cross(arrowHeadNormal);
+	    t.len(size/2);
+	    IVec v2 = vec.vec.get().dup().rev().len(size);
+	    
+	    IVec[] arrowLine = new IVec[2];
+	    IVec[] arrowHead = new IVec[3];
+	    arrowLine[0] = rt;
+	    arrowLine[1] = rt.dup().add(v);
+	    arrowHead[0] = v.dup().add(v2).sub(t).add(rt);
+	    arrowHead[1] = v.dup().add(rt);
+	    arrowHead[2] = v.dup().add(v2).add(t).add(rt);
+	    
+	    
+	    IGraphics3D g3d = (IGraphics3D)g;
+	    
+	    g3d.weight(weight);
+	    //g3d.pointSize(size);
+	    
+	    float red,green,blue,alpha;
+	    if(color!=null){
+		red = color.getRed();
+		green = color.getGreen();
+		blue = color.getBlue();
+		alpha = color.getAlpha();
+	    }
+	    else{
+		red = IConfig.objectColor.getRed();
+		green = IConfig.objectColor.getGreen();
+		blue = IConfig.objectColor.getBlue();
+		alpha = IConfig.objectColor.getAlpha();
+	    }
+
+	    // setting fill color
+	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
+		alpha = IConfig.transparentModeAlpha;
+	    
+            if(g3d.view().mode().isTransparent()) alpha = IConfig.transparentModeAlpha;
+	    
+            if(g3d.view().mode().isLight()){
+                g3d.ambient(red,green,blue,alpha);
+                g3d.diffuse(red,green,blue,alpha);
+                //g3d.specular(red,green,blue,alpha);
+                g3d.shininess(IConfig.shininess);
+                g3d.clr(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+            }
+            else{ g3d.clr(red,green,blue,alpha); }
+	    
+	    // fill
+	    if(g3d.view().mode().isFill()){
+		arrowLine[1].add(v2);
+		g3d.drawLines(arrowLine);
+		if(g3d.view().mode().isTransparent()){ alpha = IConfig.transparentModeAlpha; }
+		g3d.clr(red, green, blue, alpha);
+		g3d.drawTriangles(arrowHead);
+	    }
+	    
+	    // setting wireframe color
+            if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
+                alpha = IConfig.transparentModeAlpha;
+            else if(color!=null) alpha = (float)color.getAlpha();
+            else alpha = (float)IConfig.objectColor.getAlpha();
+	    
+            if(g3d.view().mode().isLight()&&g3d.view().mode().isLightWireframe()){
+                g3d.ambient(red,green,blue,alpha);
+		g3d.diffuse(red,green,blue,alpha);
+                //g3d.specular(red,green,blue,alpha);
+		g3d.shininess(IConfig.shininess);
+		g3d.stroke(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color // necessary here?
+            }
+            else{ g3d.stroke(red,green,blue,alpha); } // necessary here?
+	    
+	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
+		g3d.disableLight();
+	    
+	    g3d.stroke(red,green,blue,alpha);
+	    
+	    // wireframe
+	    if(g3d.view().mode().isWireframe()){
+		g3d.stroke(red, green, blue, alpha);
+		g3d.drawLines(arrowLine);
+		if(g3d.view().mode().isFill()){ g3d.drawLineLoop(arrowHead); } // close
+		else{ g3d.drawLineStrip(arrowHead); }
+	    }
+	    
+	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
+		g3d.enableLight();
+	    
+	    
+	    /*
+	    GL gl = ((IGraphicsGL)g).getGL();
 	    
 	    gl.glLineWidth(weight); //
 	    gl.glPointSize((float)size); //
 	    
-	    float red = defaultRed;
-            float green = defaultGreen;
-            float blue = defaultBlue;
-            float alpha = defaultAlpha;
-	    
-            if(color!=null){
-                red = (float)color.getRed()/255;
-                green = (float)color.getGreen()/255;
-                blue = (float)color.getBlue()/255;
-                alpha = (float)color.getAlpha()/255;
-            }
+	    float red,green,blue,alpha;
+	    //float red = defaultRed;
+	    //float green = defaultGreen;
+	    //float blue = defaultBlue;
+	    //float alpha = defaultAlpha;
+	    if(color!=null){
+		red = (float)color.getRed()/255;
+		green = (float)color.getGreen()/255;
+		blue = (float)color.getBlue()/255;
+		alpha = (float)color.getAlpha()/255;
+	    }
+	    else{
+		red = (float)IConfig.objectColor.getRed()/255;
+		green = (float)IConfig.objectColor.getGreen()/255;
+		blue = (float)IConfig.objectColor.getBlue()/255;
+		alpha = (float)IConfig.objectColor.getAlpha()/255;
+	    }
 	    
 	    if(g.view().mode().isTransparent()&&g.view().mode().isTransparentWireframe())
-		alpha = (float)transparentModeAlpha;
+		alpha = (float)IConfig.transparentModeAlpha/255;
 	    
             if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
                 float[] colorf = new float[]{ red, green, blue, alpha };
@@ -108,7 +219,7 @@ public class IVectorGraphic extends IGraphicObject{
 		gl.glVertex3d(v.x+v2.x+rt.x, v.y+v2.y+rt.y, v.z+v2.z+rt.z);
 		gl.glEnd();
 		if(g.view().mode().isTransparent()){
-		    alpha = (float)transparentModeAlpha;
+		    alpha = (float)IConfig.transparentModeAlpha/255;
 		    gl.glColor4f(red, green, blue, alpha);
 		}
 		// arrow head
@@ -133,8 +244,10 @@ public class IVectorGraphic extends IGraphicObject{
 	    
 	    if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
 		gl.glEnable(GL.GL_LIGHTING);
+
+	    */
 	}
-	else if(g.view().mode().isJava()){
+	else if(g.view().mode().isJ2D()){
 	    
 	    // ...to be implemented
 	    
@@ -143,7 +256,8 @@ public class IVectorGraphic extends IGraphicObject{
     }
     
     public boolean isDrawable(IGraphicMode m){
-	return m.isGL(); // currently GL only
+	//return m.isGL(); // currently GL only
+	return m.isGraphic3D(); 
     }
     
 }

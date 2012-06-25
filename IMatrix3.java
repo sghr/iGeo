@@ -36,8 +36,8 @@ public class IMatrix3 extends IMatrix implements IMatrix3I{
     }
     
     public IMatrix3(double v11, double v12, double v13,
-	      double v21, double v22, double v23,
-	      double v31, double v32, double v33){
+		    double v21, double v22, double v23,
+		    double v31, double v32, double v33){
 	super(3,3);
 	set(v11,v12,v13,
 	    v21,v22,v23,
@@ -78,6 +78,7 @@ public class IMatrix3 extends IMatrix implements IMatrix3I{
     
     
     public IMatrix3 dup(){ return new IMatrix3(this); }
+    public IMatrix3 cp(){ return dup(); }
     
     public double determinant(){
 	return val[0][0]*det(val[1][1],val[1][2],val[2][1],val[2][2])
@@ -142,31 +143,43 @@ public class IMatrix3 extends IMatrix implements IMatrix3I{
     
     public IMatrix3 mul(IMatrix3I m){ return mul(m.get()); }
     
-    /**
-       vector is treated as vertical vector
-    */
-    public IVec mul(IVecI v){
+    /** vector is treated as vertical vector */
+    public IVec mul(IVecI v){ return mul(v.get()); }
+    
+    /** vector is treated as vertical vector */
+    public IVec mul(IVec v){
 	IVec ret = new IVec();
-	ret.x = val[0][0]*v.x()+val[0][1]*v.y()+val[0][2]*v.z();
-	ret.y = val[1][0]*v.x()+val[1][1]*v.y()+val[1][2]*v.z();
-	ret.z = val[2][0]*v.x()+val[2][1]*v.y()+val[2][2]*v.z();
+	ret.x = val[0][0]*v.x+val[0][1]*v.y+val[0][2]*v.z;
+	ret.y = val[1][0]*v.x+val[1][1]*v.y+val[1][2]*v.z;
+	ret.z = val[2][0]*v.x+val[2][1]*v.y+val[2][2]*v.z;
+	return ret;
+    }
+    
+    /** vector is treated as vertical vector */
+    public IVec2 mul(IVec2I v){ return mul(v.get()); }
+    
+    /** vector is treated as vertical vector */
+    public IVec2 mul(IVec2 v){
+	IVec2 ret = new IVec2();
+	ret.x = val[0][0]*v.x+val[0][1]*v.y+val[0][2];
+	ret.y = val[1][0]*v.x+val[1][1]*v.y+val[1][2];
 	return ret;
     }
     
     public static IMatrix3 getXRotation(double angle){
 	return new IMatrix3(1, 0, 0,
-			     0, Math.cos(angle), -Math.sin(angle),
-			     0, Math.sin(angle), Math.cos(angle));
+			    0, Math.cos(angle), -Math.sin(angle),
+			    0, Math.sin(angle), Math.cos(angle));
     }
     public static IMatrix3 getYRotation(double angle){
 	return new IMatrix3(Math.cos(angle), 0, Math.sin(angle),
-			     0, 1, 0,
-			     -Math.sin(angle), 0, Math.cos(angle));
+			    0, 1, 0,
+			    -Math.sin(angle), 0, Math.cos(angle));
     }
     public static IMatrix3 getZRotation(double angle){
 	return new IMatrix3(Math.cos(angle), -Math.sin(angle), 0,
-			     Math.sin(angle), Math.cos(angle), 0,
-			     0, 0, 1);
+			    Math.sin(angle), Math.cos(angle), 0,
+			    0, 0, 1);
     }
     public static IMatrix3 getRotation(IVec axis, double angle){
 	IVec a = axis.dup().unit();

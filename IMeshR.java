@@ -127,6 +127,8 @@ public class IMeshR extends IObject implements IMeshI{
     public IMeshR setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IMeshR setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public IMeshR weight(double w){ super.weight(w); return this; }
+    public IMeshR weight(float w){ super.weight(w); return this; }
     
     
     /*******************************************************

@@ -48,7 +48,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     //public IMeshGeo(ArrayList<IEdge> edges, IMeshType creator){
     //    initWithEdges(edges, creator);
     //}
-
+    
     public IMeshGeo(IVec[][] matrix){ this(matrix,true,new IMeshType()); }
     public IMeshGeo(IVec[][] matrix, boolean triangulateDir){
 	this(matrix,triangulateDir,new IMeshType());
@@ -490,7 +490,159 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
         for(int i=0; i<f.vertices.length; i++){
             if(!vertices.contains(f.vertices[i])){ vertices.add(f.vertices[i]); }
         }
+    }
+    
+    public void addFace(IFace f, boolean checkVertexExisting, boolean checkEdgeExisting, boolean checkFaceExisting){
+	for(int i=0; i<f.vertices.length; i++){
+	    if(!checkVertexExisting || !vertices.contains(f.vertices[i])) vertices.add(f.vertices[i]);
+	}
+	for(int i=0; i<f.edges.length; i++){
+	    if(!checkEdgeExisting || !edges.contains(f.edges[i])) edges.add(f.edges[i]);
+	}
+	if(!checkFaceExisting || !faces.contains(f)) faces.add(f);
+    }
+    
+    
+    // OpenGL way of adding mesh faces
+    public void addTriangles(IVertex[] v){
+	for(int i=0; i<v.length-2; i+=3){
+	    IFace f = new IFace(v[i],v[i+1],v[i+2]);
+	    addFace(f, true, false, false);
+	}
+    }
+    public void addTriangles(IVec[] v){
+	for(int i=0; i<v.length-2; i+=3){
+	    IFace f = new IFace(new IVertex(v[i]),new IVertex(v[i+1]), new IVertex(v[i+2]));
+	    addFace(f, false, false, false);
+	}
+    }
+    public void addQuads(IVertex[] v){
+	for(int i=0; i<v.length-3; i+=4){
+	    IFace f = new IFace(v[i],v[i+1],v[i+2],v[i+3]);
+	    addFace(f, true, false, false);
+	}
+    }
+    public void addQuads(IVec[] v){
+	for(int i=0; i<v.length-3; i+=4){
+	    IFace f = new IFace(new IVertex(v[i]), new IVertex(v[i+1]), new IVertex(v[i+2]), new IVertex(v[i+3]));
+	    addFace(f, true, false, false);
+	}
+    }
+    public void addPolygon(IVertex[] v){
+	if(v.length<3) return;
+	IFace f = new IFace(v);
+	addFace(f, true, false, false);
+    }
+    public void addPolygon(IVec[] v){
+	if(v.length<3) return;
+	IVertex[] vtx = new IVertex[v.length];
+	for(int i=0; i<v.length; i++) vtx[i] = new IVertex(v[i]);
+	IFace f = new IFace(vtx);
+	addFace(f, false, false, false);
+    }
+    public void addTriangleStrip(IVertex[] v){
+	if(v.length<3) return;
 	
+	for(int i=0; i<v.length; i++) if(!vertices.contains(v[i])) vertices.add(v[i]);
+	
+	IEdge[] edges1 = new IEdge[v.length-1];
+	IEdge[] edges2 = new IEdge[v.length-2];
+	
+	for(int i=0; i<v.length-1; i++){ edges1[i] = new IEdge(v[i],v[i+1]); edges.add(edges1[i]); }
+	for(int i=0; i<v.length-2; i++){ edges2[i] = new IEdge(v[i],v[i+2]); edges.add(edges2[i]); }
+	
+	for(int i=0; i<v.length-2; i++){
+	    IFace f;
+	    if(i%2==0) f = new IFace(edges1[i], edges1[i+1], edges2[i]);
+	    else f = new IFace(edges1[i], edges2[i], edges1[i+1]);
+	    faces.add(f);
+	}
+    }
+    
+    public void addTriangleStrip(IVec[] v){
+	if(v.length<3) return;
+	IVertex[] vtx = new IVertex[v.length];
+	for(int i=0; i<v.length; i++){ vtx[i] = new IVertex(v[i]); vertices.add(vtx[i]); }
+	
+	IEdge[] edges1 = new IEdge[v.length-1];
+	IEdge[] edges2 = new IEdge[v.length-2];
+	
+	for(int i=0; i<v.length-1; i++){ edges1[i] = new IEdge(vtx[i],vtx[i+1]); edges.add(edges1[i]); }
+	for(int i=0; i<v.length-2; i++){ edges2[i] = new IEdge(vtx[i],vtx[i+2]); edges.add(edges2[i]); }
+	
+	for(int i=0; i<v.length-2; i++){
+	    IFace f;
+	    if(i%2==0) f = new IFace(edges1[i], edges1[i+1], edges2[i]);
+	    else f = new IFace(edges1[i], edges2[i], edges1[i+1]);
+	    faces.add(f);
+	}
+    }
+    public void addQuadStrip(IVertex[] v){
+	if(v.length<4) return;
+	int num = v.length/2;
+	for(int i=0; i<num*2; i++) if(!vertices.contains(v[i])) vertices.add(v[i]);
+	
+	IEdge[] edges1 = new IEdge[num];
+	IEdge[] edges2 = new IEdge[num-1];
+	IEdge[] edges3 = new IEdge[num-1];
+	
+	for(int i=0; i<num; i++){ edges1[i] = new IEdge(v[i*2],v[i*2+1]); edges.add(edges1[i]); }
+	for(int i=0; i<num-1; i++){ edges2[i] = new IEdge(v[i*2],v[i*2+2]); edges.add(edges2[i]); }
+	for(int i=0; i<num-1; i++){ edges3[i] = new IEdge(v[i*2+1],v[i*2+3]); edges.add(edges3[i]); }
+	
+	for(int i=0; i<num-1; i++){
+	    IFace f = new IFace(edges1[i], edges3[i], edges1[i+1], edges2[i]);
+	    faces.add(f);
+	}
+    }
+    public void addQuadStrip(IVec[] v){
+	if(v.length<4) return;
+	int num = v.length/2;
+	IVertex[] vtx = new IVertex[num*2];
+	for(int i=0; i<num*2; i++){ vtx[i] = new IVertex(v[i]); vertices.add(vtx[i]); }
+	
+	IEdge[] edges1 = new IEdge[num];
+	IEdge[] edges2 = new IEdge[num-1];
+	IEdge[] edges3 = new IEdge[num-1];
+	
+	for(int i=0; i<num; i++){ edges1[i] = new IEdge(vtx[i*2],vtx[i*2+1]); edges.add(edges1[i]); }
+	for(int i=0; i<num-1; i++){ edges2[i] = new IEdge(vtx[i*2],vtx[i*2+2]); edges.add(edges2[i]); }
+	for(int i=0; i<num-1; i++){ edges3[i] = new IEdge(vtx[i*2+1],vtx[i*2+3]); edges.add(edges3[i]); }
+	
+	for(int i=0; i<num-1; i++){
+	    IFace f = new IFace(edges1[i], edges3[i], edges1[i+1], edges2[i]);
+	    faces.add(f);
+	}
+    }
+    public void addTriangleFan(IVertex[] v){
+	if(v.length<3) return;
+	
+	for(int i=0; i<v.length; i++) if(!vertices.contains(v[i])) vertices.add(v[i]);
+	
+	IEdge[] edges1 = new IEdge[v.length-1];
+	IEdge[] edges2 = new IEdge[v.length-2];
+	for(int i=1; i<v.length; i++){ edges1[i-1] = new IEdge(v[0], v[i]); edges.add(edges1[i-1]); }
+	for(int i=1; i<v.length-1; i++){ edges2[i-1] = new IEdge(v[i], v[i+1]); edges.add(edges2[i-1]); }
+	
+	for(int i=0; i<v.length-2; i++){
+	    IFace f = new IFace(edges1[i], edges2[i], edges1[i+1]);
+	    faces.add(f);
+	}
+    }
+    public void addTriangleFan(IVec[] v){
+	if(v.length<3) return;
+	IVertex[] vtx = new IVertex[v.length];
+	for(int i=0; i<v.length; i++){ vtx[i] = new IVertex(v[i]); vertices.add(vtx[i]); }
+	
+	IEdge[] edges1 = new IEdge[v.length-1];
+	IEdge[] edges2 = new IEdge[v.length-2];
+	for(int i=1; i<v.length; i++){ edges1[i-1] = new IEdge(vtx[0], vtx[i]); edges.add(edges1[i-1]); }
+	for(int i=1; i<v.length-1; i++){ edges2[i-1] = new IEdge(vtx[i], vtx[i+1]); edges.add(edges2[i-1]); }
+	
+	for(int i=0; i<v.length-2; i++){
+	    IFace f = new IFace(edges1[i], edges2[i], edges1[i+1]);
+	    faces.add(f);
+	}
     }
     
     
@@ -1127,7 +1279,20 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     
     
     /** translate() is alias of add() */
-    public IMeshGeo translate(double x, double y, double z){ return add(x,y,z); }
+    public IMeshGeo translate(double x, double y, double z){
+	// debug
+	/*
+	for(int i=0; i<vertices.size(); i++){
+	    for(int j=0; j<vertices.size(); j++){
+		if(i!=j){
+		    if(vertices.get(i) == vertices.get(j)){ IOut.err("over wrap: "+i+" - "+j); }
+		}
+	    }
+	}
+	*/
+	return add(x,y,z);
+	
+    }
     public IMeshGeo translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
     public IMeshGeo translate(IVecI v){ return add(v); }
     

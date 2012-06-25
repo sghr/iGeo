@@ -52,6 +52,7 @@ public class IRandomAccessOutputStream extends OutputStream{
     
     public long pointer()throws IOException{ return file.getFilePointer(); }
     
+    public void close()throws IOException{ file.close(); }
     
 /*
     public byte[] toByteArray(){

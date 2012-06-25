@@ -687,7 +687,7 @@ public class IMeshCreator{
     }
     
     public static IMesh polygonStick(ICurveI crv, double radius, int polygonVertexNum){
-	int railSegmentNum = crv.epNum()*IConfig.curveGraphicResolution;
+	int railSegmentNum = crv.epNum()*IConfig.segmentResolution;
 	return polygonStick(crv,radius,polygonVertexNum,railSegmentNum);
     }
     
@@ -696,7 +696,7 @@ public class IMeshCreator{
     }
     
     public static IMesh roundStick(ICurveI crv, double radius){
-	int railSegmentNum = crv.epNum()*IConfig.curveGraphicResolution;
+	int railSegmentNum = crv.epNum()*IConfig.segmentResolution;
 	return polygonStick(crv,radius,IConfig.meshCircleResolution,railSegmentNum);
     }
     
@@ -713,7 +713,7 @@ public class IMeshCreator{
     }
     
     public static IMesh squareStick(ICurveI crv, double radius){
-	int railSegmentNum = crv.epNum()*IConfig.curveGraphicResolution;
+	int railSegmentNum = crv.epNum()*IConfig.segmentResolution;
 	return polygonStick(crv,radius,4,railSegmentNum);
     }
     

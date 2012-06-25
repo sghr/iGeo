@@ -275,7 +275,8 @@ public class ISurface extends IGeometry implements ISurfaceI{
     
     public IGraphicObject createGraphic(IGraphicMode m){
 	if(m.isNone()) return null;
-        if(m.isGL()){
+        //if(m.isGL()){
+	if(m.isGraphic3D()){
 	    return new ISurfaceGraphicGL(this);
 	    //if(m.isFill()) return new ISurfaceGraphicGL(this);
 	    //if(m.isFill()) return new ISurfaceGraphicFillGL(this);
@@ -792,5 +793,8 @@ public class ISurface extends IGeometry implements ISurfaceI{
     public ISurface setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
     public ISurface setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public ISurface setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
+    
+    public ISurface weight(double w){ super.weight(w); return this; }
+    public ISurface weight(float w){ super.weight(w); return this; }
     
 }

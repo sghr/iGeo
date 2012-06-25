@@ -33,6 +33,8 @@ package igeo;
 
 import static java.lang.Math.*;
 
+import java.util.ArrayList;
+
 /**
    A solar analysis package providing direction of the sun in
    the spcecified location at the specified time. 
@@ -41,6 +43,11 @@ import static java.lang.Math.*;
    @version 0.7.0.0;
 */
 public class ISun {
+    
+    /** internal search buffer default sample num per a day */
+    public static int bufferSampleNum =24*60; // check every min
+    
+    
     /** input location info */
     public double latitude=0, longitude=0;
     /** height(altitude) of the location */
@@ -63,7 +70,9 @@ public class ISun {
     
     public IVec northDir;
     
-    public SearchBuffer buffer=null; // cache for search
+    //public SearchBuffer buffer=null; // internal cache for search
+    //public SearchBuffer[] buffers=null; // internal cache for search, through a year
+    public ArrayList<SearchBuffer> buffers; // internal caches for search
     
     
     public static boolean precessionCorrection = true;
@@ -1040,6 +1049,11 @@ public class ISun {
     }
     
     
+    /** set north direction on XY plane */
+    public ISun northDir(IVec northDirection){ northDir = northDirection; return this; }
+    public ISun northDirection(IVec northDirection){ return northDir(northDirection); }
+    
+    
     /* calculate a solar vector (pointing sun location from the origin) at the given time.
        second can include fraction of millisecond */
     public IVec direction(int year, int month, int day, int hour, int minute, double second, boolean daylightSavingTime){
@@ -1257,24 +1271,50 @@ public class ISun {
 	return this;
     }
     
-    public double hourAt(int year, int month, int day, boolean daylightSavingTime,
-			 IVec azimuthDir, IVec northDir){
-	//project onto xy plane
-	double az = -azimuthDir.cp().z(0).angle(northDir.cp().z(0), IVec.zaxis);
-	az *= 180/Math.PI;
-	if(az < 0) az+=360;
-	return hourAt(year,month,day,daylightSavingTime,az);
+    
+    
+    /** search hour in the specified date when sun comes in the direction of azimuth */
+    public double hourAt(IVec azimuthDir, int year, int month, int day, boolean daylightSavingTime){
+	//return hourAt(azimuthDir, this.northDir, year, month, day, daylightSavingTime);
+	double az = azimuth(azimuthDir, northDir);
+	return hourAt(az,year,month,day,daylightSavingTime);
     }
     
     /** search hour in the specified date when sun comes in the direction of azimuth */
-    public double hourAt(int year, int month, int day, boolean daylightSavingTime, double azimuth){
-	final int sampleNum =24*60; // check every min
-	return hourAt(year,month,day,daylightSavingTime,azimuth,sampleNum);
+    /* // north direction should be set at the constructor or northDir()
+    public double hourAt(IVec azimuthDir, IVec northDirection,
+			 int year, int month, int day, boolean daylightSavingTime){
+	double az = azimuth(azimuthDir, northDirection);
+	return hourAt(az,year,month,day,daylightSavingTime);
+    }
+    */
+    
+    /** search hour in the specified date when sun comes in the direction of azimuth */
+    public double hourAt(double azimuth, int year, int month, int day, boolean daylightSavingTime){
+	//final int sampleNum =24*60; // check every min
+	return hourAt(azimuth,year,month,day,daylightSavingTime,bufferSampleNum);
     }
     
     /** search hour in the specified date when sun comes in the direction of azimuth */
-    public double hourAt(int year, int month, int day, boolean daylightSavingTime, double azimuth,
+    public double hourAt(double azimuth, int year, int month, int day, boolean daylightSavingTime, 
 			 int sampleNumber){
+	if(buffers==null){ buffers = new ArrayList<SearchBuffer>(); }
+	
+	SearchBuffer buf = null;
+	for(int i=buffers.size()-1; i>=0 && buf==null; i--){
+	    SearchBuffer b = buffers.get(i);
+	    //if(b.date.year==year && b.date.month==month &&b.date.day==day && b.date.daylightSavingTime==daylightSavingTime &&b.sampleNumber==sampleNumber){ buf = b; }
+	    if(b.year==year && b.month==month &&b.day==day && b.daylightSavingTime==daylightSavingTime &&b.sampleNumber==sampleNumber){ buf = b; }
+	}
+	
+	if(buf==null){
+	    buf = new SearchBuffer(this,year,month,day,daylightSavingTime,sampleNumber);
+	    buf.calc();
+	    buffers.add(buf);
+	}
+	
+	return buf.hourAt(azimuth);
+	/*
 	if(buffer==null ||
 	   buffer.date.year!=year||
 	   buffer.date.month!=month||
@@ -1285,18 +1325,424 @@ public class ISun {
 	    buffer.calc();
 	}
 	return buffer.hourAt(azimuth);
+	*/
+    }
+    
+    /** search altitude in the specified date when sun comes in the direction of azimuth */
+    /* // north direction should be set at the constructor or northDir()
+    public double altitudeAt(IVec azimuthDir, IVec northDirection, int year, int month, int day){
+	double h = hourAt(azimuthDir,northDirection,year,month,day,false); // daylightsaving is off
+	return altitude(year, month, day, h, false);
+    }
+    */
+    /** search altitude in the specified date when sun comes in the direction of azimuth */
+    public double altitudeAt(IVec azimuthDir, int year, int month, int day){
+	double h = hourAt(azimuthDir, year, month, day, false);
+	return altitude(year, month, day, h, false);
+    }
+    
+    /** search altitude in the specified date when sun comes in the direction of azimuth */
+    public double altitudeAt(double azimuth, int year, int month, int day){
+	double h = hourAt(azimuth, year, month, day, false);
+	return altitude(year, month, day, h, false);
+    }
+    
+    /** search altitude in the specified date when sun comes in the direction of azimuth */
+    public double altitudeAt(double azimuth, int year, int month, int day, int sampleNumber){
+	double h = hourAt(azimuth, year, month, day, false, sampleNumber);
+	return altitude(year, month, day, h, false);
+    }
+    
+    /** solar direction vector at specified azimuth on the date */
+    /*// north direction should be set at the constructor or northDir()
+    public IVec directionAt(IVec azimuthDir, IVec northDirection, int year, int month, int day){
+	return dirAt(azimuthDir, northDirection, year, month, day);
+    }
+    */
+    
+    /** solar direction vector at specified azimuth on the date */
+    public IVec directionAt(IVec azimuthDir, int year, int month, int day){
+	return dirAt(azimuthDir, year, month, day);
+    }
+    
+    /** solar direction vector at specified azimuth on the date */
+    public IVec directionAt(double azimuth, int year, int month, int day){
+	return dirAt(azimuth, year, month, day);
+    }
+    
+    /** solar direction vector at specified azimuth on the date */
+    public IVec directionAt(double azimuth, int year, int month, int day, int sampleNumber){
+	return dirAt(azimuth, year, month, day, sampleNumber);
+    }
+    
+    
+    /** solar direction vector at specified azimuth on the date */
+    /* // north direction should be set at the constructor or northDir()
+    public IVec dirAt(IVec azimuthDir, IVec northDirection, int year, int month, int day){
+	double h = hourAt(azimuthDir,northDirection,year,month,day,false);
+	return dir(year, month, day, h, false);
+    }
+    */
+    
+    /** solar direction vector at specified azimuth on the date */
+    public IVec dirAt(IVec azimuthDir, int year, int month, int day){
+	double h = hourAt(azimuthDir, year, month, day, false);
+	return dir(year, month, day, h, false);
+    }
+    
+    /** solar direction vector at specified azimuth on the date */
+    public IVec dirAt(double azimuth, int year, int month, int day){
+	double h = hourAt(azimuth, year, month, day, false);
+	return dir(year, month, day, h, false);
+    }
+    
+    /** solar direction vector at specified azimuth on the date */
+    public IVec dirAt(double azimuth, int year, int month, int day, int sampleNumber){
+	double h = hourAt(azimuth, year, month, day, false, sampleNumber);
+	return dir(year, month, day, h, false);
     }
     
     
     
-    // static methods
+    
+    /** min altitude angle in the specified azimuth through the year */
+    /* // north direction should be set at the constructor or northDir().
+    public double minAltitudeAt(IVec azimuthDir, IVec northDirection, int year){
+	double az = azimuth(azimuthDir, northDirection);
+	return minAltitudeAt(az, year);
+    }
+    */
+    
+    /** min altitude angle in the specified azimuth through the year */
+    public double minAltitudeAt(IVec azimuthDir, int year){
+	//return minAltitudeAt(azimuthDir,this.northDir,year);
+	double az = azimuth(azimuthDir, northDir);
+	return minAltitudeAt(az, year);
+    }
+    
+    /** min altitude angle in the specified azimuth through the year */
+    public double minAltitudeAt(double azimuth, int year){
+	return minAltitudeAt(azimuth, new DateRange(year), bufferSampleNum);
+    }
+    
+    /** min altitude angle in the specified azimuth through the year */
+    /*
+    public double minAltitudeAt(double azimuth, int year, int sampleNumber){
+	return minAltitudeAt(azimuth, new DateRange(year), sampleNumber);
+	//int num = isLeapYear(year)?366:365;
+	//double minAlt=1000; // 
+	//for(int i=1; i<=num; i++){
+	//    int[] monthAndDay = dayCountToMonthAndDate(i, year);
+	//    double alt = altitudeAt(azimuth, year, monthAndDay[0], monthAndDay[1], sampleNumber);
+	//    if(i==1 || alt<minAlt){ minAlt=alt; }
+	//}
+	//return minAlt;
+    }
+    */
+    
+    /** min altitude angle in the specified azimuth through the year */
+    public double minAltitudeAt(IVec azimuthDir, DateRange dates){
+	return minAltitudeAt(azimuth(azimuthDir, northDir), dates);
+    }
+    
+    /** min altitude angle in the specified azimuth through the year */
+    public double minAltitudeAt(double azimuth, DateRange dates){
+	return minAltitudeAt(azimuth, dates, bufferSampleNum);
+    }
+    
+    /** min altitude angle in the specified azimuth through the year */
+    public double minAltitudeAt(double azimuth, DateRange dates, int sampleNumber){
+	double minAlt=10000; // alt should be from -90 to +90
+	for(DateIterator it = dates.getIterator(); !it.past(dates); it.next()){
+	    double alt = altitudeAt(azimuth, it.year, it.month, it.day, sampleNumber);
+	    if(alt<minAlt) minAlt = alt;
+	}
+	return minAlt;
+    }
+    
+    
+    
+    /** max altitude angle in the specified azimuth through the year */
+    /* // north direction should be set at the constructor or northDir().
+    public double maxAltitudeAt(IVec azimuthDir, IVec northDirection, int year){
+	double az = azimuth(azimuthDir, northDirection);
+	return maxAltitudeAt(az, year);
+    }
+    */
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double maxAltitudeAt(IVec azimuthDir, int year){
+	//return maxAltitudeAt(azimuthDir,this.northDir,year);
+	double az = azimuth(azimuthDir, northDir);
+	return maxAltitudeAt(az,year);
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double maxAltitudeAt(double azimuth, int year){
+	return maxAltitudeAt(azimuth, new DateRange(year), bufferSampleNum);
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    /*
+    public double maxAltitudeAt(double azimuth, int year, int sampleNumber){
+	return maxAltitudeAt(azimuth,new DateRange(year),sampleNumber);
+	//int num = isLeapYear(year)?366:365;
+	//double maxAlt=1000; // 
+	//for(int i=1; i<=num; i++){
+	//    int[] monthAndDay = dayCountToMonthAndDate(i, year);
+	//    double alt = altitudeAt(azimuth, year, monthAndDay[0], monthAndDay[1], sampleNumber);
+	//    if(i==1 || alt>maxAlt){ maxAlt=alt; }
+	//}
+	//return maxAlt;
+    }
+    */
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double maxAltitudeAt(IVec azimuthDir, DateRange dates){
+	return maxAltitudeAt(azimuth(azimuthDir, northDir),dates);
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double maxAltitudeAt(double azimuth, DateRange dates){
+	return maxAltitudeAt(azimuth, dates, bufferSampleNum);
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double maxAltitudeAt(double azimuth, DateRange dates, int sampleNumber){
+	double maxAlt=-10000; // alt should be from -90 to +90
+	for(DateIterator it = dates.getIterator(); !it.past(dates); it.next()){
+	    double alt = altitudeAt(azimuth, it.year, it.month, it.day, sampleNumber);
+	    if(alt>maxAlt) maxAlt = alt;
+	}
+	return maxAlt;
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    /* // north direction should be set at the constructor or northDir().
+    public double[] minAndMaxAltitudeAt(IVec azimuthDir, IVec northDirection, int year){
+	double az = azimuth(azimuthDir, northDirection);
+	return minAndMaxAltitudeAt(az, year);
+    }
+    */
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double[] minAndMaxAltitudeAt(IVec azimuthDir, int year){
+	//return minAndMaxAltitudeAt(azimuthDir,this.northDir,year);
+	double az = azimuth(azimuthDir, northDir);
+	return minAndMaxAltitudeAt(az, year);
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double[] minAndMaxAltitudeAt(double azimuth, int year){
+	return minAndMaxAltitudeAt(azimuth, new DateRange(year), bufferSampleNum);
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    /*
+    public double[] minAndMaxAltitudeAt(double azimuth, int year, int sampleNumber){
+	return minAndMaxAltitudeAt(azimuth,new DateRange(year), sampleNumber);
+	//int num = isLeapYear(year)?366:365;
+	//double minAlt=1000, maxAlt=1000; //
+	//for(int i=1; i<=num; i++){
+	//    int[] monthAndDay = dayCountToMonthAndDate(i, year);
+	//    double alt = altitudeAt(azimuth, year, monthAndDay[0], monthAndDay[1], sampleNumber);
+	//    if(i==1 || alt<minAlt){ minAlt=alt; }
+	//    if(i==1 || alt>maxAlt){ maxAlt=alt; }
+	//}
+	//return new double[]{ minAlt, maxAlt };
+    }
+    */
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double[] minAndMaxAltitudeAt(IVec azimuthDir, DateRange dates){
+	return minAndMaxAltitudeAt(azimuth(azimuthDir, northDir), dates);
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double[] minAndMaxAltitudeAt(double azimuth, DateRange dates){
+	return minAndMaxAltitudeAt(azimuth, dates, bufferSampleNum);
+    }
+    
+    /** max altitude angle in the specified azimuth through the year */
+    public double[] minAndMaxAltitudeAt(double azimuth, DateRange dates, int sampleNumber){
+	double minAlt=10000; // alt should be from -90 to +90
+	double maxAlt=-10000; // alt should be from -90 to +90
+	for(DateIterator it = dates.getIterator(); !it.past(dates); it.next()){
+	    double alt = altitudeAt(azimuth, it.year, it.month, it.day, sampleNumber);
+	    if(alt>maxAlt) maxAlt = alt;
+	    if(alt<minAlt) minAlt = alt;
+	}
+	return new double[]{ minAlt, maxAlt };
+    }
+    
+    /** lowest solar vector in the specified azimuth through the year */
+    /* // north direction should be set at the constructor or northDir().
+    public IVec lowestDirAt(IVec azimuthDir, IVec northDirection, int year){
+	double az = azimuth(azimuthDir, northDirection);
+	double altitude = minAltitudeAt(az, year);
+	return direction(altitude, az, northDirection);
+    }
+    */
+    
+    /** lowest solar vector in the specified azimuth through the year */
+    public IVec lowestDirAt(IVec azimuthDir, int year){
+	double az = azimuth(azimuthDir, northDir);
+	double alt = minAltitudeAt(az, year);
+	return direction(alt, az, northDir);
+    }
+    
+    /** lowest solar vector in the specified azimuth through the year */
+    public IVec lowestDirAt(double azimuth, int year){
+	double alt = minAltitudeAt(azimuth, year);
+	return direction(alt, azimuth, northDir);
+    }
+    
+    /** lowest solar vector in the specified azimuth through the year */
+    /*
+    public IVec lowestDirAt(double azimuth, int year, int sampleNumber){
+	double altitude = minAltitudeAt(azimuth, year, sampleNumber);
+	return direction(altitude, azimuth, northDir);
+    }    
+    */
+    
+    /** lowest solar vector in the specified azimuth through the year */
+    public IVec lowestDirAt(IVec azimuthDir, DateRange dates){
+	double az = azimuth(azimuthDir, northDir);
+	double alt = minAltitudeAt(az, dates);
+	return direction(alt, az, northDir);
+    }
+    
+    /** lowest solar vector in the specified azimuth through the year */
+    public IVec lowestDirAt(double azimuth, DateRange dates){
+	double alt = minAltitudeAt(azimuth, dates);
+	return direction(alt, azimuth, northDir);
+    }
+    
+    /** lowest solar vector in the specified azimuth through the year */
+    public IVec lowestDirAt(double azimuth, DateRange dates, int sampleNumber){
+	double alt = minAltitudeAt(azimuth, dates, sampleNumber);
+	return direction(alt, azimuth, northDir);
+    }
+    
+    
+    /** highest solar vector in the specified azimuth through the year */
+    /* // north direction should be set at the constructor or northDir().
+    public IVec highestDirAt(IVec azimuthDir, IVec northDirection, int year){
+	double az = azimuth(azimuthDir, northDirection);
+	double altitude = maxAltitudeAt(az, year);
+	return direction(altitude, az, northDirection);
+    }
+    */
+    
+    /** highest solar vector in the specified azimuth through the year */
+    public IVec highestDirAt(IVec azimuthDir, int year){
+	double az = azimuth(azimuthDir, northDir);
+	double altitude = maxAltitudeAt(az, year);
+	return direction(altitude, az, northDir);
+    }
+    
+    /** highest solar vector in the specified azimuth through the year */
+    public IVec highestDirAt(double azimuth, int year){
+	double altitude = maxAltitudeAt(azimuth, year);
+	return direction(altitude, azimuth, northDir);
+    }
+    
+    /** highest solar vector in the specified azimuth through the year */
+    /*
+    public IVec highestDirAt(double azimuth, int year, int sampleNumber){
+	double altitude = maxAltitudeAt(azimuth, year, sampleNumber);
+	return direction(altitude, azimuth, northDir);
+    }    
+    */
+    
+    /** highest solar vector in the specified azimuth through the year */
+    public IVec highestDirAt(IVec azimuthDir, DateRange dates){
+	double az = azimuth(azimuthDir, northDir);
+	double alt = maxAltitudeAt(az, dates);
+	return direction(alt, az, northDir);
+    }
+    
+    /** highest solar vector in the specified azimuth through the year */
+    public IVec highestDirAt(double azimuth, DateRange dates){
+	double alt = maxAltitudeAt(azimuth, dates);
+	return direction(alt, azimuth, northDir);
+    }
+    
+    /** highest solar vector in the specified azimuth through the year */
+    public IVec highestDirAt(double azimuth, DateRange dates, int sampleNumber){
+	double alt = maxAltitudeAt(azimuth, dates, sampleNumber);
+	return direction(alt, azimuth, northDir);
+    }
+    
+    /** highest and lowest solar vector in the specified azimuth through the year */
+    /* // north direction should be set at the constructor or northDir().
+    public IVec[] lowestAndHighestDirAt(IVec azimuthDir, IVec northDirection, int year){
+	double az = azimuth(azimuthDir, northDirection);
+	double[] altitude = minAndMaxAltitudeAt(az, year);
+	return new IVec[]{ direction(altitude[0], az, northDirection),
+			   direction(altitude[1], az, northDirection) };
+    }
+    */
+    
+    /** highest and lowest solar vector in the specified azimuth through the year */
+    public IVec[] lowestAndHighestDirAt(IVec azimuthDir, int year){
+	double az = azimuth(azimuthDir, this.northDir);
+	double[] altitude = minAndMaxAltitudeAt(az, year);
+	return new IVec[]{ direction(altitude[0], az, northDir),
+			   direction(altitude[1], az, northDir) };
+    }
+    
+    /** highest and lowest solar vector in the specified azimuth through the year */
+    public IVec[] lowestAndHighestDirAt(double azimuth, int year){
+	double[] altitude = minAndMaxAltitudeAt(azimuth, year);
+	return new IVec[]{ direction(altitude[0], azimuth, northDir),
+			   direction(altitude[1], azimuth, northDir) };
+    }
+    
+    /** highest and lowest solar vector in the specified azimuth through the year */
+    /*
+    public IVec[] lowestAndHighestDirAt(double azimuth, int year, int sampleNumber){
+	double[] altitude = minAndMaxAltitudeAt(azimuth, year, sampleNumber);
+	return new IVec[]{ direction(altitude[0], azimuth, northDir),
+			   direction(altitude[1], azimuth, northDir) };
+    }
+    */
+    
+    /** highest and lowest solar vector in the specified azimuth through the year */
+    public IVec[] lowestAndHighestDirAt(IVec azimuthDir, DateRange dates){
+	double az = azimuth(azimuthDir, this.northDir);
+	double[] alt = minAndMaxAltitudeAt(az, dates);
+	return new IVec[]{ direction(alt[0], az, northDir),
+			   direction(alt[1], az, northDir) };
+    }
+    
+    /** highest and lowest solar vector in the specified azimuth through the year */
+    public IVec[] lowestAndHighestDirAt(double azimuth, DateRange dates){
+	double[] alt = minAndMaxAltitudeAt(azimuth, dates);
+	return new IVec[]{ direction(alt[0], azimuth, northDir),
+			   direction(alt[1], azimuth, northDir) };
+    }
+    
+    /** highest and lowest solar vector in the specified azimuth through the year */
+    public IVec[] lowestAndHighestDirAt(double azimuth, DateRange dates, int sampleNumber){
+	double[] alt = minAndMaxAltitudeAt(azimuth, dates, sampleNumber);
+	return new IVec[]{ direction(alt[0], azimuth, northDir),
+			   direction(alt[1], azimuth, northDir) };
+    }
+    
+    
+    
+    
+    /************************************************************************************
+     * static methods
+     ************************************************************************************/
     
     /** calculate azimuth angle at the given time and location
 	hour can include fraction of minutes */
     public static double azimuth(double latitude, double longitude, double elevation,
-			  double timeZone,
-			  int year, int month, int day, double hour,
-			  boolean daylightSavingTime){
+				 double timeZone,
+				 int year, int month, int day, double hour,
+				 boolean daylightSavingTime){
 	double[] retval = calcAngle(latitude, longitude, elevation,timeZone,
 				    year,month,day,hour,daylightSavingTime);
 	return retval[1];
@@ -1305,12 +1751,26 @@ public class ISun {
     /** calculate altitude angle at the given time and location
 	hour can include fraction of minutes */
     public static double altitude(double latitude, double longitude, double elevation,
-			   double timeZone,
-			   int year, int month, int day, double hour,
-			   boolean daylightSavingTime){
+				  double timeZone,
+				  int year, int month, int day, double hour,
+				  boolean daylightSavingTime){
 	double[] retval = calcAngle(latitude, longitude, elevation,timeZone,
 				    year,month,day,hour,daylightSavingTime);
 	return retval[0];
+    }
+    
+    
+    /** conveting vector to azimuth angle */
+    public static double azimuth(IVec azimuthDir, IVec northDirection){
+	//project onto xy plane
+	if(northDirection==null) northDirection = new IVec(0,1,0);
+	//double az = -azimuthDir.cp().z(0).angle(northDirection.cp().z(0), IVec.zaxis);
+	if(azimuthDir.z!=0.0) azimuthDir = azimuthDir.cp().z(0);
+	if(northDirection.cp().z!=0.0) northDirection = northDirection.cp().z(0);
+	double az = azimuthDir.angle(northDirection, IVec.zaxis);
+	az *= 180/Math.PI;
+	if(az < 0) az+=360;
+	return az;
     }
     
     
@@ -1844,7 +2304,7 @@ public class ISun {
 	r[2][2] = cosc;
 	return r;
     }
-
+    
     
     public static String degStr(double deg){
 	int d = (int)deg;
@@ -1881,6 +2341,18 @@ public class ISun {
     public static double mod(double x, double mod){ x = x%mod; if(x<0){ x+=mod; } return x; }
     
     public static void main(String[] args){
+	
+	
+	DateRange range = new DateRange(2001, 2, 20, 2000, 3, 3);
+	IOut.p(range);
+	IOut.p(range.dayCount() + "days"); //
+	
+	
+	
+	//String[] ids = java.util.TimeZone.getAvailableIDs();
+	//for(String s:ids) IG.p(s);
+	//if(true)return;
+	
 	
 	/*
 	double[] retval = ISun.pos(2451545.0);
@@ -2052,20 +2524,172 @@ public class ISun {
 	//IG.p("17 42 25.6 = "+ (17+42./60+25.6/3600)*15); //
 	//IG.p("16 25 10.3 ="+ (16+25./60+10.3/3600)*15); //
 	
+    }
+    
+    
+    
+    /** convert count of days from Jan 1st to month and date. day count 1 is Jan 1st.
+	@return array of int; first is month, second is date */
+    /*
+    public static int[] dayCountToMonthAndDate(int dayCount, int year){
+	int[] days = new int[]{ 31, isLeapYear(year)?29:28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	if(dayCount>0){
+	    for(int m=1; m<=12; m++){
+		if(dayCount <= days[m-1]) return new int[]{ m, dayCount };
+		dayCount -= days[m-1];
+	    }
+	}
+	IOut.err("dayCount is invalid number : "+ dayCount);
+	return null;
+    }
+    */
+
+    public static boolean isLeapYear(int year){
+	return year%4==0 && year%100!=0 || year%900==200 || year%900==600;
+    }
+    
+    public static int endDayOfMonth(int year, int month){
+	switch(month){
+	case 1: return 31;
+	case 2: if(isLeapYear(year)) return 29; else return 28;
+	case 3: return 31;
+	case 4: return 30;
+	case 5: return 31;
+	case 6: return 30;
+	case 7: return 31;
+	case 8: return 31;
+	case 9: return 30;
+	case 10: return 31;
+	case 11: return 30;
+	case 12: return 31;
+	}
+	IOut.err("invalid month : "+month);
+	return -1; 
+    }
+    
+    public static class DateIterator{
+	public int year, month, day;
+	
+	public DateIterator (int y, int m, int d){ year=y; month=m; day=d; }
+	
+	public void next(){
+	    day++;
+	    if(day>28 && day>endDayOfMonth(year, month)){
+		day=1; month++;
+		if(month>12){ month=1; year++; }
+	    }
+	}
+	
+	public boolean past(int y, int m, int d){
+	    if(year < y) return false;
+	    if(year > y) return true;
+	    // year == y
+	    if(month < m) return false;
+	    if(month > m) return true;
+	    // month == m
+	    if(day < d) return false;
+	    if(day > d) return true;
+	    // day == d
+	    return false; // same date returns false.
+	}
+	
+	public boolean past(DateRange d){ return past(d.endYear,d.endMonth,d.endDay); }
+	
+    }
+    
+    public static class DateRange{
+	public int startYear, endYear, startMonth, endMonth, startDay, endDay;
+	
+	public DateRange(int startYear, int startMonth, int startDay,
+			int endYear, int endMonth, int endDay){
+	    this.startYear = startYear;
+	    this.startMonth = startMonth;
+	    this.startDay = startDay;
+	    this.endYear = endYear;
+	    this.endMonth = endMonth;
+	    this.endDay = endDay;
+	}
+	
+	public DateRange(int year, int startMonth, int startDay, int endMonth, int endDay){
+	    this.startYear = year;
+	    this.startMonth = startMonth;
+	    this.startDay = startDay;
+	    this.endYear = year;
+	    this.endMonth = endMonth;
+	    this.endDay = endDay;
+	}
+	
+	public DateRange(int year, int startMonth, int endMonth){
+	    this.startYear = year;
+	    this.startMonth = startMonth;
+	    this.startDay = 1;
+	    this.endYear = year;
+	    this.endMonth = endMonth;
+	    this.endDay = endDayOfMonth(year, endMonth);
+	}
+	
+	public DateRange(int year){
+	    startYear = year;
+	    startMonth = 1;
+	    startDay = 1;
+	    endYear = year;
+	    endMonth = 12;
+	    endDay = 31;
+	}
+	
+	public DateIterator getIterator(){
+	    return new DateIterator(startYear, startMonth, startDay);
+	}
+	
+	public int dayCount(){
+	    
+	    int count=0;
+	    for(DateIterator iterator=getIterator(); !iterator.past(endYear,endMonth,endDay); iterator.next(), count++);
+	    return count;
+	    
+	    
+	    /*
+	    if(startYear < endYear) return -1;
+	    if(startYear==endYear){
+		if(startMonth < endMonth) return -1;
+		if(startMonth==endMonth){ if(startDay < endDay) return -1; }
+	    }
+	    int y = startYear;
+	    int m = startMonth;
+	    int d = startDay;
+	    int count=0;
+	    for(; y<=endYear; y++){
+		for(; y<endYear&&m<=12 || y==endYear&&m<=endMonth; m++){
+		    int endDayOfMonth = endDayOfMonth(y,m);
+		    for(  ; y<endYear && d<=endDayOfMonth ||
+			      y==endYear && m<endMonth && d<=endDayOfMonth ||
+			      y==endYear && m==endMonth && d<=endDay && d<=endDayOfMonth; d++, count++);
+		    d = 1;
+		}
+		m = 1;
+	    }
+	    return -1; //
+	    */
+	}
+	
+	public String toString(){
+	    return String.valueOf(startYear)+"/"+
+		String.valueOf(startMonth)+"/"+
+		String.valueOf(startDay)+"-"+
+		String.valueOf(endYear)+"/"+
+		String.valueOf(endMonth)+"/"+
+		String.valueOf(endDay);
+	}
 	
     }
     
     
+    /*
     public static class Date{
-	/** input time info */
-	public int year=2000, month=1, day=1;
-	/** hour includes fraction of minutes and seconds */
-	public double hour = 0;
-	/** switch to interpret hour as hour in daylight saving day */
-	public boolean daylightSavingTime = false;
-	
+	public int year=2000, month=1, day=1; // input time info 
+	public double hour = 0; // hour includes fraction of minutes and seconds
+	public boolean daylightSavingTime = false; // switch to interpret hour as hour in daylight saving day
 	public Date(){}
-	
 	public Date(int year, int month, int day, double hour, boolean daylightSavingTime){
 	    this.year = year;
 	    this.month = month;
@@ -2073,93 +2697,80 @@ public class ISun {
 	    this.hour = hour;
 	    this.daylightSavingTime = daylightSavingTime;
 	}
-	
 	public Date(int year, int month, int day, boolean daylightSavingTime){
 	    this.year = year;
 	    this.month = month;
 	    this.day = day;
 	    this.daylightSavingTime = daylightSavingTime;
 	}
-	
-	public Date(int year, int month, int day, int hour, double minute,
-		    boolean daylightSavingTime){
+	public Date(int year, int month, int day, int hour, double minute, boolean daylightSavingTime){
 	    this.year = year;
 	    this.month = month;
 	    this.day = day;
 	    this.hour = hour + minute/60.;
 	    this.daylightSavingTime = daylightSavingTime;
 	}
-	
-	public Date(int year, int month, int day, int hour, int minute, double second,
-		    boolean daylightSavingTime){
+	public Date(int year, int month, int day, int hour, int minute, double second, boolean daylightSavingTime){
 	    this.year = year;
 	    this.month = month;
 	    this.day = day;
 	    this.hour = hour + (double)minute/60. + second/3600.;
 	    this.daylightSavingTime = daylightSavingTime;
 	}
-	
 	public Date(int year, int month, int day, double hour){
 	    this.year = year;
 	    this.month = month;
 	    this.day = day;
 	    this.hour = hour;
 	}
-	
 	public Date(int year, int month, int day){
 	    this.year = year;
 	    this.month = month;
 	    this.day = day;
 	}
-	
 	public Date(int year, int month, int day, int hour, double minute){
 	    this.year = year;
 	    this.month = month;
 	    this.day = day;
 	    this.hour = hour + minute/60.;
 	}
-	
 	public Date(int year, int month, int day, int hour, int minute, double second){
 	    this.year = year;
 	    this.month = month;
 	    this.day = day;
 	    this.hour = hour + (double)minute/60. + second/3600.;
 	}
-
 	public Date(Date d){
-	    year = d.year;
-	    month = d.month;
-	    day = d.day;
-	    hour = d.hour;
+	    year = d.year; month = d.month; day = d.day; hour = d.hour;
 	    daylightSavingTime = d.daylightSavingTime;
 	}
-	
     }
+    */
     
     // store altitude and azimuth of one day
     public static class SearchBuffer{
 	public double[] altitudes;
 	public double[] azimuths;
-	public Date date;
+	//public Date date;
+	int year, month, day;
+	boolean daylightSavingTime;
 	/** sample number per a day */
-	public int sampleNumber = 24*60;  // default is every minutes
+	public int sampleNumber;
 	public ISun sun;
 	
-	public SearchBuffer(ISun sun, Date d, int sampleNumber){
-	    this.sun = sun;
-	    date = d;
+	//public SearchBuffer(ISun sun, Date d, int sampleNumber){ this.sun = sun; date = d; this.sampleNumber = sampleNumber; }
+	//public SearchBuffer(ISun sun, Date d){ this.sun = sun; date = d; sampleNumber = ISun.bufferSampleNum; }
+	public SearchBuffer(ISun sun, int year, int month, int day, boolean daylightSavingTime,
+			    int sampleNumber){
+	    //this(sun,new Date(year,month,day,daylightSavingTime),sampleNumber);
+	    this.sun = sun; this.year = year; this.month = month; this.day = day;
+	    this.daylightSavingTime = daylightSavingTime;
 	    this.sampleNumber = sampleNumber;
 	}
 	
-	public SearchBuffer(ISun sun, int year, int month, int day, boolean daylightSavingTime,
-			    int sampleNumber){
-	    this(sun,new Date(year,month,day,daylightSavingTime),sampleNumber);
-	}
-	
-	public SearchBuffer(ISun sun, Date d){ this.sun = sun; date = d; }
-	
 	public SearchBuffer(ISun sun, int year, int month, int day, boolean daylightSavingTime){
-	    this(sun,new Date(year,month,day,daylightSavingTime));
+	    //this(sun,new Date(year,month,day,daylightSavingTime));
+	    this(sun,year,month,day,daylightSavingTime,ISun.bufferSampleNum);
 	}
 	
 	public double azimuth(int i){ return azimuths[i]; }
@@ -2173,14 +2784,15 @@ public class ISun {
 		}
 		else if(i<sampleNumber &&
 			(azimuths[i]<azimuths[i+1] &&
-			 azimuth > azimuths[i] && azimuth < azimuths[i+1] ||
+			 azimuth > azimuths[i] && azimuth /*<*/ <= azimuths[i+1] ||
 			 azimuths[i]>azimuths[i+1] &&
-			 (azimuth > azimuths[i] && azimuth < (azimuths[i+1]+360) ||
-			  azimuth > azimuths[i]-360 && azimuth < azimuths[i+1]) ) ){
+			 (azimuth > azimuths[i] && azimuth /*<*/ <= (azimuths[i+1]+360) ||
+			  azimuth > azimuths[i]-360 && azimuth /*<*/ <= azimuths[i+1]) ) ){
 		    double r = (azimuth - azimuths[i])/(azimuths[i+1]-azimuths[i]);
 		    return 24.0/sampleNumber*(i+r);
 		}
 	    }
+	    IOut.err("last azimuth = "+azimuths[azimuths.length-1]);
 	    IOut.err("azimuth ("+azimuth+") not found");
 	    return -1; // error
 	}
@@ -2198,7 +2810,8 @@ public class ISun {
 	    azimuths = new double[sampleNumber+1];
 	    for(int i=0; i<=sampleNumber; i++){
 		double hour = 24.0/sampleNumber*i;
-		double[] angles = sun.angles(date.year, date.month, date.day, hour);
+		//double[] angles = sun.angles(date.year, date.month, date.day, hour);
+		double[] angles = sun.angles(year, month, day, hour);
 		azimuths[i] = angles[0];
 		altitudes[i] = angles[1];
 	    }

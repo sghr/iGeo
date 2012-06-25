@@ -94,5 +94,7 @@ public abstract class IGeometry extends IObject implements ITransformable{
     public IGeometry setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
     public IGeometry setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
     
+    public IGeometry weight(double w){ super.weight(w); return this; }
+    public IGeometry weight(float w){ super.weight(w); return this; }
         
 }

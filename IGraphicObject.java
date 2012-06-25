@@ -34,10 +34,10 @@ import igeo.gui.*;
 abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobject, IGraphicI{
     
     // should be synchronized with color range in processing when used in processing
-    public static float defaultRed = .4f; //.5f; //1f;
-    public static float defaultGreen = .4f; //.5f; //1f;
-    public static float defaultBlue = .4f; //.5f; //1f;
-    public static float defaultAlpha = 1f;
+    //public static float defaultRed = .4f; //.5f; //1f;
+    //public static float defaultGreen = .4f; //.5f; //1f;
+    //public static float defaultBlue = .4f; //.5f; //1f;
+    //public static float defaultAlpha = 1f;
     
     static int colorRange1i = 255;  
     static int colorRange2i = 255;
@@ -48,7 +48,7 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     static float colorRange3f = 1f;
     static float colorRange4f = 1f;
     
-    static public double transparentModeAlpha=0.4;
+    //static public double transparentModeAlpha=0.4;
     
     public Color color;
     public boolean visible=true;
@@ -93,6 +93,10 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
 	color = attr.color;
 	visible = attr.visible; //
     }
+    
+    public void setWeight(float w){} // implemented in child class if necessary
+    public float getWeight(){ return -1f; } // implemented in child class if necessary
+    
     
     public void setColor(Color c){ color=c; }
     

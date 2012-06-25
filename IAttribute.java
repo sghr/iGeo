@@ -44,11 +44,14 @@ public class IAttribute{
     /** object's color */
     public Color color;
     
+    /** object's stroek color; for wireframe + fill surface */
+    public Color stroke;
+    
     /** object's size, used as point size or etc */
-    public double size=1.0;
+    public /*double*/ float size=1f;
     
     /** object's line weight */
-    public double weight=1.0;
+    public /*double*/ float weight=1f;
     
     /** object's render material */
     public IMaterial material;
@@ -93,6 +96,11 @@ public class IAttribute{
     public IAttribute hsb(double h, double s, double b){ hsb((float)h,(float)s,(float)b); return this; }
     
     
+    public float weight(){ return weight; }
+    public IAttribute weight(float w){ weight=w; return this; }
+    public IAttribute weight(double w){ weight=(float)w; return this; }
+    
+    
     public Color getColor(){ return clr(); }
     public IAttribute setColor(Color c){ return clr(c); }
     public IAttribute setColor(int gray){  return clr(gray); }
@@ -111,5 +119,8 @@ public class IAttribute{
     public IAttribute setHSBColor(double h, double s, double b, double a){ return hsb(h,s,b,a); }
     public IAttribute setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
     public IAttribute setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
+    
+    
+    public IAttribute setWeight(float w){ return weight(w); }
     
 }

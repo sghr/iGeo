@@ -35,9 +35,9 @@ import igeo.*;
 */
 public class IGLPolygon extends IGLElement{
     
-    public IGLPolygon(){}
+    private IGLPolygon(){}
     //public IGLPolygon(IPolyline pl){ super(pl.get()); }
-    public IGLPolygon(IVec[] pts){ super(pts); }
+    private IGLPolygon(IVec[] pts){ super(pts); }
     
     public void draw(GL gl){
 	gl.glBegin(GL.GL_POLYGON);

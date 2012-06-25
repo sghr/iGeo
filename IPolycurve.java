@@ -281,6 +281,12 @@ public class IPolycurve extends IObject /*implements ICurveI*/{
         return this;
     }    
     
+    public IPolycurve weight(double w){ return weight((float)w); }
+    public IPolycurve weight(float w){
+	super.weight(w);
+	for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).weight(w);
+	return this;
+    }
     
     // to be implemented...
     /*

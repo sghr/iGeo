@@ -40,7 +40,7 @@ public class ISurfaceGraphicGL extends IGraphicObject{
     //public static float defaultColorBlue = .5f; //1f;
     //public static float defaultColorAlpha = 1f;
     
-    public static float defaultShininess=0.3f; //0.5f; //1f; //5f; //1f; //0.1f; //0.5f; //1f;
+    //public static float defaultShininess=0.3f; //0.5f; //1f; //5f; //1f; //0.1f; //0.5f; //1f;
     
     public ISurfaceGraphicFillGL fill;
     public ISurfaceGraphicWireframeGL wireframe;
@@ -79,6 +79,15 @@ public class ISurfaceGraphicGL extends IGraphicObject{
 	if(wireframe!=null) wireframe.setColor(c);
     }
     
+    
+    public void setWeight(float w){
+	if(wireframe!=null) wireframe.setWeight(w);
+    }
+    public float getWeight(){
+	if(wireframe!=null) return wireframe.getWeight();
+	return -1f;
+    }
+    
     @Override public void update(){
 	if(fill!=null) fill.update();
 	if(wireframe!=null) wireframe.update();
@@ -87,18 +96,8 @@ public class ISurfaceGraphicGL extends IGraphicObject{
     public boolean isDrawable(IGraphicMode m){ return m.isGL(); }
     
     public void draw(IGraphics g){
-	if(g.view().mode().isWireframe()){
-	    /*
-	    if(wireframe==null){
-		if(parent instanceof ISurface)
-		    wireframe = new ISurfaceGraphicWireframeGL((ISurface)parent);
-		else if(parent instanceof ISurfaceR)
-		    wireframe = new ISurfaceGraphicWireframeGL((ISurfaceR)parent);
-		wireframe.setColor(color);
-	    }
-	    */
-	    wireframe.draw(g);
-	}
+	
+	// fill first or wireframe first?
 	
 	if(g.view().mode().isFill()){
 	    /*
@@ -111,6 +110,19 @@ public class ISurfaceGraphicGL extends IGraphicObject{
 	    }
 	    */
 	    fill.draw(g);
+	}
+
+	if(g.view().mode().isWireframe()){
+	    /*
+	    if(wireframe==null){
+		if(parent instanceof ISurface)
+		    wireframe = new ISurfaceGraphicWireframeGL((ISurface)parent);
+		else if(parent instanceof ISurfaceR)
+		    wireframe = new ISurfaceGraphicWireframeGL((ISurfaceR)parent);
+		wireframe.setColor(color);
+	    }
+	    */
+	    wireframe.draw(g);
 	}
     }
     

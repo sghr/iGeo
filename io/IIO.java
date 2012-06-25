@@ -33,10 +33,11 @@ import igeo.*;
 */
 public class IIO{
     
-    public enum FileType{ RHINO, OBJ, OTHER };
+    public enum FileType{ RHINO, OBJ, _3DXML, OTHER };
     
     public static final String extensionObj = "obj";
     public static final String extensionRhino = "3dm";
+    public static final String extension3DXML = "3dxml";
     
     
     public static boolean isExtension(String filename, String extension){
@@ -54,6 +55,7 @@ public class IIO{
     public static FileType getFileType(String filename){
 	if(isExtension(filename, extensionRhino)) return FileType.RHINO;
 	if(isExtension(filename, extensionObj)) return FileType.OBJ;
+	if(isExtension(filename, extension3DXML)) return FileType._3DXML;
 	return FileType.OTHER;
     }
     
@@ -72,7 +74,39 @@ public class IIO{
 	FileType type = getFileType(file.getName());
 	if(type == FileType.OBJ) return openOBJ(file,server);
 	if(type == FileType.RHINO) return openRhino(file,server);
+	if(type == FileType._3DXML) return open3DXML(file,server);
 	IOut.err("file extension ."+getExtension(file.getName())+" is not supported");
+	return false;
+    }
+    
+    public static boolean open(String filename, IServerI server, IInputWrapper wrapper){
+	if(wrapper==null) return open(filename,server);
+	IOut.debug(0,"opening "+filename);
+	FileType type = getFileType(filename);
+	if(type == FileType.OBJ){
+	    InputStream is = wrapper.getStream(filename);
+	    boolean retval = openOBJ(is,server);
+	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
+	    return retval;
+	}
+	if(type == FileType.RHINO){
+	    InputStream is = wrapper.getStream(filename);
+	    boolean retval = openRhino(is,server);
+	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
+	    return retval;
+	}
+	if(type == FileType._3DXML){
+	    InputStream is = wrapper.getStream(filename);
+	    boolean retval = open3DXML(is,filename,server);
+	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
+	    return retval;
+	    
+	    //filename = IG.current().basePath + "\\"+filename;
+	    //open3DXML(filename,server); // InputStream version to be implemented
+	    //return true; // ?
+	}
+	
+	IOut.err("file extension ."+getExtension(filename)+" is not supported");
 	return false;
     }
     
@@ -86,6 +120,15 @@ public class IIO{
 	return false;
     }
     
+    public static boolean openOBJ(InputStream istream, IServerI server){
+	if(IObjFileImporter.read(istream, server)!=null){
+	    IOut.debug(0,"opening complete");
+	    return true;
+	}
+	IOut.err("error occured in opening OBJ file");
+	return false;
+    }
+    
     public static boolean openRhino(File file, IServerI server){
 	IOut.debug(0, "opening 3dm file "+file);
 	if(IRhino3dmImporter.read(file,server)){
@@ -93,6 +136,53 @@ public class IIO{
 	    return true;
 	}
 	IOut.err("error occured in opening file "+file.toString());
+	return false;
+    }
+    
+    public static boolean openRhino(InputStream istream, IServerI server){
+	if(IRhino3dmImporter.read(istream,server)){
+	    IOut.debug(0,"opening complete");
+	    return true;
+	}
+	IOut.err("error occured in opening Rhino file"); 
+	return false;
+    }
+    
+    public static boolean open3DXML(File file, IServerI server){
+	IOut.debug(0, "opening 3dxmm file "+file);
+	try{
+	    I3DXMLImporter.read(file);
+	    IOut.debug(0,"opening complete");
+	    return true;
+	}catch(IOException e){ e.printStackTrace(); }
+	return false;
+	/*
+	if(I3DXMLImporter.read(file)){
+	    IOut.debug(0,"opening complete");
+	    return true;
+	}
+	IOut.err("error occured in opening file "+file.toString());
+	return false;
+	*/
+    }
+    /*
+    public static boolean open3DXML(String file, IServerI server){
+	IOut.debug(0, "opening 3dxmm file "+file);
+	try{
+	    I3DXMLImporter.read(file);
+	    IOut.debug(0,"opening complete");
+	    return true;
+	}catch(IOException e){ e.printStackTrace(); }
+	return false;
+    }
+    */
+    public static boolean open3DXML(InputStream istream, String filename,
+				    IServerI server){
+	try{
+	    I3DXMLImporter.read(istream, filename);
+	    IOut.debug(0,"opening complete");
+	    return true;
+	}catch(IOException e){ e.printStackTrace(); }
 	return false;
     }
     

@@ -35,10 +35,10 @@ import igeo.*;
 */
 public class IGLLineStrip extends IGLElement{
     
-    public IGLLineStrip(){}
-    public IGLLineStrip(int size){ super(size); }
-    public IGLLineStrip(IVec[] pts){ super(pts); }
-    public IGLLineStrip(IPolyline pl){ super(pl.get()); }
+    private IGLLineStrip(){}
+    private IGLLineStrip(int size){ super(size); }
+    private IGLLineStrip(IVec[] pts){ super(pts); }
+    private IGLLineStrip(IPolyline pl){ super(pl.get()); }
     
     public void draw(GL gl){
 	gl.glBegin(GL.GL_LINE_STRIP);

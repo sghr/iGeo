@@ -57,7 +57,6 @@ public class IULinearMap extends IMap{
     
     /**
        adding (inserting) value between the domain of 0 - 1
-       @param domain [0,1]
     */
     public void add(double u, double value){
 	if(IG.eq(u, 0.0, IConfig.parameterTolerance)){ start = value; return; }

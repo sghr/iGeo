@@ -50,6 +50,7 @@ public class IMatrix implements IMatrixI{
     public IMatrix get(){ return this; }
     
     public IMatrix dup(){ return new IMatrix(this); }
+    public IMatrix cp(){ return dup(); }
     
     public int rowNum(){ return rowNum; }
     public int columnNum(){ return columnNum; }

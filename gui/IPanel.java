@@ -25,8 +25,9 @@ package igeo.gui;
 import java.util.ArrayList;
 import java.awt.event.*;
 import java.io.*;
-import javax.media.opengl.*;
 import javax.swing.*;
+
+import java.awt.*;
 
 import igeo.*;
 
@@ -68,7 +69,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     
     public void addPane(IPane p){
 	panes.add(p);
-	p.setParent(this);
+	p.setPanel(this);
 	//if(ig!=null) p.setIG(ig);
     }
     
@@ -78,12 +79,12 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     
     public void removePane(int i){ panes.remove(i); }
     public void clearPane(){ panes.clear(); }
+
+    public void setVisible(boolean v){ for(int i=0; i<panes.size(); i++) panes.get(i).setVisible(v); }
+    //public void show(){ for(int i=0; i<panes.size(); i++) panes.get(i).show(); }
+    //public void hide(){ for(int i=0; i<panes.size(); i++) panes.get(i).hide(); }
     
-    public void show(){ for(int i=0; i<panes.size(); i++) panes.get(i).show(); }
-    public void hide(){ for(int i=0; i<panes.size(); i++) panes.get(i).hide(); }
-    
-    /** focus on all pane
-     */
+    /** focus on all pane */
     public void focus(){
 	for(int i=0; i<panes.size(); i++) panes.get(i).focus(); 
     }
@@ -127,9 +128,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	}
     }
     
-    public IPane getPaneAt(MouseEvent e){
-	return getPaneAt(e.getX(),e.getY());
-    }
+    public IPane getPaneAt(MouseEvent e){ return getPaneAt(e.getX(),e.getY()); }
     
     public IPane getPaneAt(int x, int y){
 	//for(IPane p: panes) if(p.isVisible()&&p.contains(x,y)) return p;
@@ -167,12 +166,8 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	}
     }
     public void mouseClicked(MouseEvent e){
-	//IOut.p();//
-	
 	IPane p = getPaneAt(e);
-	if(p!=null){
-	    p.mouseClicked(e);
-	}
+	if(p!=null){ p.mouseClicked(e); }
 	
 	//if(fullScreenPane==null){ if(p!=null) enableFullScreen(p); }
 	//else disableFullScreen();
@@ -219,7 +214,6 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     
     
     public void keyPressed(KeyEvent e){
-	
 	int key = e.getKeyCode();
 	boolean shift = e.isShiftDown();
 	boolean control = e.isControlDown();
@@ -269,17 +263,19 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    System.exit(0); // temporary.
 	}
 	else if(key==KeyEvent.VK_S && control&& !shift){
-	    
-	    // create folder of the base path if not existing
-	    if(ig.basePath!=null){
-		File baseDir = new File(ig.basePath);
-		if(!baseDir.isDirectory()){
-		    IOut.debug(20, "creating directory"+baseDir.toString());
-		    if(!baseDir.mkdir()){
-			IOut.err("failed to create directory: "+baseDir.toString());
+	    try{
+		// create folder of the base path if not existing; what if it's applet or mobile environment
+		if(ig.basePath!=null){
+		    File baseDir = new File(ig.basePath);
+		    if(!baseDir.isDirectory()){
+			IOut.debug(20, "creating directory"+baseDir.toString());
+			if(!baseDir.mkdir()){
+			    IOut.err("failed to create directory: "+baseDir.toString());
+			}
 		    }
 		}
-	    }
+	    }catch(Exception ex){ ex.printStackTrace(); }
+	    
 	    
 	    File file = chooseFile(new String[][]{ new String[]{ "3dm", "3DM" },
 						   new String[]{ "obj", "Obj", "OBJ" } },
@@ -449,7 +445,8 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
         File file=null;
         boolean canceled=false;
 	
-	if(defaultPath==null) defaultPath=".";
+	//if(defaultPath==null) defaultPath=null; //".";
+	
         file = defaultFile;
 	
 	IFileFilter[] filters = new IFileFilter[acceptableExtensions.length];
@@ -467,9 +464,32 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    filters[i] = new IFileFilter(acceptableExtensions[i], description);
         }
 	
+	
+	/********* test **********/
+	/*
+	// file fileter in FileDialgo doesn't work in Windows
+	try {    
+	    FileDialog fileDialog = new FileDialog((Frame)null, "save", FileDialog.SAVE);
+	    //for(int i=0; i<filters.length; i++){ fileDialog.setFilenameFilter(filters[i]); }
+	    fileDialog.setFilenameFilter(filters[0]);
+	    fileDialog.setVisible(true);
+	    String filename = fileDialog.getFile();
+	    if(filename==null) return null;
+	    return new File(filename);
+	} catch (Exception e) { e.printStackTrace(); }
+	return null; // error
+	*/
+	/********* test end ************/
+	
+		
         do{
             canceled=false; // in the case once canceled
-            JFileChooser chooser = new JFileChooser(defaultPath);
+            //JFileChooser chooser = new JFileChooser(defaultPath);
+
+	    JFileChooser chooser;
+	    if(defaultPath==null){ chooser = new JFileChooser(); }
+	    else{ chooser = new JFileChooser(defaultPath); }
+	    
 	    //for(int i=0; i<filters.length; i++){
 	    for(int i=filters.length-1; i>=0; i--){ // opposite order
 		chooser.addChoosableFileFilter(filters[i]);
@@ -534,9 +554,10 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
             else{ file=null; }
         }while(canceled);
         return file;
+	
     }
     
-    
+    /*
     public File[] chooseFiles(String acceptableExtension,
                               String extensionDescription,
 			      String approveButtonText,
@@ -576,5 +597,5 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
         else{ files=null; }
         return files;
     }                        
-    
+    */
 }

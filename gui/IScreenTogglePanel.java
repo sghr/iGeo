@@ -39,22 +39,19 @@ public class IScreenTogglePanel extends IPanel{
     public IPane fullScreenPane=null;
     public int fullPaneOrigX, fullPaneOrigY, fullPaneOrigWidth, fullPaneOrigHeight;
     
-    public IScreenTogglePanel(int x, int y, int width, int height){
-	super(x,y,width,height);
-    }
+    public IScreenTogglePanel(int x, int y, int width, int height){ super(x,y,width,height); }
     
     // full screen of a pane inside root panel, not full screen on the display;
     public void enableFullScreen(int paneIdx){
 	IPane p = panes.get(paneIdx);
-	fullPaneOrigX = p.x;
-	fullPaneOrigY = p.y;
-	fullPaneOrigWidth = p.width;
-	fullPaneOrigHeight = p.height;
+	fullPaneOrigX = p.getX();
+	fullPaneOrigY = p.getY();
+	fullPaneOrigWidth = p.getWidth();
+	fullPaneOrigHeight = p.getHeight();
 	fullScreenPane = p;
-	
-	for(int i=0; i<panes.size(); i++){ if(i!=paneIdx) panes.get(i).hide(); }
-	
-	//IOut.p("x="+x+", y="+y+", width="+width+", height"+height); //
+	for(int i=0; i<panes.size(); i++){
+	    if(i!=paneIdx) panes.get(i).setVisible(false);
+	}
 	fullScreenPane.setBounds(this.x,this.y,this.width,this.height);
     }
     
@@ -70,12 +67,26 @@ public class IScreenTogglePanel extends IPanel{
 	    fullScreenPane.setBounds(fullPaneOrigX,fullPaneOrigY,
 				     fullPaneOrigWidth,fullPaneOrigHeight);
 	    
-	    for(int i=0; i<panes.size(); i++){ if(panes.get(i)!=fullScreenPane) panes.get(i).show(); }
+	    for(int i=0; i<panes.size(); i++){
+		//if(panes.get(i)!=fullScreenPane) panes.get(i).show();
+		if(panes.get(i)!=fullScreenPane) panes.get(i).setVisible(true);
+	    }
 	    fullScreenPane = null;
 	}
     }
     
     public boolean isFull(){ return fullScreenPane!=null; }
+    
+    public void setVisible(boolean v){
+	if(v){ // show
+	    if(fullScreenPane!=null){ fullScreenPane.setVisible(true); }
+	    else{ for(int i=0; i<panes.size(); i++) panes.get(i).setVisible(true); }
+	}
+	else{ // hide
+	    if(fullScreenPane!=null){ fullScreenPane.setVisible(false); }
+	    else{ for(int i=0; i<panes.size(); i++) panes.get(i).setVisible(false); }
+	}
+    }
     
     public void setSize(int w, int h){
 	int origW = width;
@@ -106,7 +117,7 @@ public class IScreenTogglePanel extends IPanel{
 		fullScreenPane.draw(g);
 	    }
 	}
-	else super.draw(g);
+	else{ super.draw(g); }
     }
     
     

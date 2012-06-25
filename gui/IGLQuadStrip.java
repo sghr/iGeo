@@ -32,8 +32,8 @@ import javax.media.opengl.*;
    @version 0.7.0.0;
 */
 public class IGLQuadStrip extends IGLElement{
-    public IGLQuadStrip(){}
-    public IGLQuadStrip(int size){ super(size); }
+    private IGLQuadStrip(){}
+    private IGLQuadStrip(int size){ super(size); }
     
     public void draw(GL gl){
 	gl.glBegin(GL.GL_QUAD_STRIP);

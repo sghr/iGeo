@@ -2000,7 +2000,7 @@ public class IRhino3dm{
 	
 	public static int getType(IUnit unit){
 	    switch(unit.type){
-	    case NoUnit: return no_unit_system;
+	    case NoUnits: return no_unit_system;
 	    case Angstroms: return angstroms;
 	    case Nanometers: return nanometers;
 	    case Microns: return microns;
@@ -2025,7 +2025,7 @@ public class IRhino3dm{
 	    case AstronomicalUnits: return astronomical;
 	    case Lightyears: return lightyears;
 	    case Parsecs: return parsecs;
-	    case CustomUnit: return custom_unit_system;
+	    case CustomUnits: return custom_unit_system;
 	    }
 	    
 	    IOut.err("no such unit system type "+unit.type);
@@ -2035,7 +2035,7 @@ public class IRhino3dm{
 	
 	public static IUnit.Type getIUnitType(int type){
 	    switch(type){
-	    case no_unit_system: return IUnit.Type.NoUnit;
+	    case no_unit_system: return IUnit.Type.NoUnits;
 	    case angstroms: return IUnit.Type.Angstroms;
 	    case nanometers: return IUnit.Type.Nanometers;
 	    case microns: return IUnit.Type.Microns;
@@ -2060,12 +2060,12 @@ public class IRhino3dm{
 	    case astronomical: return IUnit.Type.AstronomicalUnits;
 	    case lightyears: return IUnit.Type.Lightyears;
 	    case parsecs: return IUnit.Type.Parsecs;
-	    case custom_unit_system: return IUnit.Type.CustomUnit;
+	    case custom_unit_system: return IUnit.Type.CustomUnits;
 	    }
 	    
 	    IOut.err("no such unit system type "+type);
 	    //custom_unit_system
-	    return IUnit.Type.CustomUnit;
+	    return IUnit.Type.CustomUnits;
 	}
 	
 	public int unitSystem;
@@ -6107,7 +6107,7 @@ public class IRhino3dm{
 	    for(int i=0; i<vertices.size(); i++){
 		IVertex vtx = new IVertex(vertices.get(i));
 		if(normals!=null && normals.size()==vertices.size()){
-		    vtx.normal(normals.get(i));
+		    vtx.setNormal(normals.get(i));
 		}
 		if(texture!=null && texture.size()==vertices.size()){
 		    vtx.texture(texture.get(i));

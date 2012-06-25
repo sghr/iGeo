@@ -22,10 +22,12 @@
 
 package igeo.gui;
 
-import javax.media.opengl.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 import igeo.IG;
+import igeo.IGraphicI;
+import igeo.IConfig;
 
 /**
    Class of Graphics like java.awt.Graphics to wrap all possible graphic mode
@@ -34,20 +36,19 @@ import igeo.IG;
    @author Satoru Sugihara
    @version 0.7.0.0;
 */
-public class IGraphics{
+public interface IGraphics{
     
-    public GL gl;
-    public Graphics2D g;
-    public IView view;
+    //public IView view;
+    //public Color color = IConfig.objectColor; // default
+    //public double weight = IConfig.strokeWeight; // default
     
     //IGraphicMode mode=defaultMode;
     
-    public void IGraphics(){}
     
-    public void setGL(GL gl){ this.gl=gl; }
-    public void setGraphics(Graphics2D g){ this.g=g; }
+    //public void setGL(GL gl){ this.gl=gl; }
+    //public void setGraphics(Graphics2D g){ this.g=g; }
     
-    public void setView(IView v){ view = v; }
+    //public void setView(IView v){ view = v; }
     
     //public boolean isTypeGL(){ return type==Type.GL_WIREFRAME || type==Type.GL_FILL; }
     //public boolean isTypeJava(){ return type==Type.JAVA_WIREFRAME || type==Type.JAVA_FILL; }
@@ -56,10 +57,68 @@ public class IGraphics{
     
     //public IGraphicMode mode(){ return mode; }
     
+    //public abstract GL getGL(); // temporary
+    //public abstract Graphics2D getGraphics(); // temporary
     
-    public GL getGL(){ return gl; }
-    public Graphics2D getGraphics(){ return g; }
+    //public IView view(){ return view; }
     
-    public IView view(){ return view; }
-        
+    public IView view();
+    
+    public abstract void draw(ArrayList<IGraphicI> objects, IView view);
+    
+    
+    // should be here? or better to use IGraphicMode?
+    public abstract IGraphicMode.GraphicType type();
+    
+    /** fill color */
+    public abstract void clr(Color c); //{ color = c; }
+    /** fill color (float 0-255)*/
+    public abstract void clr(float r, float g, float b, float a);
+    /** fill color (float 0-255)*/
+    public abstract void clr(float r, float g, float b);
+
+    /** stroke (line) color */
+    public abstract void stroke(Color c);
+    /** stroke color (float 0-255)*/
+    public abstract void stroke(float r, float g, float b, float a);
+    /** stroke color (float 0-255)*/
+    public abstract void stroke(float r, float g, float b);
+    
+    
+    public abstract void weight(float w); //{ weight = w; }
+    
+    //public void diffuse(Color c)
+    //public void ambient(Color c)
+    //public void specular(Color c)
+    //public void emmisive(Color c)
+    //public void shininess(double s)
+    
+    //public void enableLight();
+    //public void disableLight();
+    
+    //public void drawPoint(IVec p);
+    //public void drawPoints(IVec[] p);
+    //public void drawLines(IVec[] p);
+    //public void drawLineStrip(IVec[] p);
+    //public void drawLineLoop(IVec[] p);
+    //public void drawPolygon(IVec[] p, IVec[] n);
+    //public void drawQuads(IVec[] p, IVec[] n);
+    //public void drawQuadStrip(IVec[] p, IVec[] n);
+    //public void drawTriangles(IVec[] p, IVec[] n);
+    //public void drawTriangleStrip(IVec[] p, IVec[] n);
+    //public void drawTriangleFan(IVec[] p, IVec[] n);
+    
+    
+    // J2D
+    // point
+    //public void drawPoint(IVec2 p);
+    // line
+    //public void drawLines(IVec2[] p);
+    //public void drawLines(IVec2[] p);
+    // bezier
+    // polygon
+    // surface?
+    
+    //public void stroke(double w)
+    
 }

@@ -24,7 +24,7 @@ package igeo.gui;
 
 import java.awt.*;
 
-import javax.media.opengl.*;
+//import javax.media.opengl.*;
 
 import igeo.*;
 
@@ -37,19 +37,13 @@ import igeo.*;
 */
 public class IView{
     
-    public static double defaultNear = IConfig.nearView; //0.001;
-    public static double defaultFar = IConfig.farView; //10000; //1000; //10000;
+    //public static double defaultNear = IConfig.nearView; //0.001;
+    //public static double defaultFar = IConfig.farView; //10000; //1000; //10000;
     
-    public static double defaultAxonRatio = IConfig.axonometricRatio; //1.0;
-    public static double defaultPersRatio = IConfig.perspectiveRatio; //0.5;
+    //public static double defaultAxonRatio = IConfig.axonometricRatio; //1.0;
+    //public static double defaultPersRatio = IConfig.perspectiveRatio; //0.5;
+    //public static double defaultViewDistance = IConfig.viewDistance; //100; //1000;
     
-    public static double defaultViewDistance = IConfig.viewDistance; //100; //1000;
-    
-    public static IGraphicMode defaultMode =
-	new IGraphicMode(IGraphicMode.GraphicType.GL, true, true, true); //
-	//new IGraphicMode(IGraphicMode.GraphicType.GL, true, true, false); //
-	//new IGraphicMode(IGraphicMode.GraphicType.GL, IGraphicMode.DisplayType.FILL);
-	//IGraphicMode.DisplayType.WIREFRAME);
     
     public static float[] defaultGLLightPosition = {0f, 0f, 1f, 0f};
     public static float[] defaultGLAmbientLight = {.4f,.4f,.4f,1f};
@@ -58,11 +52,18 @@ public class IView{
     
     public static boolean defaultGLTwoSidedLighting = false; //true; // when this is true, it seems to cause weird behavior looking like some of normals are flipped or messed up
 
+    /*
     public static double[][][] defaultGLBGColor =
 	new double[][][]{ { {1.0,1.0,1.0},{0.3,0.5,0.7} },
 			  { {0.9,0.9,0.9},{0.3,0.5,0.7} } };
+    */
     
-    // eye location
+    public static Color defaultBGColor1 = new Color(255,255,255);
+    public static Color defaultBGColor2 = new Color(230,230,230);
+    public static Color defaultBGColor3 = new Color(77,128,179);
+    public static Color defaultBGColor4 = new Color(77,128,179); 
+    
+    /** eye location */
     public IVec pos;
     
     /**
@@ -78,45 +79,51 @@ public class IView{
     // upward direction of view
     //IVec up;
     
-    // axonometric or perspective
+    /** axonometric or perspective */
     public boolean axonometric=true; //false;
     
-    // screen width&height
+    /**  screen location */
     public int screenX, screenY;
+    /**  screen width & height */
     public int screenWidth, screenHeight;
     
-    // perspective ratio = tan(angle of view)
-    public double persRatio=defaultPersRatio;
+    /** perspective ratio = tan(angle of view) */
+    public double persRatio=IConfig.perspectiveRatio; //defaultPersRatio;
     
-    // scale to window size
-    public double axonRatio=defaultAxonRatio;
+    /** scale to window size */
+    public double axonRatio=IConfig.axonometricRatio; //defaultAxonRatio;
     
-    public double near=defaultNear, far=defaultFar;
+    public double near=IConfig.nearView, far=IConfig.farView;
     
-    // target location
     //double tx, ty, tz;
+    /** view target location */
     public IVec target;
     public boolean rotateAroundTarget=false;
     public double distToTarget;
     
     //public IPoint targetPt; // for debug
     
-    public double glWidth, glHeight;
-    //public IMatrix3 glRotationMatrix;
-    public IMatrix4 glTransformMatrix;
-    public double[] glTransformArray;
+    public IMatrix4 transformMatrix;
+    public double[] transformArray;
+    
+    //public double glWidth, glHeight;
     public boolean useGL=false;
     
     public boolean hide=false;
-    //public IViewSlot slot=null;
     
     public IPane pane;
     
-    public IGraphicMode mode=new IGraphicMode(defaultMode);
+    public IGraphicMode mode=new IGraphicMode(IGraphicServer.defaultMode);
     
-    public double[][][] glBGColor = defaultGLBGColor; // null
+    //public double[][][] glBGColor = defaultGLBGColor; // null
+    //public Color javaBGColor1, javaBGColor2;
     
-    public Color javaBGColor1, javaBGColor2; 
+    /** background color: one color(1x1matrix), two color(1x2matrix) or four colors(2x2 matrix) */
+    public Color[][] bgColor = new Color[][]{
+	new Color[]{ defaultBGColor1, defaultBGColor4 },
+	new Color[]{ defaultBGColor2, defaultBGColor3 }
+    };
+    
     
     public IView(double x, double y, double z,
 		 double yaw, double pitch, double roll,
@@ -152,8 +159,8 @@ public class IView{
     
     public void enableGL(){
 	useGL=true;
-	glTransformMatrix = new IMatrix4();
-	glTransformArray = new double[16];
+	transformMatrix = new IMatrix4();
+	transformArray = new double[16];
 	update();
     }
     
@@ -165,9 +172,11 @@ public class IView{
     public boolean isHidden(){ return hide; }
     public void hide(){ hide=true; }
     public void show(){ hide=false; }
-
-
-    public void setBGColor(Color c){
+    
+    public void bgColor(Color c){
+	// test
+	bgColor[0][0]=bgColor[0][1]=bgColor[1][0]=bgColor[1][1]=c;
+	/*
 	if(useGL){
 	    for(int i=0; i<2; i++){
 		for(int j=0; j<2; j++){
@@ -178,8 +187,14 @@ public class IView{
 	    }    
 	}
 	else{ javaBGColor1 = c; javaBGColor2 = c; }
+	*/
     }
-    public void setBGColor(Color c1, Color c2){
+    public void bgColor(Color c1, Color c2){
+	// test
+	bgColor[0][0]=bgColor[1][0]=c1;
+	bgColor[0][1]=bgColor[1][1]=c2;
+	
+	/*
 	if(useGL){
 	    for(int i=0; i<2; i++){
 		glBGColor[i][0][0] = (double)c1.getRed()/255;
@@ -191,13 +206,24 @@ public class IView{
 	    }
 	}
 	else{ javaBGColor1 = c1; javaBGColor2 = c2; }
-    }
-
-    public void setBGColor(Color c1, Color c2, Color c3, Color c4){
-	setBGColor(new Color[][]{ new Color[]{ c1, c4 }, new Color[]{ c2, c3 } });
+	*/
     }
     
-    public void setBGColor(Color[][] c){
+    public void bgColor(Color c1, Color c2, Color c3, Color c4){
+	// test
+	bgColor[0][0] = c1;
+	bgColor[1][0] = c2;
+	bgColor[1][1] = c3;
+	bgColor[0][1] = c4;
+	
+	bgColor(new Color[][]{ new Color[]{ c1, c4 }, new Color[]{ c2, c3 } });
+    }
+    
+    public void bgColor(Color[][] c){
+	// test
+	for(int i=0; i<2 && i<c.length; i++)
+	    for(int j=0; j<2 && j<c[i].length; j++) bgColor[i][j]=c[i][j];
+	/*
 	if(useGL){
 	    for(int i=0; i<2; i++){
 		for(int j=0; j<2; j++){
@@ -208,24 +234,26 @@ public class IView{
 	    }
 	}
 	else{ javaBGColor1 = c[0][0]; javaBGColor2 = c[0][1]; }
+	*/
     }
     
+    
+    public Color[][] bgColor(){ return bgColor; }
     
     
     public void setPane(IPane p){
 	pane=p;
 	
 	//IOut.p("pane.x="+pane.x+", pane.y="+pane.y+", pane.width="+pane.width+", pane.height="+pane.height); //
+	
 	int origScH = screenHeight;
 	
-	screenX=pane.x; screenWidth=pane.width; screenHeight=pane.height;
+	screenX=pane.getX(); screenWidth=pane.getWidth(); screenHeight=pane.getHeight();
 	
 	if(mode.isGL()){ // flip y
-	    screenY=pane.getPanel().height - (pane.y+pane.height); 
+	    screenY=pane.getPanel().getHeight() - (pane.getY()+pane.getHeight()); 
 	}
-	else{
-	    screenY=pane.y; 
-	}
+	else{ screenY=pane.getY(); }
 	
 	// to keep extend, not axonometric ratio
 	if(axonometric&&screenHeight>0&&origScH>0){
@@ -237,7 +265,7 @@ public class IView{
 	
 	//IOut.p("x="+screenX+", y="+screenY+", w="+screenWidth+", h="+screenHeight); //
 	
-	update(); // necessary?
+	//update(); // necessary? // ok not to have?
     }
     
     public void setScreen(int x, int y, int w, int h){
@@ -254,15 +282,20 @@ public class IView{
     public void setAxonometricRatio(double r){
 	axonRatio = r; 
 	axonometric = true;
-	glWidth = screenWidth*axonRatio;
-	glHeight = screenHeight*axonRatio;
+	//glWidth = screenWidth*axonRatio;
+	//glHeight = screenHeight*axonRatio;
 	update(); //?
     }
     public void setPerspectiveRatio(double r){
 	persRatio = r;
 	axonometric = false;
-	glWidth = near*persRatio*2;
-	glHeight = glWidth*screenHeight/screenWidth;
+	
+	//glWidth = near*persRatio*2;
+	//glHeight = glWidth*screenHeight/screenWidth;
+	
+	//glHeight = near*persRatio*2;
+	//glWidth = glHeight*screenWidth/screenHeight;
+	
 	update(); //?
     }
     public void setPerspectiveAngle(double angle){
@@ -335,15 +368,16 @@ public class IView{
 	this.roll=roll; setAngle(yaw,pitch,updateTarget); 
     }
     
-    public void setAngle(double yaw, double pitch){
-	setAngle(yaw,pitch,false);
-    }
+    public void setAngle(double yaw, double pitch){ setAngle(yaw,pitch,false); }
     
     public void setAngle(double yaw, double pitch, boolean updateTarget){
 	this.yaw=yaw; this.pitch=pitch;
+	
+	// update(); //// no need to update?
+	
 	if(updateTarget){ // update to the angle with the default view distance
 	    IVec dir = frontDirection();
-	    dir.len(defaultViewDistance);
+	    dir.len(IConfig.viewDistance);
 	    target.set(dir.add(pos));
 	}
 	else if(rotateAroundTarget){
@@ -374,11 +408,11 @@ public class IView{
 	//tz += dir.z;
 	update();
     }
-
-
+    
+    
     public IVec location(){ return pos.dup(); }
     public IVec target(){ return target.dup(); }
-
+    
     public double getYaw(){ return yaw; }
     public double getPitch(){ return pitch; }
     public double getRoll(){ return roll; }
@@ -432,8 +466,8 @@ public class IView{
 	pts[6] = new IVec(bb.min.x,bb.max.y,bb.max.z);
 	pts[7] = new IVec(bb.max.x,bb.max.y,bb.max.z);
 	
-	IVec cnt = glTransformMatrix.transform(center);
-	for(int i=0; i<pts.length; i++) pts[i]=glTransformMatrix.transform(pts[i]);
+	IVec cnt = transformMatrix.transform(center);
+	for(int i=0; i<pts.length; i++) pts[i]=transformMatrix.transform(pts[i]);
 	if(axonometric){
 	    double xmin=0, ymin=0, xmax=0, ymax=0;
 	    for(int i=0; i<pts.length; i++){
@@ -453,7 +487,7 @@ public class IView{
 	    double r = wid/(screenWidth/2);
 	    if(hei/(screenHeight/2) > r) r = hei/(screenHeight/2);
 	    
-	    dir.len(-defaultViewDistance);
+	    dir.len(-IConfig.viewDistance);
 	    axonRatio = r;
 	}
 	else{
@@ -461,13 +495,20 @@ public class IView{
 	    for(int i=0; i<pts.length; i++){
 		double z = 0;
 		// check x
-		if(pts[i].x < cnt.x) z = pts[i].z+(cnt.x-pts[i].x)/persRatio;
-		else z = pts[i].z+(pts[i].x-cnt.x)/persRatio;
+		//if(pts[i].x < cnt.x) z = pts[i].z+(cnt.x-pts[i].x)/persRatio;
+		//else z = pts[i].z+(pts[i].x-cnt.x)/persRatio;
+		
+		//z = pts[i].z+Math.abs(cnt.x-pts[i].x)/persRatio;
+		z = pts[i].z+Math.abs(cnt.x-pts[i].x)/(persRatio * screenWidth/screenHeight);
+		
 		if(i==0) maxz=z;
 		else if(z>maxz) maxz=z;
 		// check y
-		if(pts[i].y < cnt.y) z = pts[i].z+(cnt.y-pts[i].y)/persRatio;
-		else z = pts[i].z+(pts[i].y-cnt.y)/persRatio;
+		//if(pts[i].y < cnt.y) z = pts[i].z+(cnt.y-pts[i].y)/persRatio;
+		//else z = pts[i].z+(pts[i].y-cnt.y)/persRatio;
+		
+		z = pts[i].z+Math.abs(cnt.y-pts[i].y)/persRatio;
+		
 		if(z>maxz) maxz=z;
 	    }
 	    maxz -= cnt.z;
@@ -486,7 +527,7 @@ public class IView{
     */
     public boolean convert(IVecI orig, IVec2 dest){
 	synchronized(this){
-	    IVec trans = glTransformMatrix.transform(orig);
+	    IVec trans = transformMatrix.transform(orig);
 	    if(axonometric){
 		trans.div(axonRatio);
 		dest.x=screenWidth/2 + trans.x;
@@ -495,7 +536,9 @@ public class IView{
 	    else{
 		trans.z = -trans.z;
 		if(trans.z < near) return false;
-		double r = screenHeight*near/trans.z/glHeight;
+		//double r = screenHeight*near/trans.z/glHeight;
+		double r = screenHeight/(trans.z*persRatio*2);
+		
 		dest.x = screenWidth/2 + trans.x*r;
 		dest.y = screenHeight/2 - trans.y*r;
 	    }
@@ -513,7 +556,7 @@ public class IView{
     */
     public boolean convert(IVecI orig, IVec2f dest){
 	synchronized(this){
-	    IVec trans = glTransformMatrix.transform(orig);
+	    IVec trans = transformMatrix.transform(orig);
 	    if(axonometric){
 		trans.div(axonRatio);
 		dest.x = (float)(screenWidth/2 + trans.x);
@@ -522,7 +565,9 @@ public class IView{
 	    else{
 		trans.z = -trans.z;
 		if(trans.z < near) return false;
-		float r = (float)(screenHeight*near/trans.z/glHeight);
+		//float r = (float)(screenHeight*near/trans.z/glHeight);
+		float r = (float)(screenHeight/(trans.z*persRatio*2));
+		
 		dest.x = (float)screenWidth/2 + ((float)trans.x)*r;
 		dest.y = (float)screenHeight/2 - ((float)trans.y)*r;
 	    }
@@ -539,7 +584,7 @@ public class IView{
     */
     public boolean convert(IVecI orig, IVec dest){
 	synchronized(this){
-	    IVec trans = glTransformMatrix.transform(orig);
+	    IVec trans = transformMatrix.transform(orig);
 	    trans.z = -trans.z;
 	    if(axonometric){
 		trans.div(axonRatio);
@@ -548,7 +593,9 @@ public class IView{
 		dest.z=trans.z;
 	    }
 	    else{
-		double r = screenHeight*near/trans.z/glHeight;
+		//double r = screenHeight*near/trans.z/glHeight;
+		double r = screenHeight/(trans.z*persRatio*2);
+		
 		dest.x = screenWidth/2 + trans.x*r;
 		dest.y = screenHeight/2 - trans.y*r;
 		dest.z = trans.z;
@@ -567,7 +614,7 @@ public class IView{
     */
     public IVec convert(IVecI orig){
 	synchronized(this){
-	    IVec trans = glTransformMatrix.transform(orig);
+	    IVec trans = transformMatrix.transform(orig);
 	    trans.z = -trans.z;
 	    if(axonometric){
 		trans.div(axonRatio);
@@ -576,7 +623,9 @@ public class IView{
 		return trans;
 	    }
 	    // perspective
-	    double r = screenHeight*near/trans.z/glHeight;
+	    //double r = screenHeight*near/trans.z/glHeight;
+	    double r = screenHeight/(trans.z*persRatio*2);
+	    
 	    trans.x = screenWidth/2 + trans.x*r;
 	    trans.y = screenHeight/2 - trans.y*r;
 	    return trans;
@@ -584,11 +633,19 @@ public class IView{
     }
     
     
-    
     //public void drawBG(IGraphics g){}
-    
+    /*
     public void drawBG(GL gl){
-	if(glBGColor!=null){
+	//if(glBGColor!=null){
+	if(bgColor!=null){
+	    double[][][] glBGColor = new double[2][2][3];
+	    for(int i=0; i<2; i++){
+		for(int j=0; j<2; j++){
+		    glBGColor[i][j][0] = (double)bgColor[i][j].getRed()/255;
+		    glBGColor[i][j][1] = (double)bgColor[i][j].getGreen()/255;
+		    glBGColor[i][j][2] = (double)bgColor[i][j].getBlue()/255;
+		}
+	    }
 	    gl.glMatrixMode(GL.GL_MODELVIEW);
 	    gl.glPushMatrix();
 	    gl.glLoadIdentity();
@@ -617,11 +674,11 @@ public class IView{
 	    gl.glPopMatrix();
 	}
     }
-    
-    
+    */
+
+    /* now this is moved to IGraphicsGL.drawView(IView)
     //public void beginGLView(GL gl, IGraphics g){
     public void draw(GL gl){
-	
 	if(hide) return;
 	
 	gl.glViewport(screenX, screenY, screenWidth, screenHeight);
@@ -664,17 +721,24 @@ public class IView{
 	gl.glLoadIdentity();
 	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
 	
-	if(axonometric)
+	if(axonometric){
+	    double glWidth = screenWidth*axonRatio;
+	    double glHeight = screenHeight*axonRatio;
 	    gl.glOrtho(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,near,far);
-	else gl.glFrustum(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,near,far);
+	}
+	else{
+	    double glHeight = near*persRatio*2;
+	    double glWidth = glHeight*screenWidth/screenHeight;
+	    gl.glFrustum(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,near,far);
+	}
 	
 	gl.glMatrixMode(GL.GL_MODELVIEW);
 	//gl.glLoadIdentity();
 	//gl.glTranslated(-x,-y,-z);
 	
-	gl.glLoadMatrixd(glTransformArray,0);
-	
+	gl.glLoadMatrixd(transformArray,0);
     }
+    */
     
     
     public void update(){
@@ -683,11 +747,13 @@ public class IView{
 	    //if(hide) return;
 	    
 	    if(useGL){
+		
+		
 		IMatrix3 rot = IMatrix3.getZRotation(yaw);
 		rot.mul(IMatrix3.getYRotation(pitch));
 		if(roll!=0) rot.mul(IMatrix3.getXRotation(roll));
 		
-		//IOut.p("x="+x+", y="+y+", z="+z+", yaw="+yaw+", pitch="+pitch); //
+		//IOut.p("x="+pos.x+", y="+pos.y+", z="+pos.z+", yaw="+yaw+", pitch="+pitch); //
 		
 		rot.invert();
 		
@@ -697,16 +763,17 @@ public class IView{
 					     -1, 0, 0);
 		conv = conv.mul(rot);
 		
-		glTransformMatrix.setId();
-		glTransformMatrix.setRange(conv, 0, 3, 0, 3);
-		glTransformMatrix.mul(IMatrix4.getTranslate(-pos.x,-pos.y,-pos.z));
+		transformMatrix.setId();
+		transformMatrix.setRange(conv, 0, 3, 0, 3);
+		transformMatrix.mul(IMatrix4.getTranslate(-pos.x,-pos.y,-pos.z));
 		
 		for(int i=0; i<4; i++)
 		    for(int j=0; j<4; j++)
-			glTransformArray[j*4+i] = glTransformMatrix.get(i,j);
+			transformArray[j*4+i] = transformMatrix.get(i,j);
 		
 		//IOut.p("screenX="+screenX+", screenY="+screenY+", screenWidth="+screenWidth+", screenHeight="+screenHeight); //
 		
+		/*
 		if(axonometric){
 		    glWidth = screenWidth*axonRatio;
 		    glHeight = screenHeight*axonRatio;
@@ -718,22 +785,16 @@ public class IView{
 		    //glHeight = glWidth*screenHeight/screenWidth;
 		    
 		    // constant height
-		    glWidth = glHeight*screenWidth/screenHeight;
 		    glHeight = near*persRatio*2;
-		    
-		    //IOut.p("persRatio = "+persRatio+", glWidth = "+glWidth+", glHeight = "+glHeight); //
+		    glWidth = glHeight*screenWidth/screenHeight;
 		}
-		
-		//if(targetPt==null){ 
-		//targetPt = new IPoint(target.dup());
-		//targetPt.setColor(Color.red);
+		*/
 	    }
-	    
 	}
     }
     
     public void setTop(){ setTop(0,0); }
-    public void setTop(double x, double y){ setTop(x,y,defaultViewDistance); }
+    public void setTop(double x, double y){ setTop(x,y,IConfig.viewDistance); }
     public void setTop(double x, double y, double z){ setTop(x,y,z,axonRatio); }
     public void setTop(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -741,7 +802,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setBottom(){ setBottom(0,0); }
-    public void setBottom(double x, double y){ setBottom(x,y,-defaultViewDistance); }
+    public void setBottom(double x, double y){ setBottom(x,y,-IConfig.viewDistance); }
     public void setBottom(double x, double y, double z){ setBottom(x,y,z,axonRatio); }
     public void setBottom(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -749,7 +810,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setLeft(){ setLeft(0,0); }
-    public void setLeft(double y, double z){ setLeft(-defaultViewDistance,y,z); }
+    public void setLeft(double y, double z){ setLeft(-IConfig.viewDistance,y,z); }
     public void setLeft(double x, double y, double z){ setLeft(x,y,z,axonRatio); }
     public void setLeft(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -757,7 +818,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setRight(){ setRight(0,0); }
-    public void setRight(double y, double z){ setRight(defaultViewDistance,y,z); }
+    public void setRight(double y, double z){ setRight(IConfig.viewDistance,y,z); }
     public void setRight(double x, double y, double z){ setRight(x,y,z,axonRatio); }
     public void setRight(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -765,7 +826,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setFront(){ setFront(0,0); }
-    public void setFront(double x, double z){ setFront(x,-defaultViewDistance,z); }
+    public void setFront(double x, double z){ setFront(x,-IConfig.viewDistance,z); }
     public void setFront(double x, double y, double z){ setFront(x,y,z,axonRatio); }
     public void setFront(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -773,7 +834,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setBack(){ setBack(0,0); }
-    public void setBack(double x, double z){ setBack(x,defaultViewDistance,z); }
+    public void setBack(double x, double z){ setBack(x,IConfig.viewDistance,z); }
     public void setBack(double x, double y, double z){ setBack(x,y,z,axonRatio); }
     public void setBack(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -782,9 +843,9 @@ public class IView{
     }
     
     public void setPerspective(){
-	setPerspective(-defaultViewDistance/Math.sqrt(3),
-		       -defaultViewDistance/Math.sqrt(3),
-		       defaultViewDistance/Math.sqrt(3));
+	setPerspective(-IConfig.viewDistance/Math.sqrt(3),
+		       -IConfig.viewDistance/Math.sqrt(3),
+		       IConfig.viewDistance/Math.sqrt(3));
     }
     public void setPerspective(double x, double y, double z){
 	setPerspective(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
@@ -799,9 +860,9 @@ public class IView{
     }
     
     public void setPerspective(double perspectiveAngle){
-	setPerspective(-defaultViewDistance/Math.sqrt(3),
-		       -defaultViewDistance/Math.sqrt(3),
-		       defaultViewDistance/Math.sqrt(3), perspectiveAngle);
+	setPerspective(-IConfig.viewDistance/Math.sqrt(3),
+		       -IConfig.viewDistance/Math.sqrt(3),
+		       IConfig.viewDistance/Math.sqrt(3), perspectiveAngle);
 	setAngle(Math.PI/4,Math.atan(Math.sqrt(2)/2),true);
 	perspective();
 	setPerspectiveAngle(perspectiveAngle);
@@ -819,9 +880,9 @@ public class IView{
     }
     
     public void setAxonometric(){
-	setAxonometric(-defaultViewDistance/Math.sqrt(3),
-		       -defaultViewDistance/Math.sqrt(3),
-		       defaultViewDistance/Math.sqrt(3));
+	setAxonometric(-IConfig.viewDistance/Math.sqrt(3),
+		       -IConfig.viewDistance/Math.sqrt(3),
+		       IConfig.viewDistance/Math.sqrt(3));
     }
     public void setAxonometric(double x, double y, double z){
 	setAxonometric(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
@@ -842,60 +903,53 @@ public class IView{
     
     public static IView getTopView(int screenX, int screenY,
 				   int screenWidth, int screenHeight){
-	return new IView(0,0,defaultViewDistance,
+	return new IView(0,0,IConfig.viewDistance,
 			 Math.PI/2, Math.PI/2, 0,
 			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getBottomView(int screenX, int screenY,
 				      int screenWidth, int screenHeight){
-	return new IView(0,0,-defaultViewDistance,
+	return new IView(0,0,-IConfig.viewDistance,
 			 Math.PI/2, -Math.PI/2, 0,
 			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getLeftView(int screenX, int screenY,
 				    int screenWidth, int screenHeight){
-	return new IView(-defaultViewDistance,0,0,
+	return new IView(-IConfig.viewDistance,0,0,
 			 0,0,0,
 			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getRightView(int screenX, int screenY,
 				     int screenWidth, int screenHeight){
-	return new IView(defaultViewDistance,0,0,
+	return new IView(IConfig.viewDistance,0,0,
 			 Math.PI,0,0,
 			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getFrontView(int screenX, int screenY,
 				     int screenWidth, int screenHeight){
-	return new IView(0,-defaultViewDistance,0,
+	return new IView(0,-IConfig.viewDistance,0,
 			 Math.PI/2,0,0,
 			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getBackView(int screenX, int screenY,
 				    int screenWidth, int screenHeight){
-	return new IView(0,defaultViewDistance,0,
+	return new IView(0,IConfig.viewDistance,0,
 			 -Math.PI/2,0,0,
 			 screenX, screenY, screenWidth, screenHeight, true);
     }
     public static IView getDefaultAxonometricView(int screenX, int screenY,
 						  int screenWidth, int screenHeight){
-	return new IView(-defaultViewDistance/Math.sqrt(3),
-			 -defaultViewDistance/Math.sqrt(3),
-			 defaultViewDistance/Math.sqrt(3),
+	return new IView(-IConfig.viewDistance/Math.sqrt(3),
+			 -IConfig.viewDistance/Math.sqrt(3),
+			 IConfig.viewDistance/Math.sqrt(3),
 			 Math.PI/4,Math.atan(Math.sqrt(2)/2),0,
 			 screenX, screenY, screenWidth, screenHeight, true);
-	/*
-	return new IView(defaultViewDistance/Math.sqrt(3),
-			 defaultViewDistance/Math.sqrt(3),
-			 defaultViewDistance/Math.sqrt(3),
-			 -Math.PI*3/4,Math.atan(Math.sqrt(2)/2),0,
-			 screenX, screenY, screenWidth, screenHeight, true);
-	*/
     }
     public static IView getDefaultPerspectiveView(int screenX, int screenY,
 						  int screenWidth, int screenHeight){
-	return new IView(-defaultViewDistance/Math.sqrt(3),
-			 -defaultViewDistance/Math.sqrt(3),
-			 defaultViewDistance/Math.sqrt(3),
+	return new IView(-IConfig.viewDistance/Math.sqrt(3),
+			 -IConfig.viewDistance/Math.sqrt(3),
+			 IConfig.viewDistance/Math.sqrt(3),
 			 Math.PI/4,Math.atan(Math.sqrt(2)/2),0,
 			 screenX, screenY, screenWidth, screenHeight, false);
     }

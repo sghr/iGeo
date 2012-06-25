@@ -25,7 +25,7 @@ package igeo.gui;
 import java.util.ArrayList;
 import java.awt.Color;
 
-import javax.media.opengl.*;
+//import javax.media.opengl.*;
 
 import igeo.*;
 
@@ -39,15 +39,21 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     
     public static final boolean insertPointOnDegree1TwistedSurface=true;
     
-    public int isoparmRatioU=IConfig.surfaceIsoparmResolution;
-    public int isoparmRatioV=IConfig.surfaceIsoparmResolution;
+    public int isoparmRatioU=IConfig.tessellationResolution;
+    public int isoparmRatioV=IConfig.tessellationResolution;
     
     //public final static int fragmentResolution = 10;
     
     public ISurfaceI surface=null; // parent
     
-    public IGLQuadMatrix quadMatrix=null;
-    public IGLTriangles triangles=null;
+    //public IGLQuadMatrix quadMatrix=null;
+    //public IGLTriangles triangles=null;
+    
+    public IVec[][] quads;
+    public IVec[][] quadsNormal;
+    public IVec[][] triangles;
+    public IVec[][] trianglesNormal;
+    
     
     // cache to update surface 
     public double[] uvalCache, vvalCache;
@@ -195,7 +201,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    }
 	}
 	
-	quadMatrix = new IGLQuadMatrix(pts,nrm);
+	//quadMatrix = new IGLQuadMatrix(pts,nrm);
+	quads = pts;
+	quadsNormal = nrm;
 	
 	uvalCache=uval;
 	vvalCache=vval;
@@ -210,8 +218,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
             outtrims = new ITrimLoopGraphic[surface.outerTrimLoopNum()];
             for(int i=0; i<surface.outerTrimLoopNum(); i++)
                 outtrims[i] = new ITrimLoopGraphic(surface.outerTrimLoop(i),
-						   true,
-						   IConfig.surfaceTrimEdgeResolution);
+						   true,IConfig.trimSegmentResolution);
         }
         else{
 	    // default outer trim loop?
@@ -223,8 +230,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
             intrims = new ITrimLoopGraphic[surface.innerTrimLoopNum()];
             for(int i=0; i<surface.innerTrimLoopNum(); i++)
                 intrims[i] = new ITrimLoopGraphic(surface.innerTrimLoop(i),
-						  false,
-						  IConfig.surfaceTrimEdgeResolution);
+						  false,IConfig.trimSegmentResolution);
         }
 	
         int unum = isoparmRatioU*(surface.uepNum()-1)+1;
@@ -356,15 +362,17 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	IVec2[][] triangles2D = ISurfaceMesh.getTriangles(surfPts,outerPts,innerPts);
 		
 	IVec[][] triangles3D = new IVec[triangles2D.length][3];
-	IVec[][] trianglesNormal = new IVec[triangles2D.length][3];
+	IVec[][] trianglesNml = new IVec[triangles2D.length][3];
 	for(int i=0; i<triangles2D.length; i++){
 	    for(int j=0; j<triangles2D[i].length; j++){
 		triangles3D[i][j] = surface.pt(triangles2D[i][j]).get();
-		trianglesNormal[i][j] = surface.normal(triangles2D[i][j]).get().unit();
+		trianglesNml[i][j] = surface.normal(triangles2D[i][j]).get().unit();
 	    }
 	}
 	
-	triangles = new IGLTriangles(triangles3D,trianglesNormal);
+	//triangles = new IGLTriangles(triangles3D,trianglesNormal);
+	triangles = triangles3D;
+	trianglesNormal = trianglesNml;
 	
 	triangles2DCache = triangles2D;
     }
@@ -375,6 +383,17 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    return;
 	}
 	
+	if(quads==null || quads.length!=uvalCache.length || quads[0].length!=vvalCache.length){
+	    quads = new IVec[uvalCache.length][vvalCache.length];
+	    quadsNormal = new IVec[uvalCache.length][vvalCache.length];
+	}
+	for(int i=0; i<uvalCache.length; i++){
+	    for(int j=0; j<vvalCache.length; j++){
+		quads[i][j] = surface.pt(uvalCache[i], vvalCache[j]).get();
+		quadsNormal[i][j] = surface.normal(uvalCache[i], vvalCache[j]).get().unit();
+	    }
+	}
+	/*
 	if(quadMatrix!=null &&
 	   quadMatrix.width() == uvalCache.length &&
 	   quadMatrix.height() == vvalCache.length){
@@ -397,6 +416,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    }
 	    quadMatrix = new IGLQuadMatrix(pts,nrm);
 	}
+	*/
     }
     
     public void updateWithTrim(){
@@ -406,6 +426,32 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    return;
 	}
 	
+	if(triangles==null || triangles.length!=triangles2DCache.length){
+	    triangles = new IVec[triangles2DCache.length][3];
+	    trianglesNormal = new IVec[triangles2DCache.length][3];
+	}
+	for(int i=0; i<triangles2DCache.length; i++){
+	    for(int j=0; j<triangles2DCache[i].length; j++){
+		triangles[i][j] = surface.pt(triangles2DCache[i][j]).get();
+		trianglesNormal[i][j] = surface.normal(triangles2DCache[i][j]).get().unit();
+	    }
+	}
+	
+	/*
+	if(triangles==null || triangles.length!=triangles2DCache.length){
+	    triangles = new IVec[triangles2DCache.length][3];
+	    trianglesNormal = new IVec[triangles2DCache.length][3];
+	    for(int i=0; i<triangles2DCache.length; i++){
+		for(int j=0; j<triangles2DCache[i].length; j++){
+		    triangles[i][j] = surface.pt(triangles2DCache[i][j]).get();
+		    trianglesNormal[i][j] = surface.normal(triangles2DCache[i][j]).get().unit();
+		}
+	    }
+	}
+	*/
+	
+	
+	/*
 	if(triangles2DCache.length == triangles.triangleNum()){
 	    for(int i=0; i<triangles2DCache.length; i++){
 		for(int j=0; j<triangles2DCache[i].length; j++){
@@ -426,57 +472,150 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    }
 	    triangles = new IGLTriangles(triangles3D,trianglesNormal);
 	}
+	*/
     }
     
     public void updateSurface(){
-	if(quadMatrix!=null) updateWithoutTrim();
+	if(quads!=null) updateWithoutTrim();
 	if(triangles!=null) updateWithTrim();
+	//if(quadMatrix!=null) updateWithoutTrim();
+	//if(triangles!=null) updateWithTrim();
     }
     
     
-    public boolean isDrawable(IGraphicMode m){ return m.isGL()&&m.isFill(); }
+    public boolean isDrawable(IGraphicMode m){
+	//return m.isGL()&&m.isFill();
+	return m.isGraphic3D()&&m.isFill();
+    }
     
     public void draw(IGraphics g){
 	//if(surface==null) initSurface(); // not initizlized at the constructor // shouldn't it?
 	if(!initialized) initSurface();
 	else if(update){ updateSurface(); update=false; }
 	
-	GL gl = g.getGL();
-	if(gl!=null){
-	    //gl.glLineWidth(0.01f);
-	    //gl.glLineWidth(1f);
-	    //gl.glLineStipple(0,(short)0xFFFF);
+	if(g.type() == IGraphicMode.GraphicType.GL||
+	   g.type() == IGraphicMode.GraphicType.P3D){
+	   
 	    
-	    float red = defaultRed;
-	    float green = defaultGreen;
-	    float blue = defaultBlue;
-	    float alpha = defaultAlpha;
+	    IGraphics3D g3d = (IGraphics3D)g;
 	    
+	    float red,green,blue,alpha;
 	    if(color!=null){
-		red = (float)color.getRed()/255;
-		green = (float)color.getGreen()/255;
-		blue = (float)color.getBlue()/255;
-		alpha = (float)color.getAlpha()/255;
+		red = color.getRed();
+		green = color.getGreen();
+		blue = color.getBlue();
+		alpha = color.getAlpha();
+	    }
+	    else{
+		red = IConfig.objectColor.getRed();
+		green = IConfig.objectColor.getGreen();
+		blue = IConfig.objectColor.getBlue();
+		alpha = IConfig.objectColor.getAlpha();
 	    }
 	    
-	    if(g.view().mode().isTransparent()){ alpha = (float)transparentModeAlpha; }
+	    if(g3d.view().mode().isTransparent()){ alpha = IConfig.transparentModeAlpha; }
 	    
-	    if(g.view().mode().isLight()){
-		float[] colorf = new float[]{ red, green, blue, alpha };
-		gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
-		gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
-		//gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
-		gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
-			       ISurfaceGraphicGL.defaultShininess);
-		gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
+	    if(g3d.view().mode().isLight()){
+		g3d.ambient(red,green,blue,alpha);
+		g3d.diffuse(red,green,blue,alpha);
+		//g3d.specular(red,green,blue,alpha);
+		g3d.shininess(IConfig.shininess);
+		g3d.clr(red,green,blue,0f);
 	    }
-	    else{ gl.glColor4f(red, green, blue, alpha); }
+	    //else{ g3d.clr(red,green,blue,alpha); }
 	    
-	    if(quadMatrix!=null) quadMatrix.draw(gl);
-	    if(triangles!=null) triangles.draw(gl);
+	    g3d.clr(red,green,blue,alpha);
+	    
+	    
+	    if(quads!=null){
+		if(quadsNormal==null){ g3d.drawQuadMatrix(quads); }
+		else{ g3d.drawQuadMatrix(quads,quadsNormal); }
+            }
+	    if(triangles!=null){
+		if(trianglesNormal==null){
+		    for(int i=0; i<triangles.length; i++) g3d.drawTriangles(triangles[i]);
+		}
+		else{
+		    for(int i=0; i<triangles.length; i++)
+			g3d.drawTriangles(triangles[i], trianglesNormal[i]);
+		}
+	    }
+	    
+	    /*
+	    if(quadMatrix!=null){
+		IVec[][] p = new IVec[quadMatrix.width][quadMatrix.height];
+		for(int i=0; i<quadMatrix.height; i++){
+		    for(int j=0; j<quadMatrix.width; j++){
+			p[j][i] = quadMatrix.pts[i*quadMatrix.width+j];
+		    }
+		}
+		
+		g3d.drawQuadMatrix(p);
+		
+		if(quadMatrix.normal==null){ g3d.drawQuadMatrix(p); }
+		else{
+		    IVec[][] n = new IVec[quadMatrix.width][quadMatrix.height];
+		    for(int i=0; i<quadMatrix.height; i++){
+			for(int j=0; j<quadMatrix.width; j++){
+			    n[j][i] = quadMatrix.normal[i*quadMatrix.width+j];
+			}
+		    }
+		    g3d.drawQuadMatrix(p,n);
+		}
+            }
+	    if(triangles!=null){
+		if(triangles.normal==null){ g3d.drawTriangles(triangles.pts); }
+		else{ g3d.drawTriangles(triangles.pts, triangles.normal); }
+	    }
+	    */
+	    
+	    /*
+	    GL gl = ((IGraphicsGL)g).getGL();
+	    //GL gl = g.getGL();
+	    
+	    if(gl!=null){
+		//gl.glLineWidth(0.01f);
+		//gl.glLineWidth(1f);
+		//gl.glLineStipple(0,(short)0xFFFF);
+		
+		float red,green,blue,alpha;
+		//float red = defaultRed;
+		//float green = defaultGreen;
+		//float blue = defaultBlue;
+		//float alpha = defaultAlpha;
+		if(color!=null){
+		    red = (float)color.getRed()/255;
+		    green = (float)color.getGreen()/255;
+		    blue = (float)color.getBlue()/255;
+		    alpha = (float)color.getAlpha()/255;
+		}
+		else{
+		    red = (float)IConfig.objectColor.getRed()/255;
+		    green = (float)IConfig.objectColor.getGreen()/255;
+		    blue = (float)IConfig.objectColor.getBlue()/255;
+		    alpha = (float)IConfig.objectColor.getAlpha()/255;
+		}
+		
+		if(g.view().mode().isTransparent()){ alpha = (float)IConfig.transparentModeAlpha/255; }
+		
+		if(g.view().mode().isLight()){
+		    float[] colorf = new float[]{ red, green, blue, alpha };
+		    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
+		    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
+		    //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
+		    gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
+				   ISurfaceGraphicGL.defaultShininess);
+		    gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
+		}
+		else{ gl.glColor4f(red, green, blue, alpha); }
+		
+		if(quadMatrix!=null) quadMatrix.draw(gl);
+		if(triangles!=null) triangles.draw(gl);
+	    }
+	    */
+	    
 	}
     }
-    
     
     
 }

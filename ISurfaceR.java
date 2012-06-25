@@ -563,6 +563,9 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     public ISurfaceR setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public ISurfaceR setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public ISurfaceR weight(double w){ super.weight(w); return this; }
+    public ISurfaceR weight(float w){ super.weight(w); return this; }
+    
     
     
     static public class IsFlat extends IParameterObject implements IBoolOp{

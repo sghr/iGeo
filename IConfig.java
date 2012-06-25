@@ -22,6 +22,9 @@
 
 package igeo;
 
+
+import java.awt.Color;
+
 /**
    An interface to contain static constants used in the whole iGeo system.
    
@@ -66,33 +69,92 @@ public /*interface*/ class IConfig{
      * graphic properties
      *****************************/
     
-    /**
-       Point resolution per edit points to draw curves in graphic classes.
-    */
-    public static int curveGraphicResolution=10; //1; //4; //3*2*2; //4; //8; //30;
+    /** Point resolution per edit points to draw curves in graphic classes. */
+    public static int segmentResolution = 10;
+    //public static int curveGraphicResolution=10; //1; //4; //3*2*2; //4; //8; //30; // variable name chbanged to segmentResolution
     
-    /**
-       Number of isoperms to draw surfaces in graphic classes.
-    */
-    public static int surfaceIsoparmResolution=4; //2;//10; //9; //2 ; //3; //4; //2; //10; // isoparm num
+    /** Number of isoperms to draw surfaces in graphic classes. if it's zero, no isoparm */
+    public static int isoparmResolution=1; // default is changed to zero. 4;
+    //public static int surfaceIsoparmResolution=4; //2;//10; //9; //2 ; //3; //4; //2; //10; // variable name changed to isoparmResolution
     
-    /**
-       Point resolution per the isoparm segment to draw wireframe curves of surfaces.
-    */
-    public static int surfaceWireframeResolution=8; //2;
-    /**
-       Point resolution per the isoparm segment to draw trim curves of surfaces.
-    */
-    public static int surfaceTrimEdgeResolution=4; //2;
+    /** Number of division per edit point to tesselate a surface into mesh. */
+    public static int tessellationResolution = 4;
+    //public static int surfaceTessellationResolution=4; //2;//10; //9; //2 ; //3; //4; //2; //10; // variable name changed to tessellationResolution
+    
+    /** Point resolution per the isoparm segment to draw wireframe curves of surfaces. */
+    //public static int surfaceWireframeResolution=8; //2; // now both wireframe and curve resolution are defined by segmentResolution
+    // public static int wireSegmentResolution = 8;
+    
+    /** Point resolution per the isoparm segment to draw trim curves of surfaces. */
+    public static int trimSegmentResolution=4;
+    //public static int surfaceTrimEdgeResolution=4; //2; // variable name changed to trimSegmentResolution
     
     /**
        This is only for saving brep or trimmed surface to Rhino file where
        the 2D trim curve is also required to have 3D representation;
        3D curve is approximated with sampled points in this resolution. 
     */
-    public static int trim3dCurveInterpolationResolution = 20;
+    public static int trimApproximationResolution = 20;
+    //public static int trim3dCurveInterpolationResolution = 20; // variable name changed to trimApproximationResolution
+    
+    
+    /** default object color to draw */
+    public static Color objectColor = new Color(102,102,102);
+    
+    /** default stroke color to draw */
+    public static Color strokeColor = new Color(102,102,102);
+    
+    /** default stroke weight to draw */
+    public static float strokeWeight = 1.0f;
+    
+    /** default ambient color */
+    public static Color ambientColor = null; //new Color(0,0,0);
+    
+    /** default emissive color */
+    public static Color emissiveColor = null;
+    
+    /** default specular color */
+    public static Color specularColor = new Color(255,255,255);
+    
+    /** default shininess */
+    public static float shininess = 0.5f;
+    
+    
+    /** transparency in transparent graphic mode in integer 0 - 255 (it used to be float 0.0-1.0. it changed) */
+    public static int transparentModeAlpha = 102; //0.4f;
+    
+    /** default point graphic dot size */
+    public static float pointSize=5f;
+    
+    /** default vector graphic arrow size */
+    public static float arrowSize=2f;
 
+    
+    /** turn on lights on display */
+    public static boolean useLight=true;
 
+    /** change wireframe colors by lights when using lights */
+    public static boolean lightWireframe=false;
+
+    /** make wireframe transparent in transparent display mode */
+    public static boolean transparentWireframe=false;
+
+    
+    /** check and remove vertices behind view location in P3D graphics */
+    public static boolean cullVertexBehindViewInP3D=true;
+    /** check and remove vertices behind view location in OpenGL graphics */
+    public static boolean cullVertexBehindViewInGL=false; 
+    
+    
+    /** enable depth test in GL graphics / depth sort in P3D graphics. if there are many faces, this makes it very slow to deisplay */
+    public static boolean depthSort=true;
+    
+    
+    /** if number of objects exceeds this, it automatically turn off depth sort in P3D. if number is negative, number is not checked. */
+    public static int maxObjectNumberForDepthSort = 3000; //
+    
+    /** turn on smooth option in P3D. This makes it slow in perspective when many vertices are out of display */
+    public static boolean smoothGraphicP3D=true; //false; //true;
     
     /*****************************
      * polygon mesh properties

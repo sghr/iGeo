@@ -22,7 +22,7 @@
 
 package igeo.gui;
 
-import javax.media.opengl.*;
+//import javax.media.opengl.*;
 
 import igeo.*;
 
@@ -34,7 +34,7 @@ import igeo.*;
 */
 public class IMeshGraphicGL extends IGraphicObject{
     
-    public static float weight = 1f;
+    public static float weight = IConfig.strokeWeight; //1f;
     
     public IMeshI mesh;
     public IVec[][] facePts, faceNormal, edgePts;
@@ -78,99 +78,186 @@ public class IMeshGraphicGL extends IGraphicObject{
 	
     }
     
-    public boolean isDrawable(IGraphicMode m){ return m.isGL(); }
+    public void setWeight(float w){ weight=w; }
+    public float getWeight(){ return weight; }
+    
+    public boolean isDrawable(IGraphicMode m){
+	//return m.isGL();
+	return m.isGraphic3D();
+    }
     
     public void draw(IGraphics g){
 	
 	if(mesh==null) initMesh(); // not initizlized at the constructor // shouldn't it?
 	
-	GL gl = g.getGL();
-	
-	if(gl!=null){
+
+	if(g.type() == IGraphicMode.GraphicType.GL||
+	   g.type() == IGraphicMode.GraphicType.P3D){
 	    
-	    gl.glLineWidth(weight);
-	    //gl.glLineStipple(0,(short)0xFFFF);
+	    IGraphics3D g3d = (IGraphics3D)g;
 	    
-            float red = defaultRed;
-            float green = defaultGreen;
-            float blue = defaultBlue;
-            float alpha = defaultAlpha;
+	    float red,green,blue,alpha;
+	    if(color!=null){
+		red = color.getRed();
+		green = color.getGreen();
+		blue = color.getBlue();
+		alpha = color.getAlpha();
+	    }
+	    else{
+		red = IConfig.objectColor.getRed();
+		green = IConfig.objectColor.getGreen();
+		blue = IConfig.objectColor.getBlue();
+		alpha = IConfig.objectColor.getAlpha();
+	    }
 	    
-            if(color!=null){
-                red = (float)color.getRed()/255;
-                green = (float)color.getGreen()/255;
-                blue = (float)color.getBlue()/255;
-                alpha = (float)color.getAlpha()/255;
-            }
+	    if(g3d.view().mode().isTransparent()) alpha = IConfig.transparentModeAlpha;
+		
+	    if(g3d.view().mode().isLight()){
+		g3d.ambient(red,green,blue,alpha);
+		g3d.diffuse(red,green,blue,alpha);
+		//g3d.specular(red,green,blue,alpha);
+		g3d.shininess(IConfig.shininess);
+		g3d.clr(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+	    }
+	    //else{ g3d.clr(red,green,blue,alpha); }
+	    g3d.clr(red,green,blue,alpha);
 	    
-	    if(g.view().mode().isTransparent())
-		alpha = (float)transparentModeAlpha;
-	    
-            if(g.view().mode().isLight()){
-                float[] colorf = new float[]{ red, green, blue, alpha };
-                gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
-                gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
-                //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
-                gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
-                               ISurfaceGraphicGL.defaultShininess);
-		gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
-            }
-            else{ gl.glColor4f(red, green, blue, alpha); }
-	    
-	    if(g.view().mode().isFill()){
+	    if(g3d.view().mode().isFill()){
 		int prevNum=0;
 		for(int i=0; i<facePts.length; i++){
-		    if(facePts[i].length!=prevNum){
-			if(i>0) gl.glEnd();
-			if(facePts[i].length==3) gl.glBegin(GL.GL_TRIANGLES);
-			else if(facePts[i].length==4) gl.glBegin(GL.GL_QUADS);
-			else gl.glBegin(GL.GL_POLYGON);
-			prevNum = facePts[i].length;
-		    }
-		    for(int j=0; j<facePts[i].length; j++){
-			gl.glNormal3d(faceNormal[i][j].x,faceNormal[i][j].y,faceNormal[i][j].z);
-			gl.glVertex3d(facePts[i][j].x,facePts[i][j].y,facePts[i][j].z);
-			//gl.glVertex3f((float)facePts[i][j].x,(float)facePts[i][j].y,(float)facePts[i][j].z);
-		    }
+		    if(facePts[i].length==3){ g3d.drawTriangles(facePts[i],faceNormal[i]); }
+		    else if(facePts[i].length==4){ g3d.drawQuads(facePts[i],faceNormal[i]); }
+		    else{ g3d.drawPolygon(facePts[i],faceNormal[i]); }
 		}
-		if(facePts.length>0) gl.glEnd();
 	    }
 	    
 	    
-	    if(g.view().mode().isTransparent()&&g.view().mode().isTransparentWireframe())
-		alpha = (float)transparentModeAlpha;
-	    else if(color!=null) alpha = (float)color.getAlpha()/255;
-	    else alpha = defaultAlpha;
+	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
+		alpha = IConfig.transparentModeAlpha;
+	    else if(color!=null) alpha = (float)color.getAlpha();
+	    else alpha = (float)IConfig.objectColor.getAlpha();
 	    
-            if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
-                float[] colorf = new float[]{ red, green, blue, alpha };
-                gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
-                gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
-                //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
-                gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
-                               ISurfaceGraphicGL.defaultShininess);
-		gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
-            }
-            else{ gl.glColor4f(red, green, blue, alpha); }
+	    if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
+		g3d.ambient(red,green,blue,alpha);
+		g3d.diffuse(red,green,blue,alpha);
+		//g3d.specular(red,green,blue,alpha);
+		g3d.shininess(IConfig.shininess);		
+		g3d.stroke(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+	    }
+	    //else{ g3d.stroke(red,green,blue,alpha); }
 	    
-	    if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
-		gl.glDisable(GL.GL_LIGHTING);
+	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
+		g3d.disableLight();
 	    
-	    gl.glColor4f(red, green, blue, alpha);
-	    
-	    if(g.view().mode().isWireframe()){
-		gl.glBegin(GL.GL_LINES);
-		for(int i=0; i<edgePts.length; i++){
-		    gl.glVertex3f((float)edgePts[i][0].x,(float)edgePts[i][0].y,(float)edgePts[i][0].z);
-		    gl.glVertex3f((float)edgePts[i][1].x,(float)edgePts[i][1].y,(float)edgePts[i][1].z);
-		}
-		gl.glEnd();
+	    if(g3d.view().mode().isWireframe()){
+		g3d.weight(weight);
+		g3d.stroke(red,green,blue,alpha);
+		for(int i=0; i<edgePts.length; i++){ g3d.drawLines(edgePts[i]); }
 	    }
 	    
-	    if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
-		gl.glEnable(GL.GL_LIGHTING);
+	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
+		g3d.enableLight();
+	    
+	    ///////////
+	    
+	    /*
+	    GL gl = ((IGraphicsGL)g).getGL();
+	    //GL gl = g.getGL();
+	    
+	    if(gl!=null){
+		
+		gl.glLineWidth(weight);
+		//gl.glLineStipple(0,(short)0xFFFF);
+		
+		float red,green,blue,alpha;
+		//float red = defaultRed;
+		//float green = defaultGreen;
+		//float blue = defaultBlue;
+		//float alpha = defaultAlpha;
+		if(color!=null){
+		    red = (float)color.getRed()/255;
+		    green = (float)color.getGreen()/255;
+		    blue = (float)color.getBlue()/255;
+		    alpha = (float)color.getAlpha()/255;
+		}
+		else{
+		    red = (float)IConfig.objectColor.getRed()/255;
+		    green = (float)IConfig.objectColor.getGreen()/255;
+		    blue = (float)IConfig.objectColor.getBlue()/255;
+		    alpha = (float)IConfig.objectColor.getAlpha()/255;
+		}
+		
+		if(g.view().mode().isTransparent())
+		    alpha = (float)IConfig.transparentModeAlpha/255;
+		
+		if(g.view().mode().isLight()){
+		    float[] colorf = new float[]{ red, green, blue, alpha };
+		    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
+		    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
+		    //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
+		    gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
+				   ISurfaceGraphicGL.defaultShininess);
+		    gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
+		}
+		else{ gl.glColor4f(red, green, blue, alpha); }
+		
+		if(g.view().mode().isFill()){
+		    int prevNum=0;
+		    for(int i=0; i<facePts.length; i++){
+			if(facePts[i].length!=prevNum){
+			    if(i>0) gl.glEnd();
+			    if(facePts[i].length==3) gl.glBegin(GL.GL_TRIANGLES);
+			    else if(facePts[i].length==4) gl.glBegin(GL.GL_QUADS);
+			    else gl.glBegin(GL.GL_POLYGON);
+			    prevNum = facePts[i].length;
+			}
+			for(int j=0; j<facePts[i].length; j++){
+			    gl.glNormal3d(faceNormal[i][j].x,faceNormal[i][j].y,faceNormal[i][j].z);
+			    gl.glVertex3d(facePts[i][j].x,facePts[i][j].y,facePts[i][j].z);
+			    //gl.glVertex3f((float)facePts[i][j].x,(float)facePts[i][j].y,(float)facePts[i][j].z);
+			}
+		    }
+		    if(facePts.length>0) gl.glEnd();
+		}
+		
+		
+		if(g.view().mode().isTransparent()&&g.view().mode().isTransparentWireframe())
+		    alpha = IConfig.transparentModeAlpha/255;
+		else if(color!=null) alpha = (float)color.getAlpha()/255;
+		//else alpha = defaultAlpha;
+		else alpha = (float)IConfig.objectColor.getAlpha()/255;
+		
+		if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
+		    float[] colorf = new float[]{ red, green, blue, alpha };
+		    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
+		    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, colorf, 0);
+		    //gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, colorf, 0);
+		    gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,
+				   ISurfaceGraphicGL.defaultShininess);
+		    gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
+		}
+		else{ gl.glColor4f(red, green, blue, alpha); }
+		
+		if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
+		    gl.glDisable(GL.GL_LIGHTING);
+		
+		gl.glColor4f(red, green, blue, alpha);
+		
+		if(g.view().mode().isWireframe()){
+		    gl.glBegin(GL.GL_LINES);
+		    for(int i=0; i<edgePts.length; i++){
+			gl.glVertex3f((float)edgePts[i][0].x,(float)edgePts[i][0].y,(float)edgePts[i][0].z);
+			gl.glVertex3f((float)edgePts[i][1].x,(float)edgePts[i][1].y,(float)edgePts[i][1].z);
+		    }
+		    gl.glEnd();
+		}
+		
+		if(g.view().mode().isLight()&&!g.view().mode().isLightWireframe())
+		    gl.glEnable(GL.GL_LIGHTING);
+	    }
+	    */
+		
 	}
-	
     }
     
 }

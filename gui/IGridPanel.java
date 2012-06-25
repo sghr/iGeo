@@ -41,14 +41,18 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
     
     //int fullViewIndex=-1; 
     
-    public IGridPanel(int x, int y, int width, int height,
-		       int xnum, int ynum){
+    public IGridPanel(int x, int y, int width, int height, int xnum, int ynum){
 	super(x,y,width,height);
-	setupGrid(xnum,ynum);
+	setupGrid(xnum,ynum,null);
+	currentMousePane = gridPanes[1][0]; //
+    }
+    public IGridPanel(int x, int y, int width, int height, int xnum, int ynum, IPane[][] panes){
+	super(x,y,width,height);
+	setupGrid(xnum,ynum,panes);
 	currentMousePane = gridPanes[1][0]; //
     }
     
-    public void setupGrid(int xnum, int ynum){
+    public void setupGrid(int xnum, int ynum, IPane[][] panes){
         if(xnum<=0 || ynum<=0){
             IOut.err("xnum and ynum need to be larger than 1");
             return;
@@ -60,14 +64,14 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
         for(int i=0; i<xnum; i++) widthRatio[i]=1.0/xnum;
         for(int i=0; i<ynum; i++) heightRatio[i]=1.0/ynum;
         
-        setupGrid(widthRatio,heightRatio);
+        setupGrid(widthRatio,heightRatio,panes);
     }
     
     /**
        @param widthRatio Array of relative width ratio. Actual width is calculatd by each ratio divided by sum of ratios
        @param heightRatio Array of relative height ratio. Actual height is calculatd by each ratio divided by sum of ratios
     */
-    public void setupGrid(double[] widthRatio, double[] heightRatio){
+    public void setupGrid(double[] widthRatio, double[] heightRatio, IPane[][] panes){
 	this.widthRatio=widthRatio;
 	this.heightRatio=heightRatio;
 	
@@ -77,7 +81,7 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
         if(widthRatio.length==0 || heightRatio.length==0){
             IOut.err("ength of widthRatio or heightRatio is zero"); return;
         }
-        
+	
         xnum = widthRatio.length;
         ynum = heightRatio.length;
 	
@@ -109,7 +113,7 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 	int[] ypos = getPositionArrayFromRatio(heightRatio, height);
 	
 	if(gridPanes==null || gridPanes.length!=xnum ||
-           gridPanes[0].length!=ynum){
+           gridPanes[0].length!=ynum || panes!=null){
 	    
             gridPanes = new IPane[xnum][ynum];
             for(int i=0; i<xnum; i++){
@@ -119,7 +123,7 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 		    int paneY = y+ypos[j];
 		    int paneW = xpos[i+1]-xpos[i];
 		    int paneH = ypos[j+1]-ypos[j];
-
+		    
 		    boolean orthogonal = false;
 		    
 		    // only if it's 2x2 view and the first execution
@@ -149,8 +153,17 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 		    
 		    v.enableRotationAroundTarget(); // here?
 		    v.setTarget(0,0,0); //
+
+		    if(panes!=null && i<panes.length && j<panes[i].length && panes[i][j]!=null){
+			gridPanes[i][j] = panes[i][j];
+			gridPanes[i][j].setBounds(paneX,paneY,paneW,paneH);
+			gridPanes[i][j].setPanel(this);
+			gridPanes[i][j].setView(v);
+		    }
+		    else{
+			gridPanes[i][j] = new IPaneLight(paneX,paneY,paneW,paneH,v,this);
+		    }
 		    
-		    gridPanes[i][j] = new IPane(paneX,paneY,paneW,paneH,v,this);
 		    if(orthogonal){
 			if(gridPanes[i][j].navigator()!=null){
 			    gridPanes[i][j].navigator().setRotateLock(true);

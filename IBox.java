@@ -198,6 +198,8 @@ public class IBox extends IBrep{
     public IBox setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IBox setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public IBox weight(double w){ super.weight(w); return this; }
+    public IBox weight(float w){ super.weight(w); return this; }
     
     /*******************************************************************************
      * implementation of ITransformable interface

@@ -80,10 +80,10 @@ public class IRhino3dmExporter extends IRhino3dm{
     public static boolean write(File file, IServerI server){
 	try{
 	    //FileOutputStream fos = new FileOutputStream(file);
-	    
 	    IRandomAccessOutputStream fos = new IRandomAccessOutputStream(file);
+	    if(fos==null) return false;
 	    boolean retval = write(fos, server);
-	    if(fos!=null) fos.close();
+	    fos.close();
 	    return retval;
 	}catch(IOException e){ e.printStackTrace(); }
 	return false;

@@ -152,7 +152,7 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
     
     /** Gets trim curve in 3d space mapped via the surface
 	(Currently very rough approximation)
-     */
+    */
     public ICurveGeo get3d(){
 	// map only control points for the moment (approximation is very rough)
 	
@@ -313,8 +313,8 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 		
 		double urange = Math.abs(cp2.x-prevCp2.x);
 		double vrange = Math.abs(cp2.y-prevCp2.y);
-		int unum = (int)(urange*uepnum*IConfig.trim3dCurveInterpolationResolution);
-		int vnum = (int)(vrange*vepnum*IConfig.trim3dCurveInterpolationResolution);
+		int unum = (int)(urange*uepnum*IConfig.trimApproximationResolution);
+		int vnum = (int)(vrange*vepnum*IConfig.trimApproximationResolution);
 		int num = Math.max(unum,vnum);
 		
 		for(int j=0; j<num; j++){
@@ -346,9 +346,9 @@ public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
 	
 	double urange = maxu - minu;
 	double vrange = maxv - minv;
-	int unum = (int)(urange*uepnum*IConfig.trim3dCurveInterpolationResolution);
-	int vnum = (int)(vrange*vepnum*IConfig.trim3dCurveInterpolationResolution);
-	int cnum = this.epNum()*IConfig.trim3dCurveInterpolationResolution;
+	int unum = (int)(urange*uepnum*IConfig.trimApproximationResolution);
+	int vnum = (int)(vrange*vepnum*IConfig.trimApproximationResolution);
+	int cnum = this.epNum()*IConfig.trimApproximationResolution;
 	int num = Math.max(cnum, Math.max(unum,vnum));
 	
 	IVec[] cpts = new IVec[num+1];

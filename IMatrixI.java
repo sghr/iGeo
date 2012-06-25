@@ -33,6 +33,8 @@ public interface IMatrixI extends IMatrixOp{
     //public IMatrix get();
     
     public IMatrixI dup();
+    /** alias of dup() */
+    public IMatrixI cp();
     
     public int rowNum();
     public int columnNum();

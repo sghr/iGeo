@@ -33,10 +33,10 @@ import javax.media.opengl.*;
 */
 public class IGLLineLoop extends IGLElement{
     
-    public IGLLineLoop(){}
-    public IGLLineLoop(int size){ super(size); }
+    private IGLLineLoop(){}
+    private IGLLineLoop(int size){ super(size); }
     
-    public IGLLineLoop(IPolyline pl){ super(pl.get()); }
+    private IGLLineLoop(IPolyline pl){ super(pl.get()); }
     
     public void draw(GL gl){
 	gl.glBegin(GL.GL_LINE_LOOP);

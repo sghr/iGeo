@@ -474,7 +474,10 @@ public class IPoint extends IGeometry implements IVecI{
     }
     
     
-    /** set size of dot in graphic */
+    /** set size of dot in graphic ; it's just alias of weight() */
+    public IPoint setSize(double sz){ return weight(sz); }
+    public IPoint size(double sz){ return weight(sz); }
+    /*
     public IPoint setSize(double sz){ return size(sz); }
     public IPoint size(double sz){
 	for(int i=0; graphics!=null && i<graphics.size(); i++)
@@ -482,6 +485,8 @@ public class IPoint extends IGeometry implements IVecI{
 		((IPointGraphic)graphics.get(i)).size(sz);
 	return this;
     }
+    */
+    
     
     public double getSize(){ return size(); }
     public double size(){
@@ -543,4 +548,6 @@ public class IPoint extends IGeometry implements IVecI{
     public IPoint setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IPoint setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public IPoint weight(double w){ super.weight(w); return this; }
+    public IPoint weight(float w){ super.weight(w); return this; }
 }

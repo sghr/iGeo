@@ -33,6 +33,7 @@ public interface IMatrix4I extends IMatrixI, IMatrix4Op{
     public IMatrix4 get();
     
     public IMatrix4I dup();
+    public IMatrix4I cp();
     
     public IMatrix4I set(double v11, double v12, double v13, double v14,
 			 double v21, double v22, double v23, double v24,

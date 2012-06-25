@@ -218,7 +218,7 @@ public class IObject{
     
     /** delete all graphics */
     public void deleteGraphic(){
-	if(server!=null && server.graphicServer!=null){
+	if(server!=null && server.graphicServer!=null && graphics!=null){
 	    //for(IGraphicObject gr:graphics)
 	    for(int i=0; i<graphics.size(); i++)
 		server.graphicServer.remove(graphics.get(i));
@@ -235,7 +235,7 @@ public class IObject{
 	    synchronized(IG.lock){ server.graphicServer().add(this); }
 	*/
 	//for(IGraphicObject gr:graphics) gr.update();
-	for(int i=0; i<graphics.size(); i++) graphics.get(i).update();
+	if(graphics!=null) for(int i=0; i<graphics.size(); i++) graphics.get(i).update();
     }
     
     /**
@@ -309,8 +309,12 @@ public class IObject{
     
     
     public boolean visible(){
-	if(attribute==null) attribute=new IAttribute(); // default true?
-	return attribute.visible;
+	//if(attribute==null) attribute=new IAttribute(); // default true?
+	//return attribute.visible;
+	if(graphics==null) return false;
+	if(attribute!=null) return attribute.visible;
+	if(graphics!=null) for(IGraphicObject gr:graphics) if(gr.visible()) return true;
+	return false;
     }
     public boolean isVisible(){ return visible(); }
     
@@ -335,19 +339,32 @@ public class IObject{
 	}
     }
     
+    /** update weight of all graphics by the color in attribute */
+    public void syncWeight(){
+	if(attribute!=null && graphics!=null){
+	    for(IGraphicObject gr:graphics) gr.setWeight(attribute.weight);
+	}
+    }
+    
     
     /** @return returns whatever Color of any graphics member. (first found) */
     public Color clr(){
 	if(attribute!=null) return attribute.color;
 	if(graphics!=null)
 	    for(IGraphicObject gr:graphics)
-		if(gr.getColor()!=null)
-		    return gr.getColor();
+		if(gr.getColor()!=null) return gr.getColor();
 	
-	return IGraphicObject.getColor(IGraphicObject.defaultRed,
-				       IGraphicObject.defaultGreen,
-				       IGraphicObject.defaultBlue,
-				       IGraphicObject.defaultAlpha);
+	//return IGraphicObject.getColor(IGraphicObject.defaultRed,IGraphicObject.defaultGreen,IGraphicObject.defaultBlue,IGraphicObject.defaultAlpha);
+	return IConfig.objectColor;
+    }
+    
+    /** @return returns weight in attribute if any attribute exists. if not default weight in IConfig */
+    public float weight(){
+	if(attribute!=null) return attribute.weight;
+	if(graphics!=null)
+	    for(IGraphicObject gr:graphics)
+		if(gr.getWeight()>=0) return gr.getWeight(); // if weight is not implented, it returns -1
+	return IConfig.strokeWeight;
     }
     
     public int redInt(){ return clr().getRed(); }
@@ -478,6 +495,13 @@ public class IObject{
 	return this;
     }
     
+    public IObject weight(double w){ return weight((float)w); }
+    public IObject weight(float w){
+	if(attribute==null) attribute = new IAttribute();
+	attribute.weight(w);
+	syncWeight();
+	return this;
+    }
     
     
     /** @return returns whatever Color of any graphics member. (first found)

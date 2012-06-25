@@ -221,6 +221,27 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
 	return sub(center).mul(f).add(center);
     }
     
+    
+    /** scale only in 1 direction */
+    public IVec2R scale1d(IVec2I axis, double f){ return scale1d(axis,new IDouble(f)); }
+    public IVec2R scale1d(double axisX, double axisY, double f){
+        return scale1d(new IVec2(axisX,axisY),new IDouble(f));
+    }
+    public IVec2R scale1d(IVec2I axis, IDoubleI f){
+        op = new Scale1d(op, axis, f); return this;
+    }
+    public IVec2R scale1d(IVec2I center, IVec2I axis, double f){
+        return scale1d(center,axis,new IDouble(f));
+    }
+    public IVec2R scale1d(double centerX, double centerY, double axisX, double axisY, double f){
+        return scale1d(new IVec2(centerX, centerY),new IVec2(axisX,axisY),new IDouble(f));
+    }
+    public IVec2R scale1d(IVec2I center, IVec2I axis, IDoubleI f){
+        if(center==this) return this;
+        return sub(center).scale1d(axis,f).add(center);
+    }
+    
+    
     /**
        reflect (mirror) 2 dimensionally to the other side of the line
     */
@@ -240,14 +261,58 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
 	return ref(linePtX,linePtY,lineDirX,lineDirY);
     }
     
-    //public IVec2R transform(IMatrix2I mat);
-    //public IVec2R transform(IMatrix3I mat);
+    /** shear operation on XY*/
+    public IVec2R shear(double sxy, double syx){ return shear(new IDouble(sxy), new IDouble(syx)); }
+    /** shear operation on XY*/
+    public IVec2R shear(IDoubleI sxy, IDoubleI syx){ op = new Shear(op, sxy, syx); return this; }
+    /** shear operation on XY*/
+    public IVec2R shear(IVec2I center, double sxy, double syx){
+	if(center==this) return this;
+	return sub(center).shear(sxy,syx).add(center);
+    }
+    /** shear operation on XY*/
+    public IVec2R shear(IVec2I center, IDoubleI sxy, IDoubleI syx){
+	if(center==this) return this;
+	return sub(center).shear(sxy,syx).add(center);
+    }
+    
+    /** alias of add() */
+    public IVec2R translate(double x, double y){ return add(x,y); }
+    /** alias of add() */
+    public IVec2R translate(IDoubleI x, IDoubleI y){ return add(x,y); }
+    /** alias of add() */
+    public IVec2R translate(IVec2I v){ return add(v); }
+    
+    
+    public IVec2R transform(IMatrix2I mat){ op = new Transform2(op,mat); return this; }
+    public IVec2R transform(IMatrix3I mat){ op = new Transform3(op,mat); return this; }
     public IVec2R transform(IVec2I xvec, IVec2I yvec){
 	op = new TransformVec2(op,xvec,yvec); return this;
     }
     public IVec2R transform(IVec2I xvec, IVec2I yvec, IVec2I translate){
 	op = new TransformVec3(op,xvec,yvec,translate); return this; 
     }
+    
+    /** mv() is alias of add() */
+    public IVec2R mv(double x, double y){ return add(x,y); }
+    /** mv() is alias of add() */
+    public IVec2R mv(IDoubleI x, IDoubleI y){ return add(x,y); }
+    /** mv() is alias of add() */
+    public IVec2R mv(IVec2I v){ return add(v); }
+    
+    
+    // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
+    /** cp() is alias of dup() */
+    public IVec2R cp(){ return dup(); }
+    
+    /** cp() is alias of dup().add() */
+    public IVec2R cp(double x, double y){ return dup().add(x,y); }
+    /** cp() is alias of dup().add() */
+    public IVec2R cp(IDoubleI x, IDoubleI y){ return dup().add(x,y); }
+    /** cp() is alias of dup().add() */
+    public IVec2R cp(IVec2I v){ return dup().add(v); }
+    
+    
     
     public IVec2R dif(IVec2I v){ return dup().sub(v); }
     public IVec2R dif(double vx, double vy){ return dup().sub(new IVec2(vx,vy)); }
@@ -265,9 +330,7 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
     public IVec2R bisect(IVec2I v){ return dup().unit().add(v.dup().unit()); }
     public IVec2R bisect(double vx, double vy){ return dup().unit().add(new IVec2R(vx,vy).unit()); }
     
-    /**
-       weighted sum
-    */
+    /** weighted sum */
     public IVec2R sum(IVec2I v2, double w1, double w2){
 	return sum(v2,new IDouble(w1),new IDouble(w2));
     }
@@ -485,10 +548,39 @@ public class IVec2R extends IParameterObject implements IVec2I, IReferenceParame
 	}
     }
     
+
+    static public class Scale1d extends IParameterObject implements IVec2Op{
+        public IVec2Op v, axis;
+        public IDoubleI factor;
+        public Scale1d(IVec2Op v, IVec2Op axis, IDoubleI factor){ this.v=v; this.axis=axis; this.factor=factor; }
+        public IVec2 get(){ return v.get().scale1d(axis.get(),factor.get()); }
+    }
+    
     static public class Ref extends IParameterObject implements IVec2Op{
 	public IVec2Op v, lineDir;
 	public Ref(IVec2Op v,  IVec2Op lineDir){ this.v=v; this.lineDir=lineDir; }
 	public IVec2 get(){ return v.get().ref(lineDir.get()); }
+    }
+    
+    static public class Shear extends IParameterObject implements IVec2Op{
+        public IVec2Op v;
+        public IDoubleOp sxy, syx;
+        public Shear(IVec2Op v, IDoubleOp sxy, IDoubleOp syx){ this.v=v; this.sxy = sxy; this.syx = syx; }
+        public IVec2 get(){ return v.get().shear(sxy.get(), syx.get()); }
+    }
+    
+    static public class Transform2 extends IParameterObject implements IVec2Op{
+	public IVec2Op v;
+	public IMatrix2Op mat;
+	public Transform2(IVec2Op v,  IMatrix2Op m){ this.v=v; mat=m; }
+	public IVec2 get(){ return v.get().transform(mat.get()); }
+    }
+    
+    static public class Transform3 extends IParameterObject implements IVec2Op{
+	public IVec2Op v;
+	public IMatrix3Op mat;
+	public Transform3(IVec2Op v,  IMatrix3Op m){ this.v=v; mat=m; }
+	public IVec2 get(){ return v.get().transform(mat.get()); }
     }
     
     static public class TransformVec2 extends IParameterObject implements IVec2Op{

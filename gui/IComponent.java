@@ -42,7 +42,7 @@ public class IComponent{
 	this.x=x; this.y=y; this.width=width; this.height=height;
     }
     public void setBounds(IComponent c){ x=c.x; y=c.y; width=c.width; height=c.height; }
-    public void setLocatoin(int x, int y){ this.x=x; this.y=y; }
+    public void setLocation(int x, int y){ this.x=x; this.y=y; }
     public void setSize(int width, int height){ this.width=width; this.height=height; }
     
     public int getX(){ return x; }
@@ -52,8 +52,9 @@ public class IComponent{
     
     
     public boolean isVisible(){ return visible; }
-    public void hide(){ visible=false; }
-    public void show(){ visible=true; }
+    public void setVisible(boolean v){ visible=v; }
+    //public void hide(){ visible=false; }
+    //public void show(){ visible=true; }
     
     public boolean contains(int x, int y){
 	if(x < this.x) return false;

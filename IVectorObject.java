@@ -530,4 +530,7 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IVectorObject setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public IVectorObject weight(double w){ super.weight(w); return this; }
+    public IVectorObject weight(float w){ super.weight(w); return this; }
+    
 }

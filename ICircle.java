@@ -322,4 +322,7 @@ public class ICircle extends ICurve{
     public ICircle setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public ICircle setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
+    public ICircle weight(double w){ super.weight(w); return this; }
+    public ICircle weight(float w){ super.weight(w); return this; }
+
 }
