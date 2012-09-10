@@ -25,6 +25,5 @@ package igeo;
    An alias class of IRand.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IRandom extends IRand{}

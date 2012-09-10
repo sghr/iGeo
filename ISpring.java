@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Class of IDynamics to simulate spring force between two particles with specified length.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISpring extends IDynamicsBase implements ITensionI{
     //public static double defaultTension=1.0;
@@ -51,7 +50,7 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     
     public ISpring(IVecI p1, IVecI p2, double tension, double length, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
 	this.length = length;
     }
@@ -65,7 +64,7 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     
     public ISpring(IVecI p1, IVecI p2, double tension, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
 	length(p1,p2);
     }
@@ -78,7 +77,7 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     
     public ISpring(IVecI p1, IVecI p2, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	length(p1,p2);
     }
         
@@ -91,7 +90,7 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     
     public ISpring(IVecI p1, IVecI p2, double tension, double length){
 	super();
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
 	this.length = length;
     }
@@ -105,7 +104,7 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     
     public ISpring(IVecI p1, IVecI p2, double tension){
 	super();
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
 	length(p1,p2);
     }
@@ -113,7 +112,7 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     public ISpring(IParticleI p1, IParticleI p2){ super(); pt1=p1; pt2=p2; length(p1,p2); }
     
     public ISpring(IVecI p1, IVecI p2){
-	super(); pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get()); length(p1,p2);
+	super(); pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get()); length(p1,p2);
     }
     
     

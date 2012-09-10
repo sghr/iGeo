@@ -30,9 +30,8 @@ import igeo.gui.*;
    Reference class of NURBS curve to contain any instance of ICurveI.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public class ICurveR extends IObject implements ICurveI{
+public class ICurveR extends IObject implements ICurveI{ // not extends IGeometry?
     public ICurveI curve; // public?
     
     public ICurveR(){ }
@@ -74,12 +73,16 @@ public class ICurveR extends IObject implements ICurveI{
     public ICurveR dup(){ return new ICurveR(this); }    
     
     
-    public IVecI pt(IDoubleI u){ return curve.pt(u); }
-    public IVecI pt(double u){ return curve.pt(u); }
+    //public IVecI pt(IDoubleI u){ return curve.pt(u); }
+    public IVecR pt(IDoubleI u){ return new IVecR(new Pt(this,u)); }
+    //public IVecI pt(double u){ return curve.pt(u); }
+    public IVecR pt(double u){ return new IVecR(new Pt(this,new IDouble(u))); }
     //public void pt(double u, IVec retval){ curve.pt(u,retval); }
     
-    public IVecI tan(IDoubleI u){ return curve.tan(u); }
-    public IVecI tan(double u){ return curve.tan(u); }
+    //public IVecI tan(IDoubleI u){ return curve.tan(u); }
+    public IVecR tan(IDoubleI u){ return new IVecR(new Tan(this,u)); }
+    //public IVecI tan(double u){ return curve.tan(u); }
+    public IVecR tan(double u){ return new IVecR(new Tan(this,new IDouble(u))); }
     //public void tan(double u, IVec retval){ curve.tan(u,retval); }
     
     /** getting i-th control point */
@@ -90,36 +93,71 @@ public class ICurveR extends IObject implements ICurveI{
     public IVecI[] cps(){ return curve.cps(); }
 
     /** getting i-th edit point */
-    public IVecI ep(int i){ return curve.ep(i); }
+    //public IVecI ep(int i){ return curve.ep(i); }
+    public IVecR ep(int i){ return pt(knot(i+deg())); } // test this.
     /** getting i-th edit point */
-    public IVecI ep(IIntegerI i){ return curve.ep(i); }
+    //public IVecI ep(IIntegerI i){ return curve.ep(i); }
+    public IVecR ep(IIntegerI i){ return pt(knot(i.cp(deg((Ir)null)))); } // test this.
     
-    public IVecI start(){ return curve.start(); }
-    public IVecI end(){ return curve.end(); }
+    //public IVecI start(){ return curve.start(); }
+    public IVecR start(){ return pt(new IDouble(0.)); }
+    //public IVecI end(){ return curve.end(); }
+    public IVecR end(){ return pt(new IDouble(1.)); }
+    
     public IVecI startCP(){ return curve.startCP(); }
     public IVecI endCP(){ return curve.endCP(); }
-
+    
+    /** parametrically mid point of a curve */
+    public IVecR mid(){ return pt(0.5); }
+    
+    /** returns center of geometry object */
+    public IVecI center(){ return curve.center(); } // not parameterized yet
+    
+    
+    
+    /** approximate invert projection from 3D location to interanl parameter U (closest point on curve) */
+    public double u(IVecI pt){ return curve.u(pt); }
+    public double u(ISwitchE r, IVecI pt){ return u(pt); }
+    public IDoubleR u(ISwitchR r, IVecI pt){ return new IDoubleR(new U(this,pt)); }
+    
+    /** approximate invert projection from 2D location to interanl parameter U */
+    public double u(IVec2I pt){ return curve.u(pt); }
+    public double u(ISwitchE r, IVec2I pt){ return u(pt); }
+    public IDoubleR u(ISwitchR r, IVec2I pt){ return new IDoubleR(new U2(this,pt)); }
+    
+    /** find approximately closest point on a curve */
+    public IVecR closePt(IVecI pt){ return pt(u(pt)); }
+    
+    /** find approximately closest point on a curve on 2D*/
+    public IVecR closePt(IVec2I pt){ return pt(u(pt)); }
+    
+    /** distance to the closest point on a curve */
+    public double dist(IVecI pt){ return curve.dist(pt); }
+    /** distance to the closest point on a curve on 2D*/
+    public double dist(IVec2I pt){ return curve.dist(pt); }
+    
+    
     
     public double knot(int i){ return curve.knot(i); }
-    public IDoubleI knot(IIntegerI i){ return curve.knot(i); }
+    public IDoubleI knot(IIntegerI i){ return curve.knot(i); } // should it be new IDoubleR ... ?
     
     public double[] knots(){ return curve.knots(); }
     public double[] knots(ISwitchE e){ return knots(); }
-    public IDoubleI[] knots(ISwitchR r){ return curve.knots(r); }
+    public IDoubleI[] knots(ISwitchR r){ return curve.knots(r); } // should it be new IDoubleR ... ?
     
     public int knotNum(){ return curve.knotNum(); }
     //public IIntegerI knotNumR(){ return curve.knotNumR(); }
     public int knotNum(ISwitchE e){ return knotNum(); }
-    public IIntegerI knotNum(ISwitchR r){ return curve.knotNum(r); }
+    public IIntegerI knotNum(ISwitchR r){ return curve.knotNum(r); } // should it be new IIntegerR ... ?
     
     public boolean isRational(){ return curve.isRational(); }
     public boolean isRational(ISwitchE e){ return isRational(); }
-    public IBoolI isRational(ISwitchR r){ return curve.isRational(r); }
+    public IBoolI isRational(ISwitchR r){ return curve.isRational(r); } // should it be new IBoolR ... ?
     
     public int deg(){ return curve.deg(); }
     //public IIntegerI degR(){ return curve.degR(); }
     public int deg(ISwitchE e){ return deg(); }
-    public IIntegerI deg(ISwitchR r){ return curve.deg(r); }
+    public IIntegerI deg(ISwitchR r){ return curve.deg(r); } // should it be new IIntegerR ... ?
     
     public int num(){ return curve.num(); }
     //public IIntegerI numR(){ return curve.numR(); }
@@ -161,7 +199,9 @@ public class ICurveR extends IObject implements ICurveI{
     public boolean isClosed(){ return curve.isClosed(); }
     //public IBoolI isClosedR(){ return curve.isClosedR(); }
     public boolean isClosed(ISwitchE e){ return isClosed(); }
-    public IBoolI isClosed(ISwitchR r){ return curve.isClosed(r); } // should be new IsClosd(surface) ?
+    //public IBoolI isClosed(ISwitchR r){ return curve.isClosed(r); } // should be new IsClosd(curve) ?
+    public IBoolR isClosed(ISwitchR r){ return new IBoolR(new IsClosed(this)); }
+    
     
     public ICurveR rev(){ curve.rev(); return this; }
     /** alias of rev() */
@@ -383,6 +423,36 @@ public class ICurveR extends IObject implements ICurveI{
         public IsClosed(ICurveOp c){ crv=c; }
         public boolean x(){ return crv.get().isClosed(); }
         public IBool get(){ return crv.get().isClosed((Ir)null); }
+    }
+    
+    static public class U extends IParameterObject implements IDoubleOp{
+        public ICurveOp crv;
+	public IVecI pt;
+        public U(ICurveOp c, IVecI p){ crv=c; pt=p; }
+        public double x(){ return crv.get().u(pt); }
+        public IDouble get(){ return crv.get().u((Ir)null,pt); }
+    }
+    
+    static public class U2 extends IParameterObject implements IDoubleOp{
+        public ICurveOp crv;
+	public IVec2I pt;
+        public U2(ICurveOp c, IVec2I p){ crv=c; pt=p; }
+        public double x(){ return crv.get().u(pt); }
+        public IDouble get(){ return crv.get().u((Ir)null,pt); }
+    }
+    
+    static public class Pt extends IParameterObject implements IVecOp{
+	public ICurveOp crv;
+	public IDoubleOp u;
+	public Pt(ICurveOp c, IDoubleOp uval){ crv=c; u=uval; }
+	public IVec get(){ return crv.get().pt(u.x()); }
+    }
+    
+    static public class Tan extends IParameterObject implements IVecOp{
+	public ICurveOp crv;
+	public IDoubleOp u;
+	public Tan(ICurveOp c, IDoubleOp uval){ crv=c; u=uval; }
+	public IVec get(){ return crv.get().tan(u.x()); }
     }
     
 }

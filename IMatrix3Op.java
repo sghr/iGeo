@@ -26,7 +26,6 @@ package igeo;
    Interface of 3x3 matrix operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IMatrix3Op extends IParameter{
     public IMatrix3 get();

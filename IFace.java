@@ -28,12 +28,14 @@ import java.util.ArrayList;
    Class of a face of polygon mesh.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IFace{
     public IVertex[] vertices;
     public IEdge[] edges;
     public IVec normal;
+
+    /** used in deleting process */
+    public boolean deleted=false; 
     
     public IFace(IEdge[] e){ init(e); }
     public IFace(IEdge e1, IEdge e2, IEdge e3){ this(new IEdge[]{e1, e2, e3}); }
@@ -75,15 +77,19 @@ public class IFace{
 	if(edges[1].contains(edges[0].vertices[0])) vertices[0]=edges[0].vertices[1];
 	else if(edges[1].contains(edges[0].vertices[1])) vertices[0]=edges[0].vertices[0];
 	else IOut.err("first&second edges don't match");
-		
+	
 	for(int i=1; i<num; i++){
 	    if(edges[i-1].contains(vertices[i-1]))
 		vertices[i]=edges[i-1].getOtherVertex(vertices[i-1]);
 	    else IOut.err((i-1)+"&"+i+" edges don't match");
 	}
 	
-	if(edges[num-1].getOtherVertex(vertices[num-1]) != vertices[0])
+	if(edges[num-1].getOtherVertex(vertices[num-1]) != vertices[0]){
 	    IOut.err("first&last vertex doesn't match");
+	    //new ICurve(edges[num-1]).clr(1.0,0,0).weight(5); //
+	    //new IPoint(vertices[0]).clr(1.0,0,0).size(6); //
+	    //new ISurface(vertices[0],vertices[1],vertices[2]).clr(1.0,0,0); //
+	}
 	
 	for(int i=0; i<num; i++){
 	    vertices[i].addFace(this);
@@ -129,11 +135,163 @@ public class IFace{
 	return null;
     }
     
+    /** returns edges which aren't a link between any two of given vertex variable vtx. matching only one is fine to be returned. */
+    public /*ArrayList<IEdge>*/ IEdge[] getOtherEdges(IVertex v1, IVertex v2, IVertex... otherVtx){
+	IVertex[] vtx = new IVertex[otherVtx.length+2];
+	vtx[0] = v1;
+	vtx[1] = v2;	
+	for(int i=0; i<otherVtx.length; i++) vtx[i+1] = otherVtx[i+2];
+	
+	ArrayList<IEdge> otherEdges = new ArrayList<IEdge>();
+	for(int i=0; i<edges.length; i++){
+	    boolean matchAny=false;
+	    for(int j=0; j<vtx.length&&!matchAny; j++){
+		if(edges[i].vertices[0]==vtx[j]) matchAny=true;
+
+	    }
+	    if(!matchAny){ otherEdges.add(edges[i]); }
+	    else{
+		matchAny=false;
+		for(int j=0; j<vtx.length&&!matchAny; j++){
+		    if(edges[i].vertices[1]==vtx[j]) matchAny=true;
+		}
+		if(!matchAny){ otherEdges.add(edges[i]); }
+	    }
+	}
+	//return otherEdges;
+	return otherEdges.toArray(new IEdge[otherEdges.size()]);
+    }
+    
+    
+    public IEdge[] getOtherEdges(IVertex v){
+	ArrayList<IEdge> otherEdges = new ArrayList<IEdge>();
+	for(int i=0; i<edges.length; i++){
+	    if(!edges[i].contains(v)) otherEdges.add(edges[i]);
+	}
+	return otherEdges.toArray(new IEdge[otherEdges.size()]);
+    }
+    
+    public IEdge getOtherEdge(IVertex v){
+	for(int i=0; i<edges.length; i++){
+	    if(!edges[i].contains(v)) return edges[i];
+	}
+	return null;
+    }
+    
+    public IEdge[] getOtherEdges(IEdge e){
+	ArrayList<IEdge> otherEdges = new ArrayList<IEdge>();
+	for(int i=0; i<edges.length; i++){
+	    if(edges[i]!=e && !edges[i].eq(e)) otherEdges.add(edges[i]);
+	}
+	return otherEdges.toArray(new IEdge[otherEdges.size()]);
+    }
+    
+    public IEdge getOtherEdge(IEdge e){
+	for(int i=0; i<edges.length; i++){ if(edges[i]!=e) return edges[i]; }
+	return null;
+    }
+    
     public IVertex getOtherVertex(IVertex v1, IVertex v2){
 	for(int i=0; i<vertices.length; i++){
 	    if( (vertices[i] != v1) && (vertices[i] != v2) ) return vertices[i];
 	}
 	return null;
+    }
+    
+    public IVertex getOtherVertex(IEdge e){
+	for(int i=0; i<vertices.length; i++){
+	    if( (vertices[i] != e.vertices[0]) && (vertices[i] != e.vertices[1]) ) return vertices[i];
+	}
+	return null;
+    }
+    
+    public IVertex[] getOtherVertices(IVertex v){
+	ArrayList<IVertex> vtx = new ArrayList<IVertex>();
+	for(int i=0; i<vertices.length; i++){
+	    if(vertices[i] != v) vtx.add(vertices[i]);
+	}
+	return vtx.toArray(new IVertex[vtx.size()]);
+    }
+    
+    
+    public IVertex[] getSharedVertices(IFace f){
+	ArrayList<IVertex> vtx = new ArrayList<IVertex>();
+	for(int i=0; i<vertices.length; i++){
+	    boolean found=false;
+	    for(int j=0; j<f.vertexNum()&&!found; j++){
+		if(vertices[i] != f.vertex(j)){
+		    vtx.add(vertices[i]);
+		    found=true;
+		}
+	    }
+	}
+	return vtx.toArray(new IVertex[vtx.size()]);
+    }
+    
+    public IEdge getSharedEdge(IFace f){
+	for(int i=0; i<edges.length; i++){
+	    boolean found=false;
+	    for(int j=0; j<f.edgeNum()&&!found; j++){
+		if( edges[i] == f.edge(j)){ return edges[i]; }
+		
+		if( edges[i].vertex(0) == f.edge(j).vertex(0) &&
+		    edges[i].vertex(1) == f.edge(j).vertex(1) ||
+		    edges[i].vertex(0) == f.edge(j).vertex(1) &&
+		    edges[i].vertex(1) == f.edge(j).vertex(0) ){
+		    return edges[i];
+		}
+	    }
+	}
+	return null;
+    }
+    
+    
+    public IVertex[] getAdjacentVertices(IVertex v1, IVertex v2){
+	IVertex[] vtx = new IVertex[2];
+	for(int i=0; i<vertices.length; i++){
+	    
+	    if( vertices[i] == v1 ){
+		if(vertices[(i+1)%vertices.length] == v2){
+		    vtx[0] = vertices[(i-1+vertices.length)%vertices.length];
+		    vtx[1] = vertices[(i+2)%vertices.length];
+		    return vtx;
+		}
+		else if(vertices[(i-1+vertices.length)%vertices.length] == v2){
+		    vtx[0] = vertices[(i+1)%vertices.length];
+		    vtx[1] = vertices[(i-2+vertices.length)%vertices.length];
+		    return vtx;
+		}
+	    }
+	}
+	return null;
+    }
+    
+    /** direction of edge based on the sequence of vertices array inside a face 
+	@return true if it's same with vertices array sequence, otherwise false and also if edge is not included inside face, false.
+    */
+    public boolean loopDir(IEdge edge){	
+	int startIdx=-1;
+	for(int i=0; i<vertices.length && startIdx<0; i++){
+	    if(vertices[i].eq(edge.vertex(0))){ startIdx=i; }
+	}
+	
+	if(startIdx<0){
+	    IOut.err("edge is not in the face");
+	    return false;
+	}
+	
+	if(vertices[(startIdx+1)%vertices.length].eq(edge.vertex(1))){ return true; }
+	if(vertices[(startIdx-1+vertices.length)%vertices.length].eq(edge.vertex(1))){ return false; }
+	
+	IOut.err("edge is not in the face");
+	return false;
+    }
+    
+    
+    public boolean sameLoopDir(IEdge e1, IEdge e2){	
+	boolean d1 = loopDir(e1);
+	boolean d2 = loopDir(e2);
+	return d1&&d2 || (!d1)&&(!d2);
     }
     
     
@@ -146,8 +304,11 @@ public class IFace{
     
     
     public void del(){
-	for(int i=0; i<edges.length; i++){
+	deleted=true;
+	for(int i=0; i<vertices.length; i++){
 	    vertices[i].faces.remove(this);
+	}
+	for(int i=0; i<edges.length; i++){
 	    edges[i].faces.remove(this);
 	}
     }
@@ -158,10 +319,25 @@ public class IFace{
 	return false;
     }
     
+    /** checks if the edge is inside face's edges array */
     public boolean contains(IEdge e){
 	for(int i=0; i<edges.length; i++){ if(edges[i]==e) return true; }
 	return false;
     }
+    
+    
+    /** checks if the edge is located on the edge of the face even if it's not inside face's edges array */
+    public boolean onFace(IEdge e){
+	if(contains(e)) return true;
+	for(int i=0; i<vertices.length; i++){
+	    if(vertices[i].eq(e.vertex(0))){
+		if(vertices[(i+1)%vertices.length].eq(e.vertex(1))) return true;
+		if(vertices[(i-1+vertices.length)%vertices.length].eq(e.vertex(1))) return true;
+	    }
+	}
+	return false;
+    }
+    
     
     public int indexOf(IEdge e){
 	for(int i=0; i<edges.length; i++){ if(edges[i]==e) return i; }
@@ -169,10 +345,19 @@ public class IFace{
     }
     
     public void replaceVertex(IVertex oldVertex, IVertex newVertex){
-	for(int i=0; i<edges.length; i++){
+	//for(int i=0; i<edges.length; i++){
+	for(int i=0; i<vertices.length; i++){
 	    if(vertices[i] == oldVertex){ vertices[i] = newVertex; return; }
+	    // how about edges?
 	}
 	IOut.err("no such vertex on this face");
+    }
+    
+    public void replaceEdge(IEdge oldEdge, IEdge newEdge){
+	for(int i=0; i<edges.length; i++){
+	    if(edges[i] == oldEdge){ edges[i] = newEdge; return; }
+	}
+	IOut.err("no such edge on this face");
     }
     
     /*
@@ -348,7 +533,7 @@ public class IFace{
         int num = edges.length;
         IEdge[] newEdges = new IEdge[num];
         for(int i=0; i<num; i++){
-            IVertex v1 = edges[i].getSharingVertex(edges[(i+1)%num]);
+            IVertex v1 = edges[i].getSharedVertex(edges[(i+1)%num]);
             newEdges[i] = creator.createEdge(v1,cv);
         }
         

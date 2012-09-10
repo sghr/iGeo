@@ -28,7 +28,6 @@ import igeo.gui.*;
    A subclass of IMap defined by sine curve in u direction.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IUSineMap extends IMap{
     public double minValue, maxValue;

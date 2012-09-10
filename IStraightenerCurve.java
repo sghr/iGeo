@@ -29,9 +29,8 @@ import java.awt.Color;
    3 point curve with straightener force inside.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public class IStraightenerCurve extends ICurve{
+public class IStraightenerCurve extends ICurve implements IStraightenerI{
     
     IStraightener straightener;
     
@@ -41,7 +40,7 @@ public class IStraightenerCurve extends ICurve{
 	straightener.target(this);
     }
     
-    public IStraightenerCurve(IParticle p1, IParticle p2, IParticle p3){
+    public IStraightenerCurve(IParticleGeo p1, IParticleGeo p2, IParticleGeo p3){
 	super(new IVec[]{ p1.pos(), p2.pos(), p3.pos()}, 2);
 	straightener = new IStraightener(p1,p2,p3);
 	straightener.target(this);
@@ -64,8 +63,35 @@ public class IStraightenerCurve extends ICurve{
 
     public boolean constant(){ return straightener.constant(); }
     public IStraightenerCurve constant(boolean cnst){ straightener.constant(cnst); return this; }
-    
+
+    /** getting end point. i==0 or i==1 or i==2*/
     public IParticleI pt(int i){ return straightener.pt(i); }
+    /** alias of pt(int) */
+    public IParticleI particle(int i){ return straightener.particle(i); }
+    /** position of particle(i) */
+    public IVec pos(int i){ return straightener.pos(i); }
+    
+    /** getting end point1. */
+    public IParticleI pt1(){ return straightener.pt1(); }
+    /** alias of pt1() */
+    public IParticleI particle1(){ return straightener.particle1(); }
+    /** position of particle1() */
+    public IVec pos1(){  return straightener.pos1(); }
+    
+    /** getting end point2. */
+    public IParticleI pt2(){ return straightener.pt2(); }
+    /** alias of pt2() */
+    public IParticleI particle2(){ return straightener.particle2(); }
+    /** position of particle2() */
+    public IVec pos2(){  return straightener.pos2(); }
+    
+    /** getting end point3. */
+    public IParticleI pt3(){ return straightener.pt3(); }
+    /** alias of pt3() */
+    public IParticleI particle3(){ return straightener.particle3(); }
+    /** position of particle3() */
+    public IVec pos3(){  return straightener.pos3(); }
+    
     
     
     public IStraightenerCurve parent(IObject par){ straightener.parent(par); return this; }

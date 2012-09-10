@@ -37,7 +37,6 @@ import igeo.gui.*;
    This class also manages the IServer to manage all the objects in iGeo.
    
    @author Satoru Sugihara
-   @version 0.7.1.0;
 */
 public class PIGraphics3D extends PGraphics3D
     implements IGraphics3D, IPane
@@ -90,6 +89,7 @@ public class PIGraphics3D extends PGraphics3D
     public boolean visible=true;
     
     public PImage bgImage=null;
+    public Color[][] bgColorCache=new Color[2][2];
     
     
     public PIGraphics3D[][] subGraphics=null;
@@ -559,10 +559,20 @@ public class PIGraphics3D extends PGraphics3D
 	    // projection?
 	    // depth test?
 	    
-	    if(bgImage==null){
-		bgImage = createBGImage(super.width,super.height,view);
+	    boolean createImg=false;
+	    
+	    for(int i=0; i<2; i++){
+		for(int j=0; j<2; j++){
+		    if(bgColorCache[i][i] != view.bgColor[i][j]){
+			bgColorCache[i][j] = view.bgColor[i][j];
+			createImg=true;
+		    }
+		}
 	    }
-
+	    
+	    if(bgImage==null||createImg)
+		bgImage = createBGImage(super.width,super.height,view); 
+	    
 	    //try{
 	    background(bgImage);
 	    //backgroundImpl(bgImage);

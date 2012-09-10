@@ -52,7 +52,6 @@ import static igeo.io.IRhino3dmExporter.*;
    This class defines OpenNURBS objects to be used in importer and exporter.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IRhino3dm{
     
@@ -5728,8 +5727,10 @@ public class IRhino3dm{
 		IVertex v = mesh.vertex(i);
 		vtx.add(v);
 		vertices.add(v.get());
-		if(v.normal!=null) normals.add(v.normal.get()); // not calc a new normal
+		if(v.normal!=null){ normals.add(v.normal.get()); }// not calc a new normal
+		else{ normals.add(v.getAverageNormal()); } //use average as default; added 20120725
 		if(v.texture!=null) texture.add(v.texture.get());
+		else{ texture.add(new IVec2(0,0)); } //default value; added 20120725
 	    }
 	    
 	    faces = new ArrayList<MeshFace>();
@@ -5739,7 +5740,10 @@ public class IRhino3dm{
 		    int vi1 = vtx.indexOf(f.vertex(0));
 		    int vi2 = vtx.indexOf(f.vertex(1));
 		    int vi3 = vtx.indexOf(f.vertex(2));
-		    if(vi1>=0 && vi2>=0 && vi3>=0) faces.add(new MeshFace(vi1,vi2,vi3,vi3));
+		    if(vi1>=0 && vi2>=0 && vi3>=0) faces.add(new MeshFace(vi1,vi2,vi3));
+		    else{
+			IOut.err("vertex of the face is missing int the vertices array");
+		    }
 		}
 		else if(f.vertexNum()==4){
 		    int vi1 = vtx.indexOf(f.vertex(0));
@@ -5747,8 +5751,11 @@ public class IRhino3dm{
 		    int vi3 = vtx.indexOf(f.vertex(2));
 		    int vi4 = vtx.indexOf(f.vertex(3));
 		    if(vi1>=0 && vi2>=0 && vi3>=0 && vi4>=0) faces.add(new MeshFace(vi1,vi2,vi3,vi4));
+		    else{
+			IOut.err("vertex of the face is missing int the vertices array");
+		    }
 		}
-		else if(f.vertexNum()>4){
+		else if(f.vertexNum()>4){ // divide
 		    int vi1 = vtx.indexOf(f.vertex(0));
 		    int vi2 = vtx.indexOf(f.vertex(1));
 		    if(vi1>=0&&vi2>=0){
@@ -5757,14 +5764,23 @@ public class IRhino3dm{
 				int vi3 = vtx.indexOf(f.vertex(j));
 				int vi4 = vtx.indexOf(f.vertex(j+1));
 				if(vi3>=0&&vi4>=0) faces.add(new MeshFace(vi1,vi2,vi3,vi4));
+				else{
+				    IOut.err("vertex of the face is missing int the vertices array");
+				}
 				vi2 = vi4;
 			    }
 			    else{
 				int vi3 = vtx.indexOf(f.vertex(j));
-				if(vi3>=0) faces.add(new MeshFace(vi1,vi2,vi3,vi3));
+				if(vi3>=0) faces.add(new MeshFace(vi1,vi2,vi3));
+				else{
+				    IOut.err("vertex of the face is missing int the vertices array");
+				}
 			    }
 			    
 			}
+		    }
+		    else{
+			IOut.err("vertex of the face is missing int the vertices array");
 		    }
 		}
 	    }
@@ -5978,7 +5994,7 @@ public class IRhino3dm{
 	}
 	
 	public void read1(Rhino3dmFile context, InputStream is)throws IOException{
-	    IOut.err();
+	    //IOut.err(); //?
 	    
 	    vertices = readArrayPoint3f(is);
 	    normals = readArrayPoint3f(is);
@@ -6434,13 +6450,34 @@ public class IRhino3dm{
     public static class MeshFace{
 	public int[] vertexIndex; // size 4 array; [2] and [3] is same for a trinangle
 	public MeshFace(){}
-	public MeshFace(int[] v){ if(v.length==4) vertexIndex=v; }
+	public MeshFace(int[] v){
+	    if(v==null){ IOut.err("input array is null"); }
+	    if(v.length==4) vertexIndex=v;
+	    else if(v.length==3){
+		vertexIndex = new int[4];
+		vertexIndex[0] = v[0];
+		vertexIndex[1] = v[1];
+		vertexIndex[2] = v[2];
+		vertexIndex[3] = v[2];
+	    }
+	    else{
+		IOut.err("wrong input array size ("+v.length+"). vertex number should be 3 or 4.");
+	    }
+	}
 	public MeshFace(int v1, int v2, int v3, int v4){
 	    vertexIndex = new int[4];
 	    vertexIndex[0] = v1;
 	    vertexIndex[1] = v2;
 	    vertexIndex[2] = v3;
 	    vertexIndex[3] = v4;
+	}
+	
+	public MeshFace(int v1, int v2, int v3){
+	    vertexIndex = new int[4];
+	    vertexIndex[0] = v1;
+	    vertexIndex[1] = v2;
+	    vertexIndex[2] = v3;
+	    vertexIndex[3] = v3;
 	}
 	
 	public String toString(){

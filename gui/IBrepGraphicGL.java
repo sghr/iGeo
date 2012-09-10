@@ -32,7 +32,6 @@ import igeo.*;
    It contains ISurfaceGraphicFillGL and  ISurfaceGraphicWireframeGL inside.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IBrepGraphicGL extends IGraphicObject{
     
@@ -41,8 +40,10 @@ public class IBrepGraphicGL extends IGraphicObject{
     public IBrepGraphicGL(IBrep brep){
 	super(brep);
 	surfaceGraphics = new ISurfaceGraphicGL[brep.surfaces.length];
-	for(int i=0; i<brep.surfaces.length; i++){
-	    surfaceGraphics[i] = new ISurfaceGraphicGL(brep, brep.surfaces[i]);
+	synchronized(this){
+	    for(int i=0; i<brep.surfaces.length; i++){
+		surfaceGraphics[i] = new ISurfaceGraphicGL(brep, brep.surfaces[i]);
+	    }
 	}
     }
     
@@ -51,12 +52,18 @@ public class IBrepGraphicGL extends IGraphicObject{
 	for(ISurfaceGraphicGL g : surfaceGraphics) g.setColor(c);
     }
     
+    public void setAttribute(IAttribute attr){
+	super.setAttribute(attr);
+	for(ISurfaceGraphicGL g : surfaceGraphics) g.setAttribute(attr);
+    }
+    
     public boolean isDrawable(IGraphicMode m){
 	//return m.isGL();
 	return m.isGraphic3D();
     }
     
-    public void draw(IGraphics g){
+    synchronized public void draw(IGraphics g){
+	if(update){ for(ISurfaceGraphicGL gr : surfaceGraphics) gr.update(); }
 	for(ISurfaceGraphicGL gr : surfaceGraphics) gr.draw(g);
     }
     

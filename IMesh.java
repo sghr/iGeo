@@ -31,7 +31,6 @@ import igeo.gui.*;
    Class of polygon mesh object.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMesh extends IGeometry implements IMeshI{
     
@@ -39,25 +38,43 @@ public class IMesh extends IGeometry implements IMeshI{
     //public IMeshI mesh;
     
     public IMesh(){ super(); mesh=new IMeshGeo(); initMesh(null); }
-    public IMesh(IServerI s){ super(s); mesh=new IMeshGeo(); initMesh(null); }
+    public IMesh(IServerI s){ super(s); mesh=new IMeshGeo(); initMesh(s); }
     
     public IMesh(IMeshGeo m){ super(); mesh=m; initMesh(null); }
     public IMesh(IServerI s, IMeshGeo m){ super(s); mesh=m; initMesh(s); }
     
-    public IMesh(IMesh m){ super(m); mesh=m.mesh.dup(); initMesh(m.server); }
+    public IMesh(IMesh m){
+	super(m); mesh=m.mesh.dup(); initMesh(m.server); if(m.attr()!=null) attr(m.attr().dup()); 
+    }
     public IMesh(IServerI s, IMesh m){ super(s,m); mesh=m.mesh.dup(); initMesh(s); }
     
-    public IMesh(IServerI s, ArrayList<ICurveI> lines){
-	super(s); mesh = new IMeshGeo(lines); initMesh(s);
-    }
-    public IMesh(ArrayList<ICurveI> lines){ this((IServerI)null,lines); }
     
-    public IMesh(IServerI s, ArrayList<ICurveI> lines, IMeshType creator){
-        super(s); mesh = new IMeshGeo(lines,creator); initMesh(s);
+    //public IMesh(IServerI s, ArrayList<ICurveI> lines){ super(s); mesh = new IMeshGeo(lines); initMesh(s); }
+    //public IMesh(ArrayList<ICurveI> lines){ this((IServerI)null,lines); }
+    
+    public IMesh(IServerI s, ICurveI[] lines){
+	super(s); mesh = new IMeshGeo(lines); 
+	if(lines!=null && lines.length>0 && lines[0] instanceof IObject){
+	    if(((IObject)lines[0]).attr()!=null) attr(((IObject)lines[0]).attr().dup());
+	}
+	initMesh(s);
     }
-    public IMesh(ArrayList<ICurveI> lines, IMeshType creator){
-	this((IServerI)null,lines,creator);
+    public IMesh(ICurveI[] lines){ this((IServerI)null,lines); }
+    
+    //public IMesh(IServerI s, ArrayList<ICurveI> lines, IMeshType creator){ super(s); mesh = new IMeshGeo(lines,creator); initMesh(s); }
+    //public IMesh(ArrayList<ICurveI> lines, IMeshType creator){ this((IServerI)null,lines,creator); }
+    
+    /** each input surface builds one 3 or 4 point face. trim is ignored. */
+    public IMesh(IServerI s, ISurfaceI[] faces){
+	super(s); mesh = new IMeshGeo(faces); 
+	if(faces!=null && faces.length>0 && faces[0] instanceof IObject){
+	    if(((IObject)faces[0]).attr()!=null) attr(((IObject)faces[0]).attr().dup());
+	}
+	initMesh(s);
     }
+    /** each input surface builds one 3 or 4 point face. trim is ignored. */
+    public IMesh(ISurfaceI[] faces){ this((IServerI)null,faces); }
+    
     
     public IMesh(IServerI s, IVec[][] matrix){
 	super(s); mesh = new IMeshGeo(matrix); initMesh(s);
@@ -101,7 +118,7 @@ public class IMesh extends IGeometry implements IMeshI{
     }
     
     public IMesh(IServerI s, IVertex[] vtx, IEdge[] edg,IFace[] fcs){
-	super(s); mesh = new IMeshGeo(vtx,edg,fcs); 
+	super(s); mesh = new IMeshGeo(vtx,edg,fcs); initMesh(s);
     }
     public IMesh(IVertex[] vtx, IEdge[] edg,IFace[] fcs){ this((IServerI)null,vtx,edg,fcs); }
     
@@ -161,114 +178,137 @@ public class IMesh extends IGeometry implements IMeshI{
     public IMesh(IServerI s, IFace[] fcs){ super(s); mesh = new IMeshGeo(fcs); initMesh(s); }
     public IMesh(IFace[] fcs){ this((IServerI)null,fcs); }
     
-    public IMeshGeo get(){ return mesh; }
     
-    public IMesh dup(){ return new IMesh(this); }
+    synchronized public IMeshGeo get(){ return mesh; }
     
-    public boolean isValid(){ if(mesh==null){ return false; } return mesh.isValid(); }
+    synchronized public IMesh dup(){ return new IMesh(this); }
+    
+    synchronized public boolean isValid(){ if(mesh==null){ return false; } return mesh.isValid(); }
     
     
-    public void initMesh(IServerI s){
+    synchronized public void initMesh(IServerI s){
 	parameter = mesh;
 	if(graphics==null) initGraphic(s);
     }
     
-    public IGraphicObject createGraphic(IGraphicMode m){
+    synchronized public IGraphicObject createGraphic(IGraphicMode m){
 	if(m.isNone()) return null;
         if(m.isGraphic3D()) return new IMeshGraphicGL(this); 
         return null;
     }
     
-    public int vertexNum(){ return mesh.vertexNum(); }
-    public int edgeNum(){ return mesh.edgeNum(); }
-    public int faceNum(){ return mesh.faceNum(); }
+    synchronized public int vertexNum(){ return mesh.vertexNum(); }
+    synchronized public int edgeNum(){ return mesh.edgeNum(); }
+    synchronized public int faceNum(){ return mesh.faceNum(); }
     
-    public int vertexNum(ISwitchE e){ return mesh.vertexNum(e); }
-    public int edgeNum(ISwitchE e){ return mesh.edgeNum(e); }
-    public int faceNum(ISwitchE e){ return mesh.faceNum(e); }
+    synchronized public int vertexNum(ISwitchE e){ return mesh.vertexNum(e); }
+    synchronized public int edgeNum(ISwitchE e){ return mesh.edgeNum(e); }
+    synchronized public int faceNum(ISwitchE e){ return mesh.faceNum(e); }
     
-    public IIntegerI vertexNum(ISwitchR r){ return mesh.vertexNum(r); }
-    public IIntegerI edgeNum(ISwitchR r){ return mesh.edgeNum(r); }
-    public IIntegerI faceNum(ISwitchR r){ return mesh.faceNum(r); }
+    synchronized public IIntegerI vertexNum(ISwitchR r){ return mesh.vertexNum(r); }
+    synchronized public IIntegerI edgeNum(ISwitchR r){ return mesh.edgeNum(r); }
+    synchronized public IIntegerI faceNum(ISwitchR r){ return mesh.faceNum(r); }
     
-    public IVertex vertex(int i){ return mesh.vertex(i); }
-    public IEdge edge(int i){ return mesh.edge(i); }
-    public IFace face(int i){ return mesh.face(i); }
+    synchronized public IVertex vertex(int i){ return mesh.vertex(i); }
+    synchronized public IEdge edge(int i){ return mesh.edge(i); }
+    synchronized public IFace face(int i){ return mesh.face(i); }
     
-    public IVertex vertex(IIntegerI i){ return mesh.vertex(i); }
-    public IEdge edge(IIntegerI i){ return mesh.edge(i); }
-    public IFace face(IIntegerI i){ return mesh.face(i); }
+    synchronized public IVertex vertex(IIntegerI i){ return mesh.vertex(i); }
+    synchronized public IEdge edge(IIntegerI i){ return mesh.edge(i); }
+    synchronized public IFace face(IIntegerI i){ return mesh.face(i); }
+    
+    /** return all vertices */
+    synchronized public ArrayList<IVertex> vertices(){ return mesh.vertices(); }
+    /** return all edges */
+    synchronized public ArrayList<IEdge> edges(){ return mesh.edges(); }
+    /** return all faces */
+    synchronized public ArrayList<IFace> faces(){ return mesh.faces(); }
+    
+    
+    /** center of mesh, calculated by average of all vertices */
+    synchronized public IVec center(){ return mesh.center(); }
     
     
     // necessary? shold this be here?
-    public IMesh addFace(IFace f){ mesh.addFace(f); return this; }
+    synchronized public IMesh addFace(IFace f){ mesh.addFace(f); return this; }
+    synchronized public IMesh addFace(IFace f, boolean checkExistingVertex, boolean checkExistingEdge, boolean checkExistingFace){ mesh.addFace(f,checkExistingVertex,checkExistingEdge,checkExistingFace); return this; }
     
     // OpenGL way of adding mesh faces
-    public IMesh addTriangles(IVertex[] v){ mesh.addTriangles(v); resetGraphic(); return this; }
-    public IMesh addTriangles(IVec[] v){ mesh.addTriangles(v); resetGraphic(); return this; }
-    public IMesh addQuads(IVertex[] v){ mesh.addQuads(v); resetGraphic(); return this; }
-    public IMesh addQuads(IVec[] v){ mesh.addQuads(v); resetGraphic(); return this; }
-    public IMesh addPolygon(IVertex[] v){ mesh.addPolygon(v); resetGraphic(); return this; }
-    public IMesh addPolygon(IVec[] v){ mesh.addPolygon(v); resetGraphic(); return this; }
-    public IMesh addTriangleStrip(IVertex[] v){ mesh.addTriangleStrip(v); resetGraphic(); return this; }
-    public IMesh addTriangleStrip(IVec[] v){ mesh.addTriangleStrip(v); resetGraphic(); return this; }
-    public IMesh addQuadStrip(IVertex[] v){ mesh.addQuadStrip(v); resetGraphic(); return this; }
-    public IMesh addQuadStrip(IVec[] v){ mesh.addQuadStrip(v); resetGraphic(); return this; }
-    public IMesh addTriangleFan(IVertex[] v){ mesh.addTriangleFan(v); resetGraphic(); return this; }
-    public IMesh addTriangleFan(IVec[] v){ mesh.addTriangleFan(v); resetGraphic(); return this; }
+    synchronized public IMesh addTriangles(IVertex[] v){ mesh.addTriangles(v); resetGraphic(); return this; }
+    synchronized public IMesh addTriangles(IVec[] v){ mesh.addTriangles(v); resetGraphic(); return this; }
+    synchronized public IMesh addQuads(IVertex[] v){ mesh.addQuads(v); resetGraphic(); return this; }
+    synchronized public IMesh addQuads(IVec[] v){ mesh.addQuads(v); resetGraphic(); return this; }
+    synchronized public IMesh addPolygon(IVertex[] v){ mesh.addPolygon(v); resetGraphic(); return this; }
+    synchronized public IMesh addPolygon(IVec[] v){ mesh.addPolygon(v); resetGraphic(); return this; }
+    synchronized public IMesh addTriangleStrip(IVertex[] v){ mesh.addTriangleStrip(v); resetGraphic(); return this; }
+    synchronized public IMesh addTriangleStrip(IVec[] v){ mesh.addTriangleStrip(v); resetGraphic(); return this; }
+    synchronized public IMesh addQuadStrip(IVertex[] v){ mesh.addQuadStrip(v); resetGraphic(); return this; }
+    synchronized public IMesh addQuadStrip(IVec[] v){ mesh.addQuadStrip(v); resetGraphic(); return this; }
+    synchronized public IMesh addTriangleFan(IVertex[] v){ mesh.addTriangleFan(v); resetGraphic(); return this; }
+    synchronized public IMesh addTriangleFan(IVec[] v){ mesh.addTriangleFan(v); resetGraphic(); return this; }
+    
+    
+    // so far only for IMeshGeo and IMesh
+    /** triangulate quad mesh to triangles */
+    public IMesh triangulate(){ mesh.triangulate(); resetGraphic(); return this; }
+    /** triangulate quad mesh to triangles */
+    public IMesh triangulate(boolean triangulateDir){ mesh.triangulate(triangulateDir); resetGraphic(); return this; }
+    
+    /** returns naked edges of the mesh */
+    public IEdge[] nakedEdges(){ return mesh.nakedEdges(); }
     
     
     
-    public IMesh name(String nm){ super.name(nm); return this; }
-    public IMesh layer(ILayer l){ super.layer(l); return this; }
-    public IMesh layer(String l){ super.layer(l); return this; }
+    synchronized public IMesh name(String nm){ super.name(nm); return this; }
+    synchronized public IMesh layer(ILayer l){ super.layer(l); return this; }
+    synchronized public IMesh layer(String l){ super.layer(l); return this; }
 
-    public IMesh attr(IAttribute at){ super.attr(at); return this; }
+    synchronized public IMesh attr(IAttribute at){ super.attr(at); return this; }
 
         
-    public IMesh hide(){ super.hide(); return this; }
-    public IMesh show(){ super.show(); return this; }
+    synchronized public IMesh hide(){ super.hide(); return this; }
+    synchronized public IMesh show(){ super.show(); return this; }
     
-    public IMesh clr(Color c){ super.clr(c); return this; }
-    public IMesh clr(Color c, int alpha){ super.clr(c,alpha); return this; }
-    public IMesh clr(int gray){ super.clr(gray); return this; }
-    public IMesh clr(float fgray){ super.clr(fgray); return this; }
-    public IMesh clr(double dgray){ super.clr(dgray); return this; }
-    public IMesh clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
-    public IMesh clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
-    public IMesh clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
-    public IMesh clr(int r, int g, int b){ super.clr(r,g,b); return this; }
-    public IMesh clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
-    public IMesh clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
-    public IMesh clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
-    public IMesh clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
-    public IMesh clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
-    public IMesh hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
-    public IMesh hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
-    public IMesh hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
-    public IMesh hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
+    synchronized public IMesh clr(Color c){ super.clr(c); return this; }
+    synchronized public IMesh clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public IMesh clr(int gray){ super.clr(gray); return this; }
+    synchronized public IMesh clr(float fgray){ super.clr(fgray); return this; }
+    synchronized public IMesh clr(double dgray){ super.clr(dgray); return this; }
+    synchronized public IMesh clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
+    synchronized public IMesh clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
+    synchronized public IMesh clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
+    synchronized public IMesh clr(int r, int g, int b){ super.clr(r,g,b); return this; }
+    synchronized public IMesh clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
+    synchronized public IMesh clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
+    synchronized public IMesh clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
+    synchronized public IMesh clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
+    synchronized public IMesh clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
+    synchronized public IMesh hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
+    synchronized public IMesh hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
+    synchronized public IMesh hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
+    synchronized public IMesh hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
-    public IMesh setColor(Color c){ super.setColor(c); return this; }
-    public IMesh setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
-    public IMesh setColor(int gray){ super.setColor(gray); return this; }
-    public IMesh setColor(float fgray){ super.setColor(fgray); return this; }
-    public IMesh setColor(double dgray){ super.setColor(dgray); return this; }
-    public IMesh setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
-    public IMesh setColor(float fgray, float falpha){ super.setColor(fgray,falpha); return this; }
-    public IMesh setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
-    public IMesh setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
-    public IMesh setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
-    public IMesh setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
-    public IMesh setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
-    public IMesh setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
-    public IMesh setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
-    public IMesh setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
-    public IMesh setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
-    public IMesh setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
-    public IMesh setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
+    synchronized public IMesh setColor(Color c){ super.setColor(c); return this; }
+    synchronized public IMesh setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IMesh setColor(int gray){ super.setColor(gray); return this; }
+    synchronized public IMesh setColor(float fgray){ super.setColor(fgray); return this; }
+    synchronized public IMesh setColor(double dgray){ super.setColor(dgray); return this; }
+    synchronized public IMesh setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
+    synchronized public IMesh setColor(float fgray, float falpha){ super.setColor(fgray,falpha); return this; }
+    synchronized public IMesh setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
+    synchronized public IMesh setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
+    synchronized public IMesh setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
+    synchronized public IMesh setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
+    synchronized public IMesh setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
+    synchronized public IMesh setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
+    synchronized public IMesh setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
+    synchronized public IMesh setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
+    synchronized public IMesh setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
+    synchronized public IMesh setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
+    synchronized public IMesh setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
-    public IMesh weight(double w){ super.weight(w); return this; }
-    public IMesh weight(float w){ super.weight(w); return this; }
+    synchronized public IMesh weight(double w){ super.weight(w); return this; }
+    synchronized public IMesh weight(float w){ super.weight(w); return this; }
     
 
     /*************************************************************************************
@@ -278,7 +318,7 @@ public class IMesh extends IGeometry implements IMeshI{
     /**
        extract all points and connect if it's at same location and create a new mesh.
     */
-    public static IMesh join(IMesh[] meshes){
+    synchronized public static IMesh join(IMesh[] meshes){
 	
 	ArrayList<IVertex> vertices = new ArrayList<IVertex>();
 	ArrayList<IEdge> edges = new ArrayList<IEdge>();
@@ -305,166 +345,209 @@ public class IMesh extends IGeometry implements IMeshI{
 	    }
 	}
 	
-	
-	
 	return new IMesh(vertices, edges, faces);
     }
     
     
     /** only setting value to closed. checking no connection of mesh */
-    public IMesh close(){ mesh.close(); return this; }
-    public boolean isClosed(){ return mesh.isClosed(); }
+    synchronized public IMesh close(){ mesh.close(); return this; }
+    synchronized public boolean isClosed(){ return mesh.isClosed(); }
+
+    synchronized public IMesh deleteVertex(int i){ return deleteVertex(mesh.vertex(i)); }
+    synchronized public IMesh deleteEdge(int i){ return deleteEdge(mesh.edge(i)); }
+    synchronized public IMesh deleteFace(int i){ return deleteFace(mesh.face(i)); }
+    
+    synchronized public IMesh deleteVertex(IIntegerI i){ return deleteVertex(i.x()); }
+    synchronized public IMesh deleteEdge(IIntegerI i){ return deleteEdge(i.x()); }
+    synchronized public IMesh deleteFace(IIntegerI i){ return deleteFace(i.x()); }
+    
+    synchronized public IMesh deleteVertex(IVertex v){
+	mesh.deleteVertex(v);
+	if(mesh.vertexNum()==0 || mesh.edgeNum()==0 || mesh.faceNum()==0) del();
+	else{ updateGraphic(); }
+	return this;
+    }
+    synchronized public IMesh deleteEdge(IEdge e){
+	mesh.deleteEdge(e);
+	if(mesh.vertexNum()==0 || mesh.edgeNum()==0 || mesh.faceNum()==0) del();
+	else{ updateGraphic(); }
+	return this;
+    }
+    synchronized public IMesh deleteFace(IFace f){
+	mesh.deleteFace(f);
+	if(mesh.vertexNum()==0 || mesh.edgeNum()==0 || mesh.faceNum()==0) del();
+	else{ updateGraphic(); }
+	return this;
+    }
+    
+    
+    /**
+       update graphic when control point location changes or some minor change.
+       This method in IMesh also updates normal vectors.
+    */
+    synchronized public void updateGraphic(){
+	super.updateGraphic();
+	if(IConfig.updateMeshNormal){
+	    for(int i=0; i<mesh.faceNum(); i++){
+		mesh.face(i).calcNormal(); // updates normal internally by vertices location
+	    }
+	    for(int i=0; i<mesh.vertexNum(); i++){
+		mesh.vertex(i).calcNormal(); // updates normal internally by adjacent face normal
+	    }
+	}
+    }
+    
     
     
     /*******************************************************
      * ITransformable methods
      ******************************************************/
     
-    public IMesh add(double x, double y, double z){ mesh.add(x,y,z); return this; }
-    public IMesh add(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.add(x,y,z); return this; }
-    public IMesh add(IVecI v){ mesh.add(v); return this; }
-    public IMesh sub(double x, double y, double z){ mesh.sub(x,y,z); return this; }
-    public IMesh sub(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.sub(x,y,z); return this; }
-    public IMesh sub(IVecI v){ mesh.sub(v); return this; }
-    public IMesh mul(IDoubleI v){ mesh.mul(v); return this; }
-    public IMesh mul(double v){ mesh.mul(v); return this; }
-    public IMesh div(IDoubleI v){ mesh.div(v); return this; }
-    public IMesh div(double v){ mesh.div(v); return this; }
+    synchronized public IMesh add(double x, double y, double z){ mesh.add(x,y,z); return this; }
+    synchronized public IMesh add(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.add(x,y,z); return this; }
+    synchronized public IMesh add(IVecI v){ mesh.add(v); return this; }
+    synchronized public IMesh sub(double x, double y, double z){ mesh.sub(x,y,z); return this; }
+    synchronized public IMesh sub(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.sub(x,y,z); return this; }
+    synchronized public IMesh sub(IVecI v){ mesh.sub(v); return this; }
+    synchronized public IMesh mul(IDoubleI v){ mesh.mul(v); return this; }
+    synchronized public IMesh mul(double v){ mesh.mul(v); return this; }
+    synchronized public IMesh div(IDoubleI v){ mesh.div(v); return this; }
+    synchronized public IMesh div(double v){ mesh.div(v); return this; }
     
-    public IMesh neg(){ mesh.neg(); return this; }
+    synchronized public IMesh neg(){ mesh.neg(); return this; }
     /** alias of neg */
-    public IMesh rev(){ return neg(); }
+    synchronized public IMesh rev(){ return neg(); }
     /** alias of neg */
-    public IMesh flip(){ return neg(); }
+    synchronized public IMesh flip(){ return neg(); }
     
     
     /** scale add */
-    public IMesh add(IVecI v, double f){ mesh.add(v,f); return this; }
+    synchronized public IMesh add(IVecI v, double f){ mesh.add(v,f); return this; }
     /** scale add */
-    public IMesh add(IVecI v, IDoubleI f){ mesh.add(v,f); return this; }
+    synchronized public IMesh add(IVecI v, IDoubleI f){ mesh.add(v,f); return this; }
     /** scale add alias */
-    public IMesh add(double f, IVecI v){ return add(v,f); }
+    synchronized public IMesh add(double f, IVecI v){ return add(v,f); }
     /** scale add alias */
-    public IMesh add(IDoubleI f, IVecI v){ return add(v,f); }
+    synchronized public IMesh add(IDoubleI f, IVecI v){ return add(v,f); }
     
     /** rotation around z-axis and origin */
-    public IMesh rot(IDoubleI angle){ mesh.rot(angle); return this; }
-    public IMesh rot(double angle){ mesh.rot(angle); return this; }
+    synchronized public IMesh rot(IDoubleI angle){ mesh.rot(angle); return this; }
+    synchronized public IMesh rot(double angle){ mesh.rot(angle); return this; }
     
     /** rotation around axis vector */
-    public IMesh rot(IVecI axis, IDoubleI angle){ mesh.rot(axis,angle); return this; }
-    public IMesh rot(IVecI axis, double angle){ mesh.rot(axis,angle); return this; }
+    synchronized public IMesh rot(IVecI axis, IDoubleI angle){ mesh.rot(axis,angle); return this; }
+    synchronized public IMesh rot(IVecI axis, double angle){ mesh.rot(axis,angle); return this; }
     
     /** rotation around axis vector and center */
-    public IMesh rot(IVecI center, IVecI axis, IDoubleI angle){ mesh.rot(center,axis,angle); return this; }
-    public IMesh rot(IVecI center, IVecI axis, double angle){ mesh.rot(center,axis,angle); return this; }
+    synchronized public IMesh rot(IVecI center, IVecI axis, IDoubleI angle){ mesh.rot(center,axis,angle); return this; }
+    synchronized public IMesh rot(IVecI center, IVecI axis, double angle){ mesh.rot(center,axis,angle); return this; }
     
     /** rotate to destination direction vector */
-    public IMesh rot(IVecI axis, IVecI destDir){ mesh.rot(axis,destDir); return this; }
+    synchronized public IMesh rot(IVecI axis, IVecI destDir){ mesh.rot(axis,destDir); return this; }
     /** rotate to destination point location */
-    public IMesh rot(IVecI center, IVecI axis, IVecI destPt){ mesh.rot(center,axis,destPt); return this; }
+    synchronized public IMesh rot(IVecI center, IVecI axis, IVecI destPt){ mesh.rot(center,axis,destPt); return this; }
     
     
     /** rotation on xy-plane around origin; same with rot(IDoubleI) */
-    public IMesh rot2(IDoubleI angle){ mesh.rot2(angle); return this; }
+    synchronized public IMesh rot2(IDoubleI angle){ mesh.rot2(angle); return this; }
     /** rotation on xy-plane around origin; same with rot(double) */
-    public IMesh rot2(double angle){ mesh.rot2(angle); return this; }
+    synchronized public IMesh rot2(double angle){ mesh.rot2(angle); return this; }
     
     /** rotation on xy-plane around center */
-    public IMesh rot2(IVecI center, IDoubleI angle){ mesh.rot2(center,angle); return this; }
-    public IMesh rot2(IVecI center, double angle){ mesh.rot2(center,angle); return this; }
+    synchronized public IMesh rot2(IVecI center, IDoubleI angle){ mesh.rot2(center,angle); return this; }
+    synchronized public IMesh rot2(IVecI center, double angle){ mesh.rot2(center,angle); return this; }
     
     /** rotation on xy-plane to destination direction vector */
-    public IMesh rot2(IVecI destDir){ mesh.rot2(destDir); return this; }
+    synchronized public IMesh rot2(IVecI destDir){ mesh.rot2(destDir); return this; }
     /** rotation on xy-plane to destination point location */
-    public IMesh rot2(IVecI center, IVecI destPt){ mesh.rot2(center,destPt); return this; }
+    synchronized public IMesh rot2(IVecI center, IVecI destPt){ mesh.rot2(center,destPt); return this; }
         
     
     /** alias of mul */
-    public IMesh scale(IDoubleI f){ return mul(f); }
-    public IMesh scale(double f){ return mul(f); }
-    public IMesh scale(IVecI center, IDoubleI f){ mesh.scale(center,f); return this; }
-    public IMesh scale(IVecI center, double f){ mesh.scale(center,f); return this; }
+    synchronized public IMesh scale(IDoubleI f){ return mul(f); }
+    synchronized public IMesh scale(double f){ return mul(f); }
+    synchronized public IMesh scale(IVecI center, IDoubleI f){ mesh.scale(center,f); return this; }
+    synchronized public IMesh scale(IVecI center, double f){ mesh.scale(center,f); return this; }
 
     
     /** scale only in 1 direction */
-    public IMesh scale1d(IVecI axis, double f){ mesh.scale1d(axis,f); return this; }
-    public IMesh scale1d(IVecI axis, IDoubleI f){ mesh.scale1d(axis,f); return this; }
-    public IMesh scale1d(IVecI center, IVecI axis, double f){ mesh.scale1d(center,axis,f); return this; }
-    public IMesh scale1d(IVecI center, IVecI axis, IDoubleI f){ mesh.scale1d(center,axis,f); return this; }
+    synchronized public IMesh scale1d(IVecI axis, double f){ mesh.scale1d(axis,f); return this; }
+    synchronized public IMesh scale1d(IVecI axis, IDoubleI f){ mesh.scale1d(axis,f); return this; }
+    synchronized public IMesh scale1d(IVecI center, IVecI axis, double f){ mesh.scale1d(center,axis,f); return this; }
+    synchronized public IMesh scale1d(IVecI center, IVecI axis, IDoubleI f){ mesh.scale1d(center,axis,f); return this; }
     
     
     /** reflect(mirror) 3 dimensionally to the other side of the plane */
-    public IMesh ref(IVecI planeDir){ mesh.ref(planeDir); return this; }
-    public IMesh ref(IVecI center, IVecI planeDir){ mesh.ref(center,planeDir); return this; }
+    synchronized public IMesh ref(IVecI planeDir){ mesh.ref(planeDir); return this; }
+    synchronized public IMesh ref(IVecI center, IVecI planeDir){ mesh.ref(center,planeDir); return this; }
     /** mirror is alias of ref */
-    public IMesh mirror(IVecI planeDir){ return ref(planeDir); }
-    public IMesh mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
+    synchronized public IMesh mirror(IVecI planeDir){ return ref(planeDir); }
+    synchronized public IMesh mirror(IVecI center, IVecI planeDir){ return ref(center,planeDir); }
     
     
     /** shear operation */
-    public IMesh shear(double sxy, double syx, double syz,
+    synchronized public IMesh shear(double sxy, double syx, double syz,
 		       double szy, double szx, double sxz){
 	mesh.shear(sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
-    public IMesh shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+    synchronized public IMesh shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
 		       IDoubleI szy, IDoubleI szx, IDoubleI sxz){
 	mesh.shear(sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
-    public IMesh shear(IVecI center, double sxy, double syx, double syz,
+    synchronized public IMesh shear(IVecI center, double sxy, double syx, double syz,
 		       double szy, double szx, double sxz){
 	mesh.shear(center,sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
-    public IMesh shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+    synchronized public IMesh shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
 		       IDoubleI szy, IDoubleI szx, IDoubleI sxz){
 	mesh.shear(center,sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
     
-    public IMesh shearXY(double sxy, double syx){ mesh.shearXY(sxy,syx); return this; }
-    public IMesh shearXY(IDoubleI sxy, IDoubleI syx){ mesh.shearXY(sxy,syx); return this; }
-    public IMesh shearXY(IVecI center, double sxy, double syx){ mesh.shearXY(center,sxy,syx); return this; }
-    public IMesh shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){ mesh.shearXY(center,sxy,syx); return this; }
+    synchronized public IMesh shearXY(double sxy, double syx){ mesh.shearXY(sxy,syx); return this; }
+    synchronized public IMesh shearXY(IDoubleI sxy, IDoubleI syx){ mesh.shearXY(sxy,syx); return this; }
+    synchronized public IMesh shearXY(IVecI center, double sxy, double syx){ mesh.shearXY(center,sxy,syx); return this; }
+    synchronized public IMesh shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){ mesh.shearXY(center,sxy,syx); return this; }
     
-    public IMesh shearYZ(double syz, double szy){ mesh.shearYZ(syz,szy); return this; }
-    public IMesh shearYZ(IDoubleI syz, IDoubleI szy){ mesh.shearYZ(syz,szy); return this; }
-    public IMesh shearYZ(IVecI center, double syz, double szy){ mesh.shearYZ(center,syz,szy); return this; }
-    public IMesh shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){ mesh.shearYZ(center,syz,szy); return this; }
+    synchronized public IMesh shearYZ(double syz, double szy){ mesh.shearYZ(syz,szy); return this; }
+    synchronized public IMesh shearYZ(IDoubleI syz, IDoubleI szy){ mesh.shearYZ(syz,szy); return this; }
+    synchronized public IMesh shearYZ(IVecI center, double syz, double szy){ mesh.shearYZ(center,syz,szy); return this; }
+    synchronized public IMesh shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){ mesh.shearYZ(center,syz,szy); return this; }
     
-    public IMesh shearZX(double szx, double sxz){ mesh.shearZX(szx,sxz); return this; }
-    public IMesh shearZX(IDoubleI szx, IDoubleI sxz){ mesh.shearZX(szx,sxz); return this; }
-    public IMesh shearZX(IVecI center, double szx, double sxz){ mesh.shearZX(center,szx,sxz); return this; }
-    public IMesh shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){ mesh.shearZX(center,szx,sxz); return this; }
+    synchronized public IMesh shearZX(double szx, double sxz){ mesh.shearZX(szx,sxz); return this; }
+    synchronized public IMesh shearZX(IDoubleI szx, IDoubleI sxz){ mesh.shearZX(szx,sxz); return this; }
+    synchronized public IMesh shearZX(IVecI center, double szx, double sxz){ mesh.shearZX(center,szx,sxz); return this; }
+    synchronized public IMesh shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){ mesh.shearZX(center,szx,sxz); return this; }
     
     /** mv() is alias of add() */
-    public IMesh mv(double x, double y, double z){ return add(x,y,z); }
-    public IMesh mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
-    public IMesh mv(IVecI v){ return add(v); }
+    synchronized public IMesh mv(double x, double y, double z){ return add(x,y,z); }
+    synchronized public IMesh mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    synchronized public IMesh mv(IVecI v){ return add(v); }
     
     
     // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
     /** cp() is alias of dup() */ 
-    public IMesh cp(){ return dup(); }
+    synchronized public IMesh cp(){ return dup(); }
     
     /** cp() is alias of dup().add() */
-    public IMesh cp(double x, double y, double z){ return dup().add(x,y,z); }
-    public IMesh cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
-    public IMesh cp(IVecI v){ return dup().add(v); }
+    synchronized public IMesh cp(double x, double y, double z){ return dup().add(x,y,z); }
+    synchronized public IMesh cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    synchronized public IMesh cp(IVecI v){ return dup().add(v); }
     
     
     /** translate() is alias of add() */
-    public IMesh translate(double x, double y, double z){ mesh.translate(x,y,z); return this; }
-    public IMesh translate(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.translate(x,y,z); return this; }
-    public IMesh translate(IVecI v){ mesh.translate(v); return this; }
+    synchronized public IMesh translate(double x, double y, double z){ mesh.translate(x,y,z); return this; }
+    synchronized public IMesh translate(IDoubleI x, IDoubleI y, IDoubleI z){ mesh.translate(x,y,z); return this; }
+    synchronized public IMesh translate(IVecI v){ mesh.translate(v); return this; }
     
     
-    public IMesh transform(IMatrix3I mat){ mesh.transform(mat); return this; }
-    public IMesh transform(IMatrix4I mat){ mesh.transform(mat); return this; }
-    public IMesh transform(IVecI xvec, IVecI yvec, IVecI zvec){ mesh.transform(xvec,yvec,zvec); return this; }
-    public IMesh transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){ mesh.transform(xvec,yvec,zvec,translate); return this; }
+    synchronized public IMesh transform(IMatrix3I mat){ mesh.transform(mat); return this; }
+    synchronized public IMesh transform(IMatrix4I mat){ mesh.transform(mat); return this; }
+    synchronized public IMesh transform(IVecI xvec, IVecI yvec, IVecI zvec){ mesh.transform(xvec,yvec,zvec); return this; }
+    synchronized public IMesh transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){ mesh.transform(xvec,yvec,zvec,translate); return this; }
     
     
 }

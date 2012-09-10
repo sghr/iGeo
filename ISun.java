@@ -32,7 +32,6 @@
 package igeo;
 
 import static java.lang.Math.*;
-
 import java.util.ArrayList;
 
 /**
@@ -40,7 +39,6 @@ import java.util.ArrayList;
    the spcecified location at the specified time. 
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISun {
     

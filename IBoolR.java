@@ -26,7 +26,6 @@ package igeo;
    Reference class of boolean to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IBoolR extends IParameterObject implements IBoolI, IReferenceParameter{
     
@@ -43,6 +42,7 @@ public class IBoolR extends IParameterObject implements IBoolI, IReferenceParame
     public IBool get(){ return op.get(); }
     public IBoolR getX(){ return this; }
     public IBoolR dup(){ return new IBoolR(op); }
+    public IBoolR cp(){ return dup(); }
     
     public IBoolOp operator(){ return op; } // for viewer 
     

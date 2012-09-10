@@ -30,7 +30,6 @@ import igeo.gui.*;
    Sphere surface class
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISphere extends ISurface{
     public IVecI center;

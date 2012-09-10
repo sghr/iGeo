@@ -35,7 +35,6 @@ import igeo.gui.*;
    If not the instance is contained by a server found in static IG methods.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 //public interface IElement{
 //public class IElement{
@@ -300,9 +299,13 @@ public class IObject{
 	if(server!=null) return layer(server.layer(layerName));
 	return layer(IG.layer(layerName));
     }
-    
+
+    /** get attributes */
     public IAttribute attr(){ return attribute; }
-    public IObject attr(IAttribute at){ attribute=at; return this; }
+    /** set attributes */
+    public IObject attr(IAttribute at){ attribute=at; syncGraphic(); return this; }
+    /** set a duplicate of attributes of another object. if obj is null or its attributes is null, ignored. */
+    public IObject attr(IObject obj){ if(obj!=null && obj.attr()!=null) attr(obj.attr().dup()); return this; }
     
     
     // shouldn't these methods be in other graphic class?
@@ -332,6 +335,9 @@ public class IObject{
 	return this;
     }
 
+    /** update all graphics by the attribute */
+    public void syncGraphic(){ syncColor(); syncWeight(); }
+    
     /** update color of all graphics by the color in attribute */
     public void syncColor(){
 	if(attribute!=null && graphics!=null){
@@ -371,11 +377,14 @@ public class IObject{
     public int greenInt(){ return clr().getGreen(); }
     public int blueInt(){ return clr().getBlue(); }
     public int alphaInt(){ return clr().getAlpha(); }
+    public int grayInt(){ Color c = clr(); return (c.getRed()+c.getGreen()+c.getBlue())/3; }
+    public int greyInt(){ return grayInt(); }
     
     public double red(){ return ((double)redInt()/255.); }
     public double green(){ return ((double)greenInt()/255.); }
     public double blue(){ return ((double)blueInt()/255.); }
     public double alpha(){ return ((double)alphaInt()/255.); }
+    public double gray(){ return ((double)grayInt()/255.); }
     
     
     public IObject clr(Color c){

@@ -26,7 +26,6 @@ package igeo;
    Abstract interface of 3 dimensional vector.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IVecI extends IVecOp, ITransformable{
     //public static final IVec xaxis = new IVec(1,0,0);

@@ -30,7 +30,6 @@ package igeo;
    Entity class of double (1 dimensional vector) to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IDouble extends IParameterObject implements IDoubleI, IEntityParameter{
     public double x;
@@ -53,6 +52,15 @@ public class IDouble extends IParameterObject implements IDoubleI, IEntityParame
     public IDouble getX(){ return this; }    
     
     public IDouble dup(){ return new IDouble(x); }
+
+    /** alias of dup() */
+    public IDouble cp(){ return dup(); }
+    
+    /** duplicate and add */
+    public IDouble cp(double v){ return dup().add(v); }
+    /** duplicate and add */
+    public IDouble cp(IDoubleI v){ return dup().add(v); }
+    
     
     public IDouble set(double x){ this.x=x; return this; }
     //public IDouble set(IDouble v){ x=v.x; return this; }

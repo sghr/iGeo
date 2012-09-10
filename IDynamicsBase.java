@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Implementation of IDynamics. It provides management of parent IObject and targets to be updated.
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 public class IDynamicsBase implements IDynamics{
     /** parent */
@@ -90,6 +89,11 @@ public class IDynamicsBase implements IDynamics{
 	}
 	return this;
     }
+    
+    
+    /** IDynamicsBase doesn't implement local dynamics feature */
+    public ArrayList<IDynamics> localDynamics(){ return null; }
+    
     
     /** add terget object to be updated by this dynamic object. */
     public IDynamicsBase target(IObject targetObj){

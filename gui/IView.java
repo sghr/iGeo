@@ -33,7 +33,6 @@ import igeo.*;
    An instance of IView is associated with an instance of IPane.
    
    @author Satoru Sugihara
-   @version 0.7.1.0;
 */
 public class IView{
     
@@ -216,7 +215,7 @@ public class IView{
 	bgColor[1][1] = c3;
 	bgColor[0][1] = c4;
 	
-	bgColor(new Color[][]{ new Color[]{ c1, c4 }, new Color[]{ c2, c3 } });
+	//bgColor(new Color[][]{ new Color[]{ c1, c4 }, new Color[]{ c2, c3 } }); // necessary?
     }
     
     public void bgColor(Color[][] c){
@@ -243,7 +242,6 @@ public class IView{
     
     public void setPane(IPane p){
 	pane=p;
-	
 	//IOut.p("pane.x="+pane.x+", pane.y="+pane.y+", pane.width="+pane.width+", pane.height="+pane.height); //
 	
 	int origScH = screenHeight;
@@ -264,7 +262,6 @@ public class IView{
 	}
 	
 	//IOut.p("x="+screenX+", y="+screenY+", w="+screenWidth+", h="+screenHeight); //
-	
 	//update(); // necessary? // ok not to have?
     }
     
@@ -273,6 +270,7 @@ public class IView{
 	screenX=x; screenY=y; screenWidth=w; screenHeight=h;
 	update(); //?
     }
+    
     public void setScreenSize(int w, int h){ screenWidth=w; screenHeight=h; update(); }
     public void setScreenPosition(int x, int y){ screenX=x; screenY=y; }
     

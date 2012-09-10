@@ -48,7 +48,6 @@ import java.util.zip.*;
    To be improved.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IRhino3dmExporter extends IRhino3dm{
     

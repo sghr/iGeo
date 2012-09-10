@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Class of a vertex of polygon mesh.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IVertex implements IVecI{
     
@@ -78,12 +77,24 @@ public class IVertex implements IVecI{
     
     
     public void del(){
-	for(int i=0; i<faces.size(); i++) faces.get(i).del();
-	for(int i=0; i<edges.size(); i++) edges.get(i).del();
-	for(int i=0; i<linkedVertices.size(); i++)
-	    linkedVertices.get(i).linkedVertices.remove(this);
+	for(int i=0; i<faces.size(); i++){
+	    //faces.get(i).vertices.remove(this);
+	    faces.get(i).del();
+	    i--;
+	}
+	for(int i=0; i<edges.size(); i++){
+	    edges.get(i).del();
+	    i--;
+	}
+	//for(int i=0; i<linkedVertices.size(); i++){ linkedVertices.get(i).linkedVertices.remove(this); }
     }
     
+    public void del(IEdge e){
+        edges.remove(e);
+        IVertex v = e.vertices[0];
+        if(v==this) v = e.vertices[1];
+        linkedVertices.remove(v);
+    }
     
     public double x(){ return pos.x(); }
     public double y(){ return pos.y(); }

@@ -26,7 +26,6 @@ package igeo;
    Reference class of double (1 dimensional vector) to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IDoubleR extends IParameterObject implements IDoubleI, IReferenceParameter{
     
@@ -47,6 +46,15 @@ public class IDoubleR extends IParameterObject implements IDoubleI, IReferencePa
     public IDoubleOp operator(){ return op; } // for viewer
     
     public IDoubleR dup(){ return new IDoubleR(op); }
+    
+    /** alias of dup() */
+    public IDoubleR cp(){ return dup(); }
+    
+    /** duplicate and add */
+    public IDoubleR cp(double v){ return dup().add(v); }
+    /** duplicate and add */
+    public IDoubleR cp(IDoubleI v){ return dup().add(v); }
+    
     
     public IDoubleR set(double u){ op=new IDouble(u); return this; }
     public IDoubleR set(IDoubleI u){ op=u; return this; }

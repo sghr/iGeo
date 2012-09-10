@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Class of 2 dimensional vector.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public double x, y;
@@ -867,6 +866,97 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	if(ip<0) return false;
 	if(ip>diff2.len2()) return false;
 	return true;
+    }
+    
+    
+    /** project the vector to the plane defined by two input vector and decompose vector to two vector and another perpendicular vector and returns coefficient of them.
+	relationship of them is like below.
+	this = return[0] * v1 + return[1] * v2 ;
+	@return array of three double number, first is coefficient of uvec, second is of vvec
+    */
+    public double[] projectTo2Vec(IVec2I v1, IVec2I v2){
+	double coef[] = new double[2];
+        // project to a plane defined by v1 and v2
+        
+	IVec2 v1n = v1.get(); if(v1n==v1) v1n = v1n.dup();
+	IVec2 v2n = v2.get(); if(v2n==v2) v2n = v2n.dup();
+	
+	v1n.unit();
+	v2n.unit();
+	
+        double ip12 = v1n.dot(v2n);
+        double iip122 = 1-ip12*ip12;
+        if(iip122==0) return null; 
+	
+	double ip1 = this.dot(v1n);
+        double ip2 = this.dot(v2n);
+        coef[0] = ((ip1-ip2*ip12)/iip122)/v1.len();
+	coef[1] = ((ip2-ip1*ip12)/iip122)/v2.len();
+	return coef;
+    }
+
+    
+    /**
+       create a new vector from this point to the line in parpendicular direction.
+    */
+    public IVec2 perpendicularVecToLine(IVec2I lineDir, IVec2I linePt){
+	double len2 = lineDir.len2();
+	if(len2==0){ IOut.err("line direction is zero"); }
+	IVec2 ldir = lineDir.get().dup();
+	IVec2 dif = dif(linePt);
+	return ldir.mul(ldir.dot(dif)/len2).sub(dif);
+    }
+    
+    /**
+       create a new vector from line to this point perpendicular to the line dir
+    */
+    public IVec2 perpendicularVecToLine(IVec2I lineDir){
+	IVec2 ldir = lineDir.get().dup();
+	return ldir.mul(ldir.dot(this)/ldir.len2()).sub(this);
+    }
+
+    /** distance to an infinite line */
+    public double distToLine(IVec2I lineDir, IVec2I linePt){
+	return perpendicularVecToLine(lineDir,linePt).len();
+    }
+    
+    /** distance to a line dir */
+    public double distToLine(IVec2I lineDir){
+	return perpendicularVecToLine(lineDir).len();
+    }
+    
+    /** distance to a line segment */
+    public double distToSegment(IVec2I linePt1, IVec2I linePt2){
+	if(linePt1==this || linePt2==this) return 0;
+	IVec2 lineDir = linePt2.get().dif(linePt1);
+	IVec2 dif = this.dif(linePt1);
+	double dot = dif.dot(lineDir)/lineDir.len2();
+	if(dot<0.0) dot=0.0; else if(dot>1.0) dot=1.0;
+	return lineDir.mul(dot).dist(dif);
+    }
+    
+    /** ratio of projected point between two points (line segment). 0.0 is at linePt1, 1.0 is at linePt2. */
+    public double ratioOnSegment(IVec2I linePt1, IVec2I linePt2){
+	IVec2 lineDir = linePt2.get().dif(linePt1);
+	return perpendicularVecToLine(lineDir,linePt1).add(this).sub(linePt1).dot(lineDir)/lineDir.len2();
+    }
+    
+    
+    /** distance to a triangle */
+    public double distToTriangle(IVec2I pt1, IVec2I pt2, IVec2I pt3){
+        IVec2 dir1 = pt2.get().dif(pt1);
+        IVec2 dir2 = pt3.get().dif(pt1);
+        double[] coef = dif(pt1).projectTo2Vec(dir1,dir2);
+        if( coef[0] >= 0 ){
+            if(coef[1] >= 0){
+                if( (coef[0]+coef[1]) <= 1 ){ // inside triangle
+                    return 0;
+                }
+                return distToSegment(pt2,pt3);
+            }
+            return distToSegment(pt1, pt2);
+        }
+        return distToSegment(pt1, pt3);
     }
     
 }

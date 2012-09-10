@@ -26,7 +26,6 @@ package igeo;
    A subclass of IMap defined by one constant number
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IConstantMap extends IMap{
     public double value;

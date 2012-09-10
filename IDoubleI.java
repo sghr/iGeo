@@ -26,7 +26,6 @@ package igeo;
    Interface of double (1 dimensional vector) to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IDoubleI extends IDoubleOp{
     /**
@@ -48,6 +47,14 @@ public interface IDoubleI extends IDoubleOp{
        @return duplicated instance
     */
     public IDoubleI dup();
+
+    /** alias of dup() */
+    public IDoubleI cp();
+
+    /** duplicate and add */
+    public IDoubleI cp(double v);
+    /** duplicate and add */
+    public IDoubleI cp(IDoubleI v);
     
     public IDoubleI set(double v);
     public IDoubleI set(IDoubleI v);

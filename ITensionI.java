@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Interface API of tension classes
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface ITensionI{
     public static double defaultTension=1.0;

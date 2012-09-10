@@ -30,13 +30,13 @@ import javax.swing.*;
 import java.awt.*;
 
 import igeo.*;
+import igeo.io.IIO;
 
 /**
    A root GUI object of iGeo managing all IPane instance.
    An instance IG is keyed by IPanel object when it's in Graphic mode.
    
    @author Satoru Sugihara
-   @version 0.7.1.0;
 */
 public class IPanel extends IComponent implements IServerI, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener{
     
@@ -136,6 +136,12 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	for(int i=panes.size()-1; i>=0; i--)
 	    if(panes.get(i).isVisible()&&panes.get(i).contains(x,y)) return panes.get(i);
 	return null;
+    }
+    
+    /** returns current pane; if null, it returns first pane. */
+    public IPane currentPane(){
+	if(currentMousePane!=null) return currentMousePane;
+	return panes.get(0);
     }
     
     
@@ -263,44 +269,8 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    System.exit(0); // temporary.
 	}
 	else if(key==KeyEvent.VK_S && control&& !shift){
-	    try{
-		// create folder of the base path if not existing; what if it's applet or mobile environment
-		if(ig.basePath!=null){
-		    File baseDir = new File(ig.basePath);
-		    if(!baseDir.isDirectory()){
-			IOut.debug(20, "creating directory"+baseDir.toString());
-			if(!baseDir.mkdir()){
-			    IOut.err("failed to create directory: "+baseDir.toString());
-			}
-		    }
-		}
-	    }catch(Exception ex){ ex.printStackTrace(); }
-	    
-	    
-	    File file = chooseFile(new String[][]{ new String[]{ "3dm", "3DM" },
-						   new String[]{ "obj", "Obj", "OBJ" } },
-				   new String[]{ "Rhinoceros 3D file v4 (.3dm)",
-						 "Wavefront OBJ file (.obj)" },
-				   "Save",
-				   true,
-				   ig.basePath,
-				   null);
-	    
-	    if(file!=null) ig.saveFile(file.getAbsolutePath());
-	    
-	    /*
-	    boolean canceled = false;
-	    do{
-		JFileChooser jfc = new JFileChooser(ig.basePath);
-		int retval = jfc.showSaveDialog(null);
-		
-		if(retval==JFileChooser.APPROVE_OPTION){
-		    File file = jfc.getSelectedFile();
-		    ig.saveFile(file.getAbsolutePath());
-		}
-	    }while(canceled);
-	    */
-	    
+	    // save
+	    saveDialog();
 	}
 	else if(key==KeyEvent.VK_ENTER && !control&& !shift){
 	    ig.pauseDynamics();
@@ -344,6 +314,122 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    serverStateCount = ig.server().stateCount();
 	    //IOut.err("bounds Updated: "+bounds); //
 	}
+    }
+
+    
+    public void saveDialog(){
+	try{
+	    // create folder of the base path if not existing; what if it's applet or mobile environment
+	    if(ig.basePath!=null){
+		File baseDir = new File(ig.basePath);
+		if(!baseDir.isDirectory()){
+		    IOut.debug(20, "creating directory"+baseDir.toString());
+		    if(!baseDir.mkdir()){
+			IOut.err("failed to create directory: "+baseDir.toString());
+		    }
+		}
+	    }
+	}catch(Exception ex){ ex.printStackTrace(); }
+	
+	File file = chooseFile(new String[][]{ new String[]{ "3dm", "3DM" },
+					       new String[]{ "obj", "Obj", "OBJ" },
+					       new String[]{ "ai", "Ai", "AI" } },
+			       new String[]{ "Rhinoceros 3D file v4 (.3dm)",
+					     "Wavefront OBJ file (.obj)",
+					     "Adobe Illustrator file (.ai) (line&polyline only)" },
+			       "Save",
+			       true,
+			       ig.basePath,
+			       null);
+	
+	//if(file!=null) ig.saveFile(file.getAbsolutePath());
+	if(file!=null){
+	    if(IIO.getFileType(file.getName()) == IIO.FileType.AI){
+		new AIScaleDialog(file);
+		return;
+	    }
+	    IIO.save(file, ig);
+	}
+	
+	/*
+	boolean canceled = false;
+	do{
+	    JFileChooser jfc = new JFileChooser(ig.basePath);
+	    int retval = jfc.showSaveDialog(null);
+	    if(retval==JFileChooser.APPROVE_OPTION){
+		File file = jfc.getSelectedFile();
+		ig.saveFile(file.getAbsolutePath());
+	    }
+	}while(canceled);
+	*/
+    }
+    
+    
+    public class AIScaleDialog extends JDialog implements ActionListener{
+	
+	public JTextField scalefield;
+	//double scale=1.0;
+	public File file;
+	
+	public AIScaleDialog(File f){
+	    super();
+	    file = f;
+	    
+	    getContentPane().setLayout(new GridLayout(2,3));
+	    boolean axon = currentPane().getView().isAxonometric();
+	    if(axon){
+		String unitStr = server().unit().toString().toLowerCase();
+		getContentPane().add(new JLabel(" scale: 1 "+unitStr+" = " ));
+	    }
+	    else{
+		getContentPane().add(new JLabel(" scale: 1 pixel = " ));
+	    }
+	    
+	    String defaultScaleText = String.valueOf(IConfig.defaultAIExportScale); //"0.1"; //"0.01"; //"1";
+	    scalefield = new JTextField(defaultScaleText, 12);
+	    getContentPane().add(scalefield);
+	    
+	    if(axon){
+		getContentPane().add(new JLabel("inch"));
+	    }
+	    else{
+		getContentPane().add(new JLabel("pt"));
+	    }
+	    
+	    JButton btn1 = new JButton("OK");
+	    btn1.addActionListener(this);
+	    getContentPane().add(btn1);
+	    
+	    JButton btn2 = new JButton("Cancel");
+	    btn2.addActionListener(this);
+	    getContentPane().add(btn2);
+	    
+	    setTitle("Set Scale");
+	    
+	    setSize(400, 90);
+	    
+	    setVisible(true);
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+	    if(e.getActionCommand().equals("OK")){
+		
+		String scalestr = scalefield.getText();
+		
+		try{
+		    
+		    double scale = Double.parseDouble(scalestr);
+		    IIO.saveAI(file, ig, scale);
+		    
+		}catch(Exception ex){
+		    ex.printStackTrace();
+		}
+	    }
+	    setVisible(false); //hide();
+	}
+	
+	//public double scale(){ return scale; }
+	
     }
     
     
@@ -467,7 +553,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	
 	/********* test **********/
 	/*
-	// file fileter in FileDialgo doesn't work in Windows
+	// file fileter in FileDialog doesn't work in Windows
 	try {    
 	    FileDialog fileDialog = new FileDialog((Frame)null, "save", FileDialog.SAVE);
 	    //for(int i=0; i<filters.length; i++){ fileDialog.setFilenameFilter(filters[i]); }
@@ -485,7 +571,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
         do{
             canceled=false; // in the case once canceled
             //JFileChooser chooser = new JFileChooser(defaultPath);
-
+	    
 	    JFileChooser chooser;
 	    if(defaultPath==null){ chooser = new JFileChooser(); }
 	    else{ chooser = new JFileChooser(defaultPath); }

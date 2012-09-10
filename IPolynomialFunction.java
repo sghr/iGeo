@@ -26,7 +26,6 @@ package igeo;
    Implementation of IFunction with polynomial.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IPolynomialFunction implements IFunction{
     public int degree;
@@ -73,7 +72,7 @@ public class IPolynomialFunction implements IFunction{
 	//for(int i=0; i<=degree; i++){ coeff[i] *= a; }
 	
 	int newdeg = this.degree + p.degree;
-	double newcoeff[] = new double[newdeg+1];
+	double[] newcoeff = new double[newdeg+1];
 	
 	for(int i=0; i<=newdeg; i++) newcoeff[i]=0;
 	

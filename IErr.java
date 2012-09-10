@@ -30,7 +30,6 @@ import java.io.*;
    @see IOut
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IErr {
     public static PrintStream ps = System.err;

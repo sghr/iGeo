@@ -28,7 +28,6 @@ import java.io.InputStream;
    A class to provide default static input stream.
       
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 public class IIn {
     public static InputStream in = System.in;

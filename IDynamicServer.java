@@ -28,7 +28,6 @@ import java.util.ArrayList;
    A server to take care of all IDynamicObject. It runs as separate thread.
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 public class IDynamicServer implements Runnable{
     
@@ -188,27 +187,75 @@ public class IDynamicServer implements Runnable{
 		    if(IConfig.loopPreinteract&&IConfig.enablePreinteract){
 			for(int i=0; i<dynamics.size(); i++){
 			    dynamics.get(i).preinteract(dynamics);
+			    
+			    if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+				ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+				for(int j=0; j<localDynamics.size(); j++){
+				    localDynamics.get(j).preinteract(dynamics);
+				}
+			    }
 			}
 		    }
 		    
 		    for(int i=0; i<dynamics.size(); i++){
 			// preinteract
-			if(!IConfig.loopPreinteract&&IConfig.enablePreinteract)
+			if(!IConfig.loopPreinteract&&IConfig.enablePreinteract){
 			    dynamics.get(i).preinteract(dynamics);
+			    
+			    if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+				ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+				for(int j=0; j<localDynamics.size(); j++){
+				    localDynamics.get(j).preinteract(dynamics);
+				}
+			    }
+			}
 			
 			// interact
 			dynamics.get(i).interact(dynamics);
+			if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+			    ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+			    for(int j=0; j<localDynamics.size(); j++){
+				localDynamics.get(j).interact(dynamics);
+			    }
+			}
+			
 			
 			// postinteract
-			if(!IConfig.loopPostinteract&&IConfig.enablePostinteract)
+			if(!IConfig.loopPostinteract&&IConfig.enablePostinteract){
 			    dynamics.get(i).postinteract(dynamics);
-			
+			    if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+				ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+				for(int j=0; j<localDynamics.size(); j++){
+				    localDynamics.get(j).postinteract(dynamics);
+				}
+			    }
+			}
+		    }
+
+		    // preupdate is executed before post interact to update force first and velocity second. // updated 20120826
+		    // preupdate
+		    if(IConfig.loopPreupdate&&IConfig.enablePreupdate){
+			for(int i=0; i<dynamics.size(); i++){
+			    dynamics.get(i).preupdate();
+			    if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+				ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+				for(int j=0; j<localDynamics.size(); j++){
+				    localDynamics.get(j).preupdate();
+				}
+			    }
+			}
 		    }
 		    
 		    // postinteract
 		    if(IConfig.loopPostinteract&&IConfig.enablePostinteract){
 			for(int i=0; i<dynamics.size(); i++){
 			    dynamics.get(i).postinteract(dynamics);
+			    if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+				ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+				for(int j=0; j<localDynamics.size(); j++){
+				    localDynamics.get(j).postinteract(dynamics);
+				}
+			    }
 			}
 		    }
 		    
@@ -219,31 +266,50 @@ public class IDynamicServer implements Runnable{
 		    }
 		    
 		    
-		    // preupdate
-		    if(IConfig.loopPreupdate&&IConfig.enablePreupdate){
-			for(int i=0; i<dynamics.size(); i++){
-			    dynamics.get(i).preupdate();
-			}
-		    }
-		    
 		    //for(IDynamics d:dynamics){ d.update(); }
 		    for(int i=0; i<dynamics.size(); i++){
 			// preupdate
-			if(!IConfig.loopPreupdate&&IConfig.enablePreupdate)
+			if(!IConfig.loopPreupdate&&IConfig.enablePreupdate){
 			    dynamics.get(i).preupdate();
+			    if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+				ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+				for(int j=0; j<localDynamics.size(); j++){
+				    localDynamics.get(j).preupdate();
+				}
+			    }
+			}
 			
 			// update
 			dynamics.get(i).update();
+			if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+			    ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+			    for(int j=0; j<localDynamics.size(); j++){
+				localDynamics.get(j).update();
+			    }
+			}
 			
 			// postupdate
-			if(!IConfig.loopPostupdate&&IConfig.enablePostupdate)
+			if(!IConfig.loopPostupdate&&IConfig.enablePostupdate){
 			    dynamics.get(i).postupdate();
+			    if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+				ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+				for(int j=0; j<localDynamics.size(); j++){
+				    localDynamics.get(j).postupdate();
+				}
+			    }
+			}
 		    }
 		    
 		    // postupdate
 		    if(IConfig.loopPostupdate&&IConfig.enablePostupdate){
 			for(int i=0; i<dynamics.size(); i++){
 			    dynamics.get(i).postupdate();
+			    if(dynamics.get(i).localDynamics()!=null){ // added 20120826
+				ArrayList<IDynamics> localDynamics = dynamics.get(i).localDynamics();
+				for(int j=0; j<localDynamics.size(); j++){
+				    localDynamics.get(j).postupdate();
+				}
+			    }
 			}
 		    }
 		    

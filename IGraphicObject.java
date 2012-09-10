@@ -29,7 +29,6 @@ import igeo.gui.*;
    A subobject of IObject to draw the object on displays.
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobject, IGraphicI{
     

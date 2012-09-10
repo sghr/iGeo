@@ -29,7 +29,6 @@ import igeo.*;
    to switch showing only one pane and showing all panes.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IGridPanel extends IScreenTogglePanel{ //IPanel{
     

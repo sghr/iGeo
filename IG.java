@@ -44,15 +44,14 @@ import igeo.io.*;
    @see IPanel
    
    @author Satoru Sugihara
-   @version 0.7.6.2
 */
 public class IG implements IServerI{
     
     public static int majorVersion(){ return 0; }
-    public static int minorVersion(){ return 7; }
-    public static int buildVersion(){ return 6; }
-    public static int revisionVersion(){ return 2; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2012, 02, 25); }
+    public static int minorVersion(){ return 8; }
+    public static int buildVersion(){ return 1; }
+    public static int revisionVersion(){ return 0; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2012, 9, 3); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -68,6 +67,9 @@ public class IG implements IServerI{
     
     /** Processing Graphics using P3D to be put in size() method in Processing; under development. do not use yet. */
     public static final String P3D = "igeo.p.PIGraphics3D";
+    
+    /** alias of IG.P3D */
+    public static final String P3 = P3D;
     
     /** Processing Graphics using JAVA to be put in size() method in Processing; to be implemented */
     //public static final String JAVA = "igeo.p.PIGraphicsJava";
@@ -509,6 +511,11 @@ public class IG implements IServerI{
 	IG ig = cur();
 	if(ig==null) return;
 	ig.deleteLayer(layerName);
+    }
+    public static void delLayer(ILayer layer){
+	IG ig = cur();
+	if(ig==null) return;
+	ig.deleteLayer(layer);
     }
     public static int layerNum(){
 	IG ig = cur();
@@ -953,6 +960,14 @@ public class IG implements IServerI{
     public static void bg(Color c){ bg(c,c,c,c); }
     public static void background(Color c){ bg(c); }
     
+    public static void defaultBG(){ blueBG(); }
+    public static void blueBG(){ bg(IView.defaultBGColor1,IView.defaultBGColor2,IView.defaultBGColor3,IView.defaultBGColor4); } // added 2012/09/02
+    public static void lightBG(){ bg(1.0, 1.0, 0.9, 0.8); } // added 2012/09/02
+    public static void darkBG(){ bg(0.15, 0.15, 0.05, 0.0); } // added 2012/09/02
+    public static void whiteBG(){ bg(1.0); } // added 2012/09/02
+    public static void blackBG(){ bg(0.0); } // added 2012/09/02
+    
+    
     public static void bg(int r1, int g1, int b1,
 			  int r2, int g2, int b2,
 			  int r3, int g3, int b3,
@@ -1143,6 +1158,7 @@ public class IG implements IServerI{
     public ILayer getLayer(int i){ return server.getLayer(i); }
     public ILayer[] getAllLayers(){ return server.getAllLayers(); }
     public void deleteLayer(String layerName){ server.deleteLayer(layerName); }
+    public void deleteLayer(ILayer layer){ server.deleteLayer(layer); }
     public int getLayerNum(){ return server.layerNum(); }
     
     public IPoint[] getPoints(){ return server.points(); }
@@ -1831,7 +1847,10 @@ public class IG implements IServerI{
 	return ISurfaceCreator.plane(corner,widthVec,heightVec);
     }
     
-    
+    public static ISurface plane(double x, double y, double z, double xwidth, double yheight){
+	return ISurfaceCreator.plane(new IVec(x,y,z),xwidth,yheight);
+    } 
+
     /** one directional extrusion */
     
     public static ISurface extrude(IVecI[] profile, double extrudeDepth){
@@ -2365,6 +2384,7 @@ public class IG implements IServerI{
     public static IMesh mesh(IMeshGeo m){ return IMeshCreator.mesh(m); }
     public static IMesh mesh(IMesh m){ return IMeshCreator.mesh(m); }
     public static IMesh mesh(ArrayList<ICurveI> lines){ return IMeshCreator.mesh(lines); }
+    public static IMesh mesh(ICurveI[] lines){ return IMeshCreator.mesh(lines); }
     public static IMesh mesh(IVec[][] matrix){ return IMeshCreator.mesh(matrix); }
     public static IMesh mesh(IVec[][] matrix, boolean triangulateDir){
 	return IMeshCreator.mesh(matrix,triangulateDir); 
@@ -3998,5 +4018,73 @@ public class IG implements IServerI{
     
     public static boolean eq(double v1, double v2){ return Math.abs(v1-v2)<=IConfig.tolerance; } 
     public static boolean eq(double v1, double v2, double tolerance){ return Math.abs(v1-v2)<=tolerance; } 
+
+
+
+
+
+    /*********************************************************
+     * random number
+     ********************************************************/
+    
+    public static void initRand(int seed){ IRand.init(seed); }
+    public static void initRandByTime(){ IRand.initByTime(); }
+    public static void initRand(){ initRandByTime(); }
+    
+    public static void seed(int seed){ initRand(seed); }
+    public static void seedByTime(){ initRandByTime(); }
+    public static void seedRand(){ initRandByTime(); }
+    
+    
+    
+    public static double rand(){ return IRand.get(); }
+    public static double rand(double max){ return IRand.get(max); }
+    public static double rand(double min, double max){ return IRand.get(min,max); }
+    
+    public static float rand(float max){ return IRand.getf(max); }
+    public static float rand(float min, float max){ return IRand.getf(min,max); }
+    
+    public static int rand(int max){ return IRand.geti(max); }
+    public static int rand(int min, int max){ return IRand.geti(min,max); }
+    
+    public static IVec randPt(){ return IRand.pt(); }
+    public static IVec randPt(double max){ return IRand.pt(max); }
+    public static IVec randPt(double min, double max){ return IRand.pt(min,max); }
+    public static IVec randPt(double maxx,double maxy,double maxz){
+	return IRand.pt(maxx,maxy,maxz);
+    }
+    public static IVec randPt(double minx, double miny, double maxx, double maxy){
+	return IRand.pt(minx,miny,maxx,maxy);
+    }
+    public static IVec randPt(double minx, double miny, double minz,
+			      double maxx, double maxy, double maxz){
+	return IRand.pt(minx,miny,minz,maxx,maxy,maxz);
+    }
+    
+    public static IVec randDir(){ return IRand.dir(); }
+    public static IVec randDir(double len){ return IRand.dir(len); }
+    static public IVec randDir(IVecI perpendicularAxis){ return IRand.dir(perpendicularAxis); }
+    static public IVec randDir(IVecI perpendicularAxis, double length){ return IRand.dir(perpendicularAxis,length); }
+    
+    
+    public static Color randClr(){ return IRand.clr(); }
+    public static Color randClr(float alpha){ return IRand.clr(alpha); }
+    public static Color randClr(int alpha){ return IRand.clr(alpha); }
+    
+    public static Color randColor(){ return randClr(); }
+    public static Color randColor(float alpha){ return randClr(alpha); }
+    public static Color randColor(int alpha){ return randClr(alpha); }
+    
+    public static Color randGray(){ return IRand.gray(); }
+    public static Color randGray(float alpha){ return IRand.gray(alpha); }
+    public static Color randGray(int alpha){ return IRand.gray(alpha); }
+    
+    public static <T> T rand(T[] array){ return IRand.get(array); }
+    public static <T> T rand(java.util.List<T> array){ return IRand.get(array); }
+    
+    public static boolean randPercent(double percent){ return pct(percent); }
+    public static boolean randPct(double percent){ return pct(percent); }
+    public static boolean percent(double percent){ return pct(percent); }
+    public static boolean pct(double percent){ return IRand.pct(percent); }
     
 }

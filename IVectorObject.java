@@ -30,7 +30,6 @@ import igeo.gui.*;
    Class only to visualize IVecI.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IVectorObject extends IObject implements IVecI{
     public IVecI vec;
@@ -486,6 +485,11 @@ public class IVectorObject extends IObject implements IVecI{
 	return -1;
     }
     
+    public IVectorObject weight(double w){ super.weight(w); return this; }
+    public IVectorObject weight(float w){ super.weight(w); return this; }
+    
+    
+    
     public IVectorObject name(String nm){ super.name(nm); return this; }
     public IVectorObject layer(ILayer l){ super.layer(l); return this; }
     
@@ -529,8 +533,5 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
     public IVectorObject setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
     public IVectorObject setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
-    
-    public IVectorObject weight(double w){ super.weight(w); return this; }
-    public IVectorObject weight(float w){ super.weight(w); return this; }
     
 }

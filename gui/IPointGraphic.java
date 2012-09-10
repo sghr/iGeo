@@ -30,7 +30,6 @@ import igeo.*;
    Graphic subobject class to draw point object
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IPointGraphic extends IGraphicObject{
     //public static double defaultSize = 5; //1.0;
@@ -52,9 +51,11 @@ public class IPointGraphic extends IGraphicObject{
     
     public void initPoint(IVecI p){ pt = p; }
     
-    public void initPoint(){
-	if(parent instanceof IPoint) pt = ((IPoint)parent).pos;
-	else if(parent instanceof IPointR) pt = ((IPointR)parent).pos;
+    synchronized public void initPoint(){
+	synchronized(parent){
+	    if(parent instanceof IPoint) pt = ((IPoint)parent).pos;
+	    else if(parent instanceof IPointR) pt = ((IPointR)parent).pos;
+	}
     }
     
     public void size(float sz){ weight(sz); }
@@ -66,7 +67,7 @@ public class IPointGraphic extends IGraphicObject{
     public float getWeight(){ return weight(); }
     
     
-    public void draw(IGraphics g){
+    synchronized public void draw(IGraphics g){
 	
 	if(pt==null) initPoint(); // if drawn before finishing constructor
 	

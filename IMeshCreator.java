@@ -23,13 +23,13 @@
 package igeo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
    Miscellious static methods to instantiate IMesh object.
    @see IMesh
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMeshCreator{
     /** state variable of a server to store surfaces created in the methods in this class */
@@ -50,9 +50,10 @@ public class IMeshCreator{
     public static IMesh mesh(){ return new IMesh(server); }
     public static IMesh mesh(IMeshGeo m){ return new IMesh(server,m); }
     public static IMesh mesh(IMesh m){ return new IMesh(server,m); }
-    public static IMesh mesh(ArrayList<ICurveI> lines){
-	return new IMesh(server,lines,type);
-    }
+    //public static IMesh mesh(ArrayList<ICurveI> lines){ return new IMesh(server,lines,type); }
+    public static IMesh mesh(ArrayList<ICurveI> lines){ return new IMesh(server,lines.toArray(new ICurve[lines.size()])); }
+    public static IMesh mesh(ICurveI[] lines){ return new IMesh(server,lines); }
+    
     public static IMesh mesh(IVec[][] matrix){ return new IMesh(server,matrix); }
     public static IMesh mesh(IVec[][] matrix, boolean triangulateDir){
 	return new IMesh(server,matrix,triangulateDir,type);
@@ -715,6 +716,368 @@ public class IMeshCreator{
     public static IMesh squareStick(ICurveI crv, double radius){
 	int railSegmentNum = crv.epNum()*IConfig.segmentResolution;
 	return polygonStick(crv,radius,4,railSegmentNum);
+    }
+    
+    
+    /** create thickned mesh towards each normal direction. if modifyOriginal is true and the mesh instance is IMesh class instance, it modify the input mesh */
+    public static IMesh thicken(IMeshI mesh, double thickness, boolean modifyOriginal, IMeshType creator){
+	if(modifyOriginal && mesh instanceof IMesh){ return thicken((IMesh)mesh,thickness,null); }
+	IMesh m = null;
+	if(mesh instanceof IMesh){ m = (IMesh)mesh.dup(); }
+	else{ m = new IMesh(mesh.get()); }
+	return thicken(m,thickness,null,creator);
+    }
+    
+    /** create thickned mesh towards the specified direction. if modifyOriginal is true and the mesh instance is IMesh class instance, it modify the input mesh */
+    public static IMesh thicken(IMeshI mesh, double thickness, IVecI dir, boolean modifyOriginal,IMeshType creator){
+	if(modifyOriginal && mesh instanceof IMesh){ return thicken((IMesh)mesh,thickness,dir,creator); }
+	IMesh m = null;
+	if(mesh instanceof IMesh){ m = (IMesh)mesh.dup(); }
+	else{ m = new IMesh(mesh.get()); }
+	return thicken(m,thickness,dir,creator);
+    }
+    
+    /** add thickness to mesh towards each normal direction. this modify the input mesh */
+    public static IMesh thicken(IMesh mesh, double thickness, IMeshType creator){
+	return thicken(mesh,thickness,null,creator);
+    }
+    
+    /** add thickness to mesh towards the specified direction. this modify the input mesh. if the direction is null, it thicken into each normal direction */
+    public static IMesh thicken(IMesh mesh, double thickness, IVecI dir, IMeshType creator){
+	
+	// offset vertices
+	ArrayList<IVertex> offVertices = new ArrayList<IVertex>();
+	// offset edges
+	ArrayList<IEdge> offEdges = new ArrayList<IEdge>();
+	// offset faces
+	ArrayList<IFace> offFaces = new ArrayList<IFace>();
+	
+	offset(mesh, thickness, dir, offVertices, offEdges, offFaces);
+	
+	/*
+	IVec offdir = null;
+	if(dir!=null){ offdir = dir.get().dup().len(thickness); }
+	for(int i=0; i<mesh.vertexNum(); i++){
+	    IVec n = mesh.vertex(i).normal().get();
+	    if(dir==null) offdir = n.dup().len(thickness);
+	    IVertex v = new IVertex(mesh.vertex(i).get().dup());
+	    v.add(offdir);
+	    v.nml(n);
+	    offVertices.add(v);
+	}
+	for(int i=0; i<mesh.edgeNum(); i++){
+	    IEdge e = mesh.edge(i);
+	    int idx1 = mesh.vertices().indexOf(e.vertices[0]);
+	    int idx2 = mesh.vertices().indexOf(e.vertices[1]);
+	    offEdges.add(new IEdge(offVertices.get(idx1), offVertices.get(idx2)));
+	}
+	for(int i=0; i<mesh.faceNum(); i++){
+	    IFace f = mesh.face(i);
+	    IEdge[] e = new IEdge[f.edgeNum()];
+	    for(int j=0; j<f.edgeNum(); j++){
+		int idx = mesh.edges().indexOf(f.edge(j));
+		e[j] = offEdges.get(idx);
+	    }
+	    offFaces.add(new IFace(e));
+	}
+	*/
+	
+	/** this boolean switch make it assume duplicated edges at the same location exist and
+	    they are supposed to be connected */
+	final boolean checkDuplicatedEdge = true;
+	/*
+	boolean[] nakedEdges = new boolean[mesh.edgeNum()];
+	for(int i=0; i<mesh.edgeNum(); i++){
+	    nakedEdges[i]=false;
+	    IEdge e1 = mesh.edge(i);
+	    if(e1.faceNum()==1){
+		boolean uniqueEdge=true;
+		for(int j=0; j<i && uniqueEdge; j++){
+		    if(e1.eq(mesh.edge(j))){
+			uniqueEdge=false;
+			nakedEdges[j]=false;
+		    }
+		}
+		if(uniqueEdge){ nakedEdges[i] = true; }
+	    }
+	}
+	*/
+	ArrayList<IEdge> nakedEdges = mesh.mesh.nakedEdges(checkDuplicatedEdge);
+	
+	
+	// side edges and faces
+	ArrayList<IEdge> sideEdges = new ArrayList<IEdge>();
+	ArrayList<IFace> sideFaces = new ArrayList<IFace>();
+	int[] sideEdgeIndex = new int[mesh.vertexNum()];
+	Arrays.fill(sideEdgeIndex, -1);
+
+	for(int i=0; i<nakedEdges.size(); i++){
+	    IEdge e = nakedEdges.get(i);
+	    int vidx1 = mesh.vertices().indexOf(e.vertex(0));
+	    IEdge sideEdge1 = null;
+	    if(sideEdgeIndex[vidx1]<0){
+		sideEdge1 = new IEdge(e.vertex(0), offVertices.get(vidx1));
+		sideEdges.add(sideEdge1);
+		sideEdgeIndex[vidx1] = sideEdges.size()-1;
+	    }
+	    else{ sideEdge1 = sideEdges.get(sideEdgeIndex[vidx1]); }
+	    
+	    int vidx2 = mesh.vertices().indexOf(e.vertex(1));
+	    IEdge sideEdge2 = null;
+	    if(sideEdgeIndex[vidx2]<0){
+		sideEdge2 = new IEdge(e.vertex(1), offVertices.get(vidx2));
+		sideEdges.add(sideEdge2);
+		sideEdgeIndex[vidx2] = sideEdges.size()-1;
+	    }
+	    else{ sideEdge2 = sideEdges.get(sideEdgeIndex[vidx2]); }
+	    
+	    // quad mesh. should it have triangulated mesh option?
+	    sideFaces.add(new IFace(e,sideEdge2,offEdges.get(mesh.edges().indexOf(e)),sideEdge1));
+	}
+	
+	/*
+	for(int i=0; i<mesh.edgeNum(); i++){
+	    if(nakedEdges[i]){
+		IEdge e = mesh.edge(i);
+		int vidx1 = mesh.vertices().indexOf(e.vertex(0));
+		IEdge sideEdge1 = null;
+		if(sideEdgeIndex[vidx1]<0){
+		    sideEdge1 = new IEdge(e.vertex(0), offVertices.get(vidx1));
+		    sideEdges.add(sideEdge1);
+		    sideEdgeIndex[vidx1] = sideEdges.size()-1;
+		}
+		else{ sideEdge1 = sideEdges.get(sideEdgeIndex[vidx1]); }
+		
+		int vidx2 = mesh.vertices().indexOf(e.vertex(1));
+		IEdge sideEdge2 = null;
+		if(sideEdgeIndex[vidx2]<0){
+		    sideEdge2 = new IEdge(e.vertex(1), offVertices.get(vidx2));
+		    sideEdges.add(sideEdge2);
+		    sideEdgeIndex[vidx2] = sideEdges.size()-1;
+		}
+		else{ sideEdge2 = sideEdges.get(sideEdgeIndex[vidx2]); }
+		
+		// quad mesh. should it have triangulated mesh option?
+		sideFaces.add(new IFace(mesh.edge(i),sideEdge2,offEdges.get(i),sideEdge1));
+	    }
+	}
+	*/
+	
+	// flip normals of the original vertex
+	if(thickness>0){ // if thickness < 0, flip offset vertices' normal
+	    for(int i=0; i<mesh.vertexNum(); i++){
+		if(mesh.vertex(i).normal!=null){
+		    mesh.vertex(i).normal.neg();
+		}
+	    }
+	    for(int i=0; i<mesh.faceNum(); i++){
+		mesh.face(i).flipNormal();
+	    }
+	}
+	else if(thickness<0){
+	    for(int i=0; i<offVertices.size(); i++){
+		if(offVertices.get(i).normal!=null){
+		    offVertices.get(i).normal.neg();
+		}
+	    }
+	    for(int i=0; i<offFaces.size(); i++){
+		offFaces.get(i).flipNormal();
+	    }
+	    for(int i=0; i<sideFaces.size(); i++){
+		sideFaces.get(i).flipNormal();
+	    }
+	}
+	
+	mesh.vertices().addAll(offVertices);
+	mesh.edges().addAll(offEdges);
+	mesh.edges().addAll(sideEdges);
+	mesh.faces().addAll(offFaces);
+	mesh.faces().addAll(sideFaces);
+	mesh.close(); //
+	return mesh;
+	
+	/*
+	ArrayList<IVertex> newVertices = new ArrayList<IVertex>();
+	ArrayList<IEdge> newEdges = new ArrayList<IEdge>();
+	ArrayList<IFace> newFaces = new ArrayList<IFace>();
+	
+	newVertices.addAll(mesh.vertices());
+	newVertices.addAll(offVertices);
+	newEdges.addAll(mesh.edges());
+	newEdges.addAll(offEdges);
+	newEdges.addAll(sideEdges);
+	newFaces.addAll(mesh.faces());
+	newFaces.addAll(offFaces);
+	newFaces.addAll(sideFaces);
+	IG.p("new mesh");
+	return new IMesh(//newVertices.toArray(new IVertex[newVertices.size()]),
+			 //newEdges.toArray(new IEdge[newEdges.size()]),
+			 newFaces.toArray(new IFace[newFaces.size()]));
+	*/
+    }
+    
+    
+    /** create offset mesh towards each normal direction. */
+    public static IMesh offset(IMeshI mesh, double thickness, IMeshType creator){
+	// offset vertices
+	ArrayList<IVertex> offVertices = new ArrayList<IVertex>();
+	// offset edges
+	ArrayList<IEdge> offEdges = new ArrayList<IEdge>();
+	// offset faces
+	ArrayList<IFace> offFaces = new ArrayList<IFace>();
+	
+	offset(mesh, thickness, null, offVertices, offEdges, offFaces);
+	//IMesh m = new IMesh(offVertices, offEdges, offFaces);
+	IMesh m = new IMesh(creator.createMesh(offVertices, offEdges, offFaces));
+	if(mesh instanceof IObject){ m.attr((IObject)mesh); }
+	return m;
+    }
+    
+    /** create ArrayList of vertices, edges, faces, offset from the mesh */
+    public static void offset(IMeshI mesh, double thickness, IVecI offsetDir,
+			      ArrayList<IVertex> resultVertices,
+			      ArrayList<IEdge> resultEdges,
+			      ArrayList<IFace> resultFaces){
+	
+	IVec dir = null;
+	if(offsetDir!=null){ dir = offsetDir.get().dup().len(thickness); }
+	
+	for(int i=0; i<mesh.vertexNum(); i++){
+	    IVec n = mesh.vertex(i).normal().get();
+	    if(offsetDir==null) dir = n.dup().len(thickness);
+	    IVertex v = new IVertex(mesh.vertex(i).get().dup());
+	    v.add(dir);
+	    //if(thickness<0){ n=n.dup().neg(); }
+	    v.nml(n);
+	    resultVertices.add(v);
+	}
+	
+	for(int i=0; i<mesh.edgeNum(); i++){
+	    IEdge e = mesh.edge(i);
+	    int idx1 = mesh.vertices().indexOf(e.vertices[0]);
+	    int idx2 = mesh.vertices().indexOf(e.vertices[1]);
+	    resultEdges.add(new IEdge(resultVertices.get(idx1), resultVertices.get(idx2)));
+	}
+	
+	for(int i=0; i<mesh.faceNum(); i++){
+	    IFace f = mesh.face(i);
+	    IEdge[] e = new IEdge[f.edgeNum()];
+	    for(int j=0; j<f.edgeNum(); j++){
+		int idx = mesh.edges().indexOf(f.edge(j));
+		e[j] = resultEdges.get(idx);
+	    }
+	    //if(thickness<0){ f.flipNormal(); }
+	    resultFaces.add(new IFace(e));
+	}
+    }
+    
+    
+    public static IMesh diamondTessellation(IMeshI mesh, boolean splitDiamond, boolean splitDir, IMeshType creator){
+	
+	IVertex[] midVtx = new IVertex[mesh.edgeNum()];
+	IEdge[][] divEdge = new IEdge[mesh.edgeNum()][2];
+	
+	for(int i=0; i<mesh.edgeNum(); i++){
+	    IEdge e = mesh.edge(i);
+	    midVtx[i] = creator.createVertex(e.vertex(0).mid(e.vertex(1)));
+	    divEdge[i][0] = creator.createEdge(e.vertex(0), midVtx[i]);
+	    divEdge[i][1] = creator.createEdge(midVtx[i], e.vertex(1));
+	}
+	
+	IEdge[][] diaEdge = new IEdge[mesh.faceNum()][];
+	IFace[][] diaFace = new IFace[mesh.faceNum()][];
+	IFace[] face = null;
+	
+	IEdge[] splitEdge = null;
+	IFace[][] splitFace = null;
+
+	if(splitDiamond){
+	    splitEdge = new IEdge[mesh.faceNum()];
+	    splitFace = new IFace[mesh.faceNum()][2];
+	}
+	else{
+	    face = new IFace[mesh.faceNum()];
+	}
+	
+	for(int i=0; i<mesh.faceNum(); i++){
+	    IFace f = mesh.face(i);
+	    int en = f.edgeNum();
+	    diaEdge[i] = new IEdge[en];
+	    diaFace[i] = new IFace[en];
+	    int[] idx = new int[en];
+	    for(int j=0; j<en; j++){ idx[j] = mesh.edges().indexOf(f.edge(j)); }
+	    
+	    for(int j=0; j<en; j++){
+		diaEdge[i][j] = creator.createEdge(midVtx[idx[j]], midVtx[idx[(j+1)%en]]);
+		diaFace[i][j] = creator.createFace(divEdge[idx[j]][1], divEdge[idx[(j+1)%en]][0], diaEdge[i][j]);
+	    }
+	    if(splitDiamond){
+		if(en==4){
+		    if(splitDir){
+			splitEdge[i] = creator.createEdge(midVtx[idx[0]], midVtx[idx[2]]);
+			splitFace[i][0] = creator.createFace(diaEdge[i][0],diaEdge[i][1],splitEdge[i]);
+			splitFace[i][1] = creator.createFace(diaEdge[i][2],diaEdge[i][3],splitEdge[i]);
+		    }
+		    else{
+			splitEdge[i] = creator.createEdge(midVtx[idx[1]], midVtx[idx[3]]);
+			splitFace[i][0] = creator.createFace(diaEdge[i][1],diaEdge[i][2],splitEdge[i]);
+			splitFace[i][1] = creator.createFace(diaEdge[i][3],diaEdge[i][0],splitEdge[i]);
+		    }
+		}
+		else{
+		    splitEdge[i] = null;
+		    splitFace[i][0] = creator.createFace(diaEdge[i]);
+		    splitFace[i][1] = null;
+		}
+	    }
+	    else{
+		face[i] = creator.createFace(diaEdge[i]);
+	    }
+	}
+	
+	ArrayList<IVertex> allVtx= new ArrayList<IVertex>();
+	ArrayList<IEdge> allEdge = new ArrayList<IEdge>();
+	ArrayList<IFace> allFace = new ArrayList<IFace>();
+	
+	for(int i=0; i<mesh.vertexNum(); i++){
+	    allVtx.add(mesh.vertex(i)); // dup? or creator.createVertex? or same instance?
+	}
+	for(int i=0; i<midVtx.length; i++){
+	    allVtx.add(midVtx[i]);
+	}
+	for(int i=0; i<divEdge.length; i++){
+	    allEdge.add(divEdge[i][0]);
+	    allEdge.add(divEdge[i][1]);
+	}
+	for(int i=0; i<diaEdge.length; i++){
+	    for(int j=0; j<diaEdge[i].length; j++){
+		allEdge.add(diaEdge[i][j]);
+	    }
+	}
+	if(splitDiamond){
+	    for(int i=0; i<splitEdge.length; i++){
+		if(splitEdge[i]!=null){ allEdge.add(splitEdge[i]); }
+	    }
+	    for(int i=0; i<splitFace.length; i++){
+		for(int j=0; j<splitFace[i].length; j++){
+		    if(splitFace[i][j]!=null){ allFace.add(splitFace[i][j]); }
+		}
+	    }
+	}
+	else{
+	    for(int i=0; i<face.length; i++){
+		allFace.add(face[i]);
+	    }
+	}
+	for(int i=0; i<diaFace.length; i++){
+	    for(int j=0; j<diaFace[i].length; j++){
+		allFace.add(diaFace[i][j]);
+	    }
+	}
+	
+	IMesh m = new IMesh(creator.createMesh(allVtx,allEdge,allFace));
+	if(mesh instanceof IObject){ m.attr((IObject)mesh); }
+	return m;
     }
     
     

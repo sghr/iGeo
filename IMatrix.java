@@ -26,7 +26,6 @@ package igeo;
    Class of numerical matrix in specified size .
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMatrix implements IMatrixI{
     

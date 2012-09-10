@@ -29,353 +29,82 @@ import java.util.ArrayList;
    Class of an agent based on one point, extending IPoint and implements IDynamics
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public class IBoid extends IParticleAgent{
+public class IBoid extends IParticle implements IBoidI{
     
-    /*
-    public double neighborDist = 300; //20; //50; //100;
-    public double separationDist = 10;
-    public double separationRatio = 0.3; //0.01;
-    public double alignmentDist = 20; //15;
-    public double alignmentRatio = 0.03; //0.01;
-    public double alignmentMaxVelocity = 2; //1;
-    public double coherenceRatio = 0.02; //0.05;
-    
-    public double randomVelocityPercent = 0.01; //0.1;
-    public double randomVelocityRange = 20; //10;
-    */
-    
-    public double cohesionDist = 100;
-    public double cohesionRatio = 5;
-    public double cohesionLimit = -1; // no limit
-    public double separationDist = 50;
-    public double separationRatio = 5;
-    public double separationLimit = -1; // no limit
-    public double alignmentDist = 20;
-    public double alignmentRatio = 5;
-    public double alignmentLimit = -1; // no limit
-    
-    
-    IVec cohesionForce = new IVec();
-    IVec separationForce = new IVec();
-    IVec alignmentForce = new IVec();
-    
-    //public ArrayList<IBoid> neighbors;
-    
-    public IBoid(){ super(); initBoid(); }
-    public IBoid(IVecI pt){ super(pt); initBoid(); }
-    public IBoid(IVec pt){ super(pt); initBoid(); }
-    public IBoid(IVecI pt, IVecI vel){ super(pt,vel); initBoid(); }
-    public IBoid(IVec pt, IVec vel){ super(pt,vel); initBoid(); }
-    public IBoid(double x, double y, double z){ super(x,y,z); initBoid(); }
+    public IBoid(){ super(new IBoidGeo()); }
+    public IBoid(IVecI pt){ super(new IBoidGeo(pt)); }
+    public IBoid(IVec pt){ super(new IBoidGeo(pt)); }
+    public IBoid(IVecI pt, IVecI vel){ super(new IBoidGeo(pt,vel)); }
+    public IBoid(IVec pt, IVec vel){ super(new IBoidGeo(pt,vel)); }
+    public IBoid(double x, double y, double z){ super(new IBoidGeo(x,y,z)); }
     public IBoid(double x, double y, double z, double vx, double vy, double vz){
-	super(x,y,z,vx,vy,vz); initBoid();
+	super(new IBoidGeo(x,y,z,vx,vy,vz)); 
     }
-    public IBoid(IBoid b){ super((IParticleAgent)b);
-	/*
-	neighborDist = b.neighborDist;
-	separationDist = b.separationDist;
-	separationRatio = b.separationRatio;
-	alignmentDist = b.alignmentDist;
-	alignmentRatio = b.alignmentRatio;
-	alignmentMaxVelocity = b.alignmentMaxVelocity;
-	coherenceRatio = b.coherenceRatio;
-	randomVelocityPercent = b.randomVelocityPercent;
-	randomVelocityRange = b.randomVelocityRange;
-	*/
-	cohesionDist = b.cohesionDist;	
-	cohesionRatio = b.cohesionRatio;
-	cohesionLimit = b.cohesionLimit;
-	separationDist = b.separationDist;
-	separationRatio = b.separationRatio;
-	separationLimit = b.separationLimit;
-	alignmentDist = b.alignmentDist;
-	alignmentRatio = b.alignmentRatio;
-	alignmentLimit = b.alignmentLimit;
-	
-	initBoid();
-    }
+    public IBoid(IBoid b){ super(new IBoidGeo((IBoidGeo)b.particle));}
     
-    public void initBoid(){
-	cohesionForce = new IVec();
-        separationForce = new IVec();
-	alignmentForce = new IVec();
-    }
-
-
-    public double cohDist(){ return cohesionDist; }
+    public IBoidGeo boid(){ return (IBoidGeo)particle; } // (IParticleGeo)particle in IParticle
+    
+    public double cohDist(){ return boid().cohDist(); }
     public double cohesionDist(){ return cohDist(); }
-    public IBoid cohDist(double dist){ cohesionDist=dist; return this; }
+    public IBoid cohDist(double dist){ boid().cohDist(dist); return this; }
     public IBoid cohesionDist(double dist){ return cohDist(dist); }
-    public double cohRatio(){ return cohesionRatio; }
+    public double cohRatio(){ return boid().cohRatio(); }
     public double cohesionRatio(){ return cohRatio(); }
-    public IBoid cohRatio(double ratio){ cohesionRatio=ratio; return this; }
+    public IBoid cohRatio(double ratio){ boid().cohRatio(ratio); return this; }
     public IBoid cohesionRatio(double ratio){ return cohRatio(ratio); }
-    public double cohLimit(){ return cohesionLimit; }
+    public double cohLimit(){ return boid().cohLimit(); }
     public double cohesionLimit(){ return cohLimit(); }
-    public IBoid cohLimit(double limit){ cohesionLimit = limit; return this; }
+    public IBoid cohLimit(double limit){ boid().cohLimit(limit); return this; }
     public IBoid cohesionLimit(double limit){ return cohLimit(limit); }
     
-    public double sepDist(){ return separationDist; }
-    public double separationDist(){ return sepDist(); }
-    public IBoid sepDist(double dist){ separationDist=dist; return this; }
-    public IBoid separationDist(double dist){ return sepDist(dist); }
-    public double sepRatio(){ return separationRatio; }
-    public double separationRatio(){ return sepRatio(); }
-    public IBoid sepRatio(double ratio){ separationRatio=ratio; return this; }
-    public IBoid separationRatio(double ratio){ return sepRatio(ratio); }
-    public double sepLimit(){ return separationLimit; }
-    public double separationLimit(){ return sepLimit(); }
-    public IBoid sepLimit(double limit){ separationLimit = limit; return this; }
-    public IBoid separationLimit(double limit){ return sepLimit(limit); }
+    public IBoid coh(double ratio, double dist){ boid().coh(ratio,dist); return this; }
+    public IBoid cohesion(double ratio, double dist){ return coh(ratio,dist); }
     
-    public double aliDist(){ return alignmentDist; }
+    public double sepDist(){ return boid().sepDist(); }
+    public double separationDist(){ return sepDist(); }
+    public IBoid sepDist(double dist){ boid().sepDist(dist); return this; }
+    public IBoid separationDist(double dist){ return sepDist(dist); }
+    public double sepRatio(){ return boid().sepRatio(); }
+    public double separationRatio(){ return sepRatio(); }
+    public IBoid sepRatio(double ratio){ boid().sepRatio(ratio); return this; }
+    public IBoid separationRatio(double ratio){ return sepRatio(ratio); }
+    public double sepLimit(){ return boid().sepLimit(); }
+    public double separationLimit(){ return sepLimit(); }
+    public IBoid sepLimit(double limit){ boid().sepLimit(limit); return this; }
+    public IBoid separationLimit(double limit){ return sepLimit(limit); }
+
+    public IBoid sep(double ratio, double dist){ boid().sep(ratio,dist); return this; }
+    public IBoid separation(double ratio, double dist){ return sep(ratio,dist); }
+    
+    public double aliDist(){ return boid().aliDist(); }
     public double alignmentDist(){ return aliDist(); }
-    public IBoid aliDist(double dist){ alignmentDist=dist; return this; }
+    public IBoid aliDist(double dist){ boid().aliDist(dist); return this; }
     public IBoid alignmentDist(double dist){ return aliDist(dist); }
-    public double aliRatio(){ return alignmentRatio; }
+    public double aliRatio(){ return boid().aliRatio(); }
     public double alignmentRatio(){ return aliRatio(); }
-    public IBoid aliRatio(double ratio){ alignmentRatio=ratio; return this; }
+    public IBoid aliRatio(double ratio){ boid().aliRatio(ratio); return this; }
     public IBoid alignmentRatio(double ratio){ return aliRatio(ratio); }
-    public double aliLimit(){ return alignmentLimit; }
+    public double aliLimit(){ return boid().aliLimit(); }
     public double alignmentLimit(){ return aliLimit(); }
-    public IBoid aliLimit(double limit){ alignmentLimit = limit; return this; }
+    public IBoid aliLimit(double limit){ boid().aliLimit(limit); return this; }
     public IBoid alignmentLimit(double limit){ return aliLimit(limit); }
     
+    public IBoid ali(double ratio, double dist){ boid().ali(ratio,dist); return this; }
+    public IBoid alignment(double ratio, double dist){ return ali(ratio,dist); }
     
-    /*
-    synchronized public void flock(){
-	separate();
-	align();
-	cohere();
+    public IBoid parameter(double cohRatio, double cohDist, 
+			   double sepRatio, double sepDist, 
+			   double aliRatio, double aliDist){
+	return param(cohRatio,cohDist,sepRatio,sepDist,aliRatio,aliDist); 
     }
     
-    synchronized public void separate(){
-	for(IBoid a: neighbors){
-	    //double dist = this.pos.dist(a.pos);
-	    double dist = this.dist(a);
-	    if(dist < separationDist && dist > 0){
-		double ratio = (separationDist - dist)/separationDist;
-		
-		//IVec diff = this.pos.diff(a.pos);
-		IVec diff = this.diff(a);
-		diff.len( separationRatio * ratio );
-		
-		addForce( diff );
-	    }
-	}
+    public IBoid param(double cohRatio, double cohDist, 
+		       double sepRatio, double sepDist, 
+		       double aliRatio, double aliDist){
+	boid().param(cohRatio,cohDist,sepRatio,sepDist,aliRatio,aliDist);
+	return this;
     }
-    
-    synchronized public void align(){
-	
-	if(neighbors.size()==0) return;
-	
-	IVec avrgVelocity = new IVec();
-	
-	for(IBoid a: neighbors){
-	    //double dist = this.pos.dist(a.pos);
-	    double dist = this.dist(a);
-	    if(dist < alignmentDist){
-		avrgVelocity.add( a.velocity() );
-	    }
-	}
-	
-	avrgVelocity.div(neighbors.size());
-	
-	if(avrgVelocity.len()>alignmentMaxVelocity) avrgVelocity.len(alignmentMaxVelocity);
-	avrgVelocity.mul(alignmentRatio);
-	addForce(avrgVelocity);
-	
-    }
-    
-    synchronized public void cohere(){
-	
-	if(neighbors.size()==0) return;
-	
-	IVec center = new IVec();
-	
-	for(IBoid a: neighbors){
-	    //center.add( a.position() );
-	    center.add(a);
-	}
-	
-	center.div(neighbors.size());
-	
-	//IVec diff = center.diff(this.position());
-	IVec diff = center.diff(this);
-	
-	double dist = diff.len();
-	
-	if(dist>0){
-	    double ratio = dist/neighborDist;
-	    diff.len(coherenceRatio*ratio);
-	    addForce(diff);
-	}
-    }
-    */
-    
-    synchronized public void interact(ArrayList<IDynamics> dynamics){
-	
-	//super.interact(dynamics); // for other local interaction
-	
-	int cohesionCount = 0;
-	int separationCount = 0;
-	int alignmentCount = 0;
-	
-	cohesionForce.zero(); // reset
-	separationForce.zero(); // reset
-	alignmentForce.zero(); // reset
-	
-	for(int i=0; i<dynamics.size(); i++){
-	    if(dynamics.get(i) instanceof IBoid && dynamics.get(i) != this){
-		IBoid b = (IBoid)dynamics.get(i);
-		IVec dif = b.pos().dif(pos());
-		double dist = dif.len();
-		// cohere
-		if(dist < cohesionDist){
-		    cohesionForce.add(dif);
-		    cohesionCount++;
-		}
-		// separate
-		if(dist < separationDist){
-		    
-		    if(dist==0){
-			if(vel().len()>0) separationForce.add(vel().dup().len(separationDist));
-			else  separationForce.add(new IVec(separationDist,0,0));
-		    }
-		    else separationForce.add( dif.len(dist-separationDist) );
-		    separationCount++;
-		    
-		    //separationForce.sub(dif); // too simple
-		    
-		} // content of dif is changed
-		
-		// align
-		if(dist < alignmentDist){
-		    alignmentForce.add(b.vel()); // velocity
-		    alignmentCount++;
-		}
-	    }
-	}
-	
-	if(cohesionCount>0){
-	    cohesionForce.mul(cohesionRatio/cohesionCount);
-	    if(cohesionLimit >= 0 && cohesionForce.len() > cohesionLimit)
-		cohesionForce.len(cohesionLimit);
-	    push(cohesionForce);
-	}
-	if(separationCount>0){
-	    separationForce.mul(separationRatio/separationCount);
-	    //separationForce.mul(separationRatio);
-	    if(separationLimit >= 0 && separationForce.len() > separationLimit)
-		separationForce.len(separationLimit);
-	    push(separationForce);
-	}
-	if(alignmentCount>0){
-	    // averagbe velocity minus this velocity
-	    alignmentForce.div(alignmentCount).sub(vel()).mul(alignmentRatio);
-	    if(alignmentLimit >= 0 && alignmentForce.len() > alignmentLimit)
-		alignmentForce.len(alignmentLimit);
-	    push(alignmentForce);
-	}
-	
-	
-	boolean interactOverridden=false;
-	// to take care of possible definition of interact(IDynamics) in a child class.
-	try{
-	    interactOverridden = 
-		getClass().getMethod("interact", IDynamics.class).getDeclaringClass() !=
-		IAgent.class;
-	}catch(NoSuchMethodException e){}
-	
-	if(interactOverridden){
-	    for(int i=0; i<dynamics.size(); i++){
-		if(dynamics.get(i) != this) interact(dynamics.get(i));
-	    }
-	}
-	
-	/*
-	for(IDynamics obj: dynamics){
-	    
-	    if(neighbors==null){ neighbors = new ArrayList<IBoid>(); }
-	    neighbors.clear();
-	    
-	    if(obj != this && obj instanceof IBoid){
-		IBoid a = (IBoid)obj;
-		//double dist = a.pos.dist(this.pos);
-		double dist = a.dist(this);
-		if(dist < neighborDist){ neighbors.add(a); }
-	    }
-	    
-	    flock();
-	    
-	    //if(IRandom.percent(0.1)) addForce(IRandom.pt(-4,4));
-	    if(randomVelocityPercent>0 &&
-	       IRandom.percent(randomVelocityPercent))
-		addForce(IRandom.pt(-randomVelocityRange,randomVelocityRange));
-	    */
-	    
-	    
-	    /*
-		    double ratio = (neighborDistance - dist)/neighborDistance;
-		    
-		    // separation
-		    if(ratio>0.5){
-			final double separationCoeff = 0.0008;
-			//IVec sep = this.diff(a).get();
-			//sep.mul( ratio * separationCoeff);
-			//this.particle.addForce(sep);
-			//a.particle.addForce(sep.neg());
-			//IVec sep = this.pos.diff(a.pos);
-			IVec sep = this.pos.diff(a.pos);
-			//sep.x *= ratio * separationCoeff;
-			//sep.y *= ratio * separationCoeff;
-			//sep.z *= ratio * separationCoeff;
-			sep.mul( (ratio-0.5)*2 * separationCoeff);
-			this.particle.addForce(sep);
-			//a.particle.addForce(sep.neg());
-		    }
-		    else{
-			// cohesion
-			final double cohesionCoeff = 0.001;
-			//IVec coh = a.diff(this).get();
-			//IVec coh = a.pos.diff(this.pos);
-			IVec coh = a.pos.diff(this.pos);
-			coh.mul( (0.5-ratio)*2 * cohesionCoeff);
-			this.addForce(coh);
-			//a.addForce(coh.neg());
-			//IOut.p(".");
-		    }
-		    // alignment
-		    final double alignmentCoeff = 0.2;
-		    //IVec ali = a.velocity().dup().mul(ratio*alignmentCoeff);
-		    IVec ali = a.velocity().dup();
-		    ali.sub(this.velocity()).mul(ratio*alignmentCoeff);
-		    this.addForce(ali);
-		    //a.addForce(ali.neg());
-		    
-		    //IVec mvel = a.velocity().dup().add(this.velocity()).mul(0.01);
-		    //a.addForce(mvel);
-		}
-	    }
-	    */
-	    
-	//}
-	
-    }
-    
-    //IVec prevPt = null;
-    //synchronized public void update(){
-	//super.update();
-	/*
-	if(time%10==0){
-	    IVec curPt = pos.dup();
-	    if(prevPt!=null) new ICurve(prevPt,curPt).clr(this.clr());
-	    prevPt=curPt;
-	}
-	*/
-    //}
     
     /**************************************
      * IParticleI API
@@ -383,6 +112,7 @@ public class IBoid extends IParticleAgent{
     
     public IBoid fix(){ super.fix(); return this; }
     public IBoid unfix(){ super.unfix(); return this; }
+    public IBoid skipUpdateOnce(boolean f){ super.skipUpdateOnce(f); return this; }
     public IBoid mass(double mass){ super.mass(mass); return this; }
     public IBoid position(IVecI v){ super.position(v); return this; }
     public IBoid pos(IVecI v){ super.pos(v); return this; }
@@ -403,6 +133,30 @@ public class IBoid extends IParticleAgent{
     public IBoid reset(){ super.reset(); return this; }
     public IBoid resetForce(){ super.resetForce(); return this; }
     
+
+    /*********************************************
+     * geometry object attachment to track agent
+     ********************************************/
+    
+    /** attach geometry object to agent to track its location.
+	@param geometries one or more geometry objects. object's center is moved to the agent's location.  */
+    public IBoid attach(IGeometry... geometries){ super.attach(geometries); return this; }
+    /** attach geometry object to agent to track its location.
+	@param geometryOrigin origin of geometry object which is moved to the agent's location.
+	@param geometries one or more geometry objects.
+    */
+    public IBoid attach(IVecI geometryOrigin, IGeometry... geometries){
+	super.attach(geometryOrigin,geometries); return this;
+    }
+    /** attach geometry object to agent to track its location.
+	@param geometryOrigin origin of geometry object which is moved to the agent's location.
+	@param geometryOrientation original orientation of geometry which is matched with particle's velocity direction; if its's null, orientatin matching is disabled.
+	@param geometries one or more geometry objects.
+    */
+    public IBoid attach(IVecI geometryOrigin, IVecI geometryOrientation, IGeometry... geometries){
+	super.attach(geometryOrigin,geometryOrientation,geometries); return this;
+    }
+    
     
     
     /**************************************
@@ -415,7 +169,6 @@ public class IBoid extends IParticleAgent{
     public IBoid x(IDoubleI vx){ pos.x(vx); return this; }
     public IBoid y(IDoubleI vy){ pos.y(vy); return this; }
     public IBoid z(IDoubleI vz){ pos.z(vz); return this; }
-    
     
     public IBoid dup(){ return new IBoid(this); }
     
@@ -628,6 +381,11 @@ public class IBoid extends IParticleAgent{
     
     public IBoid show(){ super.show(); return this; }
     public IBoid hide(){ super.hide(); return this; }
+    
+    public IBoid showPoint(){ super.showPoint(); return this; }
+    public IBoid hidePoint(){ super.hidePoint(); return this; }
+    public IBoid showGeometry(){ super.showGeometry(); return this; }
+    public IBoid hideGeometry(){ super.hideGeometry(); return this; }
     
     
     public IBoid clr(Color c){ super.clr(c); return this; }

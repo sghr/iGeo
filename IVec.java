@@ -26,7 +26,6 @@ package igeo;
    Class of 3 dimensional vector.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
@@ -880,6 +879,11 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
         return Math.abs(dot(v.get())/(len()*v.get().len())) > Math.cos(angleTolerance);
     }
     
+    public boolean isPerpendicular(IVecI v){ return isPerpendicular(v, IConfig.angleTolerance); }
+    public boolean isPerpendicular(IVecI v, double angleTolerance){
+	return Math.abs(dot(v)) < len()*v.len()*Math.cos(angleTolerance);
+    }
+    
     public boolean isStraight(IVecI v1, IVecI v2){
         //return isStraight(v1,v2,IConfig.angleTolerance);
 	return isStraight(v1,v2,IConfig.tolerance);
@@ -887,8 +891,27 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
     public boolean isStraight(IVecI v1, IVecI v2, double tolerance){
         //return v1.get().dif(this).isParallel(v2.get().dif(v1),angleReso);
-	return distToLine(v1,v2)<tolerance; // should it calculate mean line dir, not only v1&v2?
+	return distToLine(v2.get().dif(v1),v1)<tolerance; // should it calculate mean line dir, not only v1&v2?
     }
+
+    /** determine if it's on & inside the line  */
+    public boolean isOnLine(IVecI v1, IVecI v2){ return isOnLine(v1,v2,IConfig.tolerance); }
+    /** determine if it's on & inside the line  */
+    public boolean isOnLine(IVecI v1, IVecI v2, double tolerance){
+	if(!isStraight(v1,v2,tolerance)) return false;
+	IVec dif1 = dif(v1);
+	IVec dif2 = v2.get().dif(v1);
+	double len2 = dif2.len();
+	double dt = dif1.dot(dif2)/len2;
+	if(dt < -tolerance || dt > len2+tolerance) return false;
+	return true;
+    }
+    
+    /** alias of isOnLine */
+    public boolean isOnSegment(IVecI v1, IVecI v2){ return isOnLine(v1,v2); }
+    /** alias of isOnLine */
+    public boolean isOnSegment(IVecI v1, IVecI v2, double tolerance){ return isOnLine(v1,v2,tolerance); }
+    
     
     
     /** alias of cross. (not unitized) */
@@ -949,16 +972,50 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return this;
     }
     
+    
     public IVec projectToPlane(IVecI projectDir, IVecI planeNormal, IVecI planePoint){
 	if(planePoint==this) return this;
 	return sub(planePoint).projectToPlane(projectDir,planeNormal).add(planePoint);
     }
+
     
+    public IVec projectToTriangle(IVecI pt1, IVecI pt2, IVecI pt3){
+	IVec dir1 = pt2.get().dif(pt1);
+	IVec dir2 = pt3.get().dif(pt1);
+	double[] coef = sub(pt1).projectTo2Vec(dir1,dir2);
+	//orig = coef[0] * v1 + coef[1] * v2 + coef[2] * v1.cross(v2); (this is already projected)
+	add(pt1);
+	if( coef[0] >= 0 ){
+	    if(coef[1] >= 0){
+		if( (coef[0]+coef[1]) <= 1 ){ // inside triangle
+		    return this;
+		}
+		return projectToSegment(pt2,pt3);
+	    }
+	    return projectToSegment(pt1, pt2);
+	}
+	return projectToSegment(pt1, pt3);
+    }
+    
+    
+    /** project to an infinite line. the vector changes itself.  */
+    // create new point? or set it to itself? -> itself
     public IVec projectToLine(IVecI linePt, IVecI lineDir){
 	if(linePt==this) return this;
-	IVec diff = this.dif(linePt);
-	double dot = diff.dot(lineDir)/lineDir.len();
-	return diff.set(lineDir.get()).len(dot).add(linePt);
+	//IVec diff = this.dif(linePt);
+	//double dot = diff.dot(lineDir)/lineDir.len();
+	//return diff.set(lineDir.get()).len(dot).add(linePt);
+	double dot = sub(linePt).dot(lineDir)/lineDir.len2();
+	return set(lineDir).mul(dot).add(linePt);
+    }
+    
+    /** project to a line segment. this project itself */
+    public IVec projectToSegment(IVecI linePt1, IVecI linePt2){
+	if(linePt1==this || linePt2==this) return this;
+	IVec lineDir = linePt2.get().dif(linePt1);
+	double dot = sub(linePt1).dot(lineDir)/lineDir.len2();
+	if(dot<0.0) dot=0.0; else if(dot>1.0) dot=1.0;
+	return set(lineDir).mul(dot).add(linePt1);
     }
     
     /** project the vector to the plane defined by two input vector and decompose vector to two vector and another perpendicular vector and returns coefficient of them.
@@ -1045,7 +1102,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     }
     
     
-    /** distance to a line */
+    /** distance to an infinite line */
     public double distToLine(IVecI lineDir, IVecI linePt){
 	return perpendicularVecToLine(lineDir,linePt).len();
     }
@@ -1055,22 +1112,65 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return perpendicularVecToLine(lineDir).len();
     }
     
+    /** distance to a line segment */
+    public double distToSegment(IVecI linePt1, IVecI linePt2){
+	//IVec lineDir = linePt2.get().dif(linePt1);
+	//IVec projPt = perpendicularVecToLine(lineDir,linePt1).add(this);
+	//double ratio = projPt.sub(linePt1).dot(lineDir)/lineDir.len2();
+	//if(ratio<=0.0) return dist(linePt1);
+	//if(ratio>=1.0) return dist(linePt2);
+	//return dist(projPt.add(linePt1));
+	if(linePt1==this || linePt2==this) return 0;
+	IVec lineDir = linePt2.get().dif(linePt1);
+	IVec dif = this.dif(linePt1);
+	double dot = dif.dot(lineDir)/lineDir.len2();
+	if(dot<0.0) dot=0.0; else if(dot>1.0) dot=1.0;
+	return lineDir.mul(dot).dist(dif);
+    }
+    
+    /** ratio of projected point between two points (line segment). 0.0 is at linePt1, 1.0 is at linePt2. */
+    public double ratioOnSegment(IVecI linePt1, IVecI linePt2){
+	IVec lineDir = linePt2.get().dif(linePt1);
+	return perpendicularVecToLine(lineDir,linePt1).add(this).sub(linePt1).dot(lineDir)/lineDir.len2();
+    }
+    
     /** distance to a plane */
     //public double distanceToPlane(IVecI planeDir, IVecI planePt){
     public double distToPlane(IVecI planeDir, IVecI planePt){
 	//return Math.abs(this.dif(planePt).dotP(planeDir.get())/planeDir.get().len());
 	return Math.abs(dif(planePt).dot(planeDir)/planeDir.len());
     }
+
+    /** distance to a triangle */
+    public double distToTriangle(IVecI pt1, IVecI pt2, IVecI pt3){
+	IVec dir1 = pt2.get().dif(pt1);
+	IVec dir2 = pt3.get().dif(pt1);
+	double[] coef = dif(pt1).projectTo2Vec(dir1,dir2);
+	//this = coef[0] * v1 + coef[1] * v2 + coef[2] * v1.cross(v2);
+	if( coef[0] >= 0 ){
+	    if(coef[1] >= 0){
+		if( (coef[0]+coef[1]) <= 1 ){ // inside triangle
+		    return dir1.icross(dir2).len()*Math.abs(coef[2]);
+		}
+		return distToSegment(pt2,pt3);
+	    }
+	    return distToSegment(pt1, pt2);
+	}
+	return distToSegment(pt1, pt3);
+    }
+    
     
     /**
        create a new vector from this point to the line in parpendicular direction.
     */
     public IVec perpendicularVecToLine(IVecI lineDir, IVecI linePt){
+	double len2 = lineDir.len2();
+	if(len2==0){ IOut.err("line direction is zero"); }
 	IVec ldir = lineDir.get().dup();
 	//IVec diff = linePt.dif(this).get();
 	//return ldir.mul(-ldir.dot(diff)/ldir.len2()).add(diff);
 	IVec dif = dif(linePt);
-	return ldir.mul(ldir.dot(dif)/ldir.len2()).sub(dif);
+	return ldir.mul(ldir.dot(dif)/len2).sub(dif);
     }
     
     /**
@@ -1096,6 +1196,22 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return distToPlane(planeDir,planePt)<tolerance;
     }
     
+    
+    public boolean isOnTriangle(IVecI pt1, IVecI pt2, IVecI pt3, double tolerance){
+	IVec dir1 = pt2.get().dif(pt1);
+	IVec dir2 = pt3.get().dif(pt1);
+	double[] coef = dif(pt1).projectTo2Vec(dir1,dir2);
+	//this = coef[0] * v1 + coef[1] * v2 + coef[2] * v1.cross(v2);
+	double len1 = dir1.len();
+	double len2 = dir2.len();
+	if(coef[0]*len1 < -tolerance) return false;
+	if(coef[1]*len2 < -tolerance) return false;
+	if((coef[0]+coef[1]) > 1.0 + tolerance/(len1>len2?len1:len2)) return false; // use larger length
+	if(dir1.icross(dir2).len()*coef[2] > tolerance) return false;
+	return true;
+    }
+    
+    public boolean isOnTriangle(IVecI pt1, IVecI pt2, IVecI pt3){ return isOnTriangle(pt1,pt2,pt3,IConfig.tolerance); }
     
     
     /** visualize a vector as an arrow.
@@ -2282,9 +2398,150 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return intersectSegment(line1Pt1,line1Pt2,line2Pt1,line2Pt2,tolerance);
     }
     
+    /** intersection of two planes.
+	@return array of two IVec. first is intersection line direction. second is a point on intersection line. or null if no intersection found
+    */
+    public static IVec[] intersectPlane(IVec plane1Dir, IVec plane1Pt, IVec plane2Dir, IVec plane2Pt){
+	IVec ldir = plane1Dir.cross(plane2Dir);
+	if(ldir.len2()<IConfig.tolerance*IConfig.tolerance) return null; // plane is parallel
+	IVec t = plane1Dir.cross(ldir);
+	t.mul( plane2Dir.dot(plane2Pt.dif(plane1Pt))/plane2Dir.dot(t) );
+	t.add(plane1Dir);
+	return new IVec[]{ ldir, t };
+    }
+    
+    /** intersection of two planes at the origin.
+	@return intersection direction vector. when it's parallel, return value would be zero vector.
+    */
+    public static IVec intersectPlane(IVec plane1Dir, IVec plane2Dir){
+	return plane1Dir.cross(plane2Dir);
+    }
+    
+    /** intersection of two planes
+	@return array of two IVec. first is intersection line direction. second is a point on intersection line. or null if no intersection found
+    */
+    public static IVec[] intersectPlane(IVec plane1Pt1, IVec plane1Pt2, IVec plane1Pt3,
+					IVec plane2Pt1, IVec plane2Pt2, IVec plane2Pt3){
+	return intersectPlane(IVec.nml(plane1Pt1, plane1Pt2, plane1Pt3), plane1Pt1,
+			      IVec.nml(plane2Pt1, plane2Pt2, plane2Pt3), plane2Pt1);
+    }
+    
+    /** intersection of one plane and one infinite line */
+    public static IVec intersectPlaneAndLine(IVec planeDir, IVec planePt,
+					     IVec lineDir, IVec linePt){
+	IVec p = lineDir.dup();
+	p.mul( planeDir.dot(planePt.dif(linePt)) / planeDir.dot(lineDir) );
+	p.add(linePt);
+	return p;
+    }
+    
+    /** intersection of one plane at the origin and one infinite line */
+    public static IVec intersectPlaneAndLine(IVec planeDir, IVec lineDir, IVec linePt){
+	IVec p = lineDir.dup();
+	p.mul( -planeDir.dot(linePt) / planeDir.dot(lineDir) );
+	p.add(linePt);
+	return p;
+    }
+    
+    /** intersection of one plane and one infinite line */
+    public static IVec intersectPlaneAndLine(IVec planePt1, IVec planePt2, IVec planePt3,
+					     IVec linePt1, IVec linePt2){
+	return intersectPlaneAndLine(IVec.nml(planePt1,planePt2,planePt3), planePt1,
+				     linePt2.dif(linePt1),linePt1);
+    }
     
     
-    /** measure angle of polyline of pt1,pt2 and pt3 at pt2, which is equivalent to measure angle between vectors from pt2 to pt1 and pt2 to pt3.  */
+    /** intersection of one plane and one line segment. if the segment is not intersecting with the plane, it returns null. */
+    public static IVec intersectPlaneAndSegment(IVec planeDir, IVec planePt,
+						IVec linePt1, IVec linePt2){
+	IVec ldir = linePt2.dif(linePt1);
+	double r = planeDir.dot(planePt.dif(linePt1))/planeDir.dot(ldir);
+	if(r < 0 || r > 1){ return null; }
+	return ldir.mul(r).add(linePt1);
+    }
+    
+    /** intersection of one plane at the origin and one line segment. if the segment is not intersecting with the plane, it returns null. */
+    public static IVec intersectPlaneAndSegment(IVec planeDir, IVec linePt1, IVec linePt2){
+	IVec ldir = linePt2.dif(linePt1);
+	double r = -planeDir.dot(linePt1)/planeDir.dot(ldir);
+	if(r < 0 || r > 1){ return null; }
+	return ldir.mul(r).add(linePt1);
+    }
+    
+    /** bisector plane of two planes
+     @return an array of two IVec; the first is plane normal direction, the second is plane point. */
+    public static IVec[] bisectPlane(IVec planeDir1, IVec planePt1, IVec planeDir2, IVec planePt2){
+	IVec[] isct = intersectPlane(planeDir1, planePt1, planeDir2, planePt2);
+	if(isct==null) return null;
+	IVec bsct = planeDir1.dup().unit();
+	
+	if(planeDir1.dot(planeDir2)>0) bsct.add(planeDir2.dup().unit());
+	else bsct.sub(planeDir2.dup().unit());
+	
+	bsct.unit();
+	return new IVec[]{ bsct, isct[1] };
+    }
+
+    /** intersection circle of a plane and a sphere.
+	@return IVec[0] : normal or an intersection circle and the length of the vector is radius
+	        IVec[1] : center point of the intersection circle
+    */
+    public static IVec[] intersectPlaneAndSphere(IVec planeDir, IVec planePt,
+						 IVec sphereCenter, double sphereRadius){
+	IVec circleCenter = sphereCenter.dup().projectToPlane(planeDir, planeDir, planePt);
+	double dist = circleCenter.dist(sphereCenter);
+	if(dist > sphereRadius) return null;
+	if(dist == sphereRadius) return new IVec[]{ new IVec(0,0,0), circleCenter };
+	double radius = Math.sqrt( sphereRadius*sphereRadius - dist*dist );
+	IVec circleNormal = planeDir.dup().len(radius);
+	return new IVec[]{ circleNormal, circleCenter };
+    }
+    
+    public static IVec[] intersectCircleAndSphere(IVec circleNormal, IVec circleCenter, double circleRadius,
+						  IVec sphereCenter, double sphereRadius){
+	IVec[] circle2 = intersectPlaneAndSphere(circleNormal, circleCenter,
+						 sphereCenter, sphereRadius);
+	if(circle2==null) return null;
+	IVec[] isct = intersectCircle(circleNormal,circleCenter,circleRadius,circle2[0],circle2[1],circle2[0].len());
+	return isct;
+    }
+    
+    /** intersection circle of two spheres
+	@return null if no intersection or 
+                IVec[0] : normal vector of an intersection circle whose length is radius
+	        IVec[1] : center of the intersection circle
+     */
+    public static IVec[] intersectSphere(IVec sphereCenter1, double radius1, IVec sphereCenter2, double radius2){
+	IVec dif = sphereCenter2.dif(sphereCenter1);
+	double dist = dif.len();
+	if(dist > (radius1+radius2) ||
+	   dist < radius1 && (radius1-dist) > radius2  ||
+	   dist < radius2 && (radius2-dist) > radius1 ) return null;
+	
+	double len = ( dist*dist + radius1*radius1 - radius2*radius2)/(2*dist);
+	IVec circleCenter = dif.dup().len(len).add(sphereCenter1);
+	double rad = radius1*radius1 - len*len;
+	if(rad < 0) return null;
+	
+	IVec circleNormal = dif.len(Math.sqrt(rad));
+	return new IVec[]{ circleNormal, circleCenter };
+    }
+    
+    public static IVec[] intersectCircle(IVec circleNormal1, IVec circleCenter1, double radius1,
+					 IVec circleNormal2, IVec circleCenter2, double radius2){
+	if(!circleNormal1.isParallel(circleNormal2)) return null;
+	IVec[] isct = intersectSphere(circleCenter1, radius1, circleCenter2, radius2);
+	if(isct==null) return null;
+	IVec dif = circleCenter2.dif(circleCenter1);
+	if(!dif.isPerpendicular(circleNormal1)) return null;
+	double rad = isct[0].len();
+	dif.rot(circleNormal1, Math.PI/2);
+	dif.len(rad);
+	return new IVec[]{ isct[1].dup().add(dif), isct[1].sub(dif) };
+    }
+    
+    
+    /** measure angle of polyline of pt1, pt2 and pt3 at pt2, which is equivalent to measure angle between vectors from pt2 to pt1 and pt2 to pt3. */
     public static double angle(IVecI pt1, IVecI pt2, IVecI pt3){
 	return pt1.dif(pt2).angle(pt3.dif(pt2));
     }

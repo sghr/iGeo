@@ -26,7 +26,6 @@ package igeo;
    Reference class of 2 dimensional vector to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IVec2R extends IParameterObject implements IVec2I, IReferenceParameter{
     protected IVec2Op op;

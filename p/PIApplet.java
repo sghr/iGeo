@@ -31,7 +31,6 @@ import igeo.IG;
    Currently only used for debugging.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class PIApplet extends PApplet{
     static int defaultWidth=480;

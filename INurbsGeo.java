@@ -28,7 +28,6 @@ package igeo;
    @see ISurfaceGeo
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class INurbsGeo extends IParameterObject{
     
@@ -51,16 +50,10 @@ public class INurbsGeo extends IParameterObject{
     
     
     public static void normalizeKnots(double[] knots, double ustart, double uend){
-
-	//IOut.debug(20, "ustart="+ustart+", uend="+uend); //
-	//for(int i=0; i<knots.length; i++){ IOut.debug(20, "knots["+i+"]="+knots[i]); }
-	
 	for(int i=0; i<knots.length; i++){
             knots[i] -= ustart;
             knots[i] /= (uend-ustart);
         }
-	
-	//for(int i=0; i<knots.length; i++){ IOut.debug(20, "knots["+i+"]="+knots[i]); }
     }
     public static double[] createKnots(int degree, int num, boolean closed){
 	if(closed) return createClosedKnots(degree,num);
@@ -71,7 +64,7 @@ public class INurbsGeo extends IParameterObject{
        Creating generic knots. Knot values are already normalized.
     */
     public static double[] createKnots(int degree, int num){
-        double knots[] = new double[degree+num+1];
+        double[] knots = new double[degree+num+1];
         int k,m;
 	double inc = 1.0/(num-degree);
         for(k=0; k<=degree; k++) knots[k]=0;
@@ -81,7 +74,7 @@ public class INurbsGeo extends IParameterObject{
 	return knots; 
     }
     public static double[] createClosedKnots(int degree, int num){
-	double knots[] = new double[degree+num+1];
+	double[] knots = new double[degree+num+1];
 	double inc = 1.0/(num-degree);
 	//for(int k=0,m=-degree; k<=(degree+num); k++,m++) knots[k]=(double)m/(num-degree);
 	for(int k=0,m=-degree; k<=(degree+num); k++,m++) knots[k]=m*inc;

@@ -29,24 +29,23 @@ import java.awt.Color;
    Class of IDynamicObject to simulate tension force between two particles.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ITensionLineOnCurve extends ICurve implements ITensionI{
     
     public ITensionOnCurve tension;
     
-    public ITensionLineOnCurve(IParticleOnCurve p1, IParticleOnCurve p2){
+    public ITensionLineOnCurve(IParticleOnCurveI p1, IParticleOnCurveI p2){
 	super(p1.pos(), p2.pos());
 	initTensionLine(p1,p2);
     }
     
-    public ITensionLineOnCurve(IParticleOnCurve p1, IParticleOnCurve p2, double tension){
+    public ITensionLineOnCurve(IParticleOnCurveI p1, IParticleOnCurveI p2, double tension){
 	super(p1.pos(), p2.pos());
 	initTensionLine(p1,p2);
 	tension(tension);
     }
     
-    public void initTensionLine(IParticleOnCurve p1, IParticleOnCurve p2){
+    public void initTensionLine(IParticleOnCurveI p1, IParticleOnCurveI p2){
 	tension = new ITensionOnCurve(p1,p2,this);
 	addDynamics(tension);
     }

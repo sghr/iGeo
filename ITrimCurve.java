@@ -36,7 +36,6 @@ import java.util.ArrayList;
    ITrimCurve always need to be contained by surface instance and same instance of ITrimCurve should not be shared by multiple surfaces.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ITrimCurve extends ICurveGeo implements ITrimCurveI{
     

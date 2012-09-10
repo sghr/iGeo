@@ -26,7 +26,6 @@ package igeo;
    Abstract interface to define a function to output 1 dimensional value taking input of 1 dimensional value.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IFunction{
     public IFunction dup();

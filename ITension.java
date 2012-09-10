@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Class of IDynamics to simulate tension force between two particles.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ITension extends IDynamicsBase implements ITensionI{
     //public static double defaultTension=1.0;
@@ -46,27 +45,27 @@ public class ITension extends IDynamicsBase implements ITensionI{
 	this.tension = tension;
     }
     /*
-    public ITension(IParticle p1, IParticle p2, double tension, IObject parent){
+    public ITension(IParticleGeo p1, IParticleGeo p2, double tension, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
 	this.tension = tension;
     }
     
-    public ITension(IParticleAgent p1, IParticleAgent p2, double tension, IObject parent){
+    public ITension(IParticle p1, IParticle p2, double tension, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
 	this.tension = tension;
     }
     public ITension(IVec p1, IVec p2, double tension, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1); pt2=new IParticle(p2);
+	pt1 = new IParticleGeo(p1); pt2=new IParticleGeo(p2);
 	this.tension = tension;
     }
     */
     
     public ITension(IVecI p1, IVecI p2, double tension, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
     }
         
@@ -75,24 +74,24 @@ public class ITension extends IDynamicsBase implements ITensionI{
 	pt1=p1; pt2=p2;
     }
     /*
-    public ITension(IParticle p1, IParticle p2, IObject parent){
+    public ITension(IParticleGeo p1, IParticleGeo p2, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
     }
     
-    public ITension(IParticleAgent p1, IParticleAgent p2, IObject parent){
+    public ITension(IParticle p1, IParticle p2, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
     }
     public ITension(IVec p1, IVec p2, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1); pt2=new IParticle(p2);
+	pt1 = new IParticleGeo(p1); pt2=new IParticleGeo(p2);
     }
     */
     
     public ITension(IVecI p1, IVecI p2, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
     }
     
     public ITension(IParticleI p1, IParticleI p2, double tension){
@@ -101,13 +100,13 @@ public class ITension extends IDynamicsBase implements ITensionI{
 	this.tension = tension;
     }
     /*
-    public ITension(IParticle p1, IParticle p2, double tension){
+    public ITension(IParticleGeo p1, IParticleGeo p2, double tension){
 	super();
 	pt1=p1; pt2=p2;
 	this.tension = tension;
     }
     
-    public ITension(IParticleAgent p1, IParticleAgent p2, double tension){
+    public ITension(IParticle p1, IParticle p2, double tension){
 	super();
 	pt1=p1; pt2=p2;
 	this.tension = tension;
@@ -115,27 +114,27 @@ public class ITension extends IDynamicsBase implements ITensionI{
     
     public ITension(IVec p1, IVec p2, double tension){
 	super();
-	pt1 = new IParticle(p1); pt2=new IParticle(p2);
+	pt1 = new IParticleGeo(p1); pt2=new IParticleGeo(p2);
 	this.tension = tension;
     }
     */
     
     public ITension(IVecI p1, IVecI p2, double tension){
 	super();
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
     }
     
     public ITension(IParticleI p1, IParticleI p2){ super(); pt1=p1; pt2=p2; }
     /*
+    public ITension(IParticleGeo p1, IParticleGeo p2){ super(); pt1=p1; pt2=p2; }
+    
     public ITension(IParticle p1, IParticle p2){ super(); pt1=p1; pt2=p2; }
     
-    public ITension(IParticleAgent p1, IParticleAgent p2){ super(); pt1=p1; pt2=p2; }
-    
-    public ITension(IVec p1, IVec p2){ super(); pt1 = new IParticle(p1); pt2=new IParticle(p2); }
+    public ITension(IVec p1, IVec p2){ super(); pt1 = new IParticleGeo(p1); pt2=new IParticleGeo(p2); }
     */
     public ITension(IVecI p1, IVecI p2){
-	super(); pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get());
+	super(); pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
     }
     
     

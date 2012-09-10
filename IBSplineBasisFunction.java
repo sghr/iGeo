@@ -26,9 +26,8 @@ package igeo;
    Implementation of Bernstein polynomial for NURBS geometry.
       
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public class IBSplineBasisFunction{
+public class IBSplineBasisFunction{ // not implementing IFunction. return type of eval() is different
     public int degree;
     public IBSplineBasisSubFunction[] functions;
     public double[] knots;
@@ -211,11 +210,11 @@ public class IBSplineBasisFunction{
 	return null;
     }
     
+    
     /**
        Implementation of sub-indexed Bernstein polynominal for NURBS geometry.
        
        @author Satoru Sugihara
-       @version 0.7.0.0;
     */
     public class IBSplineBasisSubFunction extends IPiecewisePolynomialFunction{
 	public int degree;
@@ -243,7 +242,7 @@ public class IBSplineBasisFunction{
 	
 	public void init(){
 	    if(degree==0){
-		double dom[] = new double[2];
+		double[] dom = new double[2];
 		for(int i=0; i<dom.length; i++) dom[i] = knots[index+i];
 		super.init(dom);
 		double[] coeff = {1};

@@ -28,7 +28,6 @@ import igeo.*;
 /**
    Class of Graphics to draw 3D geometry (OpenGL or P3D)
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IGraphics3D extends IGraphics{
     

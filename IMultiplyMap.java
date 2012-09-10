@@ -27,7 +27,6 @@ package igeo;
    Output value is NOT crampped.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMultiplyMap extends IMap{
     public IMap map1, map2;

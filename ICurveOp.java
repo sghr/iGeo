@@ -26,7 +26,6 @@ package igeo;
    Interface of NURBS curve operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface ICurveOp extends IParameter{
     public ICurveGeo get();

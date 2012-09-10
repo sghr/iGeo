@@ -28,7 +28,6 @@ package igeo;
    @see ISort
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IYComparator implements IComparator<IVec>{
     public int compare(IVec v1, IVec v2){ // return >0, <0, ==0

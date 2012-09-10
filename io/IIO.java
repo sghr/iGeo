@@ -29,15 +29,15 @@ import igeo.*;
    A class to provide an interface to all File I/O.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IIO{
     
-    public enum FileType{ RHINO, OBJ, _3DXML, OTHER };
+    public enum FileType{ RHINO, OBJ, _3DXML, AI, OTHER };
     
     public static final String extensionObj = "obj";
     public static final String extensionRhino = "3dm";
     public static final String extension3DXML = "3dxml";
+    public static final String extensionAI = "ai";
     
     
     public static boolean isExtension(String filename, String extension){
@@ -56,6 +56,7 @@ public class IIO{
 	if(isExtension(filename, extensionRhino)) return FileType.RHINO;
 	if(isExtension(filename, extensionObj)) return FileType.OBJ;
 	if(isExtension(filename, extension3DXML)) return FileType._3DXML;
+	if(isExtension(filename, extensionAI)) return FileType.AI;
 	return FileType.OTHER;
     }
     
@@ -65,7 +66,7 @@ public class IIO{
 	FileType type = getFileType(filename);
 	if(type == FileType.OBJ) return openOBJ(new File(filename),server);
 	if(type == FileType.RHINO) return openRhino(new File(filename),server);
-	
+	if(type == FileType._3DXML) return open3DXML(new File(filename),server);
 	IOut.err("file extension ."+getExtension(filename)+" is not supported");
 	return false;
     }
@@ -188,14 +189,9 @@ public class IIO{
     
     public static boolean save(String filename, IServerI server){
 	FileType type = getFileType(filename);
-	if(type == FileType.OBJ){
-	    boolean ret = saveOBJ(new File(filename),server);
-	    return ret;
-	}
-	if(type == FileType.RHINO){
-	    boolean ret = saveRhino(new File(filename),server);
-	    return ret;
-	}
+	if(type == FileType.OBJ) return saveOBJ(new File(filename),server);
+	if(type == FileType.RHINO) return saveRhino(new File(filename),server);
+	if(type == FileType.AI) return saveAI(new File(filename),server);
 	IOut.err("file extension ."+getExtension(filename)+" is not supported");
 	return false;
     }
@@ -203,8 +199,8 @@ public class IIO{
     public static boolean save(File file, IServerI server){
 	FileType type = getFileType(file.getName());
 	if(type == FileType.OBJ) return saveOBJ(file,server);
-	if(type == FileType.RHINO) return saveRhino(file,server); 
-	
+	if(type == FileType.RHINO) return saveRhino(file,server);
+	if(type == FileType.AI) return saveAI(file,server); 
 	IOut.err("file extension ."+getExtension(file.getName())+" is not supported");
 	return false;
     }
@@ -223,6 +219,20 @@ public class IIO{
     public static boolean saveRhino(File file, IServerI server){
 	IOut.debug(0,"saving 3dm file: "+file);
 	if(IRhino3dmExporter.write(file,server)){
+	    IOut.debug(0,"saving complete"); 
+	    return true;
+	}
+	IOut.err("error occured in saving file "+file.toString());
+	return false;
+    }
+    
+    public static boolean saveAI(File file, IServerI server){
+	return saveAI(file,server,IConfig.defaultAIExportScale);
+    }
+    
+    public static boolean saveAI(File file, IServerI server, double scale){
+	IOut.debug(0,"saving ai file: "+file);
+	if(IAIExporter.write(file,server,scale)){
 	    IOut.debug(0,"saving complete"); 
 	    return true;
 	}

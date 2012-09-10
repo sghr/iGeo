@@ -31,7 +31,6 @@ import igeo.*;
    Objectified OpenGL polygon drawing process.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IGLPolygon extends IGLElement{
     

@@ -28,7 +28,6 @@ package igeo;
    @see ISwitchE
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class Ie implements ISwitchE{
     public static final Ie i=new Ie();

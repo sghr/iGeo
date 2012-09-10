@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Geometry of polygon mesh containing lists of vertices, edges and faces.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMeshGeo extends IParameterObject implements IMeshI{
     public ArrayList<IVertex> vertices;
@@ -37,13 +36,18 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     
     public boolean closed=false;
     
-    public IMeshGeo(ArrayList<ICurveI> lines){
-        init(lines, new IMeshType());
-    }
+    //public IMeshGeo(ArrayList<ICurveI> lines){ initWithLines(lines, new IMeshType()); }
+    //public IMeshGeo(ArrayList<ICurveI> lines, IMeshType creator){ initWithLines(lines, creator); }
     
-    public IMeshGeo(ArrayList<ICurveI> lines, IMeshType creator){
-        init(lines, creator);
-    }
+    public IMeshGeo(ICurveI[] lines){ initWithLines(lines, new IMeshType()); }
+    public IMeshGeo(ICurveI[] lines, IMeshType creator){ initWithLines(lines, creator); }
+    
+    
+    /** takes surfaces as face with 3 or 4 points face. trim is ignored*/
+    public IMeshGeo(ISurfaceI[] faces){ initWithSurfaces(faces, new IMeshType()); }
+    /** takes surfaces as face with 3 or 4 points face. trim is ignored*/
+    public IMeshGeo(ISurfaceI[] faces, IMeshType creator){ initWithSurfaces(faces, creator); }
+    
     
     //public IMeshGeo(ArrayList<IEdge> edges, IMeshType creator){
     //    initWithEdges(edges, creator);
@@ -86,9 +90,10 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     public IMeshGeo(IVertex[] vtx, IEdge[] edg,IFace[] fcs){
+	super();
         vertices = new ArrayList<IVertex>();
-        faces = new ArrayList<IFace>();
         edges = new ArrayList<IEdge>();
+        faces = new ArrayList<IFace>();
 	for(int i=0; i<vtx.length; i++) vertices.add(vtx[i]);
 	for(int i=0; i<edg.length; i++) edges.add(edg[i]);
 	for(int i=0; i<fcs.length; i++) faces.add(fcs[i]);
@@ -175,42 +180,51 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	for(int i=0; i<m.vertices.size(); i++) replaceVertex(m.vertices.get(i), vertices.get(i));
 	
     }
+
+    /*
+    public void initWithLines(ArrayList<ICurveI> lines, IMeshType creator){
+	initWithLines(lines.toArray(new ICurveI[lines.size()]),creator);
+    }
+    */
     
-    
-    public void init(ArrayList<ICurveI> lines, IMeshType creator){
+    public void initWithLines(ICurveI[] lines, IMeshType creator){
+
+	// check if lines are closed
+	int closedNum=0;
+	for(int i=0; i<lines.length; i++) if(lines[i].isClosed()) closedNum++;
 	
-        //boolean fixAllPoints=true; //false;
-        
+	// half?
+	if(closedNum>lines.length/2){
+	    initWithClosedLines(lines,creator);
+	    return;
+	}
+
+	// should the closed lines exploaded?
+	
+	
+	//boolean fixAllPoints=true; //false;
+	
         // pick all points
         vertices = new ArrayList<IVertex>();
         edges = new ArrayList<IEdge>();
-	
-        for(int i=0; i<lines.size(); i++){
-	    
-            synchronized(IG.lock){
-                ICurveI link = lines.get(i);
-		
-                IVertex p1 = creator.createVertex(link.start().get());
-                IVertex p2 = creator.createVertex(link.end().get());
-                		
-                IEdge e = creator.createEdge(p1,p2);
-		
-                edges.add(e);
-		
-                vertices.add(p1);
-                vertices.add(p2);
-            }
+        for(int i=0; i<lines.length; i++){
+            //synchronized(IG.lock){
+	    ICurveI link = lines[i];
+	    IVertex p1 = creator.createVertex(link.start().get());
+	    IVertex p2 = creator.createVertex(link.end().get());
+	    IEdge e = creator.createEdge(p1,p2);
+	    edges.add(e);
+	    vertices.add(p1);
+	    vertices.add(p2);
+	    //}
         }
 	
 	// sort 
 	ISort.sort(vertices, new IVertex.ZYXComparator());
-	
         for(int i=0; i<vertices.size(); i++){
             IVertex pt1 = vertices.get(i);
-	    
 	    // removing duplicated vertices
 	    boolean samePos=true;
-	    
 	    for(int j=i+1; j<vertices.size() && samePos; j++){
 		IVertex pt2 = vertices.get(j);
 		if(pt1.eq(pt2)){
@@ -224,24 +238,20 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
             }
         }
 	
-	
 	// deleting vertices
 	for(int i=vertices.size()-1; i>=0; i--){
 	    if(vertices.get(i).edges.size()==0) vertices.remove(i);
 	}
-	
 	// putting index of arrya to local index of v (unexpected use)
         //for(int i=0; i<vertices.size(); i++) vertices.get(i).setIndex(i);
 	
         // creating faces
-        
         faces = new ArrayList<IFace>();
         for(int i=0; i<edges.size(); i++){
             IEdge e = edges.get(i);
             IFace[] fcs = e.createFace(creator);
             if(fcs!=null){
                 for(int j=0; j<fcs.length; j++){
-		    
                     synchronized(IG.lock){
                         boolean newface=true;
                         for(int k=0; (k<faces.size())&&newface; k++){
@@ -256,6 +266,126 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
                 }
             }
         }
+    }
+    
+    
+    public void initWithClosedLines(ICurveI[] lines, IMeshType creator){
+	// should open lines removed?
+	
+	ArrayList<IVecI[]> cpts = new ArrayList<IVecI[]>();
+	for(int i=0; i<lines.length; i++){
+	    if(lines[i].deg()==1 && lines[i].isClosed()){
+		IVecI[] pts = new IVecI[lines[i].cpNum()-1];
+		for(int j=0; j<lines[i].cpNum()-1; j++){ pts[j] = lines[i].cp(j); }
+		cpts.add(pts);
+	    }
+	}
+	initWithClosedLines(cpts.toArray(new IVecI[cpts.size()][]),creator);
+	
+	/*
+        // pick all points
+        vertices = new ArrayList<IVertex>();
+        edges = new ArrayList<IEdge>();
+	faces = new ArrayList<IFace>();
+        for(int i=0; i<lines.length; i++){
+	    if(lines[i].deg()==1 && lines[i].isClosed()){
+		ICurveI link = lines[i];
+		int num = link.cpNum()-1;
+		IVertex[] vtx = new IVertex[num];
+		for(int j=0; j<num; j++){
+		    IVecI cp = link.cp(j);
+		    boolean unique=true;
+		    for(int k=0; k<vertices.size()&&unique; k++){
+			if(cp.eq(vertices.get(k))){
+			    unique=false;
+			    vtx[j] = vertices.get(k);
+			}
+		    }
+		    if(unique){
+			vtx[j] = creator.createVertex(cp);
+			vertices.add(vtx[j]);
+		    }
+		}
+		IEdge[] e = new IEdge[num];
+		for(int j=0; j<num; j++){
+		    boolean unique=true;
+		    for(int k=0; k<edges.size()&&unique; k++){
+			if(edges.get(i).contains(vtx[j],vtx[(j+1)%num])){
+			    unique=false;
+			    e[j] = edges.get(i);
+			}
+		    }
+		    if(unique){
+			e[j] = creator.createEdge(vtx[j],vtx[(j+1)%num]);
+			edges.add(e[j]);
+		    }
+		}
+		IFace f = creator.createFace(e);
+		faces.add(f);
+	    }
+        }
+	*/
+    }
+    
+    
+    public void initWithClosedLines(IVecI[][] linePts, IMeshType creator){
+	// should open lines removed?
+	
+        // pick all points
+        vertices = new ArrayList<IVertex>();
+        edges = new ArrayList<IEdge>();
+	faces = new ArrayList<IFace>();
+        for(int i=0; i<linePts.length; i++){
+	    int num = linePts[i].length;
+	    IVertex[] vtx = new IVertex[num];
+	    for(int j=0; j<num; j++){
+		IVecI cp = linePts[i][j];
+		boolean unique=true;
+		for(int k=0; k<vertices.size()&&unique; k++){
+		    if(cp.eq(vertices.get(k))){
+			unique=false;
+			vtx[j] = vertices.get(k);
+		    }
+		}
+		if(unique){
+		    vtx[j] = creator.createVertex(cp);
+		    vertices.add(vtx[j]);
+		}
+	    }
+	    IEdge[] e = new IEdge[num];
+	    for(int j=0; j<num; j++){
+		boolean unique=true;
+		for(int k=0; k<edges.size()&&unique; k++){
+		    if(edges.get(i).contains(vtx[j],vtx[(j+1)%num])){
+			unique=false;
+			e[j] = edges.get(i);
+		    }
+		}
+		if(unique){
+		    e[j] = creator.createEdge(vtx[j],vtx[(j+1)%num]);
+		    edges.add(e[j]);
+		}
+	    }
+	    IFace f = creator.createFace(e);
+	    faces.add(f);
+        }
+    }
+    
+    
+    public void initWithSurfaces(ISurfaceI[] faces, IMeshType creator){
+	ArrayList<IVecI[]> cpts = new ArrayList<IVecI[]>();
+	for(int i=0; i<faces.length; i++){
+	    ArrayList<IVecI> pts = new ArrayList<IVecI>();
+	    pts.add(faces[i].cornerCP(0,0));
+	    if(!pts.get(pts.size()-1).eq(faces[i].cornerCP(1,0))){ pts.add(faces[i].cornerCP(1,0)); }
+	    if(!pts.get(pts.size()-1).eq(faces[i].cornerCP(1,1))){ pts.add(faces[i].cornerCP(1,1)); }
+	    if(!pts.get(pts.size()-1).eq(faces[i].cornerCP(0,1))){ pts.add(faces[i].cornerCP(0,1)); }
+	    
+	    if(pts.size()==3 || pts.size()==4){
+		cpts.add(pts.toArray(new IVecI[pts.size()]));
+	    }
+	}
+	initWithClosedLines(cpts.toArray(new IVecI[cpts.size()][]),creator);
     }
     
     public IMeshGeo get(){ return this; }
@@ -370,10 +500,8 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
-    public void initWithPointMatrix(IVec[][] matrix,
-				    int unum, int vnum,
-				    boolean triangulateDir,
-				    IMeshType creator){
+    public void initWithPointMatrix(IVec[][] matrix, int unum, int vnum,
+				    boolean triangulateDir, IMeshType creator){
 	
 	IVertex[][] vmatrix = new IVertex[unum][vnum];
 	
@@ -459,10 +587,114 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public IEdge edge(IIntegerI i){ return edges.get(i.x()); }
     public IFace face(IIntegerI i){ return faces.get(i.x()); }
     
+    /** return all vertices */
+    public ArrayList<IVertex> vertices(){ return vertices; }
+    /** return all edges */
+    public ArrayList<IEdge> edges(){ return edges; }
+    /** return all faces */
+    public ArrayList<IFace> faces(){ return faces; }
+
+
+    /** center of mesh, calculated by average of all vertices */
+    public IVec center(){
+	IVec cnt = new IVec();
+	for(int i=0; i<vertices.size(); i++) cnt.add(vertices.get(i).pos());
+	return cnt.div(vertices.size());
+    }
     
-    public void deleteVertex(int i){ vertices.get(i).del(); vertices.remove(i); }
-    public void deleteEdge(int i){ edges.get(i).del(); edges.remove(i); }
-    public void deleteFace(int i){ faces.get(i).del(); faces.remove(i); }
+    
+
+    public void deleteUnlinked(){
+	for(int i=0; i<faces.size(); i++){
+	    if(faces.get(i).deleted){
+		faces.remove(i);
+		i--;
+	    }
+	}
+	for(int i=0; i<edges.size(); i++){
+	    if(edges.get(i).faces.size()==0){
+		edges.get(i).del();
+		edges.remove(i);
+		i--;
+	    }
+	}
+	for(int i=0; i<vertices.size(); i++){
+	    if(vertices.get(i).faces.size()==0 ||
+	       vertices.get(i).edges.size()<=1 ||
+	       vertices.get(i).linkedVertices.size()<=1){
+		vertices.get(i).del();
+		vertices.remove(i);
+		i--;
+	    }
+	}
+    }
+    
+    public IMeshGeo deleteVertex(IVertex v){
+	//vertices.get(i).del(); vertices.remove(i);
+	/*
+	IVertex v = vertices.get(i);
+	for(int i=0; i<v.faceNum(); i++){
+	    deleteFace(v.face(i));
+	}
+	for(int i=0; i<v.edgeNum(); i++){
+	    deleteEdge(v.edge(i));
+	}
+	for(int i=0; i<v.linkedVertices.size(); i++){
+	    v.linkedVertices.remove(v);
+	}
+	*/
+	v.del();
+	vertices.remove(v);
+	deleteUnlinked();
+	return this;
+    }
+    
+    public IMeshGeo deleteEdge(IEdge e){
+	/*
+	//edges.get(i).del(); edges.remove(i);
+	IEdge e = edges.get(i);
+	edges.remove(i);
+	for(int i=0; i<e.faceNum(); i++){
+	    e.face(i).edges.remove(e);
+	    deleteFace(e.face(i));
+	}
+	e.vertices[0].del(e);
+	e.vertices[1].del(e);
+	*/
+	e.del();
+	edges.remove(e);
+	deleteUnlinked();
+	return this;
+    }
+    public IMeshGeo deleteFace(IFace f){
+	/*
+	//faces.get(i).del(); faces.remove(i);
+	IFace f = faces.get(i);
+	for(int i=0; i<f.vertexNum(); i++){ f.vertex(i).faces.remove(f); }
+	for(int i=0; i<f.edgeNum(); i++){ f.edge(i).faces.remove(f); }
+	faces.remove(i);
+	
+	for(int i=0; i<f.vertexNum(); i++){
+	    if(f.vertex(i).faceNum()==0){ deleteVertex(f.vertex(i)); }
+	}
+	for(int i=0; i<f.edgeNum(); i++){
+	    if(f.edge(i).faceNum()==0){ deleteEdge(f.edge(i)); }
+	}
+	*/
+	f.del();
+	faces.remove(f);
+	deleteUnlinked();
+	return this;
+    }
+    
+    public IMeshGeo deleteVertex(int i){ return deleteVertex(vertex(i)); }
+    public IMeshGeo deleteEdge(int i){ return deleteEdge(edge(i)); }
+    public IMeshGeo deleteFace(int i){ return deleteFace(face(i)); }
+    
+    public IMeshGeo deleteVertex(IIntegerI i){ return deleteVertex(i.x()); }
+    public IMeshGeo deleteEdge(IIntegerI i){ return deleteEdge(i.x()); }
+    public IMeshGeo deleteFace(IIntegerI i){ return deleteFace(i.x()); }
+    
     
     public int getIndex(IVertex v){
         for(int i=0; i<vertices.size(); i++) if(vertices.get(i) == v) return i; 
@@ -649,7 +881,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     // returns actual inserted vertex
     public IVertex insertVertex(IFace f, IVertex v, IMeshType creator){
 	
-	// check vertex
+	// check existing vertex
 	for(int i=0; i<f.vertices.length; i++){
 	    if(f.vertices[i].pos.eq(v.pos)) return f.vertices[i];
 	}
@@ -666,7 +898,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	int num = f.edges.length;
 	IEdge[] newEdges = new IEdge[num];
 	for(int i=0; i<num; i++){
-	    IVertex v1 = f.edges[i].getSharingVertex(f.edges[(i+1)%num]);
+	    IVertex v1 = f.edges[i].getSharedVertex(f.edges[(i+1)%num]);
 	    newEdges[i] = creator.createEdge(v1,v);
 	    if(onEdgeIdx>=0){
 		if(i==onEdgeIdx || i+1==onEdgeIdx) onEdgeEdges.add(newEdges[i]);
@@ -725,7 +957,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	int num = f.edges.length;
 	IEdge[] newEdges = new IEdge[num];
 	for(int i=0; i<num; i++){
-	    IVertex v = f.edges[i].getSharingVertex(f.edges[(i+1)%num]);
+	    IVertex v = f.edges[i].getSharedVertex(f.edges[(i+1)%num]);
 	    if(v==v1) newEdges[i] = newEdge1;
 	    else if(v==v2) newEdges[i] = newEdge2;
 	    else newEdges[i] = creator.createEdge(v,vertexOnEdge);
@@ -771,36 +1003,97 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	edges.add(ne2);
 	
 	for(int i=0; i<e.faces.size(); i++){
-	    IVertex v3 = e.faces.get(i).getOtherVertex(v1,v2);
-	    if(v3!=null){
-		IEdge me = creator.createEdge(v3, v);
-		edges.add(me);
+	    
+	    if(e.faces.get(i).vertexNum()==3){
+		IVertex v3 = e.faces.get(i).getOtherVertex(v1,v2);
 		
-		IEdge e1 = e.faces.get(i).getEdge(v3,v1);
-		IEdge e2 = e.faces.get(i).getEdge(v3,v2);
-		
-		IEdge[] es = new IEdge[3];
-		es[0] = e1;
-		es[1] = ne1;
-		es[2] = me;
-		IFace f1 = creator.createFace(es);
-		
-		es[0] = e2;
-		es[1] = ne2;
-		es[2] = me;
-		IFace f2 = creator.createFace(es);
-		
-		faces.add(f1);
-		faces.add(f2);
+		if(v3!=null){
+		    IEdge me = creator.createEdge(v3, v);
+		    edges.add(me);
+		    
+		    IEdge e1 = e.faces.get(i).getEdge(v3,v1);
+		    IEdge e2 = e.faces.get(i).getEdge(v3,v2);
+		    
+		    IEdge[] es1 = new IEdge[3];
+		    es1[0] = e1;
+		    es1[1] = ne1;
+		    es1[2] = me;
+		    IFace f1 = creator.createFace(es1);
+
+		    IEdge[] es2 = new IEdge[3];
+		    es2[0] = e2;
+		    es2[1] = ne2;
+		    es2[2] = me;
+		    IFace f2 = creator.createFace(es2);
+		    
+		    faces.add(f1);
+		    faces.add(f2);
+		}
+		else{
+		    IOut.err("no opposite vertex!"); //
+		}
 	    }
-	    else{
-		IOut.err("no opposite vertex!"); //
+	    else{ // quad mesh
+		
+		IVertex[] v3 = e.faces.get(i).getAdjacentVertices(v1,v2); // in case of quad mesh
+		
+		if(v3!=null){
+		    IEdge me1 = creator.createEdge(v3[0], v);
+		    edges.add(me1);
+		    IEdge me2 = creator.createEdge(v3[1], v);
+		    edges.add(me2);
+		    
+		    IEdge e1 = e.faces.get(i).getEdge(v3[0],v1);
+		    IEdge e2 = e.faces.get(i).getEdge(v3[1],v2);
+		    
+		    IEdge[] es1 = new IEdge[3];
+		    es1[0] = e1;
+		    es1[1] = ne1;
+		    es1[2] = me1;
+		    IFace f1 = creator.createFace(es1);
+		    
+		    IEdge[] es2 = new IEdge[3];
+		    es2[0] = e2;
+		    es2[1] = ne2;
+		    es2[2] = me2;
+		    IFace f2 = creator.createFace(es2);
+		    
+		    IFace f3 = null;
+		    if(e.faces.get(i).vertexNum()==4){
+			IEdge e3 = e.faces.get(i).getEdge(v3[0],v3[1]);
+			IEdge[] es3 = new IEdge[3];
+			es3[0] = me1;
+			es3[1] = me2;
+			es3[2] = e3;
+			f3 = creator.createFace(es3);
+		    }
+		    else{
+			//ArrayList<IEdge> otherEdges = e.faces.get(i).getOtherEdges(v1,v2,v3[0],v3[1]);
+			IEdge[] otherEdges = e.faces.get(i).getOtherEdges(v1,v2,v3[0],v3[1]);
+			//IEdge[] es3 = new IEdge[2+otherEdges.size()];
+			IEdge[] es3 = new IEdge[2+otherEdges.length];
+			es3[0] = me1;
+			es3[1] = me2;
+			//for(int j=0; j<otherEdges.size(); i++){ es3[2+j] = otherEdges.get(j); }
+			for(int j=0; j<otherEdges.length; i++){ es3[2+j] = otherEdges[j]; }
+			f3 = creator.createFace(es3);
+		    }
+		    
+		    faces.add(f1);
+		    faces.add(f2);
+		    faces.add(f3);
+		}
+		else{
+		    IOut.err("no opposite vertex!"); //
+		}
+		
 	    }
 	}
-
+	
 	for(int i=0; i<e.faces.size(); i++){
 	    faces.remove(e.faces.get(i));
 	    e.faces.get(i).del();
+	    // i--; // no need?
 	}
 	
 	edges.remove(e);
@@ -809,13 +1102,182 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
+
+    /** divide by multiple ratios. ratios need to be orderd from smaller to larger 
+	@param ratios  [0-1]: 0 -> e.vertices[0], 1->e.vertices[1]
+	@return divided edges.
+    */
+    public IEdge[] divideEdge(IEdge e, double[] ratios, IMeshType creator){
+	
+	IVertex v1 = e.vertices[0];
+	IVertex v2 = e.vertices[1];
+	IVecI n1 = v1.nml();
+	IVecI n2 = v2.nml();
+	IVertex[] vtx = new IVertex[ratios.length];
+	for(int i=0; i<ratios.length; i++){
+	    vtx[i] = creator.createVertex(v2.pos.dup().get().sum(v1.pos,1.-ratios[i]));
+	    vtx[i].setNormal(n1.sum(n2,ratios[i]));
+	    vertices.add(vtx[i]);
+	}
+	
+	IEdge[] ne = new IEdge[vtx.length+1];
+	for(int i=0; i<=vtx.length; i++){
+	    if(i==0){ ne[i] = creator.createEdge(v1, vtx[i]); }
+	    else if(i==vtx.length){ ne[i] = creator.createEdge(vtx[i-1],v2); }
+	    else{ ne[i] = creator.createEdge(vtx[i-1],vtx[i]); }
+	    edges.add(ne[i]);
+	}
+	
+	for(int i=0; i<e.faces.size(); i++){
+	    
+	    if(e.faces.get(i).vertexNum()==3){
+		IVertex v3 = e.faces.get(i).getOtherVertex(v1,v2);
+		
+		if(v3!=null){
+		    IEdge[] me = new IEdge[vtx.length];
+		    for(int j=0; j<vtx.length; j++){
+			me[j] = creator.createEdge(v3,vtx[j]);
+			edges.add(me[j]);
+		    }
+		    
+		    IEdge e1 = e.faces.get(i).getEdge(v3,v1);
+		    IEdge e2 = e.faces.get(i).getEdge(v3,v2);
+		    
+		    for(int j=0; j<=vtx.length; j++){
+			if(j==0){
+			    IEdge[] es = new IEdge[3];
+			    es[0] = e1;
+			    es[1] = ne[j];
+			    es[2] = me[j];
+			    faces.add(creator.createFace(es));
+			}
+			else if(j==vtx.length){
+			    IEdge[] es = new IEdge[3];
+			    es[0] = me[j-1];
+			    es[1] = ne[j];
+			    es[2] = e2;
+			    faces.add(creator.createFace(es));
+			}
+			else{
+			    IEdge[] es = new IEdge[3];
+			    es[0] = me[j-1];
+			    es[1] = ne[j];
+			    es[2] = me[j];
+			    faces.add(creator.createFace(es));
+			}
+		    }
+		}
+		else{
+		    IOut.err("no opposite vertex!"); //
+		}
+	    }
+	    else{ // quad mesh
+		
+		IVertex[] v3 = e.faces.get(i).getAdjacentVertices(v1,v2); // in case of quad mesh
+		
+		if(v3!=null){
+		    int halfIndex=0;
+		    for(int j=0; j<ratios.length; j++){ if(ratios[j]<0.5) halfIndex++; }
+		    if(halfIndex>=ratios.length) halfIndex=ratios.length-1;
+		    
+		    IEdge[] me1 = new IEdge[halfIndex+1];
+		    IEdge[] me2 = new IEdge[vtx.length-halfIndex];
+		    
+		    for(int j=0; j<=halfIndex; j++){
+			me1[j] = creator.createEdge(v3[0],vtx[j]);
+			edges.add(me1[j]);
+		    }
+		    for(int j=halfIndex; j<vtx.length; j++){
+			me2[j-halfIndex] = creator.createEdge(v3[1],vtx[j]);
+			edges.add(me2[j-halfIndex]);
+		    }
+		    
+		    IEdge e1 = e.faces.get(i).getEdge(v3[0],v1);
+		    IEdge e2 = e.faces.get(i).getEdge(v3[1],v2);
+		    
+		    for(int j=0; j<=halfIndex; j++){
+			if(j==0){
+			    IEdge[] es = new IEdge[3];
+			    es[0] = e1;
+			    es[1] = ne[j];
+			    es[2] = me1[j];
+			    faces.add(creator.createFace(es));
+			}
+			else{
+			    IEdge[] es = new IEdge[3];
+			    es[0] = me1[j-1];
+			    es[1] = ne[j];
+			    es[2] = me1[j];
+			    faces.add(creator.createFace(es));
+			}
+		    }
+		    for(int j=halfIndex; j<vtx.length; j++){
+			if(j==vtx.length-1){
+			    IEdge[] es = new IEdge[3];
+			    es[0] = me2[j-halfIndex];
+			    es[1] = ne[j+1];
+			    es[2] = e2;
+			    faces.add(creator.createFace(es));
+			}
+			else{
+			    IEdge[] es = new IEdge[3];
+			    es[0] = me2[j-halfIndex];
+			    es[1] = ne[j+1];
+			    es[2] = me2[j+1-halfIndex];
+			    faces.add(creator.createFace(es));
+			}
+		    }
+		    
+		    if(e.faces.get(i).vertexNum()==4){
+			IEdge e3 = e.faces.get(i).getEdge(v3[0],v3[1]);
+			IEdge[] es3 = new IEdge[3];
+			es3[0] = me1[me1.length-1];
+			es3[1] = me2[0];
+			es3[2] = e3;
+			IFace f3 = creator.createFace(es3);
+			faces.add(f3);
+		    }
+		    else{
+			//ArrayList<IEdge> otherEdges = e.faces.get(i).getOtherEdges(v1,v2,v3[0],v3[1]);
+			IEdge[] otherEdges = e.faces.get(i).getOtherEdges(v1,v2,v3[0],v3[1]);
+			//IEdge[] es3 = new IEdge[2+otherEdges.size()];
+			IEdge[] es3 = new IEdge[2+otherEdges.length];
+			es3[0] = me1[me1.length-1];
+			es3[1] = me2[0];
+			//for(int j=0; j<otherEdges.size(); i++){ es3[2+j] = otherEdges.get(j); }
+			for(int j=0; j<otherEdges.length; i++){ es3[2+j] = otherEdges[j]; }
+			IFace f3 = creator.createFace(es3);
+			faces.add(f3);
+		    }
+		}
+		else{ IOut.err("no opposite vertex!"); } //
+	    }
+	}
+	
+	for(int i=0; i<e.faces.size(); i++){
+	    faces.remove(e.faces.get(i));
+	    e.faces.get(i).del();
+	    // i--; // no need?
+	}
+	
+	edges.remove(e);
+	e.del();
+	// edge also delete connected faces
+	
+	return ne;
+    }
+    
+    
+    
+
+
     // ratio:0-1: 0 -> e.vertices[0], 1->e.vertices[1]
-    public void divideFace(IFace f, IEdge e1, IVertex nv1, IEdge e2, IVertex nv2,
-			   IMeshType creator){
+    public IMeshGeo divideFace(IFace f, IEdge e1, IVertex nv1, IEdge e2, IVertex nv2,
+			       IMeshType creator){
 	
 	if( !f.contains(e1) || !f.contains(e2) ){
 	    IOut.err("edges are not included in the face");
-	    return;
+	    return this;
 	}
 	
 	IEdge ne = creator.createEdge(nv1,nv2);
@@ -832,7 +1294,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	int e2idx = f.indexOf(e2);
 	if(e1idx<0 || e2idx<0){
 	    IOut.err("edges are not included in the face"); //
-	    return;
+	    return this;
 	}	
 	
 	ArrayList<IEdge> edges1=new ArrayList<IEdge>();
@@ -842,25 +1304,25 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	int i;
 	
 	edges1.add(ne);
-	if(f.edges[ (e1idx+1)%num ].isSharingVertex(ne11) ) edges1.add(ne11);
-	else if(f.edges[ (e1idx+1)%num ].isSharingVertex(ne12) ) edges1.add(ne12);
+	if(f.edges[ (e1idx+1)%num ].hasSharedVertex(ne11) ) edges1.add(ne11);
+	else if(f.edges[ (e1idx+1)%num ].hasSharedVertex(ne12) ) edges1.add(ne12);
 	
 	//for(int i=e1idx+1; i<e2idx; i++) edges1.add(f.edges.get(i));
 	i=e1idx+1;
 	while(i%num != e2idx){ edges1.add(f.edges[i%num]); i++; }
 	
-	if(f.edges[ (e2idx-1+num)%num ].isSharingVertex(ne11) ) edges1.add(ne11);
-	else if(f.edges[ (e2idx-1+num)%num ].isSharingVertex(ne12) ) edges1.add(ne12);
+	if(f.edges[ (e2idx-1+num)%num ].hasSharedVertex(ne11) ) edges1.add(ne11);
+	else if(f.edges[ (e2idx-1+num)%num ].hasSharedVertex(ne12) ) edges1.add(ne12);
 	
 	edges2.add(ne);
-	if(f.edges[ (e2idx+1)%num ].isSharingVertex(ne21) ) edges2.add(ne21);
-	else if(f.edges[ (e2idx+1)%num ].isSharingVertex(ne22) ) edges2.add(ne22);
+	if(f.edges[ (e2idx+1)%num ].hasSharedVertex(ne21) ) edges2.add(ne21);
+	else if(f.edges[ (e2idx+1)%num ].hasSharedVertex(ne22) ) edges2.add(ne22);
 	
 	i=e2idx+1;
 	while(i%num != e1idx){ edges2.add(f.edges[i%num]); i++; }
 	
-	if(f.edges[ (e1idx-1+num)%num ].isSharingVertex(ne21) ) edges2.add(ne21);
-	else if(f.edges[ (e1idx-1+num)%num ].isSharingVertex(ne22) ) edges2.add(ne22);
+	if(f.edges[ (e1idx-1+num)%num ].hasSharedVertex(ne21) ) edges2.add(ne21);
+	else if(f.edges[ (e1idx-1+num)%num ].hasSharedVertex(ne22) ) edges2.add(ne22);
 	
 	
 	IEdge[] edgeArray1 = new IEdge[edges1.size()];
@@ -882,11 +1344,12 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	// keep original edge for adjacent face
 	if(e1.faces.size()==0){ edges.remove(e1); e1.del(); }
 	if(e2.faces.size()==0){ edges.remove(e2); e2.del(); }
-	
+
+	return this;
     }
     
     
-    public void triangulate(IFace f, boolean triangulateDirection, IMeshType creator){
+    public IMeshGeo triangulate(IFace f, boolean triangulateDirection, IMeshType creator){
 	
 	ArrayList<IFace> newFaces = new ArrayList<IFace>();
 	ArrayList<IEdge> newEdges = new ArrayList<IEdge>();
@@ -903,9 +1366,25 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	
 	for(int i=0; i<newEdges.size(); i++) edges.add(newEdges.get(i));
 	for(int i=0; i<newFaces.size(); i++) faces.add(newFaces.get(i));
+
+	return this;
     }
     
-    public void triangulateAll(boolean triangulateDirection, IMeshType creator){
+    
+    public IMeshGeo triangulate(){
+	return triangulate(true, new IMeshType()); // default mesh type, default direction
+    }
+    
+    public IMeshGeo triangulate(boolean triangulateDirection){
+	return triangulate(triangulateDirection, new IMeshType()); // default mesh type
+    }
+    
+    /** alias of triangulate; fow downward compatibility */
+    public IMeshGeo triangulateAll(boolean triangulateDirection, IMeshType creator){
+	return triangulate(triangulateDirection,creator);
+    }
+    
+    public IMeshGeo triangulate(boolean triangulateDirection, IMeshType creator){
 	
 	ArrayList<IFace> newFaces = new ArrayList<IFace>();
 	ArrayList<IEdge> newEdges = new ArrayList<IEdge>();
@@ -928,10 +1407,13 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	
 	for(int i=0; i<newEdges.size(); i++) edges.add(newEdges.get(i));
 	for(int i=0; i<newFaces.size(); i++) faces.add(newFaces.get(i));
+	
+	return this;
     }
     
+    public IMeshGeo triangulateAtCenter(){ return triangulateAtCenter(new IMeshType()); } // deault mesh type
     
-    public void triangulateAtCenter(IMeshType creator){
+    public IMeshGeo triangulateAtCenter(IMeshType creator){
 	
 	ArrayList<IFace> newFaces = new ArrayList<IFace>();
 	ArrayList<IEdge> newEdges = new ArrayList<IEdge>();
@@ -959,7 +1441,203 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	for(int i=0; i<newEdges.size(); i++) edges.add(newEdges.get(i));
 	for(int i=0; i<newFaces.size(); i++) faces.add(newFaces.get(i));
 	
+	return this;
     }
+    
+    
+    /** remove duplicated edge */
+    public IMeshGeo removeDuplicatedEdge(){
+	
+	for(int i=0; i<edges.size(); i++){
+	    for(int j=i+1; j<edges.size(); j++){
+		if(edges.get(i).vertex(0) == edges.get(j).vertex(0) &&
+		   edges.get(i).vertex(1) == edges.get(j).vertex(1) ||
+		   edges.get(i).vertex(0) == edges.get(j).vertex(1) &&
+		   edges.get(i).vertex(1) == edges.get(j).vertex(0) ){
+		    for(int k=0; k<edges.get(j).faces.size(); k++){
+			edges.get(j).faces.get(k).replaceEdge(edges.get(j),edges.get(i));
+		    }
+		    edges.remove(j);
+		    j--;
+		}
+	    }
+	}
+	
+	// duplicated linked vertices
+	
+	for(int i=0; i<vertices.size(); i++){
+	    IVertex v = vertices.get(i);
+	    for(int j=0; j<v.linkedVertices.size(); j++){
+		IVertex v1 = v.linkedVertices.get(j);
+		for(int k=j+1; k<v.linkedVertices.size(); k++){
+		    if(v.linkedVertices.get(k) == v1){
+			v.linkedVertices.remove(k);
+			k--;
+		    }
+		}
+	    }
+	}
+	
+	return this;
+    }
+    
+    /** returns naked edges excluding duplicated edges on the same place.
+	Note nakedEdges returns array and nakedEdges returns ArrayList. This is because
+	nakedEdge(boolean) is inteded for internal uses and nakedEdge() is for external.
+	@return array of naked edge
+    */
+    public IEdge[] nakedEdges(){
+	ArrayList<IEdge> nakedEdges = nakedEdges(true);
+	//ArrayList<IEdge> nakedEdges = nakedEdges(false);
+	return nakedEdges.toArray(new IEdge[nakedEdges.size()]);
+    }
+    
+    /**
+       @param checkDuplicatedEdge This boolean switch make it assume duplicated edges at the same location exist and they are supposed to be connected */
+    public ArrayList<IEdge> nakedEdges(boolean checkDuplicatedEdge){
+	boolean[] naked = new boolean[edges.size()];
+	for(int i=0; i<edges.size(); i++){
+	    naked[i]=false;
+	    IEdge e = edges.get(i);
+	    if(e.faceNum()==1){
+		if(checkDuplicatedEdge){
+		    boolean uniqueEdge=true;
+		    for(int j=0; j<i && uniqueEdge; j++){
+			if(e.eq(edges.get(j))){
+			    uniqueEdge=false;
+			    naked[j]=false;
+			}
+		    }
+		    if(uniqueEdge){ naked[i] = true; }
+		}
+		else{ naked[i] = true; }
+	    }
+	}
+	ArrayList<IEdge> nakedEdges = new ArrayList<IEdge>();
+	for(int i=0; i<edges.size(); i++){
+	    if(naked[i]){ nakedEdges.add(edges.get(i)); }
+	}
+	return nakedEdges;
+    }
+    
+    
+    public void subdivideNakedEdges(int recursionNum, IMeshType creator){
+	final boolean checkDuplicatedEdge=true;
+	//final int recursionNum = 0; //3;
+	
+	ArrayList<IEdge> nakedEdges = nakedEdges(checkDuplicatedEdge);
+	
+	//for(int i=0; i<nakedEdges.size(); i++) divideEdge(nakedEdges.get(i), new double[]{ 1./3, 2./3, }, creator);
+	
+	ArrayList<ArrayList<IEdge>> loops = findLoop(nakedEdges);
+	for(int i=0; i<loops.size(); i++){
+	    subdivideNakedEdges(loops.get(i),recursionNum,creator);
+	}
+    }
+    
+    public void subdivideNakedEdges(ArrayList<IEdge> loop, int recursionNum, IMeshType creator){
+	if(recursionNum<=0) return;
+	
+	int num = loop.size();
+	IEdge[][] divEdge = new IEdge[num][];
+	for(int i=0; i<num; i++){
+	    divEdge[i] = divideEdge(loop.get(i), new double[]{ 1./3, 2./3, }, creator);
+	}
+	
+	ArrayList<IEdge> newLoop = new ArrayList<IEdge>();
+	
+	for(int i=0; i<num; i++){
+	    IEdge e1=null,e2=null;
+	    if(divEdge[i][0].isConnected(divEdge[(i+1)%num][0])){
+		e1 = divEdge[i][0]; e2 = divEdge[(i+1)%num][0];
+	    }
+	    else if(divEdge[i][0].isConnected(divEdge[(i+1)%num][2])){
+		e1 = divEdge[i][0]; e2 = divEdge[(i+1)%num][2];
+	    }
+	    else if(divEdge[i][2].isConnected(divEdge[(i+1)%num][0])){
+		e1 = divEdge[i][2]; e2 = divEdge[(i+1)%num][0];
+	    }
+	    else if(divEdge[i][2].isConnected(divEdge[(i+1)%num][2])){
+		e1 = divEdge[i][2]; e2 = divEdge[(i+1)%num][2];
+	    }
+	    else{
+		IOut.err("divided edges are not connected.");
+	    }
+
+	    
+	    if(e1!=null&&e2!=null){
+		IVertex v0 = e1.getSharedVertex(e2);
+		IVertex v1 = e1.getOtherVertex(v0);
+		IVertex v2 = e2.getOtherVertex(v0);
+		
+		if(!v0.get().isStraight(v1,v2)){
+		    IEdge filletEdge = creator.createEdge(v1,v2);
+		    newLoop.add(divEdge[i][1]);
+		    newLoop.add(filletEdge);
+		    edges.add(filletEdge);
+		    faces.add(creator.createFace(new IEdge[]{filletEdge,e1,e2}));
+		}
+		else{
+		    newLoop.add(divEdge[i][1]);
+		    newLoop.add(e1);
+		    newLoop.add(e2);
+		}
+	    }
+	    
+	}
+	
+	if(newLoop.size()>2){ subdivideNakedEdges(newLoop, recursionNum-1, creator); }
+    }
+    
+    
+    public ArrayList<ArrayList<IEdge>> findLoop(ArrayList<IEdge> edges){
+	ArrayList<ArrayList<IEdge>> loops = new ArrayList<ArrayList<IEdge>>();
+	
+	while(edges.size()>0){
+	    ArrayList<IEdge> loop = new ArrayList<IEdge>();
+	    IEdge e = edges.get(0);
+	    loop.add(e);
+	    edges.remove(e);
+	    
+	    IEdge nextEdge = null;
+	    for(int i=0; i<edges.size()&&nextEdge==null; i++){
+		if(edges.get(i).isConnected(e)){ nextEdge = edges.get(i); }
+	    }
+	    if(nextEdge==null){
+		IOut.err("loop is not closed. skipped");
+		//loops.add(loop); // add non-loop or not?
+	    }
+	    else{
+		loop.add(nextEdge);
+		edges.remove(nextEdge);
+		e = nextEdge;
+		while(nextEdge!=null){
+		    nextEdge=null;
+		    for(int i=0; i<edges.size()&&nextEdge==null; i++){
+			if(edges.get(i).isConnected(e)){ nextEdge = edges.get(i); }
+		    }
+		    if(nextEdge!=null){
+			e = nextEdge;
+			loop.add(e);
+			edges.remove(e);
+			if(e.isConnected(loop.get(0))){
+			    // loop closed
+			    loops.add(loop);
+			    nextEdge=null; // exit loop
+			}
+		    }
+		    else{
+			IOut.err("loop is not closed. skipped");
+			//loops.add(loop); // add non-loop or not?
+		    }
+		}
+	    }
+	}
+	return loops;
+    }
+    
+    
+    
     
     // return: min, max
     public IVec[] getBoundingBox(){

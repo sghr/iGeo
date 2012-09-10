@@ -30,7 +30,6 @@ import igeo.gui.*;
    Transformable objects.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 
 public abstract class IGeometry extends IObject implements ITransformable{
@@ -43,6 +42,16 @@ public abstract class IGeometry extends IObject implements ITransformable{
     
     public IGeometry dup(){ return null; } // need to be overridden
     public IGeometry cp(){ return dup(); } // need to be overridden
+    
+    
+    /** returns center of geometry object */
+    abstract public IVecI center(); 
+    
+
+    /****************************************************
+     * IObject API
+     ***************************************************/
+    
     
     /** Set layer by ILayer object */
     public IGeometry layer(ILayer l){ super.layer(l); return this; }
@@ -96,5 +105,142 @@ public abstract class IGeometry extends IObject implements ITransformable{
     
     public IGeometry weight(double w){ super.weight(w); return this; }
     public IGeometry weight(float w){ super.weight(w); return this; }
-        
+    
+    
+    /****************************************************
+     * ITransformable API
+     ***************************************************/
+    
+    abstract public IGeometry add(double x, double y, double z);
+    abstract public IGeometry add(IDoubleI x, IDoubleI y, IDoubleI z);
+    abstract public IGeometry add(IVecI v);
+    abstract public IGeometry sub(double x, double y, double z);
+    abstract public IGeometry sub(IDoubleI x, IDoubleI y, IDoubleI z);
+    abstract public IGeometry sub(IVecI v);
+    abstract public IGeometry mul(IDoubleI v);
+    abstract public IGeometry mul(double v);
+    abstract public IGeometry div(IDoubleI v);
+    abstract public IGeometry div(double v);
+    
+    abstract public IGeometry neg();
+    /** alias of neg */
+    //abstract public IGeometry rev(); // rev is used in curve to revrse u parameter
+    /** alias of neg */
+    abstract public IGeometry flip();
+    
+    
+    
+    /** scale add */
+    abstract public IGeometry add(IVecI v, double f);
+    /** scale add */
+    abstract public IGeometry add(IVecI v, IDoubleI f); 
+    /** scale add alias */
+    abstract public IGeometry add(double f, IVecI v);
+    /** scale add alias */
+    abstract public IGeometry add(IDoubleI f, IVecI v); 
+    
+    /** rotation around z-axis and origin */
+    abstract public IGeometry rot(IDoubleI angle);
+    abstract public IGeometry rot(double angle);
+    
+    /** rotation around axis vector */
+    abstract public IGeometry rot(IVecI axis, IDoubleI angle);
+    abstract public IGeometry rot(IVecI axis, double angle);
+    
+    /** rotation around axis vector and center */
+    abstract public IGeometry rot(IVecI center, IVecI axis, IDoubleI angle);
+    abstract public IGeometry rot(IVecI center, IVecI axis, double angle);
+    
+    /** rotate to destination direction vector */
+    abstract public IGeometry rot(IVecI axis, IVecI destDir);
+    /** rotate to destination point location */    
+    abstract public IGeometry rot(IVecI center, IVecI axis, IVecI destPt);
+    
+    
+    /** rotation on xy-plane around origin; same with rot(IDoubleI) */
+    abstract public IGeometry rot2(IDoubleI angle);
+    /** rotation on xy-plane around origin; same with rot(double) */
+    abstract public IGeometry rot2(double angle);
+    
+    /** rotation on xy-plane around center */
+    abstract public IGeometry rot2(IVecI center, IDoubleI angle);
+    abstract public IGeometry rot2(IVecI center, double angle);
+    
+    /** rotation on xy-plane to destination direction vector */
+    abstract public IGeometry rot2(IVecI destDir);
+    /** rotation on xy-plane to destination point location */    
+    abstract public IGeometry rot2(IVecI center, IVecI destPt);
+    
+    
+    
+    /** alias of mul */
+    abstract public IGeometry scale(IDoubleI f);
+    abstract public IGeometry scale(double f);
+    abstract public IGeometry scale(IVecI center, IDoubleI f);
+    abstract public IGeometry scale(IVecI center, double f);
+
+    
+    /** scale only in 1 direction */
+    abstract public IGeometry scale1d(IVecI axis, double f);
+    abstract public IGeometry scale1d(IVecI axis, IDoubleI f);
+    abstract public IGeometry scale1d(IVecI center, IVecI axis, double f);
+    abstract public IGeometry scale1d(IVecI center, IVecI axis, IDoubleI f);
+    
+    
+    /** reflect(mirror) 3 dimensionally to the other side of the plane */
+    abstract public IGeometry ref(IVecI planeDir);
+    abstract public IGeometry ref(IVecI center, IVecI planeDir);
+    /** mirror is alias of ref */
+    abstract public IGeometry mirror(IVecI planeDir);
+    abstract public IGeometry mirror(IVecI center, IVecI planeDir);
+    
+    
+    /** shear operation */
+    abstract public IGeometry shear(double sxy, double syx, double syz,
+				double szy, double szx, double sxz);
+    abstract public IGeometry shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+				IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    abstract public IGeometry shear(IVecI center, double sxy, double syx, double syz,
+				double szy, double szx, double sxz);
+    abstract public IGeometry shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+				IDoubleI szy, IDoubleI szx, IDoubleI sxz);
+    
+    abstract public IGeometry shearXY(double sxy, double syx);
+    abstract public IGeometry shearXY(IDoubleI sxy, IDoubleI syx);
+    abstract public IGeometry shearXY(IVecI center, double sxy, double syx);
+    abstract public IGeometry shearXY(IVecI center, IDoubleI sxy, IDoubleI syx);
+    
+    abstract public IGeometry shearYZ(double syz, double szy);
+    abstract public IGeometry shearYZ(IDoubleI syz, IDoubleI szy);
+    abstract public IGeometry shearYZ(IVecI center, double syz, double szy);
+    abstract public IGeometry shearYZ(IVecI center, IDoubleI syz, IDoubleI szy);
+    
+    abstract public IGeometry shearZX(double szx, double sxz);
+    abstract public IGeometry shearZX(IDoubleI szx, IDoubleI sxz);
+    abstract public IGeometry shearZX(IVecI center, double szx, double sxz);
+    abstract public IGeometry shearZX(IVecI center, IDoubleI szx, IDoubleI sxz);
+    
+    /** mv() is alias of add() */
+    abstract public IGeometry mv(double x, double y, double z);
+    abstract public IGeometry mv(IDoubleI x, IDoubleI y, IDoubleI z);
+    abstract public IGeometry mv(IVecI v);
+    
+    
+    /** cp() is alias of dup().add() */
+    abstract public IGeometry cp(double x, double y, double z);
+    abstract public IGeometry cp(IDoubleI x, IDoubleI y, IDoubleI z);
+    abstract public IGeometry cp(IVecI v);
+    
+    
+    /** translate() is alias of add() */
+    abstract public IGeometry translate(double x, double y, double z);
+    abstract public IGeometry translate(IDoubleI x, IDoubleI y, IDoubleI z);
+    abstract public IGeometry translate(IVecI v);
+    
+    
+    abstract public IGeometry transform(IMatrix3I mat);
+    abstract public IGeometry transform(IMatrix4I mat);
+    abstract public IGeometry transform(IVecI xvec, IVecI yvec, IVecI zvec);
+    abstract public IGeometry transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate);
+    
 }

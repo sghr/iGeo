@@ -28,6 +28,5 @@ package igeo;
    @see ISwitchR
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface ISwitchE extends ISwitchI{} // switch of entity/reference; entity

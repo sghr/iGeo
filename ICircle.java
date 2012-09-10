@@ -30,7 +30,6 @@ import igeo.gui.*;
    It contains ICircleGeo instance inside.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ICircle extends ICurve{
     

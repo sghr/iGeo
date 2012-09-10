@@ -33,7 +33,6 @@ import igeo.*;
    Graphic subobject class to draw filled faces of a surface object by OpenGL.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceGraphicFillGL extends IGraphicObject{
     
@@ -105,7 +104,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	initialized=true;
     }
     
-    public void initWithoutTrim(){
+    synchronized public void initWithoutTrim(){
+	synchronized(parent){
+	
 	double[] uval;
 	double[] vval;
 	if(surface.udeg()==1){
@@ -207,10 +208,13 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	
 	uvalCache=uval;
 	vvalCache=vval;
+
+	}
     }
     
-    public void initWithTrim(){
-	
+    synchronized public void initWithTrim(){
+	synchronized(parent){
+	    
 	ITrimLoopGraphic[] outtrims = null;
         ITrimLoopGraphic[] intrims = null;
         
@@ -375,9 +379,14 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	trianglesNormal = trianglesNml;
 	
 	triangles2DCache = triangles2D;
+
+	}
     }
     
-    public void updateWithoutTrim(){
+    synchronized public void updateWithoutTrim(){
+	synchronized(parent){
+	
+	
 	if(uvalCache==null || vvalCache==null){
 	    IOut.err("cache is null. not updated.");
 	    return;
@@ -417,10 +426,13 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    quadMatrix = new IGLQuadMatrix(pts,nrm);
 	}
 	*/
+
+	}
     }
     
-    public void updateWithTrim(){
-	
+    synchronized public void updateWithTrim(){
+	synchronized(parent){
+	    
 	if(triangles2DCache==null){
 	    IOut.err("cache is null. not updated.");
 	    return;
@@ -473,6 +485,8 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    triangles = new IGLTriangles(triangles3D,trianglesNormal);
 	}
 	*/
+
+	}
     }
     
     public void updateSurface(){
@@ -488,7 +502,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	return m.isGraphic3D()&&m.isFill();
     }
     
-    public void draw(IGraphics g){
+    synchronized public void draw(IGraphics g){
 	//if(surface==null) initSurface(); // not initizlized at the constructor // shouldn't it?
 	if(!initialized) initSurface();
 	else if(update){ updateSurface(); update=false; }

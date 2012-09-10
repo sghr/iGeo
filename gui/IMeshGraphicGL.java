@@ -30,7 +30,6 @@ import igeo.*;
    Graphic subobject class to draw polygon mesh object by OpenGL.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMeshGraphicGL extends IGraphicObject{
     
@@ -43,6 +42,7 @@ public class IMeshGraphicGL extends IGraphicObject{
     public IMeshGraphicGL(IMeshR m){ super(m); }
     
     public void initMesh(){
+	synchronized(parent){
 	if(parent instanceof IMesh){ mesh = ((IMesh)parent).mesh; }
 	else if(parent instanceof IMeshR){ mesh = ((IMeshR)parent).mesh; }
 	
@@ -75,7 +75,7 @@ public class IMeshGraphicGL extends IGraphicObject{
 	    edgePts[i][0] = edge.getVertex(0).get();
 	    edgePts[i][1] = edge.getVertex(1).get();
 	}
-	
+	}
     }
     
     public void setWeight(float w){ weight=w; }
@@ -87,7 +87,7 @@ public class IMeshGraphicGL extends IGraphicObject{
     }
     
     public void draw(IGraphics g){
-	
+	// how about update?
 	if(mesh==null) initMesh(); // not initizlized at the constructor // shouldn't it?
 	
 

@@ -35,7 +35,6 @@ import igeo.*;
    @see ISubsurfaceMesh
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceMesh {
     

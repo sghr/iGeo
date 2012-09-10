@@ -40,7 +40,6 @@ import igeo.gui.*;
    This class also manages the IServer to manage all the objects in iGeo.
    
    @author Satoru Sugihara
-   @version 0.7.1.0;
 */
 public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener*/{
     

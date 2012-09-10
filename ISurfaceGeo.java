@@ -30,7 +30,6 @@ import igeo.gui.*;
    Geometry of NURBS surface.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParameter{
     
@@ -60,7 +59,11 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     /*protected*/ public ArrayList<ArrayList<ITrimCurve>> innerTrimLoop;
     /*protected*/ public ArrayList<ArrayList<ITrimCurve>> outerTrimLoop;
     /*protected*/ public boolean innerTrimClosed=false;
-    /*protected*/ public boolean outerTrimClosed=false;    
+    /*protected*/ public boolean outerTrimClosed=false;
+
+    /** point cache for proximity search */
+    public ISurfaceCache uvSearchCache;
+   
     
     public ISurfaceGeo(){}
     
@@ -943,7 +946,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public IVec corner(int u, int v){
 	if(u!=0) u=1;
 	if(v!=0) v=1;
-	return pt(u,v);
+	return pt((double)u,(double)v);
     }
     
     public IVec corner(IIntegerI u, IIntegerI v){
@@ -973,6 +976,83 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public IVec ep(IIntegerI i, IIntegerI j){
 	return pt(uknots[i.x()+udegree], vknots[j.x()+vdegree]);
     }
+    
+    
+    /** mid in UV parameter (u=0.5, v=0.5) point on a surface */
+    public IVec mid(){ return pt(0.5, 0.5); }
+    
+    /** returns center of geometry object */
+    public IVec center(){
+	int unum = ucpNum();
+	int vnum = vcpNum();
+	int ucount = unum;
+	int vcount = vnum;
+        // check if start and end of parameter match with knots[0] and knots[knots.length-1]
+	if(vknots[0] != 0.0 || vknots[vknots.length-1] != 1.0){
+            // check by cp
+	    boolean vclosed = true;
+	    for(int u=0; u<unum && vclosed; u++){
+		if(!cp(u,0).eq(cp(u, vnum-vdeg()))) vclosed = false;
+	    }
+	    if(vclosed){ vcount = vnum-vdeg(); }
+        }
+	else{
+	    boolean vclosed = true;
+	    for(int u=0; u<=unum && vclosed; u++){ // dividing by cp num?
+		if(!pt((double)u/unum, 0.).eq(pt((double)u/unum, 1.))) vclosed = false;
+	    }
+	    if(vclosed){ vcount = vnum-1; }
+	}
+	
+	// check if start and end of parameter match with knots[0] and knots[knots.length-1]
+	if(uknots[0] != 0.0 || uknots[uknots.length-1] != 1.0){
+            // check by cp
+	    boolean uclosed = true;
+	    for(int v=0; v<vnum && uclosed; v++){
+		if(!cp(0,v).eq(cp(unum-udeg(),v))) uclosed = false;
+	    }
+	    if(uclosed){ ucount = unum-udeg(); }
+        }
+	else{
+	    boolean uclosed = true;
+	    for(int v=0; v<=vnum && uclosed; v++){ // dividing by cp num?
+		if(!pt(0., (double)v/vnum).eq(pt(1., (double)v/vnum))) uclosed = false;
+	    }
+	    if(uclosed){ ucount = unum-1; }
+	}
+	
+	IVec cnt = new IVec();
+	for(int i=0; i<ucount; i++){ for(int j=0; j<vcount; j++){ cnt.add(cp(i,j)); } }
+	cnt.div(ucount*vcount);
+	return cnt;
+    }
+    
+    
+    /** approximate invert projection from 3D location to interanl UV parameter (closest point on surface) */
+    public IVec2 uv(IVecI pt){
+	if(uvSearchCache==null){ uvSearchCache = new ISurfaceCache(this); }
+	return uvSearchCache.uv(pt.get());
+    }
+/** approximate invert projection from 2D location to interanl UV parameter (closest point on surface) */
+    public IVec2 uv(IVec2I pt){
+	if(uvSearchCache==null){ uvSearchCache = new ISurfaceCache(this); }
+	return uvSearchCache.uv(pt.get());
+    }
+    
+    
+    
+    /** find approximately closest point on a surface */
+    public IVec closePt(IVecI pt){ return pt(uv(pt)); }
+    
+    /** find approximately closest point on a surface on 2D */
+    public IVec closePt(IVec2I pt){return pt(uv(pt)); }
+    
+    /** distance to the closest point on a surface */
+    public double dist(IVecI pt){ return closePt(pt).dist(pt); }
+    /** distance to the closest point on a surface on 2D*/
+    public double dist(IVec2I pt){ return closePt(pt).to2d().dist(pt); }
+    
+    
     
     
     public double uknot(int i){ return uknots[i]; }
@@ -1536,7 +1616,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public ISurfaceGeo addOuterTrimLoop(ITrimCurve loop){
 	if(loop!=null) loop.surface(this);
 	
-	if(!checkTrimLoop(loop)){ return this; }
+	if(!checkTrimLoop(loop)) return this;
 	if(outerTrimLoop==null) outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
 	if(!loop.isClosed()){ IOut.err("trim loop is not closed"); } 

@@ -27,7 +27,6 @@ package igeo;
    @see IServer
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IServerI{
     public IServer server();

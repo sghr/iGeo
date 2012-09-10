@@ -26,7 +26,6 @@ package igeo;
    A subclass of IMap defined by z depth of surface. 
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceZDepthMap extends ISurfaceDepthMap{
     public ISurfaceZDepthMap(ISurfaceI surf, double minZ, double maxZ){

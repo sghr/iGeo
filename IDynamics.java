@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Interface of a subobject of IObject to control dynamic behavior of IObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 public /*class*/interface IDynamics extends ISubobject{
     
@@ -48,13 +47,21 @@ public /*class*/interface IDynamics extends ISubobject{
     
     /** executed before interact(ArrayList<IDynamics>). behavior can be changed by IConfig.enablePreinteract and IConfig.loopPreinteract. */
     public void preinteract(ArrayList<IDynamics> dynamics);
-    /** executed after interact(ArrayList<IDynamics>). behavior can be changed by IConfig.enablePostinteract and IConfig.loopPostinteract. */
+    /** executed after interact(ArrayList<IDynamics>). behavior can be changed by IConfig.enablePostinteract and IConfig.loopPostinteract.
+     	If IConfig.loopPostinteract is false, preupdate is executed before post interact (updated 2012/08/26).
+    */
     public void postinteract(ArrayList<IDynamics> dynamics);
     
-    /** executed before update(). behavior can be changed by IConfig.enablePreupdate and IConfig.loopPreupdate. */
+    /** executed before update(). behavior can be changed by IConfig.enablePreupdate and IConfig.loopPreupdate.
+	If IConfig.loopPreupdate is false, preupdate is executed before post interact (updated 2012/08/26).
+    */
     public void preupdate();
     /** executed after update(). behavior can be changed by IConfig.enablePostupdate and IConfig.loopPostupdate. */
     public void postupdate();
+    
+    
+    /** IDynamics can have local dynamics which is managed by parent dynamics. IAgent implements this feature */
+    public ArrayList<IDynamics> localDynamics(); 
     
     
     /** add terget object to be updated by this dynamic object. */

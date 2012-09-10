@@ -26,7 +26,6 @@ package igeo;
    Interface of 4x4 matrix operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IMatrix4Op extends IParameter{
     public IMatrix4 get();

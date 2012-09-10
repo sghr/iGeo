@@ -31,7 +31,6 @@ import igeo.*;
    Graphic subobject class to draw wireframes of a surface object by OpenGL.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     public static float weight = IConfig.strokeWeight; //1f;
@@ -244,6 +243,9 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     */
     
     public void initSurface(){
+
+	synchronized(parent){
+	
 	//if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
 	//else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
 	
@@ -355,10 +357,14 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	   Math.abs(surface.cp(0,0).dist(surface.cp(0,1))-surface.cp(1,0).dist(surface.cp(1,1)))<=IConfig.tolerance &&
 	   surface.isFlat()){ simpleFlat=true; }
 	else{ simpleFlat=false; }
+
+	}
     }
     
     
     public void updateSurface(){
+
+	synchronized(parent){
 	
 	if(simpleFlat && !surface.isFlat()){
 	    // if not flat anymore, rebuild whole points
@@ -493,6 +499,8 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	public IPolyline2D[] uline2, vline2;
 	public IPolyline2D[] inTrim2=null, outTrim2=null;
 	*/
+
+	}
     }
     
     public boolean isDrawable(IGraphicMode m){
@@ -501,7 +509,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     }
     
     
-    public void draw(IGraphics g){
+    synchronized public void draw(IGraphics g){
 	
 	//if(surface==null) initSurface();
 	if(!initialized) initSurface();

@@ -29,7 +29,6 @@ import java.awt.Color;
    An interface to contain static constants used in the whole iGeo system.
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 public /*interface*/ class IConfig{
     
@@ -78,7 +77,7 @@ public /*interface*/ class IConfig{
     //public static int surfaceIsoparmResolution=4; //2;//10; //9; //2 ; //3; //4; //2; //10; // variable name changed to isoparmResolution
     
     /** Number of division per edit point to tesselate a surface into mesh. */
-    public static int tessellationResolution = 4;
+    public static int tessellationResolution = 5; //4;
     //public static int surfaceTessellationResolution=4; //2;//10; //9; //2 ; //3; //4; //2; //10; // variable name changed to tessellationResolution
     
     /** Point resolution per the isoparm segment to draw wireframe curves of surfaces. */
@@ -129,6 +128,9 @@ public /*interface*/ class IConfig{
     /** default vector graphic arrow size */
     public static float arrowSize=2f;
 
+    /** default vector graphic arrow width ratio */
+    public static float arrowWidthRatio=0.5f;
+
     
     /** turn on lights on display */
     public static boolean useLight=true;
@@ -160,12 +162,31 @@ public /*interface*/ class IConfig{
      * polygon mesh properties
      *****************************/
     
-    /**
-       number to facet circle to approximate it in polygon mesh.
-    */
+    /** number to facet circle to approximate it in polygon mesh. */
     public static int meshCircleResolution = 24; 
     
-
+    
+    /** update normal vector of mesh when its graphics is updated by agents. */
+    public static boolean updateMeshNormal=false;
+    
+    
+    /*****************************
+     * curve / surface cache properties 
+     *****************************/
+    /** resolution per EP for cache points of curve for search of closest point on curve */
+    public static int curveCacheResolution=10; //4; //1;
+    /** resolution per EP for cache points of surface for search of closest point on surface */
+    public static int surfaceCacheResolution=4; //1;
+    /** max depth of recursive search of closest point */
+    public static int cacheRecursionMaxDepth = 15; //12; //10;
+    
+    /*****************************
+     * field properties
+     *****************************/
+    //public static double defaultFieldThreshold = 100;
+    public static double defaultFieldIntensity = 10;
+    public static boolean defaultConstantFieldIntensity = true;
+    
     
     /*****************************
      * dynamics properties
@@ -197,12 +218,30 @@ public /*interface*/ class IConfig{
     
     /** put preinteract method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
     public static boolean loopPreinteract=false;
-    /** put postinteract method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
-    public static boolean loopPostinteract=false;
-    /** put preupdate method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
-    public static boolean loopPreupdate=false;
+    /** put postinteract method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. To have accurate physical simulation, this need to be true. Default is true. */
+    public static boolean loopPostinteract=true;
+    /** put preupdate method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. To have accurate physical simulation, this need to be true.  Default is true. */
+    public static boolean loopPreupdate=true;
     /** put postupdate method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
     public static boolean loopPostupdate=false;
+
+
+
+    
+    /*****************************
+     * properties of IWall
+     *****************************/
+    /** IWall put a particle to bouncing location forcefully once. usually if it's fast the particle can be already away from the wall without having a moment being exactly on the wall. If the following boolean option is true, IWall force particle to once stay at the intersecting bouncing point but this is less acurate in terms of physical simulation in longer duration. */
+    /** foceStayOnWallOnce option is removed. Insteady IWall inserts intersection point into trajectory curve.
+	see IConfig.insertBouncePointInTrajectory */
+    //public static boolean forceStayOnWallOnce = false; //true;
+    
+    /** Boolean option to turn on/off inserting an interesection point on IWall when bouncing into
+	a trajectory curve of ITrajectoryI. Default is true */
+    public static boolean insertBouncePointInTrajectory = true;
+    
+    /** When this option is true, IWall checks all other exsiting walls to see if the particle is also colliging into other walls. If so, only the closest one collides. True on this option makes the process heavy. Default is true.*/
+    public static boolean checkAdjacentWalls = true;
     
     
     /*****************************
@@ -290,9 +329,9 @@ public /*interface*/ class IConfig{
        default parameters for IView class
     */
     /** default near clipping distance */
-    public static double nearView = 0.001;
+    public static double nearView = 0.1; //0.001;
     /** default far clipping distance */
-    public static double farView = 10000;
+    public static double farView = 100000;
     /** default axonometric ratio */
     public static double axonometricRatio = 1.0;
     /** default perspective ratio */
@@ -314,6 +353,12 @@ public /*interface*/ class IConfig{
     
     /** when NURBS geometry is created at a constructor, checking validity (not infinite nor NaN) of numbers if this is true. */
     public static boolean checkValidControlPoint=true;
+
+
+    /*************************************************************************************
+     * AI Export
+     ************************************************************************************/
+    public static double defaultAIExportScale = 0.01;
     
 }
     

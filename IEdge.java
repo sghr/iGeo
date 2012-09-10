@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Class of an edge of polygon mesh.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IEdge{
     public IVertex[] vertices;
@@ -58,13 +57,19 @@ public class IEdge{
     public void addFace(IFace f){ faces.add(f); }
     public IFace getFace(int i){ return face(i); }
     public IFace face(int i){ return faces.get(i); }
+    public int faceNum(){ return faces.size(); } 
 
     public IEdge dup(){ return new IEdge(this); }
     
     public void del(){
-	for(int i=0; i<faces.size(); i++) faces.get(i).del(); 
-	vertices[0].edges.remove(this);
-	vertices[1].edges.remove(this);
+	for(int i=0; i<faces.size(); i++){
+	    faces.get(i).del();
+	    i--;
+	}
+	vertices[0].del(this);
+	vertices[1].del(this);
+	//vertices[0].edges.remove(this);
+	//vertices[1].edges.remove(this);
     }
     
     public IVec nml(double param){ // 0 - 1.0
@@ -83,12 +88,19 @@ public class IEdge{
 	// ratio 0-1 point of vertices[0] to vertices[1], 0.5 means mid point
 	return vertices[0].pos.get().sum(vertices[1].pos,ratio);
     }
+    public IVec pos(double ratio){ return getPointOnEdge(ratio); }
+    public IVec mid(){ return getPointOnEdge(0.5); }
     
     public boolean contains(IVertex v){
 	if(vertices[0]==v || vertices[1]==v) return true;
 	return false;
     }
     
+    public boolean contains(IVertex v1, IVertex v2){
+	if(vertices[0]==v1 && vertices[1]==v2 || vertices[0]==v2 && vertices[1]==v1) return true;
+	return false;
+    }
+
     public void replaceVertex(IVertex oldVertex, IVertex newVertex){
 	if(vertices[0]==oldVertex){ vertices[0] = newVertex; }
 	else if(vertices[1] ==oldVertex){ vertices[1] = newVertex; }
@@ -108,25 +120,82 @@ public class IEdge{
 	return null;
     }
     
-    public IVertex getSharingVertex(IEdge edge){
+    public IVertex getSharedVertex(IEdge edge){
 	if(edge.contains(vertices[0])) return vertices[0];
 	if(edge.contains(vertices[1])) return vertices[1];
 	return null;
     }
     
-    public boolean isSharingVertex(IEdge edge){ return getSharingVertex(edge)!=null; }
+    public IFace sharedFace(IEdge edge){
+	for(int i=0; i<faces.size(); i++){
+	    for(int j=0; j<edge.faceNum(); j++){
+		if(faces.get(i).eq(edge.face(j))) return faces.get(i);
+	    }
+	}
+	for(int i=0; i<faces.size(); i++){
+	    if(faces.get(i).onFace(edge)) return faces.get(i);
+	}
+	return null;
+    }
     
+    
+
+    /** edge sharing exact same pair of vertices */
+    public IEdge getOverlappingEdge(){
+	for(int i=0; i<vertices[0].edgeNum(); i++){
+	    if(vertices[0].edge(i)!=this &&
+	       vertices[0].edge(i).getOtherVertex(vertices[0]) == vertices[1]){
+		return vertices[0].edge(i);
+	    }
+	}
+	return null;
+    }
+    
+    /** edge sharing exact same pair of vertices */
+    public IEdge[] getOverlappingEdges(){
+	ArrayList<IEdge> overlapEdges = new ArrayList<IEdge>();
+	for(int i=0; i<vertices[0].edgeNum(); i++){
+	    if(vertices[0].edge(i)!=this &&
+	       vertices[0].edge(i).getOtherVertex(vertices[0]) == vertices[1]){
+		overlapEdges.add(vertices[0].edge(i));
+	    }
+	}
+	return overlapEdges.toArray(new IEdge[overlapEdges.size()]);
+    }
+    
+    public boolean hasSharedVertex(IEdge edge){ return getSharedVertex(edge)!=null; }
+    public boolean isConnected(IEdge edge){ return hasSharedVertex(edge); }
     
     
     public IFace getOtherFace(IFace f){
 	for(int i=0; i<faces.size(); i++) if(faces.get(i)!=f) return faces.get(i);
+	
+	IEdge[] overlappingEdge = getOverlappingEdges();
+	for(int i=0; i<overlappingEdge.length; i++){
+	    for(int j=0; j<overlappingEdge[i].faceNum(); j++){
+		if(overlappingEdge[i].face(j)!=f){
+		    return overlappingEdge[i].face(j);
+		}
+	    }
+	}
 	return null;
     }
     
-    public ArrayList getOtherFaces(IFace f){
+    public /*ArrayList<IFace>*/ IFace[] getOtherFaces(IFace f){
 	ArrayList<IFace> others = new ArrayList<IFace>();
 	for(int i=0; i<faces.size(); i++) if(faces.get(i)!=f) others.add(faces.get(i));
-	return others;
+	
+	IEdge[] overlappingEdge = getOverlappingEdges();
+	for(int i=0; i<overlappingEdge.length; i++){
+	    for(int j=0; j<overlappingEdge[i].faceNum(); j++){
+		if(overlappingEdge[i].face(j)!=f){
+		    others.add(overlappingEdge[i].face(j));
+		}
+	    }
+	}
+	
+	//return others;
+	return others.toArray(new IFace[others.size()]); //
     }
     
     public boolean isOnEdge(IVertex v){
@@ -194,11 +263,17 @@ public class IEdge{
 	return "IEdge: "+s1+"-"+s2;
     }
     
-    public boolean eq(IEdge e){
+    public boolean eq(IEdge e){ return eq(e,IConfig.tolerance); }
+    public boolean eq(IEdge e, double tolerance){
 	// direction does not matter?
 	if(vertices.length!=e.vertices.length) return false;
-	if(vertices[0].eq(e.vertices[0]) && vertices[1].eq(e.vertices[1])) return true;
-	if(vertices[0].eq(e.vertices[1]) && vertices[1].eq(e.vertices[0])) return true;
+	if(vertices[0]==e.vertices[0] && vertices[1]==e.vertices[1]) return true;
+	if(vertices[0]==e.vertices[1] && vertices[1]==e.vertices[0]) return true;
+	
+	if(vertices[0].eq(e.vertices[0],tolerance) &&
+	   vertices[1].eq(e.vertices[1],tolerance)) return true;
+	if(vertices[0].eq(e.vertices[1],tolerance) &&
+	   vertices[1].eq(e.vertices[0],tolerance)) return true;
 	return false;
     }
     

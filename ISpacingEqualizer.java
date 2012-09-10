@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Tension force to equalize spacing between pt1- pt2 and pt2 - pt3.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
     //public static double defaultTension=1.0;
@@ -43,19 +42,19 @@ public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
 	pt1=p1; pt2=p2; pt3=p3;
     }
     
-    public ISpacingEqualizer(IParticle p1, IParticle p2, IParticle p3, IObject parent){
+    public ISpacingEqualizer(IParticleGeo p1, IParticleGeo p2, IParticleGeo p3, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2; pt3=p3;
     }
     
     public ISpacingEqualizer(IVec p1, IVec p2, IVec p3, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1); pt2=new IParticle(p2); pt3 = new IParticle(p3);
+	pt1 = new IParticleGeo(p1); pt2=new IParticleGeo(p2); pt3 = new IParticleGeo(p3);
     }
     
     public ISpacingEqualizer(IVecI p1, IVecI p2, IVecI p3, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get()); pt3=new IParticle(p3.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get()); pt3=new IParticleGeo(p3.get());
     }
     
     public ISpacingEqualizer(IParticleI p1, IParticleI p2, IParticleI p3){
@@ -64,7 +63,7 @@ public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
 
     }
     
-    public ISpacingEqualizer(IParticle p1, IParticle p2, IParticle p3){
+    public ISpacingEqualizer(IParticleGeo p1, IParticleGeo p2, IParticleGeo p3){
 	super();
 	pt1=p1; pt2=p2; pt3=p3;
 	//new ICurve(pt1.pos(), pt3.pos()).clr(0,1.0,0); //
@@ -72,12 +71,12 @@ public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
     
     public ISpacingEqualizer(IVec p1, IVec p2, IVec p3){
 	super();
-	pt1 = new IParticle(p1); pt2=new IParticle(p2); pt3=new IParticle(p3);
+	pt1 = new IParticleGeo(p1); pt2=new IParticleGeo(p2); pt3=new IParticleGeo(p3);
     }
     
     public ISpacingEqualizer(IVecI p1, IVecI p2, IVecI p3){
 	super();
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get()); pt3=new IParticle(p3.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get()); pt3=new IParticleGeo(p3.get());
     }
     
     public double tension(){ return tension; }

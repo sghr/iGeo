@@ -32,7 +32,6 @@ import igeo.gui.*;
    A server to contain graphic objects to manage drawing process.
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 public class IGraphicServer{
     

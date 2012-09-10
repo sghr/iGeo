@@ -28,25 +28,24 @@ import java.util.ArrayList;
    Class of an implementation of IDynamics to limit particles to be spacified direction from a center.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IParticleDirectionLink extends IDynamicsBase{
     
-    public ArrayList<IParticle> particles;
+    public ArrayList<IParticleGeo> particles;
     public IVecI center;
     
     public IVec vel;
     
-    public IParticleDirectionLink(ArrayList<IParticle> ptcls, IVecI cntr, IObject parent){
+    public IParticleDirectionLink(ArrayList<IParticleGeo> ptcls, IVecI cntr, IObject parent){
 	super(parent);
 	particles = ptcls;
 	center = cntr;
 	initParticleDirectionLink();
     }
     
-    public IParticleDirectionLink(IParticle[] ptcls, IVecI cntr, IObject parent){
+    public IParticleDirectionLink(IParticleGeo[] ptcls, IVecI cntr, IObject parent){
 	super(parent);
-	particles = new ArrayList<IParticle>();
+	particles = new ArrayList<IParticleGeo>();
 	for(int i=0; i<ptcls.length; i++) particles.add(ptcls[i]);
 	center = cntr;
 	initParticleDirectionLink();
@@ -54,21 +53,21 @@ public class IParticleDirectionLink extends IDynamicsBase{
     
     public IParticleDirectionLink(IVecI cntr, IObject parent){
 	super(parent);
-	particles = new ArrayList<IParticle>();
+	particles = new ArrayList<IParticleGeo>();
 	center = cntr;
 	initParticleDirectionLink();
     }
     
-    public IParticleDirectionLink(ArrayList<IParticle> ptcls, IVecI cntr){
+    public IParticleDirectionLink(ArrayList<IParticleGeo> ptcls, IVecI cntr){
 	super();
 	particles = ptcls;
 	center = cntr;
 	initParticleDirectionLink();
     }
     
-    public IParticleDirectionLink(IParticle[] ptcls, IVecI cntr){
+    public IParticleDirectionLink(IParticleGeo[] ptcls, IVecI cntr){
 	super();
-	particles = new ArrayList<IParticle>();
+	particles = new ArrayList<IParticleGeo>();
 	for(int i=0; i<ptcls.length; i++) particles.add(ptcls[i]);
 	center = cntr;
 	initParticleDirectionLink();
@@ -76,7 +75,7 @@ public class IParticleDirectionLink extends IDynamicsBase{
     
     public IParticleDirectionLink(IVecI cntr){
 	super();
-	particles = new ArrayList<IParticle>();
+	particles = new ArrayList<IParticleGeo>();
 	center = cntr;
 	initParticleDirectionLink();
     }
@@ -86,7 +85,7 @@ public class IParticleDirectionLink extends IDynamicsBase{
 	for(int i=0; i<particles.size(); i++) particles.get(i).fix(); 
     }
 
-    public void add(IParticle p){
+    public void add(IParticleGeo p){
 	p.fix(); // to take control of location of particle;
 	particles.add(p);
     }
@@ -102,7 +101,7 @@ public class IParticleDirectionLink extends IDynamicsBase{
 	IVec angularVec = new IVec();
 	
 	for(int i=0; i<particles.size(); i++){
-	    IParticle p = particles.get(i);
+	    IParticleGeo p = particles.get(i);
 	    dirs[i] = p.pos.diff(center);
 	    moment.add(dirs[i].cross(p.frc));
 	    r2[i] = dirs[i].len2();
@@ -117,7 +116,7 @@ public class IParticleDirectionLink extends IDynamicsBase{
 	
 	IVec avrgDir=new IVec();
 	for(int i=0; i<particles.size(); i++){
-	    IParticle p = particles.get(i);
+	    IParticleGeo p = particles.get(i);
 	    
 	    p.frc.projectToVec(dirs[i]);
 	    p.frc.mul(IConfig.updateRate/p.mass); // only radial dir
@@ -146,8 +145,9 @@ public class IParticleDirectionLink extends IDynamicsBase{
 	
 	
 	for(int i=0; i<particles.size(); i++){
-	    IParticle p = particles.get(i);
-	    p.pos.set(p.pos.projectToLine(center, avrgDir));
+	    IParticleGeo p = particles.get(i);
+	    //p.pos.set(p.pos.projectToLine(center, avrgDir));
+	    p.pos.projectToLine(center, avrgDir);
 	    
 	    //if(p.parent!=null) p.parent.updateGraphic();
 	    p.updateTarget(); // necessary?

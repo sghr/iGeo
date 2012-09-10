@@ -29,15 +29,14 @@ import java.util.ArrayList;
    Class of an implementation of IDynamics to limit particles to be spacified direction from a center.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IParticleDistanceLink extends IDynamicsBase{
     
-    public IParticle particle;
+    public IParticleGeo particle;
     public IVecI center;
     public double distance;
     
-    public IParticleDistanceLink(IParticle ptcl, IVecI cntr, IObject parent){
+    public IParticleDistanceLink(IParticleGeo ptcl, IVecI cntr, IObject parent){
 	super(parent);
 	particle = ptcl;
 	center = cntr;
@@ -45,7 +44,7 @@ public class IParticleDistanceLink extends IDynamicsBase{
 	initParticleDistanceLink();
     }
     
-    public IParticleDistanceLink(IParticle ptcl, IVecI cntr){
+    public IParticleDistanceLink(IParticleGeo ptcl, IVecI cntr){
 	super();
 	particle = ptcl;
 	center = cntr;
@@ -53,7 +52,7 @@ public class IParticleDistanceLink extends IDynamicsBase{
 	initParticleDistanceLink();
     }
     
-    public IParticleDistanceLink(IParticle ptcl, IVecI cntr, double dist, IObject parent){
+    public IParticleDistanceLink(IParticleGeo ptcl, IVecI cntr, double dist, IObject parent){
 	super(parent);
 	particle = ptcl;
 	center = cntr;
@@ -63,7 +62,7 @@ public class IParticleDistanceLink extends IDynamicsBase{
 	initParticleDistanceLink();
     }
     
-    public IParticleDistanceLink(IParticle ptcl, double dist, IVecI cntr){
+    public IParticleDistanceLink(IParticleGeo ptcl, double dist, IVecI cntr){
 	super();
 	particle = ptcl;
 	center = cntr;

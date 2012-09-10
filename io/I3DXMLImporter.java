@@ -45,7 +45,6 @@ import javax.xml.parsers.*;
    3DXML Importer
       
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class I3DXMLImporter{
 
@@ -218,11 +217,11 @@ public class I3DXMLImporter{
 		    //read3DXML(document, entryName, is); 
 		}
 		else if(entryName.toLowerCase().endsWith("3drep")){ // read 3drep file
-		    IG.err("reading 3drep file");
+		    IOut.debug(10,"reading 3drep file");
 		    
 		    read3DRep(document, entryName,  zis);
 		    
-		    IG.err("end reading 3drep file");
+		    IOut.debug(10,"end reading 3drep file");
 		}
 	    }
 	    else{
@@ -248,6 +247,13 @@ public class I3DXMLImporter{
 	
 	IOut.p("number of RepresentationDocument : "+document.representationDocuments.size()); //
 
+	/*
+	//debug
+	for(int i=0; i<document.representationDocuments.size(); i++){
+	    document.representationDocuments.get(i).instantiatePolygon(null);
+	}
+	*/
+	
 	/*
 	for(int i=0; i<document.representationDocuments.size(); i++){
 	    IOut.p("representationDocumenent "+i+": "+document.representationDocuments.get(i).filename);
@@ -280,10 +286,8 @@ public class I3DXMLImporter{
 	*/
 	
 	document.linkNodes(); // reference, instance, referenceRep
-
 	
 	document.instantiate();
-	
 	
 	for(int i=0; i<document.references.size(); i++){
 	    IOut.p("reference "+i+": "+document.references.get(i).name);
@@ -638,9 +642,13 @@ public class I3DXMLImporter{
     
     public static void read3DRep(I3DXML document, String filename, InputStream is) throws IOException{
 	
-	IOut.p("reading document: "+filename);
+	IOut.debug(10,"reading document: "+filename);
 	
 	Node root = getXMLNode(is);
+	if(root==null){
+	    IOut.err("reading "+filename+" failed");
+	    return;
+	}
 	
 	//System.out.println(); //
 	//IOut.p(); //

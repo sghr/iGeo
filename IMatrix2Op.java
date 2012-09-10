@@ -26,7 +26,6 @@ package igeo;
    Interface of 2x2 matrix operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IMatrix2Op extends IParameter{
     public IMatrix2 get();

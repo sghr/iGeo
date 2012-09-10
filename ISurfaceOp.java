@@ -26,7 +26,6 @@ package igeo;
    Interface of NURBS surface operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface ISurfaceOp extends IParameter{
     public ISurfaceGeo get();

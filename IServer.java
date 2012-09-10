@@ -33,7 +33,6 @@ import igeo.gui.*;
    @see IGraphicServer
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IServer implements IServerI{
     
@@ -575,7 +574,10 @@ public class IServer implements IServerI{
 
     public ILayer getLayer(String layerName){ return layer(layerName); }
     public ILayer layer(String layerName){
-	for(ILayer l:layers) if(l.name().equals(layerName)) return l;
+	//for(ILayer l:layers) if(l.name().equals(layerName)) return l;
+	for(int i=0; i<layers.size(); i++){
+	    if(layers.get(i).name().equals(layerName)) return layers.get(i);
+	}
 	//return null;
 	// if not found, create a new one.
 	//updateState();
@@ -584,9 +586,15 @@ public class IServer implements IServerI{
     }
     
     public void deleteLayer(String layerName){
-	for(ILayer l:layers) if(l.name().equals(layerName)) remove(l);
+	ILayer l=null;
+	for(int i=0; i<layers.size() && l==null; i++){
+	    if(layers.get(i).name().equals(layerName)) l = layers.get(i);
+	}
+	if(l!=null) remove(l);
+	//for(ILayer l:layers) if(l.name().equals(layerName)) remove(l);
+	// if not found, do nothing
     }
     public void deleteLayer(int i){ remove(layers.get(i)); }
-    
+    public void deleteLayer(ILayer l){ remove(l); }
     
 }

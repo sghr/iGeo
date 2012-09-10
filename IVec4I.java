@@ -28,7 +28,6 @@ package igeo;
    to include weights
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IVec4I extends IVec4Op, IVecI{
 

@@ -27,7 +27,6 @@ package igeo;
    Implemented as a type of NURBS curve.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IArcGeo extends ICurveGeo{
     public static double maxSegmentAngle = Math.PI/8; //Math.PI/2;

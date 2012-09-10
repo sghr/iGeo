@@ -26,7 +26,6 @@ package igeo;
    Interface of 2 dimensional vector operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IVec2Op extends IParameter{
     public IVec2 get();

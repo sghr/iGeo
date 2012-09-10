@@ -31,7 +31,6 @@ import igeo.gui.*;
    Reference class of polygon mesh object containing any instance of IMeshI.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMeshR extends IObject implements IMeshI{
     
@@ -70,6 +69,27 @@ public class IMeshR extends IObject implements IMeshI{
     public IIntegerI vertexNum(ISwitchR r){ return mesh.vertexNum(r); }
     public IIntegerI edgeNum(ISwitchR r){ return mesh.edgeNum(r); }
     public IIntegerI faceNum(ISwitchR r){ return mesh.faceNum(r); }
+
+    /** return all vertices */
+    public ArrayList<IVertex> vertices(){ return mesh.vertices(); }
+    /** return all edges */
+    public ArrayList<IEdge> edges(){ return mesh.edges(); }
+    /** return all faces */
+    public ArrayList<IFace> faces(){ return mesh.faces(); }
+
+    public IMeshR deleteVertex(int i){ mesh.deleteVertex(i); return this; }
+    public IMeshR deleteEdge(int i){ mesh.deleteEdge(i); return this; }
+    public IMeshR deleteFace(int i){ mesh.deleteFace(i); return this; }
+    
+    public IMeshR deleteVertex(IIntegerI i){ mesh.deleteVertex(i); return this; }
+    public IMeshR deleteEdge(IIntegerI i){ mesh.deleteEdge(i); return this; }
+    public IMeshR deleteFace(IIntegerI i){ mesh.deleteFace(i); return this; }
+    
+    public IMeshR deleteVertex(IVertex v){ mesh.deleteVertex(v); return this; }
+    public IMeshR deleteEdge(IEdge e){ mesh.deleteEdge(e); return this; }
+    public IMeshR deleteFace(IFace f){ mesh.deleteFace(f); return this; }
+    
+
     
     public IVertex vertex(int i){ return mesh.vertex(i); }
     public IEdge edge(int i){ return mesh.edge(i); }
@@ -79,6 +99,8 @@ public class IMeshR extends IObject implements IMeshI{
     public IEdge edge(IIntegerI i){ return mesh.edge(i); }
     public IFace face(IIntegerI i){ return mesh.face(i); }
 
+    public IVecI center(){ return mesh.center(); }
+    
     /** only setting value to closed. checking no connection of mesh */
     public IMeshR close(){ mesh.close(); return this; }
     public boolean isClosed(){ return mesh.isClosed(); }

@@ -29,7 +29,6 @@ import java.util.ArrayList;
    Byte Output Stream keeping byte framgents as fragments never integrating into one buffer
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IByteListOutputStream extends OutputStream{
     ArrayList<byte[]> bytes;

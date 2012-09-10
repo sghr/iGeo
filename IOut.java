@@ -28,7 +28,6 @@ import java.io.*;
    A class to provide default static output stream.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IOut {
     public static PrintStream ps = System.out;

@@ -25,12 +25,12 @@ package igeo;
 
 import java.awt.Color;
 import java.util.Random;
+import java.util.List;
 
 /**
    A class to provide random number function.   
 
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IRand{
     static public final long defaultSeed=1;
@@ -108,6 +108,18 @@ public class IRand{
     static public int getInteger(int max){ return geti(max); }
     static public int getInteger(){ return geti(); }
     
+    /** get one element out of array */
+    static public <T> T get(T[] array){
+	if(array==null) return null;
+	return array[geti(0,array.length-1)];
+    }
+    
+    /** get one element out of array */
+    static public <T> T get(List<T> array){
+	if(array==null) return null;
+	return array.get(geti(0,array.size()-1));
+    }
+    
     
     static public IVec pt(IVec min, IVec max){
 	return new IVec(get(min.x,max.x),get(min.y,max.y),get(min.z,max.z));
@@ -128,6 +140,9 @@ public class IRand{
     static public IVec pt(double maxx, double maxy, double maxz){
 	return new IVec(get(maxx),get(maxy),get(maxz));
     }
+    static public IVec pt(double minx, double miny, double maxx, double maxy){
+	return new IVec(get(minx,maxx),get(miny,maxy),0);
+    }
     static public IVec pt(double min, double max){
 	return new IVec(get(min,max),get(min,max),get(min,max));
     }
@@ -140,6 +155,9 @@ public class IRand{
 			     double maxx, double maxy, double maxz){
 	return pt(minx,miny,minz,maxx,maxy,maxz);
     }
+    static public IVec point(double minx, double miny, double maxx, double maxy){
+	return pt(minx,miny,maxx,maxy);
+    }
     static public IVec point(double maxx, double maxy, double maxz){
 	return pt(maxx,maxy,maxz);
     }
@@ -150,6 +168,9 @@ public class IRand{
     static public IVec getPoint(double minx, double miny, double minz,
 				double maxx, double maxy, double maxz){
 	return pt(minx,miny,minz,maxx,maxy,maxz);
+    }
+    static public IVec getPoint(double minx, double miny, double maxx, double maxy){
+	return pt(minx,miny,maxx,maxy);
     }
     static public IVec getPoint(double maxx, double maxy, double maxz){
 	return pt(maxx,maxy,maxz);

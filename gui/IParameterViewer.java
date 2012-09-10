@@ -35,7 +35,6 @@ import igeo.*;
    Implementation is not completed at all yet.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IParameterViewer extends Component{
 

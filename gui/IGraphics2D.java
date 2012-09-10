@@ -32,7 +32,6 @@ import igeo.IGraphicI;
    Class of Graphics to draw 2D (Java2D)
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IGraphics2D extends IGraphics{
     

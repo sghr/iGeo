@@ -26,9 +26,8 @@ package igeo;
    Interface of double (or 1 dimensional vector) operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public interface IDoubleOp extends IParameter{
+public interface IDoubleOp extends IParameter, IScalar{
     public double x();
     public IDouble get();
 }

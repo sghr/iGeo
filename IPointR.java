@@ -30,7 +30,6 @@ import igeo.gui.*;
    Reference class of a point object to contain any instance of IVecI.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IPointR extends IObject implements IVecI{
     public IVecI pos;
@@ -98,7 +97,11 @@ public class IPointR extends IObject implements IVecI{
     public IVec get(){ return pos.get(); }
     /** passing position field */
     public IVecI pos(){ return pos; }
-
+    
+    /** center is same with position */
+    public IVecI center(){ return pos(); }
+    
+    
     
     public IPointR dup(){ return new IPointR(this); }
     

@@ -26,7 +26,6 @@ package igeo;
    A subclass of IMap defined by accumulated curvature of a surface
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceDensityMap extends IMap{
     public ISurfaceI surface;

@@ -26,7 +26,6 @@ package igeo;
    Abstract interface of 2 dimensional vector.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IVec2I extends IVec2Op{
     public double x();

@@ -30,7 +30,6 @@ import igeo.*;
    Polyline geometry to assist graphic classes of curves and surfaces.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IPolyline{
     public IVec[] pts;

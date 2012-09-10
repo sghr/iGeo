@@ -26,7 +26,6 @@ package igeo;
    Abstract interface of NURBS curve.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface ICurveI extends ICurveOp, ITransformable{
     
@@ -58,6 +57,30 @@ public interface ICurveI extends ICurveOp, ITransformable{
     
     /** all control points */
     public IVecI[] cps();
+    
+    /** approximate invert projection from 3D location to interanl parameter U (closest point on curve) */
+    public double u(IVecI pt);
+    public double u(ISwitchE r, IVecI pt);
+    public IDoubleI u(ISwitchR r, IVecI pt);
+    
+    /** approximate invert projection from 2D location to interanl parameter U */
+    public double u(IVec2I pt);
+    public double u(ISwitchE r, IVec2I pt);
+    public IDoubleI u(ISwitchR r, IVec2I pt);
+    
+    /** find approximately closest point on a curve */
+    public IVecI closePt(IVecI pt);
+    
+    /** find approximately closest point on a curve on 2D*/
+    public IVecI closePt(IVec2I pt);
+    
+    /** distance to the closest point on a curve */
+    public double dist(IVecI pt);
+    /** distance to the closest point on a curve on 2D*/
+    public double dist(IVec2I pt);
+    
+    
+    
     
     // maybe those are only for ICurve & ICurveGeo, not ICurveR
     //
@@ -156,6 +179,12 @@ public interface ICurveI extends ICurveOp, ITransformable{
     public IVecI end();
     public IVecI startCP();
     public IVecI endCP();
+    
+    /** parametrically mid point of a curve */
+    public IVecI mid();
+    
+    /** returns center of geometry object */
+    public IVecI center(); 
     
     
     public int epNum();
@@ -289,6 +318,19 @@ public interface ICurveI extends ICurveOp, ITransformable{
     public ICurveI transform(IMatrix4I mat);
     public ICurveI transform(IVecI xvec, IVecI yvec, IVecI zvec);
     public ICurveI transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate);
+    
+    /** mv() is alias of add() */
+    public ICurveI mv(double x, double y, double z);
+    public ICurveI mv(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ICurveI mv(IVecI v);
+
+    /** cp() is alias of dup() */
+    public ICurveI cp();
+
+    /** cp() is alias of dup().add() */
+    public ICurveI cp(double x, double y, double z);
+    public ICurveI cp(IDoubleI x, IDoubleI y, IDoubleI z);
+    public ICurveI cp(IVecI v);
     
     
 }

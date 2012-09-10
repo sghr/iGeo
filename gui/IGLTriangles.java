@@ -31,7 +31,6 @@ import igeo.*;
    Objectified OpenGL triangle drawing process.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IGLTriangles extends IGLElement{
     

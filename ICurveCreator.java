@@ -28,7 +28,6 @@ import java.util.ArrayList;
    class with collection of static methods to create various type of curve.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ICurveCreator{
     /** state variable of a server to store surfaces created in the methods in this class */

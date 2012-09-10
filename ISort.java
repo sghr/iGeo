@@ -35,7 +35,6 @@ import java.util.List;
    @see IComparator
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISort/*<T>*/{
     //IComparator<T> comp;

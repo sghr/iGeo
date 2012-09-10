@@ -26,8 +26,7 @@ package igeo;
    Abstract interface of abstract operators.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public interface IParameter{
+public interface IParameter extends IVal{
     public IParameter get();
 }

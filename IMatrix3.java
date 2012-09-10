@@ -26,7 +26,6 @@ package igeo;
    Class of 3x3 numerical matrix.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMatrix3 extends IMatrix implements IMatrix3I{
     

@@ -29,12 +29,13 @@ import java.util.ArrayList;
    Class of an agent based on one point.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IPointAgent extends IAgent implements IVecI{
     
     public IVec pos;
     public IPoint point;
+    
+    public IAgentTracker tracker;
     
     public IPointAgent(){ this(new IVec()); show(); }
     public IPointAgent(double x, double y, double z){ super(); pos=new IVec(x,y,z); show(); }
@@ -48,6 +49,31 @@ public class IPointAgent extends IAgent implements IVecI{
     
     public IVec pos(){ return pos; }
     public IPointAgent pos(IVecI v){ pos.set(v); return this; }
+
+    
+    /*********************************************
+     * geometry object attachment to track agent
+     ********************************************/
+    
+    /** attach geometry object to agent to track its location.
+	@param geometries one or more geometry objects. object's center is moved to the agent's location.  */
+    public IPointAgent attach(IGeometry... geometries){
+	if(tracker!=null) tracker.del(); // replace
+	tracker = new IAgentTracker(this, geometries);
+	return this;
+    }
+    
+    /** attach geometry object to agent to track its location.
+	@param geometryOrigin origin of geometry object which is moved to the agent's location.
+	@param geometries one or more geometry objects.
+    */
+    public IPointAgent attach(IVecI geometryOrigin, IGeometry... geometries){
+	if(tracker!=null) tracker.del(); // replace
+	tracker = new IAgentTracker(this, geometryOrigin, geometries);
+	return this;
+    }
+    
+    
     
     /**************************************
      * methods of IVecI
@@ -398,10 +424,31 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent show(){
 	if(point==null){ point = new IPoint(pos).clr(super.clr()); }
 	else{ point.show(); }
+	if(tracker!=null){ tracker.show(); }
 	super.show();
 	return this;
     }
-    public IPointAgent hide(){ if(point!=null) point.hide(); super.hide(); return this; }
+    public IPointAgent hide(){
+	if(point!=null) point.hide();
+	if(tracker!=null) tracker.hide();
+	super.hide();
+	return this;
+    }
+    
+    public IPointAgent showPoint(){
+	if(point==null){ point = new IPoint(pos).clr(super.clr()); } else{ point.show(); }
+	super.show(); return this;
+    }
+    public IPointAgent hidePoint(){ if(point!=null) point.hide(); super.hide(); return this; }
+    
+    /** show attached geometry */
+    public IPointAgent showGeometry(){ if(tracker!=null){ tracker.show(); } return this; }
+    /** hide attached geometry */
+    public IPointAgent hideGeometry(){ if(tracker!=null){ tracker.hide(); } return this; }
+    
+    
+    
+    public void del(){ if(tracker!=null) tracker.del(); point.del(); super.del(); } //
     
     
     public IPointAgent clr(Color c){ super.clr(c); point.clr(c); return this; }
@@ -456,6 +503,6 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
     public IPointAgent setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
     
-    public IPointAgent weight(double w){ super.weight(w); return this; }
-    public IPointAgent weight(float w){ super.weight(w); return this; }
+    public IPointAgent weight(double w){ super.weight(w); point.weight(w); return this; }
+    public IPointAgent weight(float w){ super.weight(w); point.weight(w); return this; }
 }

@@ -31,7 +31,6 @@ import igeo.*;
    Objectified OpenGL drawing process of matrix of quad geometries by quad strips.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IGLQuadMatrix extends IGLElement{
     public int width, height;

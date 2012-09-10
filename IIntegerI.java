@@ -26,7 +26,6 @@ package igeo;
    Interface of integer to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IIntegerI extends IIntegerOp{
     /**
@@ -48,6 +47,15 @@ public interface IIntegerI extends IIntegerOp{
        @return Duplicated instance.
     */
     public IIntegerI dup();
+    
+    /** alias of dup() */
+    public IIntegerI cp();
+    
+    /** duplicate and add */
+    public IIntegerI cp(int v);
+    
+    /** duplicate and add */
+    public IIntegerI cp(IIntegerI v);
     
     /**
        convert reference tree to one constant value

@@ -26,7 +26,6 @@ package igeo;
    Reference class of 4 dimensional vector to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenceParameter{
     protected IVec4Op op;

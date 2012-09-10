@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Implementation of piecewise function out of multiple IPolynominalFunction
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IPiecewisePolynomialFunction extends IPiecewiseFunction{
     

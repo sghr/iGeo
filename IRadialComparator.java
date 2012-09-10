@@ -28,7 +28,6 @@ package igeo;
    @see ISort
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IRadialComparator implements IComparator<IVec>{
     public IVec center = new IVec(0,0,0);

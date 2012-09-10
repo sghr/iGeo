@@ -28,7 +28,6 @@ package igeo;
    Position is provided from outside to be linked.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IParticleOnCurveI extends IParticleI{
     

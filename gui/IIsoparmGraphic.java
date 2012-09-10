@@ -32,7 +32,6 @@ import igeo.*;
    This class is mainly used in ISurfaceGrahpicWireframeGL.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IIsoparmGraphic{
     

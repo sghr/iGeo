@@ -30,7 +30,6 @@ import java.util.ArrayList;
    To be completed later.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 abstract public class IPolycurveGeo implements ICurveI{
     

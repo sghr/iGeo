@@ -32,7 +32,6 @@ import java.util.ArrayList;
    A base class of map classes to provide mapping function to set values on a 2D map and extract value out of the map. The value contained on the map is double in the range of 0.0 - 1.0.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMap{
     public static final int defaultDensityWidth=100;

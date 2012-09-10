@@ -32,7 +32,6 @@ import java.awt.Color;
    To be completed later.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IBrep extends IGeometry implements ITransformable{
     //public ArrayList<ISurface> surfaces;
@@ -100,6 +99,31 @@ public class IBrep extends IGeometry implements ITransformable{
     public void initBrep(IServerI s){
 	parameter = null; // !!! what should this be? IBrepGeo?
 	if(graphics == null) initGraphic(s);
+	
+	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedPoints(); }
+    }
+
+    public void checkDuplicatedPoints(){
+	boolean changed=false;
+	for(int i=0; i<surfaces.length; i++){
+	    
+	    for(int j=0; j<surfaces[i].ucpNum(); j++){
+		for(int k=0; k<surfaces[i].vcpNum(); k++){
+		    IVecI cp1 = surfaces[i].cp(j,k);
+		    for(int l=i+1; l<surfaces.length; l++){
+			for(int m=0; m<surfaces[l].ucpNum(); m++){
+			    for(int n=0; n<surfaces[l].vcpNum(); n++){
+				if(surfaces[l].cp(m,n) == cp1){ // same instance
+				    surfaces[l].controlPoints[m][n] = cp1.dup();
+				    changed=true;
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	if(changed){ updateGraphic(); }
     }
     
     public IGraphicObject createGraphic(IGraphicMode m){
@@ -127,12 +151,23 @@ public class IBrep extends IGeometry implements ITransformable{
     public ISurfaceGeo surface(int i){ return surfaces[i]; }
     
     public int surfaceNum(){ return surfaces.length; }
+
+    public ISurfaceGeo[] surfaces(){ return surfaces; }
     
     @Override public IBrep dup(){ return new IBrep(this); }
     
+    /** calculate center by taking average of centers of all surfaces */
+    synchronized public IVecI center(){
+	if(surfaces==null || surfaces.length==0) return null;
+	IVecI cnt = surfaces[0].center();
+	for(int i=1; i<surfaces.length; i++) cnt.add(surfaces[i].center());
+	cnt.div(surfaces.length);
+	return cnt;
+    }
+    
     
     /** checking parameters validity. */
-    public boolean isValid(){
+    synchronized public boolean isValid(){
 	if(surfaces==null || surfaces.length==0) return false;
 	for(int i=0; i<surfaces.length; i++){
 	    if(!surfaces[i].isValid()) return false;
@@ -147,55 +182,55 @@ public class IBrep extends IGeometry implements ITransformable{
     }
     */
     
-    public IBrep name(String nm){ super.name(nm); return this; }
-    public IBrep layer(ILayer l){ super.layer(l); return this; }
-    public IBrep layer(String l){ super.layer(l); return this; }
+    synchronized public IBrep name(String nm){ super.name(nm); return this; }
+    synchronized public IBrep layer(ILayer l){ super.layer(l); return this; }
+    synchronized public IBrep layer(String l){ super.layer(l); return this; }
     
-    public IBrep attr(IAttribute at){ super.attr(at); return this; }
+    synchronized public IBrep attr(IAttribute at){ super.attr(at); return this; }
     
-    public IBrep hide(){ super.hide(); return this; }
-    public IBrep show(){ super.show(); return this; }
+    synchronized public IBrep hide(){ super.hide(); return this; }
+    synchronized public IBrep show(){ super.show(); return this; }
     
-    public IBrep clr(Color c){ super.clr(c); return this; }
-    public IBrep clr(Color c, int alpha){ super.clr(c,alpha); return this; }
-    public IBrep clr(int gray){ super.clr(gray); return this; }
-    public IBrep clr(float fgray){ super.clr(fgray); return this; }
-    public IBrep clr(double dgray){ super.clr(dgray); return this; }
-    public IBrep clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
-    public IBrep clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
-    public IBrep clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
-    public IBrep clr(int r, int g, int b){ super.clr(r,g,b); return this; }
-    public IBrep clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
-    public IBrep clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
-    public IBrep clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
-    public IBrep clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
-    public IBrep clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
-    public IBrep hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
-    public IBrep hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
-    public IBrep hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
-    public IBrep hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
+    synchronized public IBrep clr(Color c){ super.clr(c); return this; }
+    synchronized public IBrep clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public IBrep clr(int gray){ super.clr(gray); return this; }
+    synchronized public IBrep clr(float fgray){ super.clr(fgray); return this; }
+    synchronized public IBrep clr(double dgray){ super.clr(dgray); return this; }
+    synchronized public IBrep clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
+    synchronized public IBrep clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
+    synchronized public IBrep clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
+    synchronized public IBrep clr(int r, int g, int b){ super.clr(r,g,b); return this; }
+    synchronized public IBrep clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
+    synchronized public IBrep clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
+    synchronized public IBrep clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
+    synchronized public IBrep clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
+    synchronized public IBrep clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
+    synchronized public IBrep hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
+    synchronized public IBrep hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
+    synchronized public IBrep hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
+    synchronized public IBrep hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
-    public IBrep setColor(Color c){ super.setColor(c); return this; }
-    public IBrep setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
-    public IBrep setColor(int gray){ super.setColor(gray); return this; }
-    public IBrep setColor(float fgray){ super.setColor(fgray); return this; }
-    public IBrep setColor(double dgray){ super.setColor(dgray); return this; }
-    public IBrep setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
-    public IBrep setColor(float fgray, int falpha){ super.setColor(fgray,falpha); return this; }
-    public IBrep setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
-    public IBrep setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
-    public IBrep setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
-    public IBrep setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
-    public IBrep setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
-    public IBrep setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
-    public IBrep setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
-    public IBrep setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
-    public IBrep setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
-    public IBrep setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
-    public IBrep setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
+    synchronized public IBrep setColor(Color c){ super.setColor(c); return this; }
+    synchronized public IBrep setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IBrep setColor(int gray){ super.setColor(gray); return this; }
+    synchronized public IBrep setColor(float fgray){ super.setColor(fgray); return this; }
+    synchronized public IBrep setColor(double dgray){ super.setColor(dgray); return this; }
+    synchronized public IBrep setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
+    synchronized public IBrep setColor(float fgray, int falpha){ super.setColor(fgray,falpha); return this; }
+    synchronized public IBrep setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
+    synchronized public IBrep setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
+    synchronized public IBrep setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
+    synchronized public IBrep setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
+    synchronized public IBrep setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
+    synchronized public IBrep setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
+    synchronized public IBrep setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
+    synchronized public IBrep setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
+    synchronized public IBrep setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
+    synchronized public IBrep setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
+    synchronized public IBrep setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
     
-    public IBrep weight(double w){ super.weight(w); return this; }
-    public IBrep weight(float w){ super.weight(w); return this; }
+    synchronized public IBrep weight(double w){ super.weight(w); return this; }
+    synchronized public IBrep weight(float w){ super.weight(w); return this; }
         
     
 
@@ -203,302 +238,302 @@ public class IBrep extends IGeometry implements ITransformable{
      * implementation of ITransformable interface
      ******************************************************************************/
         
-    public IBrep add(double x, double y, double z){
+    synchronized public IBrep add(double x, double y, double z){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].add(x,y,z);
 	return this;
     }
-    public IBrep add(IDoubleI x, IDoubleI y, IDoubleI z){
+    synchronized public IBrep add(IDoubleI x, IDoubleI y, IDoubleI z){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].add(x,y,z);
 	return this;
     }
-    public IBrep add(IVecI v){
+    synchronized public IBrep add(IVecI v){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].add(v);
 	return this;
     }
-    public IBrep sub(double x, double y, double z){
+    synchronized public IBrep sub(double x, double y, double z){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].sub(x,y,z);
 	return this;
     }
-    public IBrep sub(IDoubleI x, IDoubleI y, IDoubleI z){
+    synchronized public IBrep sub(IDoubleI x, IDoubleI y, IDoubleI z){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].sub(x,y,z);
 	return this;
     }
-    public IBrep sub(IVecI v){
+    synchronized public IBrep sub(IVecI v){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].sub(v);
 	return this;
     }
-    public IBrep mul(IDoubleI v){
+    synchronized public IBrep mul(IDoubleI v){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].mul(v);
 	return this;
     }
-    public IBrep mul(double v){
+    synchronized public IBrep mul(double v){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].mul(v);
 	return this;
     }
-    public IBrep div(IDoubleI v){
+    synchronized public IBrep div(IDoubleI v){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].div(v);
 	return this;
     }
-    public IBrep div(double v){
+    synchronized public IBrep div(double v){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].div(v);
 	return this;
     }
     
-    public IBrep neg(){
+    synchronized public IBrep neg(){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].neg();
 	return this;
     }
     /** alias of neg */
-    //public IBrep rev(); // rev is used in curve to revrse u parameter
+    //synchronized public IBrep rev(); // rev is used in curve to revrse u parameter
     /** alias of neg */
-    public IBrep flip(){
+    synchronized public IBrep flip(){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].flip();
 	return this;
     }
     
     
     /** scale add */
-    public IBrep add(IVecI v, double f){
+    synchronized public IBrep add(IVecI v, double f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].add(v,f);
 	return this;
     }
-    public IBrep add(IVecI v, IDoubleI f){
+    synchronized public IBrep add(IVecI v, IDoubleI f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].add(v,f);
 	return this;
     }
     /** scale add alias */
-    public IBrep add(double f, IVecI v){ return add(v,f); }
-    public IBrep add(IDoubleI f, IVecI v){ return add(v,f); }
+    synchronized public IBrep add(double f, IVecI v){ return add(v,f); }
+    synchronized public IBrep add(IDoubleI f, IVecI v){ return add(v,f); }
     
-    public IBrep rot(IDoubleI angle){
+    synchronized public IBrep rot(IDoubleI angle){
 	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot(angle); } return this;
     }
-    public IBrep rot(double angle){
+    synchronized public IBrep rot(double angle){
 	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot(angle); } return this;
     }
     
-    public IBrep rot(IVecI axis, IDoubleI angle){
+    synchronized public IBrep rot(IVecI axis, IDoubleI angle){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot(axis,angle);
 	return this;
     }
-    public IBrep rot(IVecI axis, double angle){
+    synchronized public IBrep rot(IVecI axis, double angle){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot(axis,angle);
 	return this;
     }
     
-    public IBrep rot(IVecI center, IVecI axis, IDoubleI angle){
+    synchronized public IBrep rot(IVecI center, IVecI axis, IDoubleI angle){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot(center,axis,angle);
 	return this;
     }
-    public IBrep rot(IVecI center, IVecI axis, double angle){
+    synchronized public IBrep rot(IVecI center, IVecI axis, double angle){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot(center,axis,angle);
 	return this;
     }
     
     /** rotate to destination direction vector */
-    public IBrep rot(IVecI axis, IVecI destDir){
+    synchronized public IBrep rot(IVecI axis, IVecI destDir){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot(axis,destDir);
 	return this;
     }
     /** rotate to destination point location */    
-    public IBrep rot(IVecI center, IVecI axis, IVecI destPt){
+    synchronized public IBrep rot(IVecI center, IVecI axis, IVecI destPt){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot(center,axis,destPt);
 	return this;
     }
     
-    public IBrep rot2(IDoubleI angle){ return rot(angle); }
-    public IBrep rot2(double angle){ return rot(angle); }
-    public IBrep rot2(IVecI center, IDoubleI angle){
+    synchronized public IBrep rot2(IDoubleI angle){ return rot(angle); }
+    synchronized public IBrep rot2(double angle){ return rot(angle); }
+    synchronized public IBrep rot2(IVecI center, IDoubleI angle){
 	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot2(center,angle); }	return this;
     }
-    public IBrep rot2(IVecI center, double angle){
+    synchronized public IBrep rot2(IVecI center, double angle){
 	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot2(center,angle); }	return this;
     }
     
     /** rotation on xy-plane to destination direction vector */
-    public IBrep rot2(IVecI destDir){
+    synchronized public IBrep rot2(IVecI destDir){
 	for(int i=0; i<surfaces.length; i++){ surfaces[i].rot2(destDir); } return this;
     }
     /** rotation on xy-plane to destination point location */    
-    public IBrep rot2(IVecI center, IVecI destPt){
+    synchronized public IBrep rot2(IVecI center, IVecI destPt){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].rot2(center,destPt);
 	return this;
     }
     
     
     /** alias of mul */
-    public IBrep scale(IDoubleI f){
+    synchronized public IBrep scale(IDoubleI f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].scale(f);
 	return this;
     }
-    public IBrep scale(double f){
+    synchronized public IBrep scale(double f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].scale(f);
 	return this;
     }
-    public IBrep scale(IVecI center, IDoubleI f){
+    synchronized public IBrep scale(IVecI center, IDoubleI f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].scale(center,f);
 	return this;
     }
-    public IBrep scale(IVecI center, double f){
+    synchronized public IBrep scale(IVecI center, double f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].scale(center,f);
 	return this;
     }
     
     
     /** scale only in 1 direction */
-    public IBrep scale1d(IVecI axis, double f){
+    synchronized public IBrep scale1d(IVecI axis, double f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].scale1d(axis,f);
 	return this;
     }
-    public IBrep scale1d(IVecI axis, IDoubleI f){
+    synchronized public IBrep scale1d(IVecI axis, IDoubleI f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].scale1d(axis,f);
 	return this;
     }
-    public IBrep scale1d(IVecI center, IVecI axis, double f){
+    synchronized public IBrep scale1d(IVecI center, IVecI axis, double f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].scale1d(center,axis,f);
 	return this;
     }
-    public IBrep scale1d(IVecI center, IVecI axis, IDoubleI f){
+    synchronized public IBrep scale1d(IVecI center, IVecI axis, IDoubleI f){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].scale1d(center,axis,f);
 	return this;
     }
     
     
     /** reflect(mirror) 3 dimensionally to the other side of the plane */
-    public IBrep ref(IVecI planeDir){
+    synchronized public IBrep ref(IVecI planeDir){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].ref(planeDir);
 	return this;
     }
-    public IBrep ref(IVecI center, IVecI planeDir){
+    synchronized public IBrep ref(IVecI center, IVecI planeDir){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].ref(center,planeDir);
 	return this;
     }
     /** mirror is alias of ref */
-    public IBrep mirror(IVecI planeDir){
+    synchronized public IBrep mirror(IVecI planeDir){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].mirror(planeDir);
 	return this;
     }
-    public IBrep mirror(IVecI center, IVecI planeDir){
+    synchronized public IBrep mirror(IVecI center, IVecI planeDir){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].mirror(center,planeDir);
 	return this;
     }
     
     
     /** shear operation */
-    public IBrep shear(double sxy, double syx, double syz,
+    synchronized public IBrep shear(double sxy, double syx, double syz,
 				double szy, double szx, double sxz){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shear(sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
-    public IBrep shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+    synchronized public IBrep shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
 				IDoubleI szy, IDoubleI szx, IDoubleI sxz){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shear(sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
-    public IBrep shear(IVecI center, double sxy, double syx, double syz,
+    synchronized public IBrep shear(IVecI center, double sxy, double syx, double syz,
 				double szy, double szx, double sxz){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shear(center,sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
-    public IBrep shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
+    synchronized public IBrep shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
 				IDoubleI szy, IDoubleI szx, IDoubleI sxz){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shear(center,sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
     
-    public IBrep shearXY(double sxy, double syx){
+    synchronized public IBrep shearXY(double sxy, double syx){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearXY(sxy,syx);
 	return this;
     }
-    public IBrep shearXY(IDoubleI sxy, IDoubleI syx){
+    synchronized public IBrep shearXY(IDoubleI sxy, IDoubleI syx){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearXY(sxy,syx);
 	return this;
     }
-    public IBrep shearXY(IVecI center, double sxy, double syx){
+    synchronized public IBrep shearXY(IVecI center, double sxy, double syx){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearXY(center,sxy,syx);
 	return this;
     }
-    public IBrep shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
+    synchronized public IBrep shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearXY(center,sxy,syx);
 	return this;
     }
     
-    public IBrep shearYZ(double syz, double szy){
+    synchronized public IBrep shearYZ(double syz, double szy){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearYZ(syz,szy);
 	return this;
     }
-    public IBrep shearYZ(IDoubleI syz, IDoubleI szy){
+    synchronized public IBrep shearYZ(IDoubleI syz, IDoubleI szy){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearYZ(syz,szy);
 	return this;
     }
-    public IBrep shearYZ(IVecI center, double syz, double szy){
+    synchronized public IBrep shearYZ(IVecI center, double syz, double szy){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearYZ(center,syz,szy);
 	return this;
     }
-    public IBrep shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
+    synchronized public IBrep shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearYZ(center,syz,szy);
 	return this;
     }
     
-    public IBrep shearZX(double szx, double sxz){
+    synchronized public IBrep shearZX(double szx, double sxz){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearZX(szx,sxz);
 	return this;
     }
-    public IBrep shearZX(IDoubleI szx, IDoubleI sxz){
+    synchronized public IBrep shearZX(IDoubleI szx, IDoubleI sxz){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearZX(szx,sxz);
 	return this;
     }
-    public IBrep shearZX(IVecI center, double szx, double sxz){
+    synchronized public IBrep shearZX(IVecI center, double szx, double sxz){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearZX(center,szx,sxz);
 	return this;
     }
-    public IBrep shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
+    synchronized public IBrep shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].shearZX(center,szx,sxz);
 	return this;
     }
     
     /** mv() is alias of add() */
-    public IBrep mv(double x, double y, double z){
+    synchronized public IBrep mv(double x, double y, double z){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].mv(x,y,z);
 	return this;
     }
-    public IBrep mv(IDoubleI x, IDoubleI y, IDoubleI z){
+    synchronized public IBrep mv(IDoubleI x, IDoubleI y, IDoubleI z){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].mv(x,y,z);
 	return this;
     }
-    public IBrep mv(IVecI v){
+    synchronized public IBrep mv(IVecI v){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].mv(v);
 	return this;
     }
     
     /** cp() is alias of dup() */ 
-    public IBrep cp(){ return dup(); }
+    synchronized public IBrep cp(){ return dup(); }
     
     /** cp() is alias of dup().add() */
-    public IBrep cp(double x, double y, double z){ return dup().add(x,y,z); }
-    public IBrep cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
-    public IBrep cp(IVecI v){ return dup().add(v); }
+    synchronized public IBrep cp(double x, double y, double z){ return dup().add(x,y,z); }
+    synchronized public IBrep cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
+    synchronized public IBrep cp(IVecI v){ return dup().add(v); }
     
     
     /** translate() is alias of add() */
-    public IBrep translate(double x, double y, double z){ return add(x,y,z); }
-    public IBrep translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
-    public IBrep translate(IVecI v){ return add(v); }
+    synchronized public IBrep translate(double x, double y, double z){ return add(x,y,z); }
+    synchronized public IBrep translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
+    synchronized public IBrep translate(IVecI v){ return add(v); }
     
     
-    public IBrep transform(IMatrix3I mat){
+    synchronized public IBrep transform(IMatrix3I mat){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].transform(mat);
 	return this;
     }
-    public IBrep transform(IMatrix4I mat){
+    synchronized public IBrep transform(IMatrix4I mat){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].transform(mat);
 	return this;
     }
-    public IBrep transform(IVecI xvec, IVecI yvec, IVecI zvec){
+    synchronized public IBrep transform(IVecI xvec, IVecI yvec, IVecI zvec){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].transform(xvec,yvec,zvec);
 	return this;
     }
-    public IBrep transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
+    synchronized public IBrep transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
 	for(int i=0; i<surfaces.length; i++) surfaces[i].transform(xvec,yvec,zvec,translate);
 	return this;
     }

@@ -27,7 +27,6 @@ package igeo;
    Output value is crampped with 0.0 - 1.0.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IScaleMap extends IMap{
     public IMap map;

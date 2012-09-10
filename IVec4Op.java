@@ -26,7 +26,6 @@ package igeo;
    Interface of 4 dimensional vector operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IVec4Op extends IVecOp{
     public IVec4 get();

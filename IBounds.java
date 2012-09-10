@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Bounding box described by minimum point and maximum point.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IBounds{
     public IVec min=null, max=null;
@@ -38,11 +37,35 @@ public class IBounds{
     public IBounds(IVec p){ init(p); }
     
     public IBounds(IObject obj){ compare(obj); }
-
+    
+    public IBounds(IVec min, IVec max){ this.min=min; this.max=max; }
+    
+    public IBounds(IVec corner, double xwidth, double yheight, double zdepth){
+	init(corner);
+	compare(corner.add(xwidth,yheight,zdepth));
+    }
+    
+    public IBounds(double x, double y, double z, double xwidth, double yheight, double zdepth){
+	IVec p = new IVec(x,y,z);
+	init(p);
+	compare(p.add(xwidth,yheight,zdepth));
+    }
+    
+    
     public IVec min(){ return min; }
     public IVec getMin(){ return min(); }
     public IVec max(){ return max; }
     public IVec getMax(){ return max(); }
+    
+    public double minX(){ return min.x; }
+    public double minY(){ return min.y; }
+    public double minZ(){ return min.z; }
+    public double maxX(){ return max.x; }
+    public double maxY(){ return max.y; }
+    public double maxZ(){ return max.z; }
+    public double width(){ return max.x - min.x; }
+    public double height(){ return max.y - min.y; }
+    public double depth(){ return max.z - min.z; }
     
     public IVec size(){
 	if(min==null||max==null) return null;

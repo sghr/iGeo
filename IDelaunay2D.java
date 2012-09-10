@@ -30,7 +30,6 @@ import igeo.gui.*;
    Class to calculate Delaunay triangulation out of 2D points.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IDelaunay2D {
     

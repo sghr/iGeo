@@ -47,7 +47,6 @@ import java.util.zip.*;
    Rhinoceros 3dm importer class.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IRhino3dmImporter extends IRhino3dm{
     

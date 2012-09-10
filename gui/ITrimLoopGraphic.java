@@ -34,7 +34,6 @@ import igeo.*;
    @see ISurfaceGraphicWireframeGL   
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ITrimLoopGraphic{
     public ISurfaceI surface;

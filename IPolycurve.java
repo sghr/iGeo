@@ -31,7 +31,6 @@ import java.awt.Color;
    To be completed later.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 
 public class IPolycurve extends IObject /*implements ICurveI*/{

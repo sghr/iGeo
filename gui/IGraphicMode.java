@@ -29,7 +29,6 @@ import igeo.IConfig;
    wireframe / fill / transparent fill / wireframe+fill / wireframe+transparent fill.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IGraphicMode{
     

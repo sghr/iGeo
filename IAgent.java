@@ -29,7 +29,6 @@ import java.util.ArrayList;
    Class of an agent based on one point, extending IPoint and implements IDynamics
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IAgent extends IObject implements IDynamics{
     
@@ -44,11 +43,23 @@ public class IAgent extends IObject implements IDynamics{
     public int duration=-1; //lifetime=-1;
     public boolean alive=true;
     
+    /** check if a child class overrides void interact(IDynamics) or not */
+    boolean interactOverridden=false;
+    
+    
     public IAgent(){ super(); initAgent(); }
     
     public IAgent(IObject parent){ super(); this.parent=parent; initAgent(); }
     
-    public void initAgent(){ super.addDynamics(this); }
+    public void initAgent(){
+	super.addDynamics(this);
+	/** check if a child class overrides void interact(IDynamics) or not */
+	try{
+	    interactOverridden = 
+		getClass().getMethod("interact", IDynamics.class).getDeclaringClass() !=
+		IAgent.class;
+	}catch(NoSuchMethodException e){}
+    }
     
     
     /** override IObject.addDynamics to manage dynamics locally.
@@ -113,6 +124,10 @@ public class IAgent extends IObject implements IDynamics{
     }
     
     
+    /** local dynamics are updated by IDynamics server too but not show up in interact's argument. only its parent show up */
+    public ArrayList<IDynamics> localDynamics(){ return localDynamics; }
+    
+    
     /** add terget object to be updated by this dynamic object. */
     public IAgent target(IObject targetObj){
 	if(targets==null) targets = new ArrayList<IObject>();
@@ -156,12 +171,13 @@ public class IAgent extends IObject implements IDynamics{
     //public void initInteract(ArrayList<IDynamics> agents){
     synchronized public void preinteract(ArrayList<IDynamics> agents){
 	time++; // time needs to be updated here to have same value in interact() and update()
-	if(localDynamics!=null) for(IDynamics d:localDynamics) d.interact(agents);
+	//if(localDynamics!=null) for(IDynamics d:localDynamics) d.interact(agents); // commented out 20120826; now localDynamics are managed by IDynamicServer
     }
     
     synchronized public void interact(ArrayList<IDynamics> agents){ // could be overridden
 	//initInteract(agents);
 	
+	/*
 	// to take care of possible definition of interact(IDynamics) in a child class.
 	boolean interactOverridden=false;
 	try{
@@ -169,10 +185,13 @@ public class IAgent extends IObject implements IDynamics{
 		getClass().getMethod("interact", IDynamics.class).getDeclaringClass() !=
 		IAgent.class;
 	}catch(NoSuchMethodException e){}
+	*/
 	
 	if(interactOverridden){
+	    IDynamics d=null;
 	    for(int i=0; i<agents.size(); i++){
-		if(agents.get(i) != this) interact(agents.get(i));
+		d = agents.get(i);
+		if(d != this) interact(d);
 	    }
 	}
     }
@@ -183,7 +202,7 @@ public class IAgent extends IObject implements IDynamics{
     
     //synchronized public void initUpdate(){
     synchronized public void preupdate(){
-	if(localDynamics!=null) for(IDynamics d:localDynamics) d.update();
+	//if(localDynamics!=null) for(IDynamics d:localDynamics) d.update(); // commented out 20120826; now localDynamics are managed by IDynamicServer
 	if( duration>=0 && time>=duration ){ del(); }
 	else if(server!=null) server.updateState();
     }

@@ -31,7 +31,6 @@ import igeo.gui.*;
    In the current version, this material information is not used yet.
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 
 public class IBasicMaterial extends IMaterial{

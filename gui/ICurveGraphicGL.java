@@ -30,7 +30,6 @@ import igeo.*;
    Graphic subobject class to draw a curve object by OpenGL
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ICurveGraphicGL extends IGraphicObject{
     public /*static*/ float weight = IConfig.strokeWeight; //1f;
@@ -52,7 +51,9 @@ public class ICurveGraphicGL extends IGraphicObject{
 	//init();
     }
     
-    public void initCurve(){
+    synchronized public void initCurve(){
+	synchronized(parent){
+	    
 	if(curve==null){ // added in 2011/10/18
 	    if(parent instanceof ICurve){ curve = ((ICurve)parent).curve; }
 	    else if(parent instanceof ICurveR){ curve = ((ICurveR)parent).curve; }
@@ -88,6 +89,7 @@ public class ICurveGraphicGL extends IGraphicObject{
 	//if(polyline==null || polyline.pts != pts){ polyline = new IGLLineStrip(pts); }
 	
 	if(update) update=false;
+	}
     }
     
     public void setWeight(float w){ weight=w; }
@@ -98,7 +100,7 @@ public class ICurveGraphicGL extends IGraphicObject{
 	return m.isGraphic3D();
     }
     
-    public void draw(IGraphics g){
+    synchronized public void draw(IGraphics g){
 	
 	if(curve==null || update /*&& curve.deg()>1*/ ) // now need to be updated with deg 1
 	    initCurve(); // not initizlized at the constructor // shouldn't it?

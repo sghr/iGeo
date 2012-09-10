@@ -28,7 +28,6 @@ package igeo;
    @see IEntityParameter
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IReferenceParameter extends IParameter/*, ISwitchR*/{
     public IParameter operator();

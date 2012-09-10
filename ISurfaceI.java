@@ -26,7 +26,6 @@ package igeo;
    Abstract interface of NURBS surface.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface ISurfaceI extends ISurfaceOp, ITransformable{
     
@@ -90,11 +89,39 @@ public interface ISurfaceI extends ISurfaceOp, ITransformable{
     public IVecI ep(int i, int j);
     public IVecI ep(IIntegerI i, IIntegerI j);
     
+    /** mid in UV parameter (u=0.5, v=0.5) point on a surface */
+    public IVecI mid();
+    
+    /** returns center of geometry object */
+    public IVecI center();
+    
+    
+    
+    
+    /** approximate invert projection from 3D location to interanl UV parameter (closest point on surface) */
+    public IVec2I uv(IVecI pt);
+    
+    /** approximate invert projection from 2D location to interanl UV parameter (closest point on surface) */
+    public IVec2I uv(IVec2I pt);
+    
+    /** find approximately closest point on a surface */
+    public IVecI closePt(IVecI pt);
+    
+    /** find approximately closest point on a surface on 2D */
+    public IVecI closePt(IVec2I pt);
+    
+    /** distance to the closest point on a surface */
+    public double dist(IVecI pt);
+    /** distance to the closest point on a surface on 2D*/
+    public double dist(IVec2I pt);
+
+    
+    
     public /*IDoubleI*/ double uknot(int i);
     public IDoubleI uknot(IIntegerI i);
     public /*IDoubleI*/ double vknot(int i);
     public IDoubleI vknot(IIntegerI i);
-
+    
     public double[] uknots();
     public double[] uknots(ISwitchE e);
     public IDoubleI[] uknots(ISwitchR r);

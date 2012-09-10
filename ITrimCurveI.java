@@ -27,7 +27,6 @@ package igeo;
    A trim curve is either outer trim curve (outside edge) or inner trim curve (edge of hole). 
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface ITrimCurveI extends ICurveI{
     

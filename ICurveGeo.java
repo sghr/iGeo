@@ -26,7 +26,6 @@ package igeo;
    Geometry of NURBS curve.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
@@ -52,6 +51,8 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public IBSplineBasisFunction basisFunction;
     /** derivative of bernstein basis function */
     public IBSplineBasisFunction derivativeFunction;
+    
+    public ICurveCache uSearchCache;
     
     
     
@@ -129,6 +130,8 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	ustart=0.; uend=1.;
 	init(getPointsFromArray(xyzValues), degree, close);
     }
+    
+    public ICurveGeo(IEdge edge){ this(edge.vertex(0), edge.vertex(1)); }
     
     
     public ICurveGeo(ICurveGeo crv){
@@ -362,6 +365,20 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public IVecI[] cps(){ return controlPoints; }
     
     
+    
+    
+    /** add control point at the end and rebuild the curve and change degree if possible.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo addCP(IVecI pt, int newDegree){
+	if(degree==newDegree || 
+	   (controlPoints.length==2 && controlPoints[0].eq(controlPoints[1]))) return addCP(pt);
+	
+	if(controlPoints.length+1 > newDegree){ degree=newDegree; } 
+	return addCP(pt); // if pt is invalid, it'd crash
+    }
+    
     /** add control point at the end and rebuild the curve.
 	note that a knots is rebuilt with default equal intervals
 	and destroy original knot intervals if variable, like circle.
@@ -373,6 +390,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	}
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pt); }
 	int num = controlPoints.length;
+	//check if it started with duplicated 2 points and if so, remove one of them.
+	if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; }
+	
 	IVecI[] controlPoints2 = new IVecI[num+1];
 	for(int i=0; i<num; i++){ controlPoints2[i] = controlPoints[i]; }
 	controlPoints2[num] = pt;
@@ -389,6 +409,19 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	defaultWeights = defaultWeights2;
 	return this;
     }
+    
+    /** add control point at i and rebuild the curve and change degree.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo addCP(int index, IVecI pt, int newDegree){
+	if(degree==newDegree || 
+	   (controlPoints.length==2 && controlPoints[0].eq(controlPoints[1]))) return addCP(index,pt);
+	
+	if(controlPoints.length+1 > newDegree){ degree=newDegree; } 
+	return addCP(index,pt); // if pt is invalid, it'd crash
+    }
+    
     /** add control point at i and rebuild the curve.
      	note that a knots is rebuilt with default equal intervals
 	and destroy original knot intervals if variable, like circle.
@@ -404,6 +437,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	    return this; 
 	}
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pt); }
+	
+	//check if it started with duplicated 2 points and if so, remove one of them.
+	if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; }
 	
 	IVecI[] controlPoints2 = new IVecI[num+1];
 	int i=0; 
@@ -426,6 +462,17 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	return this;
     }
     
+    /** add control point at i and rebuild the curve and change degree.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo addCP(IVecI[] pts, int newDegree){
+	if(degree==newDegree || 
+	   (controlPoints.length==2 && controlPoints[0].eq(controlPoints[1]))) return addCP(pts);
+	if(controlPoints.length+1 > newDegree){ degree=newDegree; } 
+	return addCP(pts); // if pt is invalid, it'd crash
+    }
+    
     /** add control points at the end and rebuild the curve.
 	note that a knots is rebuilt with default equal intervals
 	and destroy original knot intervals if variable, like circle.
@@ -440,6 +487,10 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	}
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pts); }
 	int num = controlPoints.length;
+	
+	//check if it started with duplicated 2 points and if so, remove one of them.
+	if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; }
+	
 	IVecI[] controlPoints2 = new IVecI[num+num2];
 	int i=0;
 	for(; i<num; i++){ controlPoints2[i] = controlPoints[i]; }
@@ -458,6 +509,18 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	defaultWeights = defaultWeights2;
 	return this;
     }
+    
+    /** add control point at i and rebuild the curve and change degree.
+     	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ICurveGeo addCP(int index, IVecI[] pts, int newDegree){
+	if(degree==newDegree || 
+	   (controlPoints.length==2 && controlPoints[0].eq(controlPoints[1]))) return addCP(index,pts);
+	if(controlPoints.length+1 > newDegree){ degree=newDegree; } 
+	return addCP(index,pts); // if pt is invalid, it'd crash
+    }
+    
     /** add control points at i and rebuild the curve.
      	note that a knots is rebuilt with default equal intervals
 	and destroy original knot intervals if variable, like circle.
@@ -477,6 +540,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	}
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pts); }
 	
+	//check if it started with duplicated 2 points and if so, remove one of them.
+	if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; }
+		
 	IVecI[] controlPoints2 = new IVecI[num+num2];
 	int i=0;
 	for(; i<index; i++){ controlPoints2[i] = controlPoints[i]; }
@@ -599,6 +665,59 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
     public IVec startCP(){ return controlPoints[0].get(); }
     public IVec endCP(){ return controlPoints[controlPoints.length-1].get(); }
+    
+    
+    /** parametrically mid point of a curve */
+    public IVec mid(){ return pt(0.5); }
+    
+    /** returns center of geometry object */
+    public IVec center(){
+	int count = cpNum();
+	// check if it's closed and having overlapping control points
+	if(knots[0] != 0.0 || knots[knots.length-1] != 1.0){
+	    // check by cp
+	    if(cp(0).eq(cp(cpNum()-deg()))){ count = cpNum()-deg(); }
+	}
+	else if(cp(0).eq(cp(cpNum()-1))){
+	    count = cpNum()-1;
+	}
+	// calc average of control points
+	IVec cnt = new IVec();
+	for(int i=0; i<count; i++){ cnt.add(cp(i)); }
+	cnt.div(count);
+	return cnt;
+    }
+    
+    
+    
+    /** approximate invert projection from 3D location to interanl parameter U (closest point on curve) */
+    public double u(IVecI pt){
+	if(uSearchCache==null){ uSearchCache = new ICurveCache(this); }
+	return uSearchCache.u(pt.get());
+    }
+    public double u(ISwitchE r, IVecI pt){ return u(pt); }
+    public IDouble u(ISwitchR r, IVecI pt){ return new IDouble(u(pt)); }
+    
+    /** approximate invert projection from 2D location to interanl parameter U */
+    public double u(IVec2I pt){
+	if(uSearchCache==null){ uSearchCache = new ICurveCache(this); }
+	return uSearchCache.u(pt.get());
+    }
+    public double u(ISwitchE r, IVec2I pt){ return u(pt); }
+    public IDouble u(ISwitchR r, IVec2I pt){ return new IDouble(u(pt)); }
+    
+    
+    /** find approximately closest point on a curve */
+    public IVec closePt(IVecI pt){ return pt(u(pt)); }
+    
+    /** find approximately closest point on a curve on 2D */
+    public IVec closePt(IVec2I pt){ return pt(u(pt)); }
+    
+    /** distance to the closest point on a curve */
+    public double dist(IVecI pt){ return closePt(pt).dist(pt); }
+    /** distance to the closest point on a curve on 2D*/
+    public double dist(IVec2I pt){ return closePt(pt).to2d().dist(pt); }
+    
     
     public double knot(int i){ return knots[i]; }
     public IDouble knot(IIntegerI i){ return new IDouble(knots[i.x()]); }

@@ -29,7 +29,6 @@ import javax.media.opengl.*;
    Objectified OpenGL quad strip drawing process.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IGLQuadStrip extends IGLElement{
     private IGLQuadStrip(){}

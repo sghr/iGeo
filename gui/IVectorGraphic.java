@@ -30,7 +30,6 @@ import igeo.*;
    Graphic subobject class to draw a vector with an arrowhead
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IVectorGraphic extends IGraphicObject{
     //public static double defaultSize = 2; //1; //5; //1.0;
@@ -67,15 +66,14 @@ public class IVectorGraphic extends IGraphicObject{
 	if(g.type() == IGraphicMode.GraphicType.GL ||
 	   g.type() == IGraphicMode.GraphicType.P3D){
 	    
-	    
 	    IVec rt = vec.root.get();
 	    IVec v = vec.vec.get();
 	    IVec t = null;
 	    
-	    if(v.angle(arrowHeadNormal)<IConfig.angleTolerance)
-		t = v.cross(arrowHeadNormal2);
+	    //if(v.angle(arrowHeadNormal)<IConfig.angleTolerance){ // this excludes 180 deg
+	    if(v.isParallel(arrowHeadNormal)){ t = v.cross(arrowHeadNormal2); }
 	    else t = v.cross(arrowHeadNormal);
-	    t.len(size/2);
+	    t.len(size/2*IConfig.arrowWidthRatio);
 	    IVec v2 = vec.vec.get().dup().rev().len(size);
 	    
 	    IVec[] arrowLine = new IVec[2];
@@ -86,10 +84,9 @@ public class IVectorGraphic extends IGraphicObject{
 	    arrowHead[1] = v.dup().add(rt);
 	    arrowHead[2] = v.dup().add(v2).add(t).add(rt);
 	    
-	    
 	    IGraphics3D g3d = (IGraphics3D)g;
 	    
-	    g3d.weight(weight);
+	    g3d.weight(weight); // debug
 	    //g3d.pointSize(size);
 	    
 	    float red,green,blue,alpha;
@@ -105,7 +102,7 @@ public class IVectorGraphic extends IGraphicObject{
 		blue = IConfig.objectColor.getBlue();
 		alpha = IConfig.objectColor.getAlpha();
 	    }
-
+	    
 	    // setting fill color
 	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
 		alpha = IConfig.transparentModeAlpha;

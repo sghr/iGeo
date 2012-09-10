@@ -26,7 +26,6 @@ package igeo;
    A subclass of IMap defined by taking smaller value of two maps.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMinMap extends IMap{
     public IMap map1, map2;

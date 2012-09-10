@@ -26,7 +26,6 @@ package igeo;
    A subobject of IObject to contain numerical geometry data
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 public class IParameterObject /*extends*/ implements ISubobject{
     

@@ -30,7 +30,6 @@ import igeo.gui.*;
    Reference class of NURBS surface to contain any instance of ISurfaceI.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceR extends IObject implements ISurfaceI{
     
@@ -79,52 +78,110 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     
     public ISurfaceR dup(){ return new ISurfaceR(this); }    
     
-    public IVecI pt(IVec2I v){ return surface.pt(v); }
-    public IVecI pt(IDoubleI u, IDoubleI v){ return surface.pt(u,v); }
-    public IVecI pt(double u, double v){ return surface.pt(u,v); }
+    //public IVecI pt(IVec2I v){ return surface.pt(v); }
+    //public IVecI pt(IDoubleI u, IDoubleI v){ return surface.pt(u,v); }
+    //public IVecI pt(double u, double v){ return surface.pt(u,v); }
+    public IVecR pt(IVec2I v){ return new IVecR(new Pt(surface,v)); }
+    public IVecR pt(IDoubleI u, IDoubleI v){ return new IVecR(new Pt(surface,new IVec2R(u,v))); }
+    public IVecR pt(double u, double v){ return new IVecR(new Pt(surface,new IVec2(u,v))); }
     
     /**
        @param u u coordinates in uv parameter space
        @param v v coordinates in uv parameter space
        @param n length in normal direction in 3D space
     */
-    public IVecI pt(double u, double v, double n){ return surface.pt(u,v,n); }
-    public IVecI pt(IDoubleI u, IDoubleI v, IDoubleI n){ return surface.pt(u,v,n); }
-    public IVecI pt(IVecI v){ return surface.pt(v); }
+    //public IVecR pt(double u, double v, double n){ return surface.pt(u,v,n); }
+    //public IVecR pt(IDoubleI u, IDoubleI v, IDoubleI n){ return surface.pt(u,v,n); }
+    //public IVecR pt(IVecI v){ return surface.pt(v); }
+    public IVecR pt(double u, double v, double n){ return pt(u,v).add(nml(u,v).len(n)); }
+    public IVecR pt(IDoubleI u, IDoubleI v, IDoubleI n){ return pt(u,v).add(nml(u,v).len(n)); }
+    public IVecR pt(IVecI v){
+	IDoubleI x = v.x((Ir)null);
+	IDoubleI y = v.y((Ir)null);
+	return pt(x,y).add(nml(x,y).len(v.z((Ir)null)));
+    }
     
+    //public IVecI utan(IVec2I v){ return surface.utan(v); }
+    //public IVecI utan(IDoubleI u, IDoubleI v){ return surface.utan(u,v); }
+    //public IVecI utan(double u, double v){ return surface.utan(u,v); }
+    public IVecR utan(IVec2I v){ return new IVecR(new UTan(surface,v)); }
+    public IVecR utan(IDoubleI u, IDoubleI v){ return new IVecR(new UTan(surface,new IVec2R(u,v))); }
+    public IVecR utan(double u, double v){ return new IVecR(new UTan(surface,new IVec2(u,v))); }
     
-    public IVecI utan(IVec2I v){ return surface.utan(v); }
-    public IVecI utan(IDoubleI u, IDoubleI v){ return surface.utan(u,v); }
-    public IVecI utan(double u, double v){ return surface.utan(u,v); }
+    //public IVecI vtan(IVec2I v){ return surface.vtan(v); }
+    //public IVecI vtan(IDoubleI u, IDoubleI v){ return surface.vtan(u,v); }
+    //public IVecI vtan(double u, double v){ return surface.vtan(u,v); }
+    public IVecR vtan(IVec2I v){ return new IVecR(new VTan(surface,v)); }
+    public IVecR vtan(IDoubleI u, IDoubleI v){ return new IVecR(new VTan(surface,new IVec2R(u,v))); }
+    public IVecR vtan(double u, double v){ return new IVecR(new VTan(surface,new IVec2(u,v))); }
     
-    public IVecI vtan(IVec2I v){ return surface.vtan(v); }
-    public IVecI vtan(IDoubleI u, IDoubleI v){ return surface.vtan(u,v); }
-    public IVecI vtan(double u, double v){ return surface.vtan(u,v); }
+    public IVecR normal(IVec2I v){ return nml(v); }
+    public IVecR normal(IDoubleI u, IDoubleI v){ return nml(u,v); }
+    public IVecR normal(double u, double v){ return nml(u,v); }
     
-    public IVecI normal(IVec2I v){ return surface.normal(v); }
-    public IVecI normal(IDoubleI u, IDoubleI v){ return surface.normal(u,v); }
-    public IVecI normal(double u, double v){ return surface.normal(u,v); }
+    public IVecR nrml(IVec2I v){ return nml(v); }
+    public IVecR nrml(IDoubleI u, IDoubleI v){ return nml(u,v); }
+    public IVecR nrml(double u, double v){ return nml(u,v); }
     
-    public IVecI nrml(IVec2I v){ return surface.nrml(v); }
-    public IVecI nrml(IDoubleI u, IDoubleI v){ return surface.nrml(u,v); }
-    public IVecI nrml(double u, double v){ return surface.nrml(u,v); }
+    //public IVecI nml(IVec2I v){ return surface.nml(v); }
+    //public IVecI nml(IDoubleI u, IDoubleI v){ return surface.nml(u,v); }
+    //public IVecI nml(double u, double v){ return surface.nml(u,v); }
+    public IVecR nml(IVec2I v){ return new IVecR(new Normal(surface,v)); }
+    public IVecR nml(IDoubleI u, IDoubleI v){ return new IVecR(new Normal(surface,new IVec2R(u,v))); }
+    public IVecR nml(double u, double v){ return new IVecR(new Normal(surface,new IVec2(u,v))); }
     
-    public IVecI nml(IVec2I v){ return surface.nml(v); }
-    public IVecI nml(IDoubleI u, IDoubleI v){ return surface.nml(u,v); }
-    public IVecI nml(double u, double v){ return surface.nml(u,v); }
     
     public IVecI cp(int i, int j){ return surface.cp(i,j); }
     public IVecI cp(IIntegerI i, IIntegerI j){ return surface.cp(i,j); }
     
     public IVecI[][] cps(){ return surface.cps(); }
+
+    //public IVecI ep(int i, int j){ surface.ep(i,j); }
+    //public IVecI ep(IIntegerI i, IIntegerI j){ return surface.ep(i,j); }
+    public IVecR ep(int i, int j){ return pt(uknot(i+udeg()),vknot(j+vdeg())); } // test this.
+    public IVecR ep(IIntegerI i, IIntegerI j){ return pt(uknot(i.cp(udeg((Ir)null))),vknot(j.cp(vdeg((Ir)null)))); } // test this.
     
-    public IVecI ep(int i, int j){ return surface.ep(i,j); }
-    public IVecI ep(IIntegerI i, IIntegerI j){ return surface.ep(i,j); }
+    //public IVecI corner(int i, int j){ return surface.corner(i,j); }
+    //public IVecI corner(IIntegerI i, IIntegerI j){ return surface.corner(i,j); }
+    public IVecR corner(int i, int j){
+	if(i!=0) i=1;
+	if(j!=0) j=1;
+	return pt((double)i,(double)j);
+    } // test this.
+    public IVecR corner(IIntegerI i, IIntegerI j){
+	//return surface.corner(i,j);
+	// how about if(u!=0) u=1 ?
+	return pt(new IDoubleR(i), new IDoubleR(j));
+    } // test this.
     
-    public IVecI corner(int i, int j){ return surface.corner(i,j); }
-    public IVecI corner(IIntegerI i, IIntegerI j){ return surface.corner(i,j); }
     public IVecI cornerCP(int i, int j){ return surface.cornerCP(i,j); }
     public IVecI cornerCP(IIntegerI i, IIntegerI j){ return surface.cornerCP(i,j); }
+    
+    /** mid in UV parameter (u=0.5, v=0.5) point on a surface */
+    public IVecR mid(){ return pt(0.5,0.5); }
+    
+    /** returns center of geometry object */
+    public IVecI center(){ return surface.center(); } // not parameterized yet
+	
+    
+    /** approximate invert projection from 3D location to interanl UV parameter (closest point on surface) */
+    public IVec2R uv(IVecI pt){ return new IVec2R(new UV(this,pt)); }
+    /** approximate invert projection from 2D location to interanl UV parameter (closest point on surface) */
+    public IVec2R uv(IVec2I pt){ return new IVec2R(new UV2(this,pt)); }
+    
+    
+    
+    /** find approximately closest point on a surface */
+    public IVecR closePt(IVecI pt){ return pt(uv(pt)); }
+    
+    /** find approximately closest point on a surface on 2D */
+    public IVecR closePt(IVec2I pt){ return pt(uv(pt)); }
+    
+    /** distance to the closest point on a surface */
+    public double dist(IVecI pt){ return surface.dist(pt); }
+    /** distance to the closest point on a surface on 2D*/
+    public double dist(IVec2I pt){ return surface.dist(pt); }
+    
     
     public double uknot(int i){ return surface.uknot(i); }
     public IDoubleI uknot(IIntegerI i){ return surface.uknot(i); }
@@ -574,18 +631,63 @@ public class ISurfaceR extends IObject implements ISurfaceI{
         public boolean x(){ return srf.get().isFlat(); }
         public IBool get(){ return srf.get().isFlat((Ir)null); }
     }
+    
     static public class IsUClosed extends IParameterObject implements IBoolOp{
         public ISurfaceOp srf;
         public IsUClosed(ISurfaceOp s){ srf=s; }
         public boolean x(){ return srf.get().isUClosed(); }
         public IBool get(){ return srf.get().isUClosed((Ir)null); }
     }
+    
     static public class IsVClosed extends IParameterObject implements IBoolOp{
         public ISurfaceOp srf;
         public IsVClosed(ISurfaceOp s){ srf=s; }
         public boolean x(){ return srf.get().isVClosed(); }
         public IBool get(){ return srf.get().isVClosed((Ir)null); }
     }
+    
+    static public class UV extends IParameterObject implements IVec2Op{
+        public ISurfaceOp srf;
+        public IVecI pt;
+        public UV(ISurfaceOp s, IVecI p){ srf=s; pt=p; }
+	public IVec2 get(){ return srf.get().uv(pt); }
+    }
+    
+    static public class UV2 extends IParameterObject implements IVec2Op{
+        public ISurfaceOp srf;
+        public IVec2I pt;
+        public UV2(ISurfaceOp s, IVec2I p){ srf=s; pt=p; }
+	public IVec2 get(){ return srf.get().uv(pt); }
+    }
+    
+    static public class Pt extends IParameterObject implements IVecOp{
+	public ISurfaceOp srf;
+	public IVec2Op uv;
+	public Pt(ISurfaceOp s, IVec2Op uvval){ srf=s; uv=uvval; }
+	public IVec get(){ return srf.get().pt(uv.get()); }
+    }
+    
+    static public class UTan extends IParameterObject implements IVecOp{
+	public ISurfaceOp srf;
+	public IVec2Op uv;
+	public UTan(ISurfaceOp s, IVec2Op uvval){ srf=s; uv=uvval; }
+	public IVec get(){ return srf.get().utan(uv.get()); }
+    }
+    
+    static public class VTan extends IParameterObject implements IVecOp{
+	public ISurfaceOp srf;
+	public IVec2Op uv;
+	public VTan(ISurfaceOp s, IVec2Op uvval){ srf=s; uv=uvval; }
+	public IVec get(){ return srf.get().vtan(uv.get()); }
+    }
+    
+    static public class Normal extends IParameterObject implements IVecOp{
+	public ISurfaceOp srf;
+	public IVec2Op uv;
+	public Normal(ISurfaceOp s, IVec2Op uvval){ srf=s; uv=uvval; }
+	public IVec get(){ return srf.get().nml(uv.get()); }
+    }
+    
 }
 
 

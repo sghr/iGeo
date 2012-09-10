@@ -26,7 +26,6 @@ package igeo;
    A subclass of IMap defined by depth of surface in the assigned depth direction.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceDepthMap extends IMap{
     public ISurfaceI surface;

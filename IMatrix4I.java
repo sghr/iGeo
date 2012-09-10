@@ -26,7 +26,6 @@ package igeo;
    Abstract interface of 4x4 numerical matrix.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IMatrix4I extends IMatrixI, IMatrix4Op{
     

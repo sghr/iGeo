@@ -32,7 +32,6 @@ import igeo.*;
    It contains ISurfaceGraphicFillGL and  ISurfaceGraphicWireframeGL inside.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ISurfaceGraphicGL extends IGraphicObject{
     //public static float defaultColorRed = .5f; //1f;

@@ -45,7 +45,6 @@ import javax.xml.parsers.*;
    3DXML file
       
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class I3DXML{
     
@@ -415,6 +414,9 @@ public class I3DXML{
     
     
     public static class I3DXMLNode{
+	
+	static String nameDelimiter = "/";
+	
 	public int id;
 	//public String type;
 	public String name;
@@ -535,6 +537,17 @@ public class I3DXML{
 		}
 		
 		ArrayList<IGeometry> geo = reference.instantiate(mat);
+
+
+		// add name
+		if(name!=null){
+		    for(int i=0; i<geo.size(); i++){
+			String n = geo.get(i).name();
+			if(n!=null){ n = name + nameDelimiter + n; }
+			else{ n = name; }
+			geo.get(i).name(n);
+		    }
+		}
 		
 		//ArrayList<IGeometry> geo = reference.instantiate(relativeMatrix);
 		/*

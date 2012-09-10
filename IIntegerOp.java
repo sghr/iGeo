@@ -26,9 +26,8 @@ package igeo;
    Interface of integer operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public interface IIntegerOp extends IParameter{
+public interface IIntegerOp extends IParameter, IScalar{
     public int x();
     public IInteger get();
 }

@@ -32,7 +32,6 @@ import igeo.*;
    Base class of OpenGL graphic vertex data collection
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public abstract class IGLElement{
     public IVec[] pts;

@@ -28,7 +28,6 @@ package igeo;
    @see IObject
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public /*class*/ interface ISubobject /*implements ISubelementI*/{
     //public IObject parent=null;

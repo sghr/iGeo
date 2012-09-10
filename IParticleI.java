@@ -22,13 +22,13 @@
 
 package igeo;
 
+import java.util.ArrayList;
 /**
    Class of an implementation of IDynamicObject to have physical attributes of point.
    It has attributes of position, velocity, acceleration, force, and mass.
    Position is provided from outside to be linked.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IParticleI extends IVecI{
 
@@ -68,7 +68,7 @@ public interface IParticleI extends IVecI{
     public IParticleI force(IVecI v);
     /** set force */
     public IParticleI frc(IVecI v);
-
+    
     /** get friction */
     public double friction();
     /** get friction */
@@ -106,5 +106,29 @@ public interface IParticleI extends IVecI{
     public IParticleI fix();
     /** unfix movement */
     public IParticleI unfix();
+    
+    /** check if it's fixed */
+    public boolean fixed();
+    
+    /** for other agent to control particle */
+    public IParticleI skipUpdateOnce(boolean f);
+    /** for other agent to control particle */
+    public boolean skipUpdateOnce();
+    
+    // partial methods of IDynamics // how necessary?
+    /** add terget object to be updated by this dynamic object. */
+    public IParticleI target(IObject targetObj);
+    /** get total target number. */
+    public int targetNum();
+    /** get target object. */
+    public IObject target(int i);
+    /** get all target objects. */
+    public ArrayList<IObject> targets();
+    /** remove target object. */
+    public IParticleI  removeTarget(int i);
+    /** remove target object. */
+    public IParticleI  removeTarget(IObject obj);
+    /** update all terget objects (should be called when the dynamic object is updated). */
+    public void updateTarget();
     
 }

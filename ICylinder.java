@@ -30,7 +30,6 @@ import igeo.gui.*;
    Cylinder surface class
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ICylinder extends ISurface{
     public IVecI pt1, pt2;

@@ -26,7 +26,6 @@ package igeo;
    Abstract interface of 3x3 numerical matrix.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IMatrix3I extends IMatrixI, IMatrix3Op{
     

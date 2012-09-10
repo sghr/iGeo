@@ -26,7 +26,6 @@ package igeo;
    Interface of 3 dimensional vector operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IVecOp extends IParameter{
     public IVec get();

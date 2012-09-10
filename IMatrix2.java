@@ -26,7 +26,6 @@ package igeo;
    Class of 2x2 numerical matrix.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMatrix2 extends IMatrix implements IMatrix2I{
     

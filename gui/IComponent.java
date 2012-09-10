@@ -28,7 +28,6 @@ import igeo.IG;
    Base class of custom GUI components.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IComponent{
     public int x, y, width, height;

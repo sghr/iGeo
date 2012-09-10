@@ -34,7 +34,6 @@ import igeo.IConfig;
    (Currently Java AWT and OpenGL).
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IGraphics{
     

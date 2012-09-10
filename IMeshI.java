@@ -22,11 +22,12 @@
 
 package igeo;
 
+import java.util.ArrayList;
+
 /**
    Abstract interface of polygon mesh.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IMeshI extends ITransformable{
 
@@ -56,8 +57,40 @@ public interface IMeshI extends ITransformable{
     public IEdge edge(IIntegerI i);
     public IFace face(IIntegerI i);
     
+    public IMeshI deleteVertex(int i);
+    public IMeshI deleteEdge(int i);
+    public IMeshI deleteFace(int i);
+    
+    public IMeshI deleteVertex(IIntegerI i);
+    public IMeshI deleteEdge(IIntegerI i);
+    public IMeshI deleteFace(IIntegerI i);
+    
+    public IMeshI deleteVertex(IVertex v);
+    public IMeshI deleteEdge(IEdge e);
+    public IMeshI deleteFace(IFace f);
+    
+    
+    /** center point of mesh */
+    public IVecI center();
+    
+    
+    /** return all vertices */
+    public ArrayList<IVertex> vertices();
+    /** return all edges */
+    public ArrayList<IEdge> edges();
+    /** return all faces */
+    public ArrayList<IFace> faces();
     
     public IMeshI close();
     public boolean isClosed();
+    
+    
+    /** cp() is alias of dup() */
+    public IMeshI cp();
 
+    /** cp() is alias of dup().add() */
+    public IMeshI cp(double x, double y, double z);
+    public IMeshI cp(IDoubleI x, IDoubleI y, IDoubleI z);
+    public IMeshI cp(IVecI v);
+    
 }

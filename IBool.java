@@ -26,7 +26,6 @@ package igeo;
    Entity class of boolean to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IBool extends IParameterObject implements IBoolI, IEntityParameter{
     public boolean x;
@@ -52,7 +51,7 @@ public class IBool extends IParameterObject implements IBoolI, IEntityParameter{
     public IBool get(){ return new IBool(x); }
     public IBool getX(){ return this; }
     public IBool dup(){ return new IBool(x); }
-    
+    public IBool cp(){ return dup(); }
     
     public IBool set(IBoolI v){ x=v.x(); return this; }
     public IBool set(IBool v){ x=v.x; return this; }

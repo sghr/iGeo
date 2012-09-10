@@ -28,9 +28,8 @@ import java.util.ArrayList;
    Class of IDynamicsBase to simulate tension force to make 3 points in straight
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public class IStraightener extends IDynamicsBase implements ITensionI{
+public class IStraightener extends IDynamicsBase implements IStraightenerI{
     //public static double defaultTension=1.0;
     
     public IParticleI pt1, pt2, pt3;
@@ -43,19 +42,19 @@ public class IStraightener extends IDynamicsBase implements ITensionI{
 	pt1=p1; pt2=p2; pt3=p3;
     }
     
-    public IStraightener(IParticle p1, IParticle p2, IParticle p3, IObject parent){
+    public IStraightener(IParticleGeo p1, IParticleGeo p2, IParticleGeo p3, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2; pt3=p3;
     }
     
     public IStraightener(IVec p1, IVec p2, IVec p3, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1); pt2=new IParticle(p2); pt3 = new IParticle(p3);
+	pt1 = new IParticleGeo(p1); pt2=new IParticleGeo(p2); pt3 = new IParticleGeo(p3);
     }
     
     public IStraightener(IVecI p1, IVecI p2, IVecI p3, IObject parent){
 	super(parent);
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get()); pt3=new IParticle(p3.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get()); pt3=new IParticleGeo(p3.get());
     }
     
     public IStraightener(IParticleI p1, IParticleI p2, IParticleI p3){
@@ -63,19 +62,19 @@ public class IStraightener extends IDynamicsBase implements ITensionI{
 	pt1=p1; pt2=p2; pt3=p3;
     }
     
-    public IStraightener(IParticle p1, IParticle p2, IParticle p3){
+    public IStraightener(IParticleGeo p1, IParticleGeo p2, IParticleGeo p3){
 	super();
 	pt1=p1; pt2=p2; pt3=p3;
     }
     
     public IStraightener(IVec p1, IVec p2, IVec p3){
 	super();
-	pt1 = new IParticle(p1); pt2=new IParticle(p2); pt3=new IParticle(p3);
+	pt1 = new IParticleGeo(p1); pt2=new IParticleGeo(p2); pt3=new IParticleGeo(p3);
     }
     
     public IStraightener(IVecI p1, IVecI p2, IVecI p3){
 	super();
-	pt1 = new IParticle(p1.get()); pt2=new IParticle(p2.get()); pt3=new IParticle(p3.get());
+	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get()); pt3=new IParticleGeo(p3.get());
     }
     
     public double tension(){ return tension; }
@@ -84,7 +83,7 @@ public class IStraightener extends IDynamicsBase implements ITensionI{
     public boolean constant(){ return constantTension; }
     public IStraightener constant(boolean cnst){ constantTension = cnst; return this; }
 
-    /** getting end point. i==0 or i==1 */
+    /** getting end point. i==0 , i==1 or i==2 */
     public IParticleI pt(int i){
 	if(i==2) return pt3; if(i==1) return pt2; return pt1;
     }
@@ -107,9 +106,9 @@ public class IStraightener extends IDynamicsBase implements ITensionI{
     /** position of particle2 */
     public IVec pos2(){ return pt2().pos(); }
     
-    /** getting end point2. */
+    /** getting end point3. */
     public IParticleI pt3(){ return pt3; }
-    /** alias of pt2() */
+    /** alias of pt3() */
     public IParticleI particle3(){ return pt3(); }
     /** position of particle3() */
     public IVec pos3(){ return pt3().pos(); }

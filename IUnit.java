@@ -26,7 +26,6 @@ package igeo;
    Unit of geometries in a server
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 
 public class IUnit{

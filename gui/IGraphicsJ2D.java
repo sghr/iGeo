@@ -32,7 +32,6 @@ import igeo.gui.IGraphicMode;
 /**
    Class of Graphics to draw 3D geometry (OpenGL or P3D)
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IGraphicsJ2D implements IGraphics2D{
     

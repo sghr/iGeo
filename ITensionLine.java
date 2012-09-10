@@ -29,7 +29,6 @@ import java.awt.Color;
    Class of IDynamicObject to simulate tension force between two particles.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! added 20120303 */{
     
@@ -50,6 +49,16 @@ public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! a
 	initTensionLine(p1,p2,tension);
     }
     /*
+    public ITensionLine(IParticleGeo p1, IParticleGeo p2){
+	super(p1.pos(), p2.pos());
+	initTensionLine(p1,p2);
+    }
+    
+    public ITensionLine(IParticleGeo p1, IParticleGeo p2, double tension){
+	super(p1.pos(), p2.pos());
+	initTensionLine(p1,p2,tension);
+    }
+    
     public ITensionLine(IParticle p1, IParticle p2){
 	super(p1.pos(), p2.pos());
 	initTensionLine(p1,p2);
@@ -60,34 +69,24 @@ public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! a
 	initTensionLine(p1,p2,tension);
     }
     
-    public ITensionLine(IParticleAgent p1, IParticleAgent p2){
-	super(p1.pos(), p2.pos());
-	initTensionLine(p1,p2);
-    }
-    
-    public ITensionLine(IParticleAgent p1, IParticleAgent p2, double tension){
-	super(p1.pos(), p2.pos());
-	initTensionLine(p1,p2,tension);
-    }
-    
     public ITensionLine(IVec p1, IVec p2){
 	super(p1, p2);
-	initTensionLine(new IParticle(p1),new IParticle(p2));
+	initTensionLine(new IParticleGeo(p1),new IParticleGeo(p2));
     }
     
     public ITensionLine(IVec p1, IVec p2, double tension){
 	super(p1, p2);
-	initTensionLine(new IParticle(p1),new IParticle(p2),tension);
+	initTensionLine(new IParticleGeo(p1),new IParticleGeo(p2),tension);
     }
     */    
     public ITensionLine(IVecI p1, IVecI p2){
 	super(p1, p2);
-	initTensionLine(new IParticle(p1.get()),new IParticle(p2.get()));
+	initTensionLine(new IParticleGeo(p1.get()),new IParticleGeo(p2.get()));
     }
     
     public ITensionLine(IVecI p1, IVecI p2, double tension){
 	super(p1, p2);
-	initTensionLine(new IParticle(p1.get()),new IParticle(p2.get()),tension);
+	initTensionLine(new IParticleGeo(p1.get()),new IParticleGeo(p2.get()),tension);
     }
     
     public void initTensionLine(IParticleI p1, IParticleI p2){
@@ -138,6 +137,11 @@ public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! a
     public ITensionLine parent(){ return this; }
     public ITensionLine parent(IObject par){ return this; } // cannot change parent. ignored.
     /** add terget object to be updated by this dynamic object. */
+    
+    
+    /** IDynamicsBase doesn't implement local dynamics feature */
+    public ArrayList<IDynamics> localDynamics(){ return null; }
+    
     public ITensionLine target(IObject targetObj){
         if(targets==null) targets = new ArrayList<IObject>();
         targets.add(targetObj);

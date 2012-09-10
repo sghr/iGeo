@@ -26,11 +26,10 @@ package igeo;
    Entity class of integer to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IInteger extends IParameterObject implements IIntegerI, IEntityParameter{
     public int x;
-
+    
     public IInteger(){}
     public IInteger(int i){ x=i; }
     public IInteger(IInteger i){ x=i.x; }
@@ -50,6 +49,17 @@ public class IInteger extends IParameterObject implements IIntegerI, IEntityPara
     public IInteger get(){ return new IInteger(x); }
     public IInteger getX(){ return this; }
     public IInteger dup(){ return new IInteger(x); }
+    
+    /** alias of dup() */
+    public IInteger cp(){ return dup(); }
+    
+    /** duplicate and add */
+    public IInteger cp(int v){ return dup().add(v); }
+    /** duplicate and add */
+    public IInteger cp(IInteger v){ return dup().add(v); }
+    /** duplicate and add */
+    public IInteger cp(IIntegerI v){ return dup().add(v); }
+    
     
     public IInteger set(int v){ x=v; return this; }
     public IInteger set(IInteger v){ x=v.x; return this; }

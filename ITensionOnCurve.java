@@ -28,7 +28,6 @@ import java.util.ArrayList;
    Class of IDynamics to simulate tension force between two particles on curve based on distance in u parameter space.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class ITensionOnCurve extends IDynamicsBase implements ITensionI{
     //public static double defaultTension=1.0;

@@ -28,7 +28,6 @@ package igeo;
    @see ISort
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IComparator<T>{
     public int compare(T o1, T o2); // return >0, <0, ==0

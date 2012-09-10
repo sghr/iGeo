@@ -30,7 +30,6 @@ import igeo.io.IInputWrapper;
    Input wrapper class. Mostly for wrapping Processing's input stream method.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class PIInput extends IInputWrapper{
     public PApplet papplet;

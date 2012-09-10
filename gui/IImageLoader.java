@@ -32,7 +32,6 @@ import igeo.*;
    Class to provide function to load image from external file into Java AWT Image object.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IImageLoader implements ImageObserver{
     public static final IImageLoader observer=new IImageLoader();

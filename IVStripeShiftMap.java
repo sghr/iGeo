@@ -28,7 +28,6 @@ import java.util.ArrayList;
    A subclass of IMap defined by another map and parameter shift in v direction in a stripe way in u direction
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IVStripeShiftMap extends IMap{
     public ArrayList<Double> domains;

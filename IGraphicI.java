@@ -28,7 +28,6 @@ import igeo.gui.*;
    An interface defining drawing methods.
    
    @author Satoru Sugihara
-   @version 0.7.0.0
 */
 public interface IGraphicI{
     public void draw(IGraphics g);

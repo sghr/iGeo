@@ -26,9 +26,8 @@ package igeo;
    Interface of boolean operator.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public interface IBoolOp extends IParameter{
+public interface IBoolOp extends IParameter, IScalar{
     public boolean x();
     public IBool get();
 }

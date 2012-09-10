@@ -30,7 +30,6 @@ import java.util.ArrayList;
    Abstracted mouse button type.
       
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMouseButton{
     

@@ -28,7 +28,6 @@ import igeo.gui.*;
    A subclass of IMap defined by taking larger value of two maps.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IMaxMap extends IMap{
     public IMap map1, map2;

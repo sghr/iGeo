@@ -26,7 +26,6 @@ package igeo;
    Reference class of integer to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IIntegerR extends IParameterObject implements IIntegerI, IReferenceParameter{
     protected IIntegerOp op;
@@ -44,6 +43,15 @@ public class IIntegerR extends IParameterObject implements IIntegerI, IReference
     public IIntegerOp operator(){ return op; } // for viewer
     
     public IIntegerR dup(){ return new IIntegerR(op); }
+    
+    /** alias of dup() */
+    public IIntegerR cp(){ return dup(); }
+    
+    /** duplicate and add */
+    public IIntegerR cp(int v){ return dup().add(v); }
+    /** duplicate and add */
+    public IIntegerR cp(IIntegerI v){ return dup().add(v); }
+    
     
     public IIntegerR set(IIntegerI u){ op=u; return this; }
     public IIntegerR set(int u){ op=new IInteger(u); return this; }

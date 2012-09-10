@@ -29,7 +29,6 @@ import java.awt.event.*;
    AWT component with double buffering
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IDoubleBuffer{
     Component component;

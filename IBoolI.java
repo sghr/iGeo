@@ -26,7 +26,6 @@ package igeo;
    Interface of boolean to be used as IParameterObject.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public interface IBoolI extends IBoolOp{
     /**
@@ -48,6 +47,9 @@ public interface IBoolI extends IBoolOp{
        @return duplicated instance
     */
     public IBoolI dup();
+    
+    /** alias of dup() */
+    public IBoolI cp();
     
     /**
        convert reference tree to one constant value

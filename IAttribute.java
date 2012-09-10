@@ -29,7 +29,6 @@ import igeo.gui.*;
    A super class of misc attributes of IObject, mostly graphic related.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IAttribute{
     
@@ -73,6 +72,7 @@ public class IAttribute{
     }
     
     public IAttribute dup(){ return new IAttribute(this); }
+    public IAttribute cp(){ return dup(); }
     
     public Color clr(){ return color; }
     public IAttribute clr(Color c){ color = c; return this; }

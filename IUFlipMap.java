@@ -26,7 +26,6 @@ package igeo;
    A subclass of IMap defined by flipping another map in u direction.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IUFlipMap extends IMap{
     public IMap map;

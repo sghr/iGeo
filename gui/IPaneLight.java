@@ -39,7 +39,6 @@ import igeo.*;
    @see IPanel
    
    @author Satoru Sugihara
-   @version 0.7.1.0;
 */
 public class IPaneLight extends IComponent implements IPane{
     

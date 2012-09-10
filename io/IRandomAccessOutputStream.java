@@ -25,11 +25,12 @@ package igeo.io;
 import java.io.*;
 import java.util.ArrayList;
 
+import igeo.*;
+
 /**
    Byte Output Stream keeping byte framgents as fragments never integrating into one buffer
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IRandomAccessOutputStream extends OutputStream{
     public RandomAccessFile file;
@@ -42,7 +43,27 @@ public class IRandomAccessOutputStream extends OutputStream{
 	file = new RandomAccessFile(f, "rw");
     }
     
-    public void write(byte[] b)throws IOException{ file.write(b); }
+    public void write(byte[] b)throws IOException{ 
+	final int maxBuf = 5000000; //5MB //10000000; // 10MB // added 2012/09/02
+	try{
+	    if(b.length>maxBuf){
+		for(int i=0; i*maxBuf < b.length; i++){
+		    file.write(b, i*maxBuf, (b.length-i*maxBuf>maxBuf)?maxBuf:(b.length-i*maxBuf));
+		}
+	    }
+	    else{
+		file.write(b); 
+	    }
+	}
+	catch(OutOfMemoryError e){
+	    IOut.err("write buffer size = "+b.length); //
+	    e.printStackTrace();
+	    throw e;
+	}
+	catch(IOException e){
+	    throw e;
+	}
+    }
     
     public void write(byte[] b, int off, int len)throws IOException{ file.write(b,off,len); }
     

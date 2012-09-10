@@ -26,7 +26,6 @@ package igeo;
    A subclass of IMap defined by inverting value from 0 to 1 and 1 to 0.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
 public class IInvertMap extends IMap{
     public IMap map;
