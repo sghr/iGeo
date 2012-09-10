@@ -26,314 +26,233 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 /**
-   Class of an agent with IParticle.
+   Alias class of IParticle for backward compatibility. Use IParticle instead.
    
    @author Satoru Sugihara
-   @version 0.7.0.0;
 */
-public class IParticleAgent extends IPointAgent implements IParticleI{
+public class IParticleAgent extends IParticle{
     
-    public IParticle particle;
-    /** only to refer to particle.vel and particle.frc */
-    public IVec vel, frc; 
+    public IParticleAgent(){ super(); }
+    public IParticleAgent(double x, double y, double z){ super(x,y,z); }
+    public IParticleAgent(IVec p){ super(p); }
+    public IParticleAgent(IVecI p){ super(p); }
+    public IParticleAgent(IParticleGeo ptcl){ super(ptcl); }
+    public IParticleAgent(IParticle p){ super(p); }
+    public IParticleAgent(double x, double y, double z, double vx, double vy, double vz){ super(x,y,z,vx,vy,vz); }
+    public IParticleAgent(IVec p, IVec vel){ super(p,vel); }
+    public IParticleAgent(IVecI p, IVecI vel){ super(p,vel); }
+    public IParticleAgent(IParticleGeo ptcl, IVecI vel){ super(ptcl,vel); }
+    public IParticleAgent(IParticle p, IVecI vel){ super(p,vel); }
     
-    public IParticleAgent(){ super(); initParticleAgent(); }
-    public IParticleAgent(double x, double y, double z){ super(x,y,z); initParticleAgent(); }
-    public IParticleAgent(IVec p){ super(p); initParticleAgent(); }
-    public IParticleAgent(IVecI p){ super(p); initParticleAgent(); }
-    public IParticleAgent(IParticle ptcl){ super(ptcl.pos); initParticleAgent(ptcl); }
-    public IParticleAgent(IParticleAgent p){ super((IPointAgent)p); initParticleAgent(p); }    
-    
-    public IParticleAgent(double x, double y, double z, double vx, double vy, double vz){ super(x,y,z); initParticleAgent(new IVec(vx,vy,vz)); }
-    public IParticleAgent(IVec p, IVec vel){ super(p); initParticleAgent(vel); }
-    public IParticleAgent(IVecI p, IVecI vel){ super(p); initParticleAgent(vel); }
-    public IParticleAgent(IParticle ptcl, IVecI vel){ super(ptcl.pos); initParticleAgent(ptcl,vel); }
-    public IParticleAgent(IParticleAgent p, IVecI vel){ super((IPointAgent)p); initParticleAgent(vel); }    
-    
-    public void initParticleAgent(){
-	particle = new IParticle(pos, (IObject)this);
-	vel = particle.vel;
-	frc = particle.frc;
-	addDynamics(particle);
-    }
-    public void initParticleAgent(IParticle ptcl){
-	particle = ptcl;
-	pos = particle.pos;
-	vel = particle.vel;
-	frc = particle.frc;
-	addDynamics(particle);
-    }
-    public void initParticleAgent(IParticleAgent ptcl){
-	particle = new IParticle(this.pos, ptcl.vel().dup(), (IObject)this);
-	pos = particle.pos;
-	vel = particle.vel;
-	frc = particle.frc;
-	addDynamics(particle);
-    }
-    public void initParticleAgent(IVecI vel){
-	particle = new IParticle(pos, vel, this);
-	this.vel = particle.vel;
-	frc = particle.frc;
-	addDynamics(particle);
-    }
-    public void initParticleAgent(IParticle ptcl, IVecI vel){
-	particle = ptcl;
-	particle.vel(vel);
-	pos = particle.pos;
-	this.vel = particle.vel;
-	frc = particle.frc;
-	addDynamics(particle);
-    }
     
     /**************************************
      * IParticleI API
      **************************************/
     
-    synchronized public IParticleAgent fix(){ particle.fix(); return this; }
-    synchronized public IParticleAgent unfix(){ particle.unfix(); return this; }
+    synchronized public IParticleAgent fix(){ super.fix(); return this; }
+    synchronized public IParticleAgent unfix(){ super.unfix(); return this; }
+    synchronized public IParticleAgent mass(double mass){ super.mass(mass); return this; }
+    synchronized public IParticleAgent position(IVecI v){ super.position(v); return this; }
+    synchronized public IParticleAgent pos(IVecI v){ super.pos(v); return this; }
+    synchronized public IParticleAgent velocity(IVecI v){ super.velocity(v); return this; }
+    synchronized public IParticleAgent vel(IVecI v){ super.vel(v); return this; }
+    synchronized public IParticleAgent force(IVecI v){ super.force(v); return this; }
+    synchronized public IParticleAgent frc(IVecI v){ super.frc(v); return this; }
+    synchronized public IParticleAgent friction(double friction){ super.friction(friction); return this; }
+    synchronized public IParticleAgent fric(double friction){ super.fric(friction); return this; }
+    synchronized public IParticleAgent decay(double d){ super.decay(d); return this; }
     
-    synchronized public double mass(){ return particle.mass(); }
-    synchronized public IParticleAgent mass(double mass){ particle.mass(mass); return this; }
+    synchronized public IParticleAgent push(IVecI f){ super.push(f); return this; }
+    synchronized public IParticleAgent push(double fx, double fy, double fz){ super.push(fx,fy,fz); return this; }
+    synchronized public IParticleAgent pull(IVecI f){ super.pull(f); return this; }
+    synchronized public IParticleAgent pull(double fx, double fy, double fz){ super.pull(fx,fy,fz); return this; }
+    synchronized public IParticleAgent addForce(IVecI f){ super.addForce(f); return this; }
+    synchronized public IParticleAgent addForce(double fx, double fy, double fz){ super.addForce(fx,fy,fz); return this; }
     
-    synchronized public IVec position(){ return particle.position(); }
-    synchronized public IParticleAgent position(IVecI v){ particle.position(v); return this; }
-    
-    synchronized public IVec pos(){ return particle.pos(); }
-    synchronized public IParticleAgent pos(IVecI v){ particle.pos(v); return this; }
-    
-    synchronized public IVec velocity(){ return particle.velocity(); }
-    synchronized public IParticleAgent velocity(IVecI v){ particle.velocity(v); return this; }
-    
-    synchronized public IVec vel(){ return particle.vel(); }
-    synchronized public IParticleAgent vel(IVecI v){ particle.vel(v); return this; }
-    
-    synchronized public IVec acceleration(){ return particle.acceleration(); }
-    //synchronized public IParticleAgent acceleration(IVec v){ particle.acceleration(v); return this; }
-    synchronized public IVec acc(){ return particle.acc(); }
-    //synchronized public IParticleAgent acc(IVec v){ particle.acc(v); return this; }
-    
-    synchronized public IVec force(){ return particle.force(); }
-    synchronized public IParticleAgent force(IVecI v){ particle.force(v); return this; }
-    
-    synchronized public IVec frc(){ return particle.frc(); }
-    synchronized public IParticleAgent frc(IVecI v){ particle.frc(v); return this; }
-    
-    synchronized public double friction(){ return particle.friction(); }
-    synchronized public IParticleAgent friction(double friction){ particle.friction(friction); return this; }
-    
-    synchronized public double fric(){ return particle.fric(); }
-    synchronized public IParticleAgent fric(double friction){ particle.fric(friction); return this; }
-    /* alias of friction */
-    synchronized public double decay(){ return fric(); }
-    /* alias of friction */
-    synchronized public IParticleAgent decay(double d){ return fric(d); }
-    
-    synchronized public IParticleAgent push(IVecI f){ particle.push(f); return this; }
-    synchronized public IParticleAgent push(double fx, double fy, double fz){ particle.push(fx,fy,fz); return this; }
-    synchronized public IParticleAgent pull(IVecI f){ particle.pull(f); return this; }
-    synchronized public IParticleAgent pull(double fx, double fy, double fz){ particle.pull(fx,fy,fz); return this; }
-    synchronized public IParticleAgent addForce(IVecI f){ particle.addForce(f); return this; }
-    synchronized public IParticleAgent addForce(double fx, double fy, double fz){ particle.addForce(fx,fy,fz); return this; }
-    
-    
-    
-    synchronized public IParticleAgent reset(){ particle.reset(); return this; }
-    synchronized public IParticleAgent resetForce(){ particle.resetForce(); return this; }
+    synchronized public IParticleAgent reset(){ super.reset(); return this; }
+    synchronized public IParticleAgent resetForce(){ super.resetForce(); return this; }
     
     
     /**************************************
      * methods of IVecI
      *************************************/
     
-    public IParticleAgent x(double vx){ pos.x(vx); return this; }
-    public IParticleAgent y(double vy){ pos.y(vy); return this; }
-    public IParticleAgent z(double vz){ pos.z(vz); return this; }
+    public IParticleAgent x(double vx){ super.x(vx); return this; }
+    public IParticleAgent y(double vy){ super.y(vy); return this; }
+    public IParticleAgent z(double vz){ super.z(vz); return this; }
     
-    public IParticleAgent x(IDoubleI vx){ pos.x(vx); return this; }
-    public IParticleAgent y(IDoubleI vy){ pos.y(vy); return this; }
-    public IParticleAgent z(IDoubleI vz){ pos.z(vz); return this; }
-    
-
+    public IParticleAgent x(IDoubleI vx){ super.x(vx); return this; }
+    public IParticleAgent y(IDoubleI vy){ super.y(vy); return this; }
+    public IParticleAgent z(IDoubleI vz){ super.z(vz); return this; }
+        
     public IParticleAgent dup(){ return new IParticleAgent(this); }
     
-    public IParticleAgent set(IVecI v){ pos.set(v); return this; }
-    public IParticleAgent set(double x, double y, double z){ pos.set(x,y,z); return this;}
-    public IParticleAgent set(IDoubleI x, IDoubleI y, IDoubleI z){ pos.set(x,y,z); return this; }
+    public IParticleAgent set(IVecI v){ super.set(v); return this; }
+    public IParticleAgent set(double x, double y, double z){ super.set(x,y,z); return this;}
+    public IParticleAgent set(IDoubleI x, IDoubleI y, IDoubleI z){ super.set(x,y,z); return this; }
+    public IParticleAgent add(double x, double y, double z){ super.add(x,y,z); return this; }
+    public IParticleAgent add(IDoubleI x, IDoubleI y, IDoubleI z){ super.add(x,y,z); return this; }    
+    public IParticleAgent add(IVecI v){ super.add(v); return this; }
+    public IParticleAgent sub(double x, double y, double z){ super.sub(x,y,z); return this; }
+    public IParticleAgent sub(IDoubleI x, IDoubleI y, IDoubleI z){ super.sub(x,y,z); return this; }
+    public IParticleAgent sub(IVecI v){ super.sub(v); return this; }
+    public IParticleAgent mul(IDoubleI v){ super.mul(v); return this; }
+    public IParticleAgent mul(double v){ super.mul(v); return this; }
+    public IParticleAgent div(IDoubleI v){ super.div(v); return this; }
+    public IParticleAgent div(double v){ super.div(v); return this; }
+    public IParticleAgent neg(){ super.neg(); return this; }
+    public IParticleAgent rev(){ super.rev(); return this; }
+    public IParticleAgent flip(){ super.flip(); return this; }
+    public IParticleAgent zero(){ super.zero(); return this; }
     
-    public IParticleAgent add(double x, double y, double z){ pos.add(x,y,z); return this; }
-    public IParticleAgent add(IDoubleI x, IDoubleI y, IDoubleI z){ pos.add(x,y,z); return this; }    
-    public IParticleAgent add(IVecI v){ pos.add(v); return this; }
+    public IParticleAgent add(IVecI v, double f){ super.add(v,f); return this; }
+    public IParticleAgent add(IVecI v, IDoubleI f){ super.add(v,f); return this; }
+    public IParticleAgent add(double f, IVecI v){ super.add(f,v); return this; }
+    public IParticleAgent add(IDoubleI f, IVecI v){ super.add(f,v); return this; }
     
-    public IParticleAgent sub(double x, double y, double z){ pos.sub(x,y,z); return this; }
-    public IParticleAgent sub(IDoubleI x, IDoubleI y, IDoubleI z){ pos.sub(x,y,z); return this; }
-    public IParticleAgent sub(IVecI v){ pos.sub(v); return this; }
-    public IParticleAgent mul(IDoubleI v){ pos.mul(v); return this; }
-    public IParticleAgent mul(double v){ pos.mul(v); return this; }
-    public IParticleAgent div(IDoubleI v){ pos.div(v); return this; }
-    public IParticleAgent div(double v){ pos.div(v); return this; }
-    public IParticleAgent neg(){ pos.neg(); return this; }
-    public IParticleAgent rev(){ return neg(); }
-    public IParticleAgent flip(){ return neg(); }
-
-    public IParticleAgent zero(){ pos.zero(); return this; }
-    
-    public IParticleAgent add(IVecI v, double f){ pos.add(v,f); return this; }
-    public IParticleAgent add(IVecI v, IDoubleI f){ pos.add(v,f); return this; }
-    
-    public IParticleAgent add(double f, IVecI v){ return add(v,f); }
-    public IParticleAgent add(IDoubleI f, IVecI v){ return add(v,f); }
-    
-    public IParticleAgent len(IDoubleI l){ pos.len(l); return this; }
-    public IParticleAgent len(double l){ pos.len(l); return this; }
-    
-    public IParticleAgent unit(){ pos.unit(); return this; }
-    
-    public IParticleAgent rot(IDoubleI angle){ pos.rot(angle); return this; }
-    public IParticleAgent rot(double angle){ pos.rot(angle); return this; }
-    
-    public IParticleAgent rot(IVecI axis, IDoubleI angle){ pos.rot(axis,angle); return this; }
-    public IParticleAgent rot(IVecI axis, double angle){ pos.rot(axis,angle); return this; }
+    public IParticleAgent len(IDoubleI l){ super.len(l); return this; }
+    public IParticleAgent len(double l){ super.len(l); return this; }
+    public IParticleAgent unit(){ super.unit(); return this; }
+    public IParticleAgent rot(IDoubleI angle){ super.rot(angle); return this; }
+    public IParticleAgent rot(double angle){ super.rot(angle); return this; }
+    public IParticleAgent rot(IVecI axis, IDoubleI angle){ super.rot(axis,angle); return this; }
+    public IParticleAgent rot(IVecI axis, double angle){ super.rot(axis,angle); return this; }
     public IParticleAgent rot(double axisX, double axisY, double axisZ, double angle){
-	pos.rot(axisX,axisY,axisZ,angle); return this;
+	super.rot(axisX,axisY,axisZ,angle); return this;
     }
-    
     public IParticleAgent rot(IVecI center, IVecI axis, double angle){
-	pos.rot(center, axis,angle); return this;
+	super.rot(center, axis,angle); return this;
     }
     public IParticleAgent rot(IVecI center, IVecI axis, IDoubleI angle){
-	pos.rot(center, axis,angle); return this;
+	super.rot(center, axis,angle); return this;
     }
     public IParticleAgent rot(double centerX, double centerY, double centerZ,
 			      double axisX, double axisY, double axisZ, double angle){
-	pos.rot(centerX,centerY,centerZ,axisX,axisY,axisZ,angle); return this;
+	super.rot(centerX,centerY,centerZ,axisX,axisY,axisZ,angle); return this;
     }
-    
-    public IParticleAgent rot(IVecI axis, IVecI destDir){ pos.rot(axis,destDir); return this; }
+    public IParticleAgent rot(IVecI axis, IVecI destDir){ super.rot(axis,destDir); return this; }
     public IParticleAgent rot(IVecI center, IVecI axis, IVecI destPt){
-	pos.rot(center,axis,destPt); return this;
+	super.rot(center,axis,destPt); return this;
     }
-    
-    public IParticleAgent rot2(IDoubleI angle){ return rot(angle); }
-    public IParticleAgent rot2(double angle){ return rot(angle); }
-    public IParticleAgent rot2(IVecI center, double angle){ pos.rot2(center,angle); return this; }
-    public IParticleAgent rot2(IVecI center, IDoubleI angle){ pos.rot2(center,angle); return this; }
+    public IParticleAgent rot2(IDoubleI angle){ super.rot2(angle); return this; }
+    public IParticleAgent rot2(double angle){ super.rot2(angle); return this; }
+    public IParticleAgent rot2(IVecI center, double angle){ super.rot2(center,angle); return this; }
+    public IParticleAgent rot2(IVecI center, IDoubleI angle){ super.rot2(center,angle); return this; }
     public IParticleAgent rot2(double centerX, double centerY, double angle){
-	pos.rot2(centerX,centerY,angle); return this;
+	super.rot2(centerX,centerY,angle); return this;
     }
+    public IParticleAgent rot2(IVecI destDir){ super.rot2(destDir); return this; }
+    public IParticleAgent rot2(IVecI center, IVecI destPt){ super.rot2(center,destPt); return this; }
     
-    public IParticleAgent rot2(IVecI destDir){ pos.rot2(destDir); return this; }
-    public IParticleAgent rot2(IVecI center, IVecI destPt){ pos.rot2(center,destPt); return this; }
+    public IParticleAgent scale(IDoubleI f){ super.scale(f); return this; }
+    public IParticleAgent scale(double f){ super.scale(f); return this; }
     
-    public IParticleAgent scale(IDoubleI f){ pos.scale(f); return this; }
-    public IParticleAgent scale(double f){ pos.scale(f); return this; }
-    
-    public IParticleAgent scale(IVecI center, IDoubleI f){ pos.scale(center,f); return this; }
-    public IParticleAgent scale(IVecI center, double f){ pos.scale(center,f); return this; }
+    public IParticleAgent scale(IVecI center, IDoubleI f){ super.scale(center,f); return this; }
+    public IParticleAgent scale(IVecI center, double f){ super.scale(center,f); return this; }
     public IParticleAgent scale(double centerX, double centerY, double centerZ, double f){
-	pos.scale(centerX,centerY,centerZ,f); return this;
+	super.scale(centerX,centerY,centerZ,f); return this;
     }
     
     /** scale only in 1 direction */
-    public IParticleAgent scale1d(IVecI axis, double f){ pos.scale1d(axis,f); return this; }
-    public IParticleAgent scale1d(IVecI axis, IDoubleI f){ pos.scale1d(axis,f); return this; }
+    public IParticleAgent scale1d(IVecI axis, double f){ super.scale1d(axis,f); return this; }
+    public IParticleAgent scale1d(IVecI axis, IDoubleI f){ super.scale1d(axis,f); return this; }
     public IParticleAgent scale1d(double axisX, double axisY, double axisZ, double f){
-	pos.scale1d(axisX,axisY,axisZ,f); return this;
+	super.scale1d(axisX,axisY,axisZ,f); return this;
     }
     public IParticleAgent scale1d(IVecI center, IVecI axis, double f){
-	pos.scale1d(center,axis,f); return this;
+	super.scale1d(center,axis,f); return this;
     }
     public IParticleAgent scale1d(IVecI center, IVecI axis, IDoubleI f){
-	pos.scale1d(center,axis,f); return this;
+	super.scale1d(center,axis,f); return this;
     }
     public IParticleAgent scale1d(double centerX, double centerY, double centerZ,
 				  double axisX, double axisY, double axisZ, double f){
-	pos.scale1d(centerX,centerY,centerZ,axisX,axisY,axisZ,f); return this;
+	super.scale1d(centerX,centerY,centerZ,axisX,axisY,axisZ,f); return this;
     }
     
-    public IParticleAgent ref(IVecI planeDir){ pos.ref(planeDir); return this; }
+    public IParticleAgent ref(IVecI planeDir){ super.ref(planeDir); return this; }
     public IParticleAgent ref(double planeX, double planeY, double planeZ){
-	pos.ref(planeX,planeY,planeZ); return this;
+	super.ref(planeX,planeY,planeZ); return this;
     }
     public IParticleAgent ref(IVecI center, IVecI planeDir){
-	pos.ref(center,planeDir); return this;
+	super.ref(center,planeDir); return this;
     }
     public IParticleAgent ref(double centerX, double centerY, double centerZ,
 			      double planeX, double planeY, double planeZ){
-	pos.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
+	super.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
     }
-    public IParticleAgent mirror(IVecI planeDir){ pos.ref(planeDir); return this; }
+    public IParticleAgent mirror(IVecI planeDir){ super.ref(planeDir); return this; }
     public IParticleAgent mirror(double planeX, double planeY, double planeZ){
-	pos.ref(planeX, planeY, planeZ); return this;
+	super.ref(planeX, planeY, planeZ); return this;
     }
     public IParticleAgent mirror(IVecI center, IVecI planeDir){
-	pos.ref(center,planeDir); return this;
+	super.ref(center,planeDir); return this;
     }
     public IParticleAgent mirror(double centerX, double centerY, double centerZ,
 				 double planeX, double planeY, double planeZ){
-	pos.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
+	super.ref(centerX,centerY,centerZ,planeX,planeY,planeZ); return this;
     }
     
     public IParticleAgent shear(double sxy, double syx, double syz,
 				double szy, double szx, double sxz){
-	pos.shear(sxy,syx,syz,szy,szx,sxz); return this;
+	super.shear(sxy,syx,syz,szy,szx,sxz); return this;
     }
     public IParticleAgent shear(IDoubleI sxy, IDoubleI syx, IDoubleI syz,
 				IDoubleI szy, IDoubleI szx, IDoubleI sxz){
-	pos.shear(sxy,syx,syz,szy,szx,sxz); return this;
+	super.shear(sxy,syx,syz,szy,szx,sxz); return this;
     }
     public IParticleAgent shear(IVecI center, double sxy, double syx, double syz,
 				double szy, double szx, double sxz){
-	pos.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+	super.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
     }
     public IParticleAgent shear(IVecI center, IDoubleI sxy, IDoubleI syx, IDoubleI syz,
 				IDoubleI szy, IDoubleI szx, IDoubleI sxz){
-	pos.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
+	super.shear(center,sxy,syx,syz,szy,szx,sxz); return this;
     }
     
-    public IParticleAgent shearXY(double sxy, double syx){ pos.shearXY(sxy,syx); return this; }
-    public IParticleAgent shearXY(IDoubleI sxy, IDoubleI syx){ pos.shearXY(sxy,syx); return this; }
+    public IParticleAgent shearXY(double sxy, double syx){ super.shearXY(sxy,syx); return this; }
+    public IParticleAgent shearXY(IDoubleI sxy, IDoubleI syx){ super.shearXY(sxy,syx); return this; }
     public IParticleAgent shearXY(IVecI center, double sxy, double syx){
-	pos.shearXY(center,sxy,syx); return this;
+	super.shearXY(center,sxy,syx); return this;
     }
     public IParticleAgent shearXY(IVecI center, IDoubleI sxy, IDoubleI syx){
-	pos.shearXY(center,sxy,syx); return this;
+	super.shearXY(center,sxy,syx); return this;
     }
     
-    public IParticleAgent shearYZ(double syz, double szy){ pos.shearYZ(syz,szy); return this; }
-    public IParticleAgent shearYZ(IDoubleI syz, IDoubleI szy){ pos.shearYZ(syz,szy); return this; }
+    public IParticleAgent shearYZ(double syz, double szy){ super.shearYZ(syz,szy); return this; }
+    public IParticleAgent shearYZ(IDoubleI syz, IDoubleI szy){ super.shearYZ(syz,szy); return this; }
     public IParticleAgent shearYZ(IVecI center, double syz, double szy){
-	pos.shearYZ(center,syz,szy); return this;
+	super.shearYZ(center,syz,szy); return this;
     }
     public IParticleAgent shearYZ(IVecI center, IDoubleI syz, IDoubleI szy){
-	pos.shearYZ(center,syz,szy); return this;
+	super.shearYZ(center,syz,szy); return this;
     }
     
-    public IParticleAgent shearZX(double szx, double sxz){ pos.shearZX(szx,sxz); return this; }
-    public IParticleAgent shearZX(IDoubleI szx, IDoubleI sxz){ pos.shearZX(szx,sxz); return this; }
+    public IParticleAgent shearZX(double szx, double sxz){ super.shearZX(szx,sxz); return this; }
+    public IParticleAgent shearZX(IDoubleI szx, IDoubleI sxz){ super.shearZX(szx,sxz); return this; }
     public IParticleAgent shearZX(IVecI center, double szx, double sxz){
-	pos.shearZX(center,szx,sxz); return this;
+	super.shearZX(center,szx,sxz); return this;
     }
     public IParticleAgent shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
-	pos.shearZX(center,szx,sxz); return this;
+	super.shearZX(center,szx,sxz); return this;
     }
     
-    public IParticleAgent translate(double x, double y, double z){ pos.translate(x,y,z); return this; }
-    public IParticleAgent translate(IDoubleI x, IDoubleI y, IDoubleI z){ pos.translate(x,y,z); return this; }
-    public IParticleAgent translate(IVecI v){ pos.translate(v); return this; }
+    public IParticleAgent translate(double x, double y, double z){ super.translate(x,y,z); return this; }
+    public IParticleAgent translate(IDoubleI x, IDoubleI y, IDoubleI z){ super.translate(x,y,z); return this; }
+    public IParticleAgent translate(IVecI v){ super.translate(v); return this; }
     
-    public IParticleAgent transform(IMatrix3I mat){ pos.transform(mat); return this; }
-    public IParticleAgent transform(IMatrix4I mat){ pos.transform(mat); return this; }
+    public IParticleAgent transform(IMatrix3I mat){ super.transform(mat); return this; }
+    public IParticleAgent transform(IMatrix4I mat){ super.transform(mat); return this; }
     public IParticleAgent transform(IVecI xvec, IVecI yvec, IVecI zvec){
-	pos.transform(xvec,yvec,zvec); return this;
+	super.transform(xvec,yvec,zvec); return this;
     }
     public IParticleAgent transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
-	pos.transform(xvec,yvec,zvec,translate); return this;
+	super.transform(xvec,yvec,zvec,translate); return this;
     }
     
-    public IParticleAgent mv(double x, double y, double z){ return add(x,y,z); }
-    public IParticleAgent mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
-    public IParticleAgent mv(IVecI v){ return add(v); }
-    
+    public IParticleAgent mv(double x, double y, double z){ super.mv(x,y,z); return this; }
+    public IParticleAgent mv(IDoubleI x, IDoubleI y, IDoubleI z){ super.mv(x,y,z); return this; }
+    public IParticleAgent mv(IVecI v){ super.mv(v); return this; }
     public IParticleAgent cp(){ return dup(); }
     public IParticleAgent cp(double x, double y, double z){ return dup().add(x,y,z); }
     public IParticleAgent cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
@@ -344,8 +263,8 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     /**************************************
      * methods of IPoint
      *************************************/
-    public IParticleAgent setSize(double sz){ return size(sz); }
-    public IParticleAgent size(double sz){ point.size(sz); return this; }
+    public IParticleAgent setSize(double sz){ super.setSize(sz); return this; }
+    public IParticleAgent size(double sz){ super.size(sz); return this; }
     
     /**************************************
      * methods of IObject
@@ -399,5 +318,14 @@ public class IParticleAgent extends IPointAgent implements IParticleI{
     
     public IParticleAgent weight(double w){ super.weight(w); return this; }
     public IParticleAgent weight(float w){ super.weight(w); return this; }
+
+    
+    // partial methods of IDynamics
+    /** add terget object to be updated by this dynamic object. */
+    public IParticleAgent target(IObject targetObj){ super.target(targetObj); return this; }
+    /** remove target object. */
+    public IParticleAgent  removeTarget(int i){ super.removeTarget(i); return this; }
+    /** remove target object. */
+    public IParticleAgent  removeTarget(IObject obj){ super.removeTarget(obj); return this; }
     
 }
