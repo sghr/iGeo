@@ -28,6 +28,7 @@ import processing.opengl.*;
 import javax.media.opengl.*;
 
 import java.awt.event.*;
+import java.awt.geom.*;
 import java.awt.*;
 
 import com.sun.opengl.util.j2d.Overlay;
@@ -41,7 +42,7 @@ import igeo.gui.*;
    
    @author Satoru Sugihara
 */
-public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener*/{
+public class PIGraphicsGL extends PGraphicsOpenGL /*implements*/ /*MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener,*/ /*ComponentListener*/{
     
     public IPanel panel;
     public IGraphicsGL igg;
@@ -105,6 +106,8 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
 	else parent.registerDraw(this);
 	parent.registerPost(this);
 	
+	if(PIConfig.resizable){ parent.frame.setResizable(true); }
+	
 	super.hints[DISABLE_OPENGL_2X_SMOOTH]=true;  //
 	super.hints[ENABLE_OPENGL_4X_SMOOTH]=true;  //
     }
@@ -147,14 +150,17 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
        Drawing all the iGeo objects through IPanel.
        Overlay is also used to draw 2D graphics on top of OpenGL 3D graphics.
     */
-    public void drawIG(){
+    public synchronized void drawIG(){
 	
-	int[] viewport = new int[4];
-	gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+	int[] viewport=null;
+	if(PIConfig.restoreGLViewport){
+	    viewport = new int[4];
+	    gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+	}
 	
 	gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPushMatrix();
-        
+	
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPushMatrix();
 	
@@ -167,10 +173,9 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
 	setGLProperties();
 	
 	if(igg.getGraphics()==null){
-	    overlay = new Overlay(drawable); //
-	    igg.setGraphics(overlay.createGraphics());
-	    igg.getGraphics().setBackground(overlayBG);
+	    setOverlay();
 	}
+	
 	//igg.setGraphics(overlay.createGraphics());
 	
 	igg.getGraphics().clearRect(0,0,parent.getWidth(),parent.getHeight()); //
@@ -191,15 +196,30 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
 	gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPopMatrix();
 	
+	
 	// bring the original viewport back
-	gl.glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+	if(PIConfig.restoreGLViewport && viewport!=null){
+	    gl.glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+	}
 	
-	
-	overlay.markDirty(0,0,parent.getWidth(),parent.getHeight());
-	overlay.drawAll();
+	if(overlay!=null){
+	    overlay.markDirty(0,0,parent.getWidth(),parent.getHeight());
+	    overlay.drawAll();
+	}
 	
 	//g.dispose();
 	//igg.getGraphics().dispose();
+    }
+    
+    public void setOverlay(){
+	overlay = new Overlay(drawable); //
+	igg.setGraphics(overlay.createGraphics());
+	igg.getGraphics().setBackground(overlayBG);
+    }
+    
+    public void setSize(int w, int h){
+	super.setSize(w,h);
+	setOverlay(); // update overlay
     }
     
     
@@ -241,11 +261,16 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements MouseListener, Mo
     }
     public void focusGained(FocusEvent e){
     }
+    */
+    /*
     public void componentHidden(ComponentEvent e){
     }
     public void componentMoved(ComponentEvent e){
     }
-    public void componentResized(ComponentEvent e){
+    public synchronized void componentResized(ComponentEvent e){
+	int w = e.getComponent().getBounds().width;
+	int h = e.getComponent().getBounds().height;
+	setSize(w,h);
     }
     public void componentShown(ComponentEvent e){
     }

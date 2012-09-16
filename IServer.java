@@ -252,6 +252,7 @@ public class IServer implements IServerI{
     
     public void pause(){ dynamicServer.pause(); }
     public void resume(){ dynamicServer.resume(); }
+    public boolean isRunning(){ return dynamicServer.isRunning(); }
     
     public void start(){ dynamicServer.start(); }
     public void stop(){ dynamicServer.stop(); }

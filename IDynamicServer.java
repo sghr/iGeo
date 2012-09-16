@@ -143,6 +143,8 @@ public class IDynamicServer implements Runnable{
     
     public void pause(){ runningDynamics=false; }
     public void resume(){ runningDynamics=true; }
+    public boolean isRunning(){ return runningDynamics; }
+    
     
     public void start(){
 	if(!startedOnce && !runningDynamics && thread==null){

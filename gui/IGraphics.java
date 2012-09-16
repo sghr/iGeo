@@ -63,8 +63,9 @@ public interface IGraphics{
     
     public IView view();
     
-    public abstract void draw(ArrayList<IGraphicI> objects, IView view);
-    
+    public void draw(ArrayList<IGraphicI> objects, IView view);
+
+    //public void setSize(int w, int h);
     
     // should be here? or better to use IGraphicMode?
     public abstract IGraphicMode.GraphicType type();

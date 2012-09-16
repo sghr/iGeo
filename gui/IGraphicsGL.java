@@ -178,10 +178,16 @@ public class IGraphicsGL implements IGraphics3D{
 	
 	drawView(view);
 	
-	if(objects!=null)
-	    //for(int i=0; i<objects.size(); i++)
-	    for(int i=objects.size()-1; i>=0; i--)
-		if(objects.get(i).isVisible()) objects.get(i).draw(this);
+	if(objects!=null){
+	    if(IConfig.drawOrderForward){
+		for(int i=0; i<objects.size(); i++)
+		    if(objects.get(i).isVisible()) objects.get(i).draw(this);
+	    }
+	    else{
+		for(int i=objects.size()-1; i>=0; i--)
+		    if(objects.get(i).isVisible()) objects.get(i).draw(this);
+	    }
+	}
 	
 	if(view.mode().isLight()){
 	    gl.glDisable(GL.GL_LIGHTING);

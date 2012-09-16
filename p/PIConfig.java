@@ -48,4 +48,15 @@ public class PIConfig{
     */
     public static boolean resetGLDepthAfter=true;
     
+    /**
+       A switch to enable resizing the frame (window). Default true.
+    */
+    public static boolean resizable = true;
+    
+    /**
+       restore Processing's original viewport in case some GL drawing is done in original Processing before iGeo.
+       Warning: if this option is true, runtime resizing of window will crash.
+    */
+    public static boolean restoreGLViewport = false; 
+    
 }

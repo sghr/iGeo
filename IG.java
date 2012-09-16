@@ -276,6 +276,8 @@ public class IG implements IServerI{
     public static void pause(){ IG ig=cur(); if(ig!=null) ig.pauseDynamics(); }
     /** resume dynamics update. */
     public static void resume(){ IG ig=cur(); if(ig!=null) ig.resumeDynamics(); }
+    /** check if dynamics is running */
+    public static boolean isRunning(){ IG ig=cur(); if(ig!=null){ return ig.isDynamicsRunning(); } return false; }
     
     /** start dynamics update. if IConfig.autoStart is true, this should not be used. */
     public static void start(){ IG ig=cur(); if(ig!=null) ig.startDynamics(); }
@@ -1205,11 +1207,12 @@ public class IG implements IServerI{
     
     public void pauseDynamics(){ server.pause(); }
     public void resumeDynamics(){ server.resume(); }
+    /** check if dynamics is running */
+    public boolean isDynamicsRunning(){ return server.isRunning(); }
+    
     
     public void startDynamics(){ server.start(); }
     public void stopDynamics(){ server.stop(); }
-    
-    //public boolean isDynamicsRunning(){ server.
     
     
     //public void draw(IGraphics g){ server.draw(g); }

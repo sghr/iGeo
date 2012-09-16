@@ -223,6 +223,11 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	int key = e.getKeyCode();
 	boolean shift = e.isShiftDown();
 	boolean control = e.isControlDown();
+
+	// for mac
+	if(e.isMetaDown()){ control = true; }
+	
+	
 	
 	if(key==KeyEvent.VK_F && /*!shift &&*/!control){
 	    currentMousePane.focus();
@@ -273,7 +278,14 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    saveDialog();
 	}
 	else if(key==KeyEvent.VK_ENTER && !control&& !shift){
-	    ig.pauseDynamics();
+
+	    // toggle running
+	    if(ig.isDynamicsRunning()){
+		ig.pauseDynamics();
+	    }
+	    else{
+		ig.resumeDynamics();
+	    }
 	    //if(ig.isDynamicsRunning()){ ig.pauseDynamics(); }
 	    //else{ ig.resumeDynamics(); }
 	}

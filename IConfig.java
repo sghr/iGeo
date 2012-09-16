@@ -157,6 +157,10 @@ public /*interface*/ class IConfig{
     
     /** turn on smooth option in P3D. This makes it slow in perspective when many vertices are out of display */
     public static boolean smoothGraphicP3D=true; //false; //true;
+
+    
+    /** set order of drawing in forward (from old to new) or backwards. default is false(backwards) */
+    public static boolean drawOrderForward=false;
     
     /*****************************
      * polygon mesh properties

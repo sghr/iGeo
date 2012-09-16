@@ -177,7 +177,8 @@ public class PIGraphics3D extends PGraphics3D
 	    else parent.registerDraw(this);
 	    parent.registerPost(this);
 	    
-	    
+	    if(PIConfig.resizable){ parent.frame.setResizable(true); }
+	    	    
 	    enableDepthSort=IConfig.depthSort;
 	    if(enableDepthSort){ super.hint(ENABLE_DEPTH_SORT); }
 	    else{ super.hint(DISABLE_DEPTH_SORT); }
@@ -338,105 +339,7 @@ public class PIGraphics3D extends PGraphics3D
        Drawing all the iGeo objects through IPanel.
        Overlay is also used to draw 2D graphics on top of OpenGL 3D graphics.
     */
-    public void drawIG(){
-	
-	if(panel!=null) panel.draw(this);
-	
-	/*
-	if(subGraphics==null){
-	    super.beginDraw();
-	    super.background((float)IRand.get(255),(float)IRand.get(255),(float)IRand.get(255)); //
-	    //backgroundColor = 0xff00ffff;
-	    //super.backgroundImpl();
-	    super.fill(255,0,0);
-	    //super.rect(0,0,200,200);
-	    
-	    // test
-	    beginShape(QUADS);
-	    vertex(100,10,10);
-	    vertex(150,10,-10);
-	    vertex(150,40,10);
-	    vertex(110,50,-10);
-	    endShape();
-	    super.fill(128);
-	    box(100,100,100);
-	    IG.p("w = "+width+", h = "+height);
-	    //for(int i=0; i<pixels.length; i++) IOut.print(pixels[i] +" "); //
-	    super.endDraw();
-	}
-	else{
-	    panel.draw(this);
-	    //for(int i=0; i<subGraphics.length; i++){
-	    //	for(int j=0; j<subGraphics[i].length; j++){
-	    //	    subGraphics[i][j].drawIG();
-	    //	    super.image(subGraphics[i][j],subGraphics[i][j].getX(),subGraphics[i][j].getY());
-	    //	}
-	    //}
-	}
-	*/
-	
-	//super.resetMatrix(); // ?
-	//panel.draw(this);
-	
-	/*
-	int[] viewport = new int[4];
-	gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
-	
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPushMatrix();
-        
-        gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glPushMatrix();
-	
-	if(PIConfig.resetGLDepthBefore) gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-	
-	//gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-	//gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-	
-	setGLProperties();
-	
-	if(igg.getGraphics()==null){
-	    overlay = new Overlay(drawable); //
-	    igg.setGraphics(overlay.createGraphics());
-	    igg.getGraphics().setBackground(overlayBG);
-	}
-	//igg.setGraphics(overlay.createGraphics());
-	
-	igg.getGraphics().clearRect(0,0,parent.getWidth(),parent.getHeight()); //
-	
-	//overlay = new Overlay(drawable); //
-	//Graphics2D g = overlay.createGraphics();
-	//igg.setGraphics(g);
-	
-	igg.setGL(gl);
-	
-	panel.draw(igg);
-	
-	if(PIConfig.resetGLDepthAfter) gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-	
-	gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glPopMatrix();
-	
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPopMatrix();
-	
-	// bring the original viewport back
-	gl.glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-	
-	//g.dispose();
-	//igg.getGraphics().dispose();
-	*/
-	
-	/*
-	// test
-	beginShape(QUADS);
-	vertex(10,10,10);
-	vertex(50,10,-10);
-	vertex(50,40,10);
-	vertex(10,50,-10);
-	endShape();
-	*/
-    }
+    public void drawIG(){ if(panel!=null) panel.draw(this); }
     
     
     public void post(){
@@ -543,7 +446,7 @@ public class PIGraphics3D extends PGraphics3D
 	g.fill(c.getRed(),c.getGreen(),c.getBlue());
 	g.vertex(0,h);
 	g.endShape();
-
+	
 	g.endDraw();
 	
 	return g.get();
@@ -569,8 +472,8 @@ public class PIGraphics3D extends PGraphics3D
 		    }
 		}
 	    }
-	    
-	    if(bgImage==null||createImg)
+	    if(bgImage==null||createImg||
+	       bgImage.width<super.width||bgImage.height<super.height) // added 20120915
 		bgImage = createBGImage(super.width,super.height,view); 
 	    
 	    //try{
@@ -732,9 +635,7 @@ public class PIGraphics3D extends PGraphics3D
 			  (float)view.transformArray[3], (float)view.transformArray[7],
 			  (float)view.transformArray[11], (float)view.transformArray[15]);
 	
-	
-	
-	
+		
 	/*
         gl.glMatrixMode(GL.GL_MODELVIEW);
         //gl.glLoadIdentity();
@@ -794,7 +695,6 @@ public class PIGraphics3D extends PGraphics3D
 	}
 	
 	super.beginDraw();
-	
 	
 	drawView(view);
 
