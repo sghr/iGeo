@@ -752,7 +752,14 @@ public class ITensileNet{
     */
     public static ITensileNet create(IMeshI mesh, IVecI[] fixedPoints){
 
-	
+	if(removeMeshDuplicates){
+	    if(mesh instanceof IMesh){
+		((IMesh)mesh).removeDuplicates();
+	    }
+	    else if(mesh instanceof IMeshGeo){
+		((IMeshGeo)mesh).removeDuplicates();
+	    }
+	}
 	
 	ArrayList<IEdge> edges = new ArrayList<IEdge>();
 	if(keepDuplicatedMeshEdge){ 
