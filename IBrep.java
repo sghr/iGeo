@@ -191,8 +191,14 @@ public class IBrep extends IGeometry implements ITransformable{
     synchronized public IBrep hide(){ super.hide(); return this; }
     synchronized public IBrep show(){ super.show(); return this; }
     
+    synchronized public IBrep clr(IColor c){ super.clr(c); return this; }
+    synchronized public IBrep clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public IBrep clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public IBrep clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public IBrep clr(Color c){ super.clr(c); return this; }
     synchronized public IBrep clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public IBrep clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public IBrep clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public IBrep clr(int gray){ super.clr(gray); return this; }
     synchronized public IBrep clr(float fgray){ super.clr(fgray); return this; }
     synchronized public IBrep clr(double dgray){ super.clr(dgray); return this; }
@@ -210,8 +216,14 @@ public class IBrep extends IGeometry implements ITransformable{
     synchronized public IBrep hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     synchronized public IBrep hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    synchronized public IBrep setColor(IColor c){ super.setColor(c); return this; }
+    synchronized public IBrep setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IBrep setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IBrep setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public IBrep setColor(Color c){ super.setColor(c); return this; }
     synchronized public IBrep setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IBrep setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IBrep setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public IBrep setColor(int gray){ super.setColor(gray); return this; }
     synchronized public IBrep setColor(float fgray){ super.setColor(fgray); return this; }
     synchronized public IBrep setColor(double dgray){ super.setColor(dgray); return this; }

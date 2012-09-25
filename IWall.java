@@ -440,4 +440,16 @@ public class IWall extends IAgent{
     }
     */
     
+
+
+    /**************************************
+     * methods of IObject
+     *************************************/
+    
+    public IWall name(String nm){ super.name(nm); return this; }
+    public IWall layer(ILayer l){ super.layer(l); return this; }
+    
+    public IWall hide(){ super.hide(); return this; }
+    public IWall show(){ super.show(); return this; }
+    
 }

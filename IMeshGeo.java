@@ -1657,21 +1657,216 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
+    /** only setting value to closed. checking no connection of mesh */
+    public IMeshGeo close(){ closed=true; return this; } 
+    public boolean isClosed(){ return closed; }
+    
+    
+    
     public static IMeshGeo joinMesh(IMeshGeo[] meshes){
 	ArrayList<IFace> faces = new ArrayList<IFace>();
 	for(int i=0; i<meshes.length; i++){
 	    for(int j=0; j<meshes[i].faceNum(); j++){ faces.add(meshes[i].face(j)); }
 	}
-	IFace[] fcs = new IFace[faces.size()];
-	for(int i=0; i<faces.size(); i++) fcs[i] = faces.get(i);
-	return new IMeshGeo(fcs);
+	IMeshGeo mesh = new IMeshGeo(faces.toArray(new IFace[faces.size()]));
+	mesh.removeDuplicates();
+	return mesh;
+    }
+
+    /** join other meshes into the current one and remove duplicated edges and vertices */
+    public IMeshGeo join(IMeshGeo[] meshes){ return join(meshes, IConfig.tolerance); }
+    
+    /** join other meshes into the current one and remove duplicated edges and vertices */
+    public IMeshGeo join(IMeshGeo[] meshes, double tolerance){
+	synchronized(IG.lock){ // IG.lock or IG.dynamicServer() ?
+	    for(int i=0; i<meshes.length; i++){
+		for(int j=0; j<meshes[i].vertexNum(); j++){
+		    if(!vertices.contains(meshes[i].vertex(j))) vertices.add(meshes[i].vertex(j));
+		}
+		for(int j=0; j<meshes[i].edgeNum(); j++){
+		    if(!edges.contains(meshes[i].edge(j))) edges.add(meshes[i].edge(j));
+		}
+		for(int j=0; j<meshes[i].faceNum(); j++){
+		    if(!faces.contains(meshes[i].face(j))) faces.add(meshes[i].face(j));
+		}
+	    }
+	    removeDuplicates(tolerance);
+	}
+	return this;
     }
     
-
-    /** only setting value to closed. checking no connection of mesh */
-    public IMeshGeo close(){ closed=true; return this; } 
-    public boolean isClosed(){ return closed; }
     
+    
+    /** remove duplicated vertices and edges */
+    public IMeshGeo removeDuplicates(){ return removeDuplicates(IConfig.tolerance); }
+    
+    /** remove duplicated vertices and edges */
+    public IMeshGeo removeDuplicates(double tolerance){
+	
+	ArrayList<IVertex> vertices2 = new ArrayList<IVertex>(this.vertices);
+	ArrayList<IVertex> removedVertex = new ArrayList<IVertex>();
+	ArrayList<IVertex> replacingVertex = new ArrayList<IVertex>();
+	
+	for(int i=0; i<vertices2.size()-1; i++){
+	    IVertex v1 = vertices2.get(i);
+	    for(int j=i+1; j<vertices2.size(); j++){
+		IVertex v2 = vertices2.get(j);
+		if(v1.eq(v2, tolerance)){
+		    //v2.replaceVertex(v1); // this is buggy
+		    vertices2.remove(j);
+		    j--;
+		    removedVertex.add(v2);
+		    replacingVertex.add(v1);
+		}
+	    }
+	}
+	
+	for(int i=0; i<vertices2.size(); i++){
+	    vertices2.get(i).edges.clear();
+	    vertices2.get(i).faces.clear();
+	    vertices2.get(i).linkedVertices.clear();
+	}
+	
+	ArrayList<IEdge> edges2 = new ArrayList<IEdge>(this.edges);
+	ArrayList<IEdge> removedEdge = new ArrayList<IEdge>();
+	ArrayList<IEdge> replacingEdge = new ArrayList<IEdge>();
+	for(int i=0; i<edges2.size()-1; i++){
+	    IEdge e1 = edges2.get(i);
+	    for(int j=i+1; j<edges2.size(); j++){
+		IEdge e2 = edges2.get(j);
+		
+		if(e1.eq(e2, tolerance)){
+		    edges2.remove(j);
+		    j--;
+		    removedEdge.add(e2);
+		    replacingEdge.add(e1);
+		}
+	    }
+	}
+	
+	if(removedVertex.size()==0 && removedEdge.size()==0){
+	    return this; // no duplicates
+	}
+	
+	for(int i=0; i<edges2.size(); i++){
+	    if( removedVertex.contains( edges2.get(i).vertices[0] ) ){
+		edges2.get(i).vertices[0] = replacingVertex.get(removedVertex.indexOf( edges2.get(i).vertices[0] ));
+	    }
+	    if( removedVertex.contains( edges2.get(i).vertices[1] ) ){
+		edges2.get(i).vertices[1] = replacingVertex.get(removedVertex.indexOf( edges2.get(i).vertices[1] ));
+	    }
+	    edges2.get(i).faces.clear();
+	    
+	    edges2.get(i).vertices[0].addEdge(edges2.get(i));
+	    edges2.get(i).vertices[1].addEdge(edges2.get(i));
+	}
+	
+	ArrayList<IFace> faces2 = new ArrayList<IFace>();
+	for(int i=0; i<faces.size(); i++){
+	    IEdge[] faceEdges = new IEdge[faces.get(i).edgeNum()];
+	    for(int j=0; j<faces.get(i).edgeNum(); j++){
+		if(removedEdge.contains(faces.get(i).edges[j])){
+		    faceEdges[j] = replacingEdge.get(removedEdge.indexOf(faces.get(i).edges[j]));
+		}
+		else{ faceEdges[j] =faces.get(i).edges[j]; }
+		//IG.err("face "+i+", "+j+": "+faceEdges[j].vertices[0].pos+" - "+faceEdges[j].vertices[1].pos);
+	    }
+	    faces2.add(new IFace(faceEdges));
+	}
+	
+	synchronized(IG.lock){ // IG.lock or IG.dynamicServer() ?
+	    vertices.clear();
+	    edges.clear();
+	    faces = faces2;
+	    for(int i=0; i<faces2.size(); i++){
+		IFace f = faces2.get(i);
+		for(int j=0; j<f.vertices.length; j++){
+		    if(!vertices.contains(f.vertices[j])) vertices.add(f.vertices[j]);
+		}
+		for(int j=0; j<f.edges.length; j++){
+		    if(!edges.contains(f.edges[j])) edges.add(f.edges[j]);
+		}
+	    }
+	}
+	return this;
+    }
+    
+    
+    /** remove duplicated vertices and edges */
+    //public static IMeshGeo unify(IMeshGeo mesh){ return unify(mesh, IConfig.tolerance); }
+    
+    /** remove duplicated vertices and edges */
+    /*
+    public static IMeshGeo unify(IMeshGeo mesh, double tolerance){
+	ArrayList<IVertex> vertices = new ArrayList<IVertex>(mesh.vertices);
+	ArrayList<IEdge> edges = new ArrayList<IEdge>(mesh.edges);
+	ArrayList<IFace> faces = new ArrayList<IFace>(mesh.faces);
+
+	ArrayList<IVertex> removedVertex = new ArrayList<IVertex>();
+	ArrayList<IVertex> replacingVertex = new ArrayList<IVertex>();
+
+	for(int i=0; i<vertices.size()-1; i++){
+	    IVertex v1 = vertices.get(i);
+	    for(int j=i+1; j<vertices.size(); j++){
+		IVertex v2 = vertices.get(j);
+		if(v1.eq(v2, tolerance)){
+		    //v2.replaceVertex(v1); // this is buggy
+		    vertices.remove(j);
+		    j--;
+		    removedVertex.add(v2);
+		    replacingVertex.add(v1);
+		    //IG.err("replacing v2="+v2.pos+", v1="+v1.pos); //
+		}
+	    }
+	}
+	
+	for(int i=0; i<vertices.size(); i++){
+	    vertices.get(i).edges.clear();
+	    vertices.get(i).faces.clear();
+	    vertices.get(i).linkedVertices.clear();
+	}
+	
+	ArrayList<IEdge> removedEdge = new ArrayList<IEdge>();
+	ArrayList<IEdge> replacingEdge = new ArrayList<IEdge>();
+	for(int i=0; i<edges.size()-1; i++){
+	    IEdge e1 = edges.get(i);
+	    for(int j=i+1; j<edges.size(); j++){
+		IEdge e2 = edges.get(j);
+		if(e1.eq(e2, tolerance)){
+		    edges.remove(j);
+		    j--;
+		    removedEdge.add(e2);
+		    replacingEdge.add(e1);
+		}
+	    }
+	}
+	for(int i=0; i<edges.size(); i++){
+	    if( removedVertex.contains( edges.get(i).vertices[0] ) ){
+		edges.get(i).vertices[0] = replacingVertex.get(removedVertex.indexOf( edges.get(i).vertices[0] ));
+	    }
+	    if( removedVertex.contains( edges.get(i).vertices[1] ) ){
+		edges.get(i).vertices[1] = replacingVertex.get(removedVertex.indexOf( edges.get(i).vertices[1] ));
+	    }
+	    edges.get(i).faces.clear();
+	    edges.get(i).vertices[0].addEdge(edges.get(i));
+	    edges.get(i).vertices[1].addEdge(edges.get(i));
+	}
+	
+	IFace[] newFaces = new IFace[faces.size()];
+	for(int i=0; i<faces.size(); i++){
+	    IEdge[] faceEdges = new IEdge[faces.get(i).edgeNum()];
+	    for(int j=0; j<faces.get(i).edgeNum(); j++){
+		if(removedEdge.contains(faces.get(i).edges[j])){
+		    faceEdges[j] = replacingEdge.get(removedEdge.indexOf(faces.get(i).edges[j]));
+		}
+		else{ faceEdges[j] =faces.get(i).edges[j]; }
+		//IG.err("face "+i+", "+j+": "+faceEdges[j].vertices[0].pos+" - "+faceEdges[j].vertices[1].pos);
+	    }
+	    newFaces[i] = new IFace(faceEdges);
+	}
+	return new IMeshGeo(newFaces);
+    }
+    */
     
     
     /*************************************************

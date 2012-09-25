@@ -23,7 +23,7 @@
 package igeo.gui;
 
 import java.util.ArrayList;
-import java.awt.Color;
+//import java.awt.Color;
 
 import igeo.*;
 
@@ -72,7 +72,7 @@ public class ISurfaceGraphicGL extends IGraphicObject{
 	if(wireframe!=null) wireframe.setAttribute(attr);
     }
     
-    public void setColor(Color c){
+    public void setColor(IColor c){
 	super.setColor(c);
 	if(fill!=null) fill.setColor(c);
 	if(wireframe!=null) wireframe.setColor(c);

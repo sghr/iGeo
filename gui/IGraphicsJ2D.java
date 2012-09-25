@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import igeo.IG;
 import igeo.IGraphicI;
+import igeo.IColor;
 import igeo.gui.IGraphicMode;
 
 /**
@@ -48,6 +49,7 @@ public class IGraphicsJ2D implements IGraphics2D{
     // stroke colorp
 
     public IView view;
+    public boolean firstDraw=true;
     
     public IGraphicMode.GraphicType type(){ return IGraphicMode.GraphicType.J2D; }
 
@@ -57,12 +59,16 @@ public class IGraphicsJ2D implements IGraphics2D{
 	view = v; // current view
     }
 
-    public void clr(Color c){}
+    public void clr(IColor c){}
+    public void clr(float[] rgba){}
     public void clr(float r, float g, float b, float a){}
     public void clr(float r, float g, float b){}
-    public void stroke(Color c){}
+    public void stroke(IColor c){}
+    public void stroke(float[] rgba){}
     public void stroke(float r, float g, float b, float a){}
     public void stroke(float r, float g, float b){}
     public void weight(float w){}
-
+    
+    public boolean firstDraw(){ return firstDraw; }
+    public void firstDraw(boolean f){ firstDraw=f; }
 }

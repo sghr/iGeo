@@ -76,12 +76,20 @@ public class IFace{
 	
 	if(edges[1].contains(edges[0].vertices[0])) vertices[0]=edges[0].vertices[1];
 	else if(edges[1].contains(edges[0].vertices[1])) vertices[0]=edges[0].vertices[0];
-	else IOut.err("first&second edges don't match");
+	else{
+	    IOut.err("first&second edges don't match");
+	    IOut.err("edges[0] = "+edges[0].vertices[0].pos+", "+edges[0].vertices[1].pos); //
+	    IOut.err("edges[1] = "+edges[1].vertices[0].pos+", "+edges[1].vertices[1].pos); //
+	}
 	
 	for(int i=1; i<num; i++){
 	    if(edges[i-1].contains(vertices[i-1]))
 		vertices[i]=edges[i-1].getOtherVertex(vertices[i-1]);
-	    else IOut.err((i-1)+"&"+i+" edges don't match");
+	    else{
+		IOut.err((i-1)+"&"+i+" edges don't match");
+		//IOut.err("vertex["+(i-1)+"] =" + vertices[i-1]); //
+		//IOut.err("edges["+(i-1)+"] = "+edges[i-1].vertices[0]+", "+edges[i-1].vertices[1]); //
+	    }
 	}
 	
 	if(edges[num-1].getOtherVertex(vertices[num-1]) != vertices[0]){

@@ -269,8 +269,14 @@ public class IMesh extends IGeometry implements IMeshI{
     synchronized public IMesh hide(){ super.hide(); return this; }
     synchronized public IMesh show(){ super.show(); return this; }
     
+    synchronized public IMesh clr(IColor c){ super.clr(c); return this; }
+    synchronized public IMesh clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public IMesh clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public IMesh clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public IMesh clr(Color c){ super.clr(c); return this; }
     synchronized public IMesh clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public IMesh clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public IMesh clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public IMesh clr(int gray){ super.clr(gray); return this; }
     synchronized public IMesh clr(float fgray){ super.clr(fgray); return this; }
     synchronized public IMesh clr(double dgray){ super.clr(dgray); return this; }
@@ -288,8 +294,14 @@ public class IMesh extends IGeometry implements IMeshI{
     synchronized public IMesh hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     synchronized public IMesh hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    synchronized public IMesh setColor(IColor c){ super.setColor(c); return this; }
+    synchronized public IMesh setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IMesh setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IMesh setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public IMesh setColor(Color c){ super.setColor(c); return this; }
     synchronized public IMesh setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IMesh setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IMesh setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public IMesh setColor(int gray){ super.setColor(gray); return this; }
     synchronized public IMesh setColor(float fgray){ super.setColor(fgray); return this; }
     synchronized public IMesh setColor(double dgray){ super.setColor(dgray); return this; }
@@ -318,6 +330,7 @@ public class IMesh extends IGeometry implements IMeshI{
     /**
        extract all points and connect if it's at same location and create a new mesh.
     */
+    /*
     synchronized public static IMesh join(IMesh[] meshes){
 	
 	ArrayList<IVertex> vertices = new ArrayList<IVertex>();
@@ -347,7 +360,19 @@ public class IMesh extends IGeometry implements IMeshI{
 	
 	return new IMesh(vertices, edges, faces);
     }
+    */
     
+
+    /**
+       static method to join meshes. it's renamed from join to joinMesh. now method "join" is an instance method
+    */
+    synchronized public static IMesh joinMesh(IMesh[] meshes){
+	IMeshGeo[] meshgeo = new IMeshGeo[meshes.length];
+	for(int i=0; i<meshes.length; i++){ meshgeo[i] = meshes[i].mesh; }
+	IMesh mesh = new IMesh(IMeshGeo.joinMesh(meshgeo));
+	mesh.attr(meshes[0].attr()); // copy attributes
+	return mesh;
+    }
     
     /** only setting value to closed. checking no connection of mesh */
     synchronized public IMesh close(){ mesh.close(); return this; }
@@ -377,6 +402,30 @@ public class IMesh extends IGeometry implements IMeshI{
 	mesh.deleteFace(f);
 	if(mesh.vertexNum()==0 || mesh.edgeNum()==0 || mesh.faceNum()==0) del();
 	else{ updateGraphic(); }
+	return this;
+    }
+    
+    
+    /** remove duplicated edges and vertices */
+    //public static IMesh unify(IMesh m){ return new IMesh(IMeshGeo.unify(m.mesh)); }
+    
+    /** remove uplicated edges and vertices */
+    public IMesh removeDuplicates(){
+	mesh.removeDuplicates(); return this;
+    }
+    /** remove uplicated edges and vertices */
+    public IMesh removeDuplicates(double tolerance){
+	mesh.removeDuplicates(tolerance); return this;
+    }
+    
+    /** join other meshes into the current one and remove duplicated edges and vertices */
+    public IMesh join(IMesh[] meshes){ return join(meshes, IConfig.tolerance); }
+    
+    /** join other meshes into the current one and remove duplicated edges and vertices */
+    public IMesh join(IMesh[] meshes, double tolerance){
+	IMeshGeo[] meshgeo = new IMeshGeo[meshes.length];
+	for(int i=0; i<meshes.length; i++){ meshgeo[i] = meshes[i].mesh; }
+	mesh.join(meshgeo, tolerance);
 	return this;
     }
     

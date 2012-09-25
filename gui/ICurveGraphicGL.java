@@ -104,8 +104,7 @@ public class ICurveGraphicGL extends IGraphicObject{
 	
 	if(curve==null || update /*&& curve.deg()>1*/ ) // now need to be updated with deg 1
 	    initCurve(); // not initizlized at the constructor // shouldn't it?
-	
-	
+
 	if(g.type() == IGraphicMode.GraphicType.GL ||
 	   g.type() == IGraphicMode.GraphicType.P3D ){
 	    
@@ -113,35 +112,39 @@ public class ICurveGraphicGL extends IGraphicObject{
 	    
 	    g3d.weight(weight);
 	    
-	    float red,green,blue,alpha;
+	    //float red,green,blue,alpha;
+	    float[] rgba=null;
 	    if(color!=null){
-		red = color.getRed();
-		green = color.getGreen();
-		blue = color.getBlue();
-		alpha = color.getAlpha();
+		rgba = color.rgba();
+		//red = color.getRed();
+		//green = color.getGreen();
+		//blue = color.getBlue();
+		//alpha = color.getAlpha();
 	    }
 	    else{
-		red = IConfig.objectColor.getRed();
-		green = IConfig.objectColor.getGreen();
-		blue = IConfig.objectColor.getBlue();
-		alpha = IConfig.objectColor.getAlpha();
+		rgba = IConfig.objectColor.rgba();
+		//red = IConfig.objectColor.getRed();
+		//green = IConfig.objectColor.getGreen();
+		//blue = IConfig.objectColor.getBlue();
+		//alpha = IConfig.objectColor.getAlpha();
 	    }
 	    
 	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
-		alpha = IConfig.transparentModeAlpha;
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
 	    
 	    if(g3d.view().mode().isLight()&&g3d.view().mode().isLightWireframe()){
-		g3d.ambient(red,green,blue,alpha);
-		g3d.diffuse(red,green,blue,alpha);
+		g3d.ambient(rgba);
+		g3d.diffuse(rgba);
 		g3d.shininess(IConfig.shininess);
-		g3d.stroke(red,green,blue,0f);
+		g3d.stroke(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f);
 	    }
 	    //else{ g3d.stroke(red,green,blue,alpha); }
 	    
 	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
 		g3d.disableLight();
 	    
-	    g3d.stroke(red,green,blue,alpha);
+	    g3d.stroke(rgba);
+	    
 	    
 	    //polyline.draw(gl);
 	    //g3d.drawLineStrip(polyline.pts);
@@ -162,7 +165,7 @@ public class ICurveGraphicGL extends IGraphicObject{
 	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
 		g3d.enableLight();
 	    
-
+	    
 	    /*
 
 	    GL gl = ((IGraphicsGL)g).getGL();
@@ -191,7 +194,7 @@ public class ICurveGraphicGL extends IGraphicObject{
 		}
 		
 		if(g.view().mode().isTransparent()&&g.view().mode().isTransparentWireframe())
-		    alpha = (float)IConfig.transparentModeAlpha/255;
+		    alpha = (float)IConfig.transparentModeAlpha/255f;
 		
 		if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
 		    float[] colorf = new float[]{ red, green, blue, alpha };

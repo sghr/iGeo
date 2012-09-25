@@ -64,7 +64,8 @@ public class IPaneLight extends IComponent implements IPane{
     public IPaneLight(int x, int y, int width, int height){ super(x,y,width,height); }
     
     public void setPanel(IPanel p){ parent=p; }
-    public IPanel getPanel(){ return parent; }
+    public void setPanel(IPanelI p){ if(p instanceof IPanel) parent=(IPanel)p; }
+    public IPanelI getPanel(){ return parent; }
     //public void setIG(IG ig){ this.ig=ig; }
     
     public void setBorderWidth(float b){
@@ -73,8 +74,10 @@ public class IPaneLight extends IComponent implements IPane{
     }
     public float getBorderWidth(){ return borderWidth; }
     public Stroke getBorderStroke(){ return borderStroke; }
+    public void setBorderColor(int r, int g, int b, int a){ borderColor = new Color(r,g,b,a); }
     public void setBorderColor(Color c){ borderColor = c;}
-    public Color getBorderColor(){ return borderColor; }
+    //public Color getBorderColor(){ return borderColor; }
+    public int getBorderColor(){ return borderColor.getRGB(); }
     
     public INavigator navigator(){ return navigator; }
     
@@ -173,46 +176,47 @@ public class IPaneLight extends IComponent implements IPane{
     }
     
     
-    public void mousePressed(MouseEvent e){
+    public void mousePressed(IMouseEvent e){
 	navigator.mousePressed(e);
     }
-    public void mouseReleased(MouseEvent e){
+    public void mouseReleased(IMouseEvent e){
 	navigator.mouseReleased(e);
     }
-    public void mouseClicked(MouseEvent e){
+    public void mouseClicked(IMouseEvent e){
 	navigator.mouseClicked(e);
     }
-    public void mouseEntered(MouseEvent e){
+    public void mouseEntered(IMouseEvent e){
 	navigator.mouseEntered(e);
     }
-    public void mouseExited(MouseEvent e){
+    public void mouseExited(IMouseEvent e){
 	navigator.mouseExited(e);
     }
-    public void mouseMoved(MouseEvent e){
+    public void mouseMoved(IMouseEvent e){
 	navigator.mouseMoved(e);
     }
-    public void mouseDragged(MouseEvent e){
+    public void mouseDragged(IMouseEvent e){
 	navigator.mouseDragged(e);
     }
     
-    public void mouseWheelMoved(MouseWheelEvent e){
+    public void mouseWheelMoved(IMouseWheelEvent e){
 	navigator.mouseWheelMoved(e);
     }
     
-    public void keyPressed(KeyEvent e){
+    public void keyPressed(IKeyEvent e){
 	navigator.keyPressed(e);
     }
-    public void keyReleased(KeyEvent e){
+    public void keyReleased(IKeyEvent e){
 	navigator.keyReleased(e);
     }
-    public void keyTyped(KeyEvent e){
+    public void keyTyped(IKeyEvent e){
 	navigator.keyTyped(e);
     }
-    
+
+    /*
     public void focusLost(FocusEvent e){
     }
     public void focusGained(FocusEvent e){
     }
-    
+    */
     
 }

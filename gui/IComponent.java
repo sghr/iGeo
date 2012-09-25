@@ -44,8 +44,8 @@ public class IComponent{
     public void setLocation(int x, int y){ this.x=x; this.y=y; }
     public void setSize(int width, int height){ this.width=width; this.height=height; }
     
-    public int getX(){ return x; }
-    public int getY(){ return y; }
+    public float getX(){ return x; }
+    public float getY(){ return y; }
     public int getWidth(){ return width; }
     public int getHeight(){ return height; }
     

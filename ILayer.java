@@ -427,9 +427,17 @@ public class ILayer extends IObject{
     }
     
     
-    public Color clr(){ return attribute.clr(); }
+    public IColor clr(){ return attribute.clr(); }
+    public Color color(){ return attribute.color(); }
+    public Color awtColor(){ return attribute.awtColor(); }
+    public ILayer clr(IColor c){ attribute.clr(c); return this; }
+    public ILayer clr(IColor c, int alpha){ attribute.clr(c,alpha); return this; }
+    public ILayer clr(IColor c, float alpha){ attribute.clr(c,alpha); return this; }
+    public ILayer clr(IColor c, double alpha){ attribute.clr(c,alpha); return this; }
     public ILayer clr(Color c){ attribute.clr(c); return this; }
     public ILayer clr(Color c, int alpha){ attribute.clr(c,alpha); return this; }
+    public ILayer clr(Color c, float alpha){ attribute.clr(c,alpha); return this; }
+    public ILayer clr(Color c, double alpha){ attribute.clr(c,alpha); return this; }
     public ILayer clr(int gray){ attribute.clr(gray); return this; }
     public ILayer clr(float fgray){ attribute.clr(fgray); return this; }
     public ILayer clr(double dgray){ attribute.clr(dgray); return this; }
@@ -447,9 +455,16 @@ public class ILayer extends IObject{
     public ILayer hsb(float h, float s, float b){ attribute.hsb(h,s,b); return this; }
     public ILayer hsb(double h, double s, double b){ attribute.hsb(h,s,b); return this; }
     
-    public Color getColor(){ return clr(); }
+    public IColor getColor(){ return clr(); }
+    public Color getAWTColor(){ return color(); }
+    public ILayer setColor(IColor c){ return clr(c); }
+    public ILayer setColor(IColor c, int alpha){ return clr(c, alpha); }
+    public ILayer setColor(IColor c, float alpha){ return clr(c, alpha); }
+    public ILayer setColor(IColor c, double alpha){ return clr(c, alpha); }
     public ILayer setColor(Color c){ return clr(c); }
     public ILayer setColor(Color c, int alpha){ return clr(c, alpha); }
+    public ILayer setColor(Color c, float alpha){ return clr(c, alpha); }
+    public ILayer setColor(Color c, double alpha){ return clr(c, alpha); }
     public ILayer setColor(int gray){  return clr(gray); }
     public ILayer setColor(float fgray){  return clr(fgray); }
     public ILayer setColor(double dgray){ return clr(dgray); }

@@ -422,8 +422,14 @@ public class IParticleOnCurve extends IPointAgent implements IParticleOnCurveI{
     public IParticleOnCurve hide(){ super.hide(); return this; }
     
     
+    public IParticleOnCurve clr(IColor c){ super.clr(c); return this; }
+    public IParticleOnCurve clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IParticleOnCurve clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IParticleOnCurve clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public IParticleOnCurve clr(Color c){ super.clr(c); return this; }
     public IParticleOnCurve clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IParticleOnCurve clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public IParticleOnCurve clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IParticleOnCurve clr(int gray){ super.clr(gray); return this; }
     public IParticleOnCurve clr(float fgray){ super.clr(fgray); return this; }
     public IParticleOnCurve clr(double dgray){ super.clr(dgray); return this; }
@@ -441,8 +447,14 @@ public class IParticleOnCurve extends IPointAgent implements IParticleOnCurveI{
     public IParticleOnCurve hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public IParticleOnCurve hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    public IParticleOnCurve setColor(IColor c){ super.setColor(c); return this; }
+    public IParticleOnCurve setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public IParticleOnCurve setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public IParticleOnCurve setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     public IParticleOnCurve setColor(Color c){ super.setColor(c); return this; }
     public IParticleOnCurve setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public IParticleOnCurve setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    public IParticleOnCurve setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public IParticleOnCurve setColor(int gray){ super.setColor(gray); return this; }
     public IParticleOnCurve setColor(float fgray){ super.setColor(fgray); return this; }
     public IParticleOnCurve setColor(double dgray){ super.setColor(dgray); return this; }

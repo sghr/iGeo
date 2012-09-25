@@ -22,7 +22,7 @@
 
 package igeo;
 
-import java.awt.Color;
+import java.awt.*;
 
 import igeo.gui.*;
 
@@ -512,8 +512,14 @@ public class IPoint extends IGeometry implements IVecI{
     synchronized public IPoint hide(){ super.hide(); return this; }
     synchronized public IPoint show(){ super.show(); return this; }
     
+    synchronized public IPoint clr(IColor c){ super.clr(c); return this; }
+    synchronized public IPoint clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public IPoint clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public IPoint clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public IPoint clr(Color c){ super.clr(c); return this; }
     synchronized public IPoint clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public IPoint clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public IPoint clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public IPoint clr(int gray){ super.clr(gray); return this; }
     synchronized public IPoint clr(float fgray){ super.clr(fgray); return this; }
     synchronized public IPoint clr(double dgray){ super.clr(dgray); return this; }
@@ -531,8 +537,14 @@ public class IPoint extends IGeometry implements IVecI{
     synchronized public IPoint hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     synchronized public IPoint hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    synchronized public IPoint setColor(IColor c){ super.setColor(c); return this; }
+    synchronized public IPoint setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IPoint setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IPoint setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public IPoint setColor(Color c){ super.setColor(c); return this; }
     synchronized public IPoint setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IPoint setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public IPoint setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public IPoint setColor(int gray){ super.setColor(gray); return this; }
     synchronized public IPoint setColor(float fgray){ super.setColor(fgray); return this; }
     synchronized public IPoint setColor(double dgray){ super.setColor(dgray); return this; }

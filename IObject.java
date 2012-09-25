@@ -24,6 +24,7 @@ package igeo;
 
 import java.util.ArrayList;
 import java.awt.Color;
+
 import igeo.gui.*;
 
 /**
@@ -354,7 +355,7 @@ public class IObject{
     
     
     /** @return returns whatever Color of any graphics member. (first found) */
-    public Color clr(){
+    public IColor clr(){
 	if(attribute!=null) return attribute.color;
 	if(graphics!=null)
 	    for(IGraphicObject gr:graphics)
@@ -363,6 +364,8 @@ public class IObject{
 	//return IGraphicObject.getColor(IGraphicObject.defaultRed,IGraphicObject.defaultGreen,IGraphicObject.defaultBlue,IGraphicObject.defaultAlpha);
 	return IConfig.objectColor;
     }
+    
+    
     
     /** @return returns weight in attribute if any attribute exists. if not default weight in IConfig */
     public float weight(){
@@ -377,7 +380,7 @@ public class IObject{
     public int greenInt(){ return clr().getGreen(); }
     public int blueInt(){ return clr().getBlue(); }
     public int alphaInt(){ return clr().getAlpha(); }
-    public int grayInt(){ Color c = clr(); return (c.getRed()+c.getGreen()+c.getBlue())/3; }
+    public int grayInt(){ return clr().getGrey(); }
     public int greyInt(){ return grayInt(); }
     
     public double red(){ return ((double)redInt()/255.); }
@@ -387,32 +390,59 @@ public class IObject{
     public double gray(){ return ((double)grayInt()/255.); }
     
     
-    public IObject clr(Color c){
+    public IObject clr(IColor c){
 	if(attribute==null) attribute = new IAttribute();
 	attribute.clr(c);
 	syncColor();
 	return this;
     }
+    
+    
     /** to set color, with alpha value overwritten */
-    public IObject clr(Color c, int alpha){
+    public IObject clr(IColor c, int alpha){
 	if(attribute==null) attribute = new IAttribute();
 	attribute.clr(c,alpha);
 	syncColor();
 	return this;
     }
     /** to set color, with alpha value overwritten */
-    public IObject clr(Color c, float alpha){
+    public IObject clr(IColor c, float alpha){
 	if(attribute==null) attribute = new IAttribute();
 	attribute.clr(c,alpha);
 	syncColor();
 	return this;
     }
+    /** to set color, with alpha value overwritten */
+    public IObject clr(IColor c, double alpha){ return clr(c,(float)alpha); }
+    
+    
+    
+    /** @return returns whatever Color of any graphics member. (first found) */
+    public Color color(){ return awtColor(); }
+    /** @return returns whatever Color of any graphics member. (first found) */
+    public Color awtColor(){
+	if(attribute!=null) return attribute.color.awt();
+	if(graphics!=null)
+	    for(IGraphicObject gr:graphics) if(gr.getColor()!=null) return gr.getColor().awt();
+	return IConfig.objectColor.awt();
+    }
+    public IObject clr(Color c){ return clr(new IColor(c)); }
+    public IObject clr(Color c, int alpha){ return clr(new IColor(c),alpha); }
+    public IObject clr(Color c, float alpha){ return clr(new IColor(c),alpha); }
+    public IObject clr(Color c, double alpha){ return clr(new IColor(c),alpha); }
+    /** @return returns whatever Color of any graphics member. (first found) */
+    public IColor getColor(){ return clr(); }
+    public Color getAWTColor(){ return awtColor(); }
+    
+    
     public IObject clr(int gray){
 	if(attribute==null) attribute = new IAttribute();
 	attribute.clr(gray);
 	syncColor();
 	return this;
     }
+    
+    
     public IObject clr(double dgray){
 	if(attribute==null) attribute = new IAttribute();
 	attribute.clr(dgray);
@@ -513,12 +543,16 @@ public class IObject{
     }
     
     
-    /** @return returns whatever Color of any graphics member. (first found)
-     */
-    public Color getColor(){ return clr(); }
     
+    
+    public IObject setColor(IColor c){ return clr(c); }
+    public IObject setColor(IColor c, int alpha){ return clr(c,alpha); }
+    public IObject setColor(IColor c, float alpha){ return clr(c,alpha); }
+    public IObject setColor(IColor c, double alpha){ return clr(c,alpha); }
     public IObject setColor(Color c){ return clr(c); }
     public IObject setColor(Color c, int alpha){ return clr(c,alpha); }
+    public IObject setColor(Color c, float alpha){ return clr(c,alpha); }
+    public IObject setColor(Color c, double alpha){ return clr(c,alpha); }
     public IObject setColor(int gray){ return clr(gray); }
     public IObject setColor(float fgray){ return clr(fgray); }
     public IObject setColor(double dgray){ return clr(dgray); }

@@ -23,7 +23,7 @@
 package igeo;
 
 
-import java.awt.Color;
+//import java.awt.Color;
 
 /**
    An interface to contain static constants used in the whole iGeo system.
@@ -98,22 +98,24 @@ public /*interface*/ class IConfig{
     
     
     /** default object color to draw */
-    public static Color objectColor = new Color(102,102,102);
+    //public static Color objectColor = new Color(102,102,102);
+    public static IColor objectColor = new IColor(102,102,102);
     
     /** default stroke color to draw */
-    public static Color strokeColor = new Color(102,102,102);
+    //public static Color strokeColor = new Color(102,102,102);
+    public static IColor strokeColor = new IColor(102,102,102);
     
     /** default stroke weight to draw */
     public static float strokeWeight = 1.0f;
     
     /** default ambient color */
-    public static Color ambientColor = null; //new Color(0,0,0);
+    public static IColor ambientColor = null; //new Color(0,0,0);
     
     /** default emissive color */
-    public static Color emissiveColor = null;
+    public static IColor emissiveColor = null;
     
     /** default specular color */
-    public static Color specularColor = new Color(255,255,255);
+    public static IColor specularColor = new IColor(255,255,255);
     
     /** default shininess */
     public static float shininess = 0.5f;
@@ -121,6 +123,13 @@ public /*interface*/ class IConfig{
     
     /** transparency in transparent graphic mode in integer 0 - 255 (it used to be float 0.0-1.0. it changed) */
     public static int transparentModeAlpha = 102; //0.4f;
+    
+    
+    public static IColor bgColor1 = new IColor(255,255,255);
+    public static IColor bgColor2 = new IColor(230,230,230);
+    public static IColor bgColor3 = new IColor(77,128,179);
+    public static IColor bgColor4 = new IColor(77,128,179);
+    
     
     /** default point graphic dot size */
     public static float pointSize=5f;
@@ -161,6 +170,16 @@ public /*interface*/ class IConfig{
     
     /** set order of drawing in forward (from old to new) or backwards. default is false(backwards) */
     public static boolean drawOrderForward=false;
+    
+    
+    /** all graphic objects in IGraphicServer are deleted once drawn in a panel
+	(objects in IServer and dynamics in IDynamicServer are preserved)
+	usually used with clearBackground=false */
+    public static boolean deleteGraphicObjectsAfterDraw=false;
+    
+    /** in every drawing cycle, background is cleared with specified background color or gradient */
+    public static boolean clearBG=true;
+    
     
     /*****************************
      * polygon mesh properties
@@ -228,9 +247,10 @@ public /*interface*/ class IConfig{
     public static boolean loopPreupdate=true;
     /** put postupdate method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
     public static boolean loopPostupdate=false;
-
-
-
+    
+    /** synchronize draw loop and dynamics updating loop instead of using another thread. default is false to use multi-thread. */
+    public static boolean syncDrawAndDynamics=false;
+    
     
     /*****************************
      * properties of IWall

@@ -111,8 +111,14 @@ public class IMeshR extends IObject implements IMeshI{
     public IMeshR hide(){ super.hide(); return this; }
     public IMeshR show(){ super.show(); return this; }
     
+    public IMeshR clr(IColor c){ super.clr(c); return this; }
+    public IMeshR clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IMeshR clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IMeshR clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public IMeshR clr(Color c){ super.clr(c); return this; }
     public IMeshR clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IMeshR clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public IMeshR clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IMeshR clr(int gray){ super.clr(gray); return this; }
     public IMeshR clr(float fgray){ super.clr(fgray); return this; }
     public IMeshR clr(double dgray){ super.clr(dgray); return this; }

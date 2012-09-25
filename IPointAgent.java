@@ -22,7 +22,7 @@
 
 package igeo;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -451,8 +451,14 @@ public class IPointAgent extends IAgent implements IVecI{
     public void del(){ if(tracker!=null) tracker.del(); point.del(); super.del(); } //
     
     
-    public IPointAgent clr(Color c){ super.clr(c); point.clr(c); return this; }
-    public IPointAgent clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    public IPointAgent clr(IColor c){ super.clr(c); point.clr(c); return this; }
+    public IPointAgent clr(IColor c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    public IPointAgent clr(IColor c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    public IPointAgent clr(IColor c, double alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    //public IPointAgent clr(Color c){ super.clr(c); point.clr(c); return this; }
+    //public IPointAgent clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    //public IPointAgent clr(Color c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    //public IPointAgent clr(Color c, double alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     public IPointAgent clr(int gray){ super.clr(gray); point.clr(gray); return this; }
     public IPointAgent clr(float fgray){ super.clr(fgray); point.clr(fgray); return this; }
     public IPointAgent clr(double dgray){ super.clr(dgray); point.clr(dgray); return this; }
@@ -484,8 +490,14 @@ public class IPointAgent extends IAgent implements IVecI{
 	super.hsb(h,s,b); point.hsb(h,s,b); return this;
     }
     
-    public IPointAgent setColor(Color c){ return clr(c); }
-    public IPointAgent setColor(Color c, int alpha){ return clr(c,alpha); }
+    public IPointAgent setColor(IColor c){ return clr(c); }
+    public IPointAgent setColor(IColor c, int alpha){ return clr(c,alpha); }
+    public IPointAgent setColor(IColor c, float alpha){ return clr(c,alpha); }
+    public IPointAgent setColor(IColor c, double alpha){ return clr(c,alpha); }
+    //public IPointAgent setColor(Color c){ return clr(c); }
+    //public IPointAgent setColor(Color c, int alpha){ return clr(c,alpha); }
+    //public IPointAgent setColor(Color c, float alpha){ return clr(c,alpha); }
+    //public IPointAgent setColor(Color c, double alpha){ return clr(c,alpha); }
     public IPointAgent setColor(int gray){ return clr(gray); }
     public IPointAgent setColor(float fgray){ return clr(fgray); }
     public IPointAgent setColor(double dgray){ return clr(dgray); }

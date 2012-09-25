@@ -22,7 +22,7 @@
 
 package igeo;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -388,8 +388,14 @@ public class IBoid extends IParticle implements IBoidI{
     public IBoid hideGeometry(){ super.hideGeometry(); return this; }
     
     
-    public IBoid clr(Color c){ super.clr(c); return this; }
-    public IBoid clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IBoid clr(IColor c){ super.clr(c); return this; }
+    public IBoid clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IBoid clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IBoid clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    //public IBoid clr(Color c){ super.clr(c); return this; }
+    //public IBoid clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    //public IBoid clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    //public IBoid clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IBoid clr(int gray){ super.clr(gray); return this; }
     public IBoid clr(float fgray){ super.clr(fgray); return this; }
     public IBoid clr(double dgray){ super.clr(dgray); return this; }
@@ -407,8 +413,14 @@ public class IBoid extends IParticle implements IBoidI{
     public IBoid hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public IBoid hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
-    public IBoid setColor(Color c){ super.setColor(c); return this; }
-    public IBoid setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public IBoid setColor(IColor c){ super.setColor(c); return this; }
+    public IBoid setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public IBoid setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public IBoid setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
+    //public IBoid setColor(Color c){ super.setColor(c); return this; }
+    //public IBoid setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    //public IBoid setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    //public IBoid setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public IBoid setColor(int gray){ super.setColor(gray); return this; }
     public IBoid setColor(float fgray){ super.setColor(fgray); return this; }
     public IBoid setColor(double dgray){ super.setColor(dgray); return this; }

@@ -56,12 +56,12 @@ public class IView{
 	new double[][][]{ { {1.0,1.0,1.0},{0.3,0.5,0.7} },
 			  { {0.9,0.9,0.9},{0.3,0.5,0.7} } };
     */
-    
-    public static Color defaultBGColor1 = new Color(255,255,255);
-    public static Color defaultBGColor2 = new Color(230,230,230);
-    public static Color defaultBGColor3 = new Color(77,128,179);
-    public static Color defaultBGColor4 = new Color(77,128,179); 
-    
+    /*
+    public static IColor defaultBGColor1 = new IColor(255,255,255);
+    public static IColor defaultBGColor2 = new IColor(230,230,230);
+    public static IColor defaultBGColor3 = new IColor(77,128,179);
+    public static IColor defaultBGColor4 = new IColor(77,128,179); 
+    */
     /** eye location */
     public IVec pos;
     
@@ -118,9 +118,9 @@ public class IView{
     //public Color javaBGColor1, javaBGColor2;
     
     /** background color: one color(1x1matrix), two color(1x2matrix) or four colors(2x2 matrix) */
-    public Color[][] bgColor = new Color[][]{
-	new Color[]{ defaultBGColor1, defaultBGColor4 },
-	new Color[]{ defaultBGColor2, defaultBGColor3 }
+    public IColor[][] bgColor = new IColor[][]{
+	new IColor[]{ IConfig.bgColor1, IConfig.bgColor4 },
+	new IColor[]{ IConfig.bgColor2, IConfig.bgColor3 }
     };
     
     
@@ -172,7 +172,7 @@ public class IView{
     public void hide(){ hide=true; }
     public void show(){ hide=false; }
     
-    public void bgColor(Color c){
+    public void bgColor(IColor c){
 	// test
 	bgColor[0][0]=bgColor[0][1]=bgColor[1][0]=bgColor[1][1]=c;
 	/*
@@ -188,7 +188,7 @@ public class IView{
 	else{ javaBGColor1 = c; javaBGColor2 = c; }
 	*/
     }
-    public void bgColor(Color c1, Color c2){
+    public void bgColor(IColor c1, IColor c2){
 	// test
 	bgColor[0][0]=bgColor[1][0]=c1;
 	bgColor[0][1]=bgColor[1][1]=c2;
@@ -208,7 +208,7 @@ public class IView{
 	*/
     }
     
-    public void bgColor(Color c1, Color c2, Color c3, Color c4){
+    public void bgColor(IColor c1, IColor c2, IColor c3, IColor c4){
 	// test
 	bgColor[0][0] = c1;
 	bgColor[1][0] = c2;
@@ -218,7 +218,7 @@ public class IView{
 	//bgColor(new Color[][]{ new Color[]{ c1, c4 }, new Color[]{ c2, c3 } }); // necessary?
     }
     
-    public void bgColor(Color[][] c){
+    public void bgColor(IColor[][] c){
 	// test
 	for(int i=0; i<2 && i<c.length; i++)
 	    for(int j=0; j<2 && j<c[i].length; j++) bgColor[i][j]=c[i][j];
@@ -237,7 +237,7 @@ public class IView{
     }
     
     
-    public Color[][] bgColor(){ return bgColor; }
+    public IColor[][] bgColor(){ return bgColor; }
     
     
     public void setPane(IPane p){
@@ -246,12 +246,12 @@ public class IView{
 	
 	int origScH = screenHeight;
 	
-	screenX=pane.getX(); screenWidth=pane.getWidth(); screenHeight=pane.getHeight();
+	screenX=(int)pane.getX(); screenWidth=pane.getWidth(); screenHeight=pane.getHeight();
 	
 	if(mode.isGL()){ // flip y
-	    screenY=pane.getPanel().getHeight() - (pane.getY()+pane.getHeight()); 
+	    screenY=pane.getPanel().getHeight() - ((int)pane.getY()+pane.getHeight()); 
 	}
-	else{ screenY=pane.getY(); }
+	else{ screenY=(int)pane.getY(); }
 	
 	// to keep extend, not axonometric ratio
 	if(axonometric&&screenHeight>0&&origScH>0){

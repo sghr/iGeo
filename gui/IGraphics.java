@@ -22,11 +22,11 @@
 
 package igeo.gui;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 import igeo.IG;
 import igeo.IGraphicI;
+import igeo.IColor;
 import igeo.IConfig;
 
 /**
@@ -71,18 +71,25 @@ public interface IGraphics{
     public abstract IGraphicMode.GraphicType type();
     
     /** fill color */
-    public abstract void clr(Color c); //{ color = c; }
+    //public abstract void clr(Color c); //{ color = c; }
+    public abstract void clr(IColor c); //{ color = c; }
     /** fill color (float 0-255)*/
     public abstract void clr(float r, float g, float b, float a);
     /** fill color (float 0-255)*/
     public abstract void clr(float r, float g, float b);
-
+    
+    /** fill color (array of 4 float in order of  r, g, b, a)*/
+    public abstract void clr(float[] rgba);
+    
     /** stroke (line) color */
-    public abstract void stroke(Color c);
+    //public abstract void stroke(Color c);
+    public abstract void stroke(IColor c);
     /** stroke color (float 0-255)*/
     public abstract void stroke(float r, float g, float b, float a);
     /** stroke color (float 0-255)*/
     public abstract void stroke(float r, float g, float b);
+    /** stroke color (array of 4 float in order of  r, g, b, a)*/
+    public abstract void stroke(float[] rgba);
     
     
     public abstract void weight(float w); //{ weight = w; }
@@ -120,5 +127,10 @@ public interface IGraphics{
     // surface?
     
     //public void stroke(double w)
+    
+    /** check if this is the first time frame to draw */
+    public boolean firstDraw();
+    /** set the first draw flag */
+    public void firstDraw(boolean f);
     
 }

@@ -70,18 +70,18 @@ public class IGraphicServer{
     
     public IServer server;
     
-    public IPanel panel;
+    public IPanelI panel;
     
     public IGraphicMode[] modes=null;
     
     public boolean useGL;
     
     
-    public IGraphicServer(IServer s, IPanel p){
+    public IGraphicServer(IServer s, IPanelI p){
 	server=s;
 	panel = p;
 	views=new ArrayList<IView>();
-	for(int i=0; i<panel.paneNum(); i++) views.add(panel.getPane(i).getView());
+	for(int i=0; i<panel.paneNum(); i++) views.add(panel.pane(i).getView());
     }
     
     public void addView(IView v){ views.add(v); }
@@ -100,10 +100,10 @@ public class IGraphicServer{
     public boolean isGL(){ return useGL; }
     
     
-    public void bg(Color c1, Color c2, Color c3, Color c4){
+    public void bg(IColor c1, IColor c2, IColor c3, IColor c4){
 	if(views!=null) for(IView v:views) v.bgColor(c1,c2,c3,c4);
     }
-    public void background(Color c1, Color c2, Color c3, Color c4){ bg(c1,c2,c3,c4); }
+    public void background(IColor c1, IColor c2, IColor c3, IColor c4){ bg(c1,c2,c3,c4); }
     
     
     public void add(IObject e){

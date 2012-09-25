@@ -24,34 +24,68 @@ package igeo.gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 /**
-   Abstracted mouse button type.
+   Abstracted mouse event (x,y and button type).
       
    @author Satoru Sugihara
 */
-public class IMouseButton{
+public class IMouseEvent{
+
+    final static public int Button1 = 1; //MouseEvent.BUTTON1; // if it doesn't have awt?
+    final static public int Button2 = 2; //MouseEvent.BUTTON2; 
+    final static public int Button3 = 3; //MouseEvent.BUTTON3;
     
     public int button;
     public boolean shiftDown;
     public boolean controlDown;
     public boolean altDown;
+
+    public float mouseX, mouseY;
     
     //int mask;
     
-    public IMouseButton(){
-	button = MouseEvent.BUTTON1; shiftDown=false; controlDown=false; altDown=false; 
+    public IMouseEvent(){
+	button = Button1; /*MouseEvent.BUTTON1;*/ shiftDown=false; controlDown=false; altDown=false; 
     }
-    public IMouseButton(int b){
+    public IMouseEvent(int b){
 	button = b; shiftDown=false; controlDown=false; altDown=false; 
     }
-    public IMouseButton(int b, boolean shiftDown, boolean controlDown, boolean altDown){
+    public IMouseEvent(int b, boolean shiftDown, boolean controlDown, boolean altDown){
 	button=b;
 	this.shiftDown = shiftDown;
 	this.controlDown = controlDown;
 	this.altDown = altDown;
     }
+    
+    public IMouseEvent(float x, float y){
+	this();
+	mouseX = x;
+	mouseY = y;
+    }
+    public IMouseEvent(int b, float x, float y){
+	this(b);
+	mouseX = x;
+	mouseY = y;
+    }
+    public IMouseEvent(int b, boolean shiftDown, boolean controlDown, boolean altDown, float x, float y){
+	this(b,shiftDown,controlDown,altDown);
+	mouseX = x;
+	mouseY = y;
+    }
+    
+    public IMouseEvent(MouseEvent e){
+	button = e.getButton();
+	shiftDown = e.isShiftDown();
+	controlDown = e.isControlDown();
+	altDown = e.isAltDown();
+	
+	mouseX = e.getX();
+	mouseY = e.getY();
+    }
+    
+    public int getX(){ return (int)mouseX; }
+    public int getY(){ return (int)mouseY; }
     
     /*
     // SHIFT_DOWN or SHIFT_DOWN_MASK?
@@ -65,20 +99,22 @@ public class IMouseButton{
     public boolean isControlDown(){ return controlDown; }
     public boolean isAltDown(){ return altDown; }
     
+    /** check button matching */
     public boolean match(MouseEvent e){
-	
-	//IOut.p("e.button="+e.getButton()); //
-	//IOut.p("button="+button);//
-	//IOut.p("e.shift="+e.isShiftDown());
-	//IOut.p("e.control="+e.isControlDown());
-	//IOut.p("e.alt="+e.isAltDown());
-	//IOut.p("modifiers&MASK="+(e.getModifiers() & (InputEvent.SHIFT_MASK|InputEvent.CTRL_MASK|InputEvent.ALT_MASK)));
-	//IOut.p("mask="+mask); //
-	
 	if(e.getButton()!=button) return false;
 	if(shiftDown!=e.isShiftDown()) return false;
 	if(controlDown!=e.isControlDown()) return false;
 	if(e.getButton()!=MouseEvent.BUTTON2 && // ignore BUTTON2 for ALT
+	   altDown!=e.isAltDown()) return false;
+	return true;
+    }
+    
+    /** check button matching */
+    public boolean match(IMouseEvent e){
+	if(e.button!=button) return false;
+	if(shiftDown!=e.shiftDown) return false;
+	if(controlDown!=e.controlDown) return false;
+	if(e.button!=Button2 && // ignore BUTTON2 for ALT
 	   altDown!=e.isAltDown()) return false;
 	return true;
     }

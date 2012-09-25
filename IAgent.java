@@ -22,7 +22,7 @@
 
 package igeo;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -226,8 +226,14 @@ public class IAgent extends IObject implements IDynamics{
     public IAgent hide(){ super.hide(); return this; }
     public IAgent show(){ super.show(); return this; }
     
-    public IAgent clr(Color c){ super.clr(c); return this; }
-    public IAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IAgent clr(IColor c){ super.clr(c); return this; }
+    public IAgent clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IAgent clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IAgent clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    //public IAgent clr(Color c){ super.clr(c); return this; }
+    //public IAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    //public IAgent clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    //public IAgent clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IAgent clr(int gray){ super.clr(gray); return this; }
     public IAgent clr(float fgray){ super.clr(fgray); return this; }
     public IAgent clr(double dgray){ super.clr(dgray); return this; }
@@ -248,8 +254,14 @@ public class IAgent extends IObject implements IDynamics{
     public IAgent weight(float w){ super.weight(w); return this; }
     public IAgent weight(double w){ super.weight(w); return this; }
     
-    public IAgent setColor(Color c){ super.setColor(c); return this; }
-    public IAgent setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public IAgent setColor(IColor c){ super.setColor(c); return this; }
+    public IAgent setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public IAgent setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public IAgent setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
+    //public IAgent setColor(Color c){ super.setColor(c); return this; }
+    //public IAgent setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    //public IAgent setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    //public IAgent setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public IAgent setColor(int gray){ super.setColor(gray); return this; }
     public IAgent setColor(float fgray){ super.setColor(fgray); return this; }
     public IAgent setColor(double dgray){ super.setColor(dgray); return this; }

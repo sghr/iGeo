@@ -38,7 +38,7 @@ import igeo.*;
 import igeo.gui.*;
 
 import java.io.*;
-import java.awt.Color;
+//import java.awt.Color;
 import java.util.ArrayList;
 import java.util.zip.*;
 
@@ -213,17 +213,17 @@ public class IRhino3dmImporter extends IRhino3dm{
     }
     
     
-    public static Color readColor(InputStream is)throws IOException{
+    public static IColor readColor(InputStream is)throws IOException{
 	return readColor(readInt32(is));
     }
     
-    public static Color readColor(int i){
+    public static IColor readColor(int i){
 	int r = i&0xFF;
 	int g = (i>>8)&0xFF;
 	int b = (i>>16)&0xFF;
 	int a = (i>>24)&0xFF;
 	//return new Color(r,g,b,a);
-	return new Color(r,g,b,255-a); // !
+	return new IColor(r,g,b,255-a); // !
     }
     
     public static String readString(InputStream is)throws IOException{
@@ -356,15 +356,15 @@ public class IRhino3dmImporter extends IRhino3dm{
     }
     
     
-    public static ArrayList<Color> readArrayColor(InputStream is) throws IOException{
+    public static ArrayList<IColor> readArrayColor(InputStream is) throws IOException{
 	int count = readInt(is);
-	ArrayList<Color> array = new ArrayList<Color>(count);
+	ArrayList<IColor> array = new ArrayList<IColor>(count);
 	for(int i=0; i<count; i++){ array.add(readColor(is)); }
 	return array;
     }
-    public static ArrayList<Color> readArrayColor(byte[] buf, int count) throws IOException{
+    public static ArrayList<IColor> readArrayColor(byte[] buf, int count) throws IOException{
 	ByteArrayInputStream bais = new ByteArrayInputStream(buf);
-	ArrayList<Color> array = new ArrayList<Color>(count);
+	ArrayList<IColor> array = new ArrayList<IColor>(count);
 	for(int i=0; i<count; i++){ array.add(readColor(bais)); }
 	return array;
     }

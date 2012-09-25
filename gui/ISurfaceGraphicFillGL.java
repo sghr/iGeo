@@ -23,7 +23,7 @@
 package igeo.gui;
 
 import java.util.ArrayList;
-import java.awt.Color;
+//import java.awt.Color;
 
 //import javax.media.opengl.*;
 
@@ -503,6 +503,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     }
     
     synchronized public void draw(IGraphics g){
+
+	
+	
 	//if(surface==null) initSurface(); // not initizlized at the constructor // shouldn't it?
 	if(!initialized) initSurface();
 	else if(update){ updateSurface(); update=false; }
@@ -513,33 +516,37 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    
 	    IGraphics3D g3d = (IGraphics3D)g;
 	    
-	    float red,green,blue,alpha;
+	    //float red,green,blue,alpha;
+	    float[] rgba=null;
 	    if(color!=null){
-		red = color.getRed();
-		green = color.getGreen();
-		blue = color.getBlue();
-		alpha = color.getAlpha();
+		rgba = color.rgba();
+		//red = color.getRed();
+		//green = color.getGreen();
+		//blue = color.getBlue();
+		//alpha = color.getAlpha();
 	    }
 	    else{
-		red = IConfig.objectColor.getRed();
-		green = IConfig.objectColor.getGreen();
-		blue = IConfig.objectColor.getBlue();
-		alpha = IConfig.objectColor.getAlpha();
+		rgba = IConfig.objectColor.rgba();
+		//red = IConfig.objectColor.getRed();
+		//green = IConfig.objectColor.getGreen();
+		//blue = IConfig.objectColor.getBlue();
+		//alpha = IConfig.objectColor.getAlpha();
 	    }
 	    
-	    if(g3d.view().mode().isTransparent()){ alpha = IConfig.transparentModeAlpha; }
+	    if(g3d.view().mode().isTransparent()){
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
+	    }
 	    
 	    if(g3d.view().mode().isLight()){
-		g3d.ambient(red,green,blue,alpha);
-		g3d.diffuse(red,green,blue,alpha);
-		//g3d.specular(red,green,blue,alpha);
+		g3d.ambient(rgba);
+		g3d.diffuse(rgba);
+		//g3d.specular(rgba);
 		g3d.shininess(IConfig.shininess);
-		g3d.clr(red,green,blue,0f);
+		g3d.clr(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f);
 	    }
 	    //else{ g3d.clr(red,green,blue,alpha); }
 	    
-	    g3d.clr(red,green,blue,alpha);
-	    
+	    g3d.clr(rgba);
 	    
 	    if(quads!=null){
 		if(quadsNormal==null){ g3d.drawQuadMatrix(quads); }
@@ -610,7 +617,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    alpha = (float)IConfig.objectColor.getAlpha()/255;
 		}
 		
-		if(g.view().mode().isTransparent()){ alpha = (float)IConfig.transparentModeAlpha/255; }
+		if(g.view().mode().isTransparent()){ alpha = (float)IConfig.transparentModeAlpha/255f; }
 		
 		if(g.view().mode().isLight()){
 		    float[] colorf = new float[]{ red, green, blue, alpha };

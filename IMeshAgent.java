@@ -23,7 +23,7 @@
 package igeo;
 
 import java.util.ArrayList;
-
+import java.awt.Color;
 /**
    Agent to iterate mesh faces.
    
@@ -58,5 +58,65 @@ public class IMeshAgent extends IAgent{
 	
 	centerPt = new IPoint(curFace.getCenter()).clr(1.,0,0).size(5);
     }
+    
+    
+    
+    /**************************************
+     * methods of IObject
+     *************************************/
+    
+    public IMeshAgent name(String nm){ super.name(nm); return this; }
+    public IMeshAgent layer(ILayer l){ super.layer(l); return this; }
+    
+    public IMeshAgent hide(){ super.hide(); return this; }
+    public IMeshAgent show(){ super.show(); return this; }
+    
+    public IMeshAgent clr(IColor c){ super.clr(c); return this; }
+    public IMeshAgent clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IMeshAgent clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IMeshAgent clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IMeshAgent clr(Color c){ super.clr(c); return this; }
+    public IMeshAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IMeshAgent clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public IMeshAgent clr(Color c, double alpha){ super.clr(c,alpha); return this; }
+    public IMeshAgent clr(int gray){ super.clr(gray); return this; }
+    public IMeshAgent clr(float fgray){ super.clr(fgray); return this; }
+    public IMeshAgent clr(double dgray){ super.clr(dgray); return this; }
+    public IMeshAgent clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
+    public IMeshAgent clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
+    public IMeshAgent clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
+    public IMeshAgent clr(int r, int g, int b){ super.clr(r,g,b); return this; }
+    public IMeshAgent clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
+    public IMeshAgent clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
+    public IMeshAgent clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
+    public IMeshAgent clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
+    public IMeshAgent clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
+    public IMeshAgent hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
+    public IMeshAgent hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
+    public IMeshAgent hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
+    public IMeshAgent hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
+
+    public IMeshAgent weight(float w){ super.weight(w); return this; }
+    public IMeshAgent weight(double w){ super.weight(w); return this; }
+    
+    public IMeshAgent setColor(Color c){ super.setColor(c); return this; }
+    public IMeshAgent setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public IMeshAgent setColor(int gray){ super.setColor(gray); return this; }
+    public IMeshAgent setColor(float fgray){ super.setColor(fgray); return this; }
+    public IMeshAgent setColor(double dgray){ super.setColor(dgray); return this; }
+    public IMeshAgent setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
+    public IMeshAgent setColor(float fgray, float falpha){ super.setColor(fgray,falpha); return this; }
+    public IMeshAgent setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
+    public IMeshAgent setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
+    public IMeshAgent setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
+    public IMeshAgent setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
+    public IMeshAgent setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
+    public IMeshAgent setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
+    public IMeshAgent setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
+    public IMeshAgent setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
+    public IMeshAgent setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
+    public IMeshAgent setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
+    public IMeshAgent setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
+    
     
 }

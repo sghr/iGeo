@@ -89,67 +89,78 @@ public class IVectorGraphic extends IGraphicObject{
 	    g3d.weight(weight); // debug
 	    //g3d.pointSize(size);
 	    
-	    float red,green,blue,alpha;
+	    //float red,green,blue,alpha;
+	    float[] rgba=null;
 	    if(color!=null){
-		red = color.getRed();
-		green = color.getGreen();
-		blue = color.getBlue();
-		alpha = color.getAlpha();
+		rgba = color.rgba();
+		//red = color.getRed();
+		//green = color.getGreen();
+		//blue = color.getBlue();
+		//alpha = color.getAlpha();
 	    }
 	    else{
-		red = IConfig.objectColor.getRed();
-		green = IConfig.objectColor.getGreen();
-		blue = IConfig.objectColor.getBlue();
-		alpha = IConfig.objectColor.getAlpha();
+		rgba = IConfig.objectColor.rgba();
+		//red = IConfig.objectColor.getRed();
+		//green = IConfig.objectColor.getGreen();
+		//blue = IConfig.objectColor.getBlue();
+		//alpha = IConfig.objectColor.getAlpha();
 	    }
 	    
 	    // setting fill color
-	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
-		alpha = IConfig.transparentModeAlpha;
+	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe()){
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
+		//alpha = IConfig.transparentModeAlpha;
+	    }
 	    
-            if(g3d.view().mode().isTransparent()) alpha = IConfig.transparentModeAlpha;
+            if(g3d.view().mode().isTransparent()){
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
+		//alpha = IConfig.transparentModeAlpha;
+	    }
 	    
             if(g3d.view().mode().isLight()){
-                g3d.ambient(red,green,blue,alpha);
-                g3d.diffuse(red,green,blue,alpha);
-                //g3d.specular(red,green,blue,alpha);
+                g3d.ambient(rgba);
+                g3d.diffuse(rgba);
+                //g3d.specular(rgba);
                 g3d.shininess(IConfig.shininess);
-                g3d.clr(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+                g3d.clr(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f); // ? without this, the color is tinted with the previous object's color
             }
-            else{ g3d.clr(red,green,blue,alpha); }
+            else{ g3d.clr(rgba); }
 	    
 	    // fill
 	    if(g3d.view().mode().isFill()){
 		arrowLine[1].add(v2);
 		g3d.drawLines(arrowLine);
-		if(g3d.view().mode().isTransparent()){ alpha = IConfig.transparentModeAlpha; }
-		g3d.clr(red, green, blue, alpha);
+		if(g3d.view().mode().isTransparent()){
+		    g3d.clr(rgba[0]*255, rgba[1]*255, rgba[2]*255, IConfig.transparentModeAlpha);
+		}
+		else{ g3d.clr(rgba); }
 		g3d.drawTriangles(arrowHead);
 	    }
 	    
 	    // setting wireframe color
-            if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
-                alpha = IConfig.transparentModeAlpha;
-            else if(color!=null) alpha = (float)color.getAlpha();
-            else alpha = (float)IConfig.objectColor.getAlpha();
+            if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe()){
+		rgba = new float[]{ rgba[0],rgba[1],rgba[2], IConfig.transparentModeAlpha/255f };
+	    }
+            else if(color!=null){ rgba[3] = color.a(); }
+            else{ rgba = new float[]{ rgba[0],rgba[1],rgba[2], IConfig.objectColor.a() }; }
 	    
             if(g3d.view().mode().isLight()&&g3d.view().mode().isLightWireframe()){
-                g3d.ambient(red,green,blue,alpha);
-		g3d.diffuse(red,green,blue,alpha);
-                //g3d.specular(red,green,blue,alpha);
+                g3d.ambient(rgba);
+		g3d.diffuse(rgba);
+                //g3d.specular(rgba);
 		g3d.shininess(IConfig.shininess);
-		g3d.stroke(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color // necessary here?
+		g3d.stroke(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f); // ? without this, the color is tinted with the previous object's color // necessary here?
             }
-            else{ g3d.stroke(red,green,blue,alpha); } // necessary here?
+            else{ g3d.stroke(rgba); } // necessary here?
 	    
 	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
 		g3d.disableLight();
 	    
-	    g3d.stroke(red,green,blue,alpha);
+	    g3d.stroke(rgba);
 	    
 	    // wireframe
 	    if(g3d.view().mode().isWireframe()){
-		g3d.stroke(red, green, blue, alpha);
+		g3d.stroke(rgba);
 		g3d.drawLines(arrowLine);
 		if(g3d.view().mode().isFill()){ g3d.drawLineLoop(arrowHead); } // close
 		else{ g3d.drawLineStrip(arrowHead); }
@@ -157,7 +168,6 @@ public class IVectorGraphic extends IGraphicObject{
 	    
 	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
 		g3d.enableLight();
-	    
 	    
 	    /*
 	    GL gl = ((IGraphicsGL)g).getGL();
@@ -184,7 +194,7 @@ public class IVectorGraphic extends IGraphicObject{
 	    }
 	    
 	    if(g.view().mode().isTransparent()&&g.view().mode().isTransparentWireframe())
-		alpha = (float)IConfig.transparentModeAlpha/255;
+		alpha = (float)IConfig.transparentModeAlpha/255f;
 	    
             if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
                 float[] colorf = new float[]{ red, green, blue, alpha };
@@ -216,7 +226,7 @@ public class IVectorGraphic extends IGraphicObject{
 		gl.glVertex3d(v.x+v2.x+rt.x, v.y+v2.y+rt.y, v.z+v2.z+rt.z);
 		gl.glEnd();
 		if(g.view().mode().isTransparent()){
-		    alpha = (float)IConfig.transparentModeAlpha/255;
+		    alpha = (float)IConfig.transparentModeAlpha/255f;
 		    gl.glColor4f(red, green, blue, alpha);
 		}
 		// arrow head

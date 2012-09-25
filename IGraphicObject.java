@@ -49,7 +49,7 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     
     //static public double transparentModeAlpha=0.4;
     
-    public Color color;
+    public IColor color;
     public boolean visible=true;
     
     public IObject parent;
@@ -97,22 +97,29 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     public float getWeight(){ return -1f; } // implemented in child class if necessary
     
     
-    public void setColor(Color c){ color=c; }
+    public void setColor(IColor c){ color=c; }
+    public void setColor(Color c){ color=new IColor(c); }
     
-    public Color getColor(){ return color; }
+    public IColor getColor(){ return color; }
+    public Color getAWTColor(){ return color.awt(); }
     
-    public void setColor(Color c, int alpha){ setColor(getColor(c,alpha)); }
-    public void setColor(Color c, float alpha){ setColor(getColor(c,alpha)); }
-    public void setColor(int gray){ setColor(getColor(gray)); }
-    public void setColor(float fgray){ setColor(getColor(fgray)); }
-    public void setColor(int gray, int alpha){ setColor(getColor(gray,alpha)); }
-    public void setColor(float fgray, float falpha){ setColor(getColor(fgray,falpha)); }
-    public void setColor(int r, int g, int b){ setColor(getColor(r,g,b)); }
-    public void setColor(float fr, float fg, float fb){ setColor(getColor(fr,fg,fb)); }
-    public void setColor(int r, int g, int b, int a){ setColor(getColor(r,g,b,a)); }
-    public void setColor(float fr, float fg, float fb, float fa){ setColor(getColor(fr,fg,fb,fa)); }
-    public void setHSBColor(float h, float s, float b, float a){ setColor(getHSBColor(h,s,b,a)); }
-    public void setHSBColor(float h, float s, float b){ setColor(getHSBColor(h,s,b)); }
+    public void setColor(IColor c, int alpha){ color = new IColor(c,alpha); }
+    public void setColor(IColor c, float alpha){ color = new IColor(c,alpha); }
+    public void setColor(Color c, int alpha){ color = new IColor(c,alpha); }
+    public void setColor(Color c, float alpha){ color = new IColor(c,alpha); }
+    public void setColor(int gray){ color = new IColor(gray); }
+    public void setColor(float fgray){ color = new IColor(fgray); }
+    public void setColor(int gray, int alpha){ color = new IColor(gray,alpha); }
+    public void setColor(float fgray, float falpha){ color = new IColor(fgray,falpha); }
+    public void setColor(int r, int g, int b){ color = new IColor(r,g,b); }
+    public void setColor(float fr, float fg, float fb){ color = new IColor(fr,fg,fb); }
+    public void setColor(int r, int g, int b, int a){ color = new IColor(r,g,b,a); }
+    public void setColor(float fr, float fg, float fb, float fa){ color = new IColor(fr,fg,fb,fa); }
+    public void setHSBColor(float h, float s, float b, float a){ color = IColor.hsb(h,s,b,a); }
+    public void setHSBColor(float h, float s, float b){ color = IColor.hsb(h,s,b); }
+
+    
+    
     
     
     public static Color getColor(Color c, int alpha){

@@ -22,9 +22,6 @@
 
 package igeo.gui;
 
-//import javax.media.opengl.*;
-import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 
 import igeo.*;
@@ -45,8 +42,8 @@ public interface IPane{
     public void setLocation(int x, int y);
     public void setSize(int width, int height);
     
-    public int getX();
-    public int getY();
+    public float getX();
+    public float getY();
     public int getWidth();
     public int getHeight();
     
@@ -57,14 +54,16 @@ public interface IPane{
     
     public boolean contains(int x, int y);
     
-    public void setPanel(IPanel p);
-    public IPanel getPanel();
+    public void setPanel(IPanelI p);
+    public IPanelI getPanel();
     
     public void setBorderWidth(float b);
     public float getBorderWidth();
-    public Stroke getBorderStroke();
-    public void setBorderColor(Color c);
-    public Color getBorderColor();
+    //public Stroke getBorderStroke();
+    public void setBorderColor(int r, int g, int b, int a);
+    //public void setBorderColor(Color c);
+    //public Color getBorderColor();
+    public int getBorderColor();
     public INavigator navigator();
     public void setBounds(int x, int y, int w, int h);
     public void setView(IView view);
@@ -76,19 +75,22 @@ public interface IPane{
     
     /** Focus view on objects */
     public void focus(ArrayList<IObject> e);
+
     
-    public void mousePressed(MouseEvent e);
-    public void mouseReleased(MouseEvent e);
-    public void mouseClicked(MouseEvent e);
-    public void mouseEntered(MouseEvent e);
-    public void mouseExited(MouseEvent e);
-    public void mouseMoved(MouseEvent e);
-    public void mouseDragged(MouseEvent e);
-    public void mouseWheelMoved(MouseWheelEvent e);
-    public void keyPressed(KeyEvent e);
-    public void keyReleased(KeyEvent e);
-    public void keyTyped(KeyEvent e);
-    public void focusLost(FocusEvent e);
-    public void focusGained(FocusEvent e);
+    public void mousePressed(IMouseEvent e);
+    public void mouseReleased(IMouseEvent e);
+    public void mouseClicked(IMouseEvent e);
+    public void mouseEntered(IMouseEvent e);
+    public void mouseExited(IMouseEvent e);
+    public void mouseMoved(IMouseEvent e);
+    public void mouseDragged(IMouseEvent e);
+    public void mouseWheelMoved(IMouseWheelEvent e);
+    public void keyPressed(IKeyEvent e);
+    public void keyReleased(IKeyEvent e);
+    public void keyTyped(IKeyEvent e);
+
+    //public void focusLost(FocusEvent e);
+    //public void focusGained(FocusEvent e);
+    
     
 }

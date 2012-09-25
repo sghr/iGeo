@@ -23,10 +23,10 @@
 package igeo.io;
 
 import java.io.*;
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.util.Vector;
+
+
+
+
 import java.util.ArrayList;
 import java.text.*;
 
@@ -543,7 +543,7 @@ class IAIExporter {
 
     
     public static void writePaintStyle(PrintStream ps,
-				       Color fillColor, Color strokeColor, double lineWidth){
+				       IColor fillColor, IColor strokeColor, double lineWidth){
 	ps.println("0 A"); // lock
 	if(fillColor!=null) ps.println("0 O"); // overprint color
 	if(strokeColor!=null) ps.println("0 R"); // overprint color
@@ -640,7 +640,7 @@ class IAIExporter {
 	
 	double lineWeight = defaultLineWeight;
 
-	Color color = null;
+	IColor color = null;
 	if(curve instanceof IObject) color = ((IObject)curve).clr();
 	
 	if(fillClosedCurve && curve.isClosed()){

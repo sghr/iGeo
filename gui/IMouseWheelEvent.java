@@ -20,25 +20,31 @@
 
 ---*/
 
-package igeo;
+package igeo.gui;
 
+import java.awt.*;
+import java.awt.event.*;
 
 /**
-   A Class of rendering material properties for IObject geometries.
-   In the current version, this material information is not used yet.
-   
+   Abstracted mouse wheel event
+      
    @author Satoru Sugihara
 */
+public class IMouseWheelEvent{
 
-public class IBasicMaterial extends IMaterial{
-    public IColor ambient;
-    public IColor diffuse;
-    public IColor emission;
-    public IColor specular;
-    public IColor reflection;
-    public IColor transparent;
-    public double refraction = 1.;
-    public double reflectivity = 0.;
-    public double shine = 0.;
-    public double transparency = 0.;
+    public int rotation;
+    public int scrollAmount;
+    public int scrollType;
+    
+    public IMouseWheelEvent(){}
+    public IMouseWheelEvent(int rot){ rotation = rot; }
+    public IMouseWheelEvent(MouseWheelEvent e){
+	rotation = e.getWheelRotation();
+	scrollAmount = e.getScrollAmount();
+	scrollType = e.getScrollType();
+    }
+    
+    public int getScrollAmount(){ return scrollAmount; }
+    public int getScrollType(){ return scrollType; }
+    public int getWheelRotation(){ return rotation; }
 }

@@ -156,6 +156,13 @@ public class IDynamicServer implements Runnable{
 	    IOut.debug(0,"dynamic server started");
 	}
     }
+
+    public void startWithoutThread(){
+	runningDynamics=true;
+	startedOnce=true;
+	time=0;
+	IOut.debug(0,"dynamic server started");
+    }
     
     public void stop(){
 	runningDynamics=false;
@@ -166,12 +173,12 @@ public class IDynamicServer implements Runnable{
     /** in case dynamicServer need to start again after stopped. */
     public void reset(){ startedOnce=false; }
     
-    public void run(){
-	Thread thisThread = Thread.currentThread();
-	while(thread==thisThread){
-	    
-	    if(runningDynamics){
-		if(duration>=0 && time>=duration){ stop(); break; }
+    
+    public void step(){
+	
+	if(runningDynamics){
+	    if(duration>=0 && time>=duration){ stop(); }
+	    else{
 		synchronized(this){
 		    // adding objects
 		    if(addingDynamics.size()>0){
@@ -233,7 +240,7 @@ public class IDynamicServer implements Runnable{
 			    }
 			}
 		    }
-
+		    
 		    // preupdate is executed before post interact to update force first and velocity second. // updated 20120826
 		    // preupdate
 		    if(IConfig.loopPreupdate&&IConfig.enablePreupdate){
@@ -314,11 +321,19 @@ public class IDynamicServer implements Runnable{
 			    }
 			}
 		    }
-		    
 		}
 		time++;
 		IOut.debug(20,"time="+time); //
 	    }
+	}
+    }
+    
+    
+    public void run(){
+	Thread thisThread = Thread.currentThread();
+	while(thread==thisThread){
+	    
+	    step();
 	    
 	    try{
 		//Thread.sleep(updateRate);

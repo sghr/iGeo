@@ -33,8 +33,8 @@ import java.awt.Color;
 
 public class IFieldVisualizer extends IAgent{
     public static int defaultNum = 10;
-    public static Color defaultMinColor = new Color(0,128,255); //Color.green;
-    public static Color defaultMaxColor = Color.red;
+    public static IColor defaultMinColor = new IColor(0,128,255); //Color.green;
+    public static IColor defaultMaxColor = new IColor(255,0,0);
     
     /** corner of grid box */
     public IVec min, max;
@@ -58,7 +58,7 @@ public class IFieldVisualizer extends IAgent{
     
     /** for coloring vector by length */
     public double minLength=0, maxLength=10;
-    public Color minColor=defaultMinColor, maxColor=defaultMaxColor;
+    public IColor minColor=defaultMinColor, maxColor=defaultMaxColor;
     /** adjust minLength/maxLength relative to existing lengths */
     public boolean autoColorAdjust=true;
     
@@ -132,30 +132,35 @@ public class IFieldVisualizer extends IAgent{
     
     public IFieldVisualizer colorRange(int minRed, int minGreen, int minBlue,
 				       int maxRed, int maxGreen, int maxBlue){
-	return colorRange(IGraphicObject.getColor(minRed,minGreen,minBlue),
-			  IGraphicObject.getColor(maxRed,maxGreen,maxBlue));
+	return colorRange(new IColor(minRed,minGreen,minBlue),
+			  new IColor(maxRed,maxGreen,maxBlue));
     }
     
     public IFieldVisualizer colorRange(int minRed, int minGreen, int minBlue, double minLength,
 				       int maxRed, int maxGreen, int maxBlue, double maxLength){
-	return colorRange(IGraphicObject.getColor(minRed,minGreen,minBlue), minLength,
-			  IGraphicObject.getColor(maxRed,maxGreen,maxBlue), maxLength);
+	return colorRange(new IColor(minRed,minGreen,minBlue), minLength,
+			  new IColor(maxRed,maxGreen,maxBlue), maxLength);
     }
     
     public IFieldVisualizer colorRange(float minRed, float minGreen, float minBlue,
 				       float maxRed, float maxGreen, float maxBlue){
-	return colorRange(IGraphicObject.getColor(minRed,minGreen,minBlue),
-			  IGraphicObject.getColor(maxRed,maxGreen,maxBlue));
+	return colorRange(new IColor(minRed,minGreen,minBlue),
+			  new IColor(maxRed,maxGreen,maxBlue));
     }
     
     public IFieldVisualizer colorRange(float minRed, float minGreen, float minBlue, double minLength,
 				       float maxRed, float maxGreen, float maxBlue, double maxLength){
-	return colorRange(IGraphicObject.getColor(minRed,minGreen,minBlue), minLength,
-			  IGraphicObject.getColor(maxRed,maxGreen,maxBlue), maxLength);
+	return colorRange(new IColor(minRed,minGreen,minBlue), minLength,
+			  new IColor(maxRed,maxGreen,maxBlue), maxLength);
     }
     
     public IFieldVisualizer colorRange(Color minColor, double minLength,
 				       Color maxColor, double maxLength){
+	return colorRange(new IColor(minColor), minLength, new IColor(maxColor), maxLength);
+    }
+    
+    public IFieldVisualizer colorRange(IColor minColor, double minLength,
+				       IColor maxColor, double maxLength){
 	this.minColor = minColor;
 	minLength = minLength;
 	this.maxColor = maxColor;
@@ -163,24 +168,27 @@ public class IFieldVisualizer extends IAgent{
 	autoColorAdjust=false;
 	
 	if(alpha!=1f){
-	    minColor = new Color(minColor.getRed(), minColor.getGreen(), minColor.getBlue(),
+	    minColor = new IColor(minColor.getRed(), minColor.getGreen(), minColor.getBlue(),
 				 (int)(alpha*255));
-	    maxColor = new Color(maxColor.getRed(), maxColor.getGreen(), maxColor.getBlue(),
-				 (int)(alpha*255));
+	    maxColor = new IColor(maxColor.getRed(), maxColor.getGreen(), maxColor.getBlue(),
+				  (int)(alpha*255));
 	}
 	
 	return this;
     }
     
-    public IFieldVisualizer colorRange(Color minClr, Color maxClr){
+    public IFieldVisualizer colorRange(Color minColor, Color maxColor){
+	return colorRange(new IColor(minColor), new IColor(maxColor));
+    }
+    public IFieldVisualizer colorRange(IColor minClr, IColor maxClr){
 	minColor = minClr;
 	maxColor = maxClr;
 	autoColorAdjust=true;
 	if(alpha!=1f){
-	    minColor = new Color(minColor.getRed(), minColor.getGreen(), minColor.getBlue(),
-				 (int)(alpha*255));
-	    maxColor = new Color(maxColor.getRed(), maxColor.getGreen(), maxColor.getBlue(),
-				 (int)(alpha*255));
+	    minColor = new IColor(minColor.getRed(), minColor.getGreen(), minColor.getBlue(),
+				  (int)(alpha*255));
+	    maxColor = new IColor(maxColor.getRed(), maxColor.getGreen(), maxColor.getBlue(),
+				  (int)(alpha*255));
 	}
 	return this;
     }
@@ -188,10 +196,10 @@ public class IFieldVisualizer extends IAgent{
     public IFieldVisualizer alpha(float a){
 	if(a<0f) alpha=0f; else if(a>1f) alpha=1f; else alpha = a;
 	
-	minColor = new Color(minColor.getRed(), minColor.getGreen(), minColor.getBlue(),
-			     (int)(alpha*255));
-	maxColor = new Color(maxColor.getRed(), maxColor.getGreen(), maxColor.getBlue(),
-			     (int)(alpha*255));
+	minColor = new IColor(minColor.getRed(), minColor.getGreen(), minColor.getBlue(),
+			      (int)(alpha*255));
+	maxColor = new IColor(maxColor.getRed(), maxColor.getGreen(), maxColor.getBlue(),
+			      (int)(alpha*255));
 	
 	return this;
     }
@@ -199,8 +207,8 @@ public class IFieldVisualizer extends IAgent{
     public IFieldVisualizer alpha(int a){ return alpha((float)a/255); }
     
     
-    public Color minColor(){ return minColor; }
-    public Color maxColor(){ return maxColor; }
+    public IColor minColor(){ return minColor; }
+    public IColor maxColor(){ return maxColor; }
     public double minLength(){ return minLength; }
     public double maxLength(){ return maxLength; }
     
@@ -489,4 +497,16 @@ public class IFieldVisualizer extends IAgent{
     public IParticleI  removeTarget(IObject obj){ return this; }
     public void updateTarget(){ }
     */
+
+    /**************************************
+     * methods of IObject
+     *************************************/
+    
+    public IFieldVisualizer name(String nm){ super.name(nm); return this; }
+    public IFieldVisualizer layer(ILayer l){ super.layer(l); return this; }
+    
+    public IFieldVisualizer hide(){ super.hide(); return this; }
+    public IFieldVisualizer show(){ super.show(); return this; }
+    
+    
 }

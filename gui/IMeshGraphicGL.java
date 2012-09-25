@@ -96,31 +96,36 @@ public class IMeshGraphicGL extends IGraphicObject{
 	    
 	    IGraphics3D g3d = (IGraphics3D)g;
 	    
-	    float red,green,blue,alpha;
+	    //float red,green,blue,alpha;
+	    float[] rgba=null;
 	    if(color!=null){
-		red = color.getRed();
-		green = color.getGreen();
-		blue = color.getBlue();
-		alpha = color.getAlpha();
+		rgba = color.rgba();
+		//red = color.getRed();
+		//green = color.getGreen();
+		//blue = color.getBlue();
+		//alpha = color.getAlpha();
 	    }
 	    else{
-		red = IConfig.objectColor.getRed();
-		green = IConfig.objectColor.getGreen();
-		blue = IConfig.objectColor.getBlue();
-		alpha = IConfig.objectColor.getAlpha();
+		rgba = IConfig.objectColor.rgba();
+		//red = IConfig.objectColor.getRed();
+		//green = IConfig.objectColor.getGreen();
+		//blue = IConfig.objectColor.getBlue();
+		//alpha = IConfig.objectColor.getAlpha();
 	    }
 	    
-	    if(g3d.view().mode().isTransparent()) alpha = IConfig.transparentModeAlpha;
-		
-	    if(g3d.view().mode().isLight()){
-		g3d.ambient(red,green,blue,alpha);
-		g3d.diffuse(red,green,blue,alpha);
-		//g3d.specular(red,green,blue,alpha);
-		g3d.shininess(IConfig.shininess);
-		g3d.clr(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+	    if(g3d.view().mode().isTransparent()){
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
 	    }
-	    //else{ g3d.clr(red,green,blue,alpha); }
-	    g3d.clr(red,green,blue,alpha);
+	    
+	    if(g3d.view().mode().isLight()){
+		g3d.ambient(rgba);
+		g3d.diffuse(rgba);
+		//g3d.specular(rgba);
+		g3d.shininess(IConfig.shininess);
+		g3d.clr(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f); // ? without this, the color is tinted with the previous object's color
+	    }
+	    //else{ g3d.clr(rgba); }
+	    g3d.clr(rgba);
 	    
 	    if(g3d.view().mode().isFill()){
 		int prevNum=0;
@@ -132,26 +137,34 @@ public class IMeshGraphicGL extends IGraphicObject{
 	    }
 	    
 	    
-	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
-		alpha = IConfig.transparentModeAlpha;
-	    else if(color!=null) alpha = (float)color.getAlpha();
-	    else alpha = (float)IConfig.objectColor.getAlpha();
+	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe()){
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
+		//alpha = IConfig.transparentModeAlpha;
+	    }
+	    else if(color!=null){
+		rgba[3] = color.a();
+		//alpha = (float)color.getAlpha();
+	    }
+	    else{
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.objectColor.a() };
+		//alpha = (float)IConfig.objectColor.getAlpha();
+	    }
 	    
 	    if(g.view().mode().isLight()&&g.view().mode().isLightWireframe()){
-		g3d.ambient(red,green,blue,alpha);
-		g3d.diffuse(red,green,blue,alpha);
-		//g3d.specular(red,green,blue,alpha);
+		g3d.ambient(rgba);
+		g3d.diffuse(rgba);
+		//g3d.specular(rgba);
 		g3d.shininess(IConfig.shininess);		
-		g3d.stroke(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+		g3d.stroke(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f); // ? without this, the color is tinted with the previous object's color
 	    }
-	    //else{ g3d.stroke(red,green,blue,alpha); }
+	    //else{ g3d.stroke(rgba); }
 	    
 	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
 		g3d.disableLight();
 	    
 	    if(g3d.view().mode().isWireframe()){
 		g3d.weight(weight);
-		g3d.stroke(red,green,blue,alpha);
+		g3d.stroke(rgba);
 		for(int i=0; i<edgePts.length; i++){ g3d.drawLines(edgePts[i]); }
 	    }
 	    
@@ -188,7 +201,7 @@ public class IMeshGraphicGL extends IGraphicObject{
 		}
 		
 		if(g.view().mode().isTransparent())
-		    alpha = (float)IConfig.transparentModeAlpha/255;
+		    alpha = (float)IConfig.transparentModeAlpha/255f;
 		
 		if(g.view().mode().isLight()){
 		    float[] colorf = new float[]{ red, green, blue, alpha };
@@ -222,7 +235,7 @@ public class IMeshGraphicGL extends IGraphicObject{
 		
 		
 		if(g.view().mode().isTransparent()&&g.view().mode().isTransparentWireframe())
-		    alpha = IConfig.transparentModeAlpha/255;
+		    alpha = IConfig.transparentModeAlpha/255f;
 		else if(color!=null) alpha = (float)color.getAlpha()/255;
 		//else alpha = defaultAlpha;
 		else alpha = (float)IConfig.objectColor.getAlpha()/255;

@@ -324,8 +324,14 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     public void del(){ if(trajectory!=null){ trajectory.del(); } super.del(); }
     
     
+    public IParticleTrajectory clr(IColor c){ super.clr(c); return this; }
+    public IParticleTrajectory clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IParticleTrajectory clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IParticleTrajectory clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public IParticleTrajectory clr(Color c){ super.clr(c); return this; }
     public IParticleTrajectory clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IParticleTrajectory clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public IParticleTrajectory clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IParticleTrajectory clr(int gray){ super.clr(gray); return this; }
     public IParticleTrajectory clr(float fgray){ super.clr(fgray); return this; }
     public IParticleTrajectory clr(double dgray){ super.clr(dgray); return this; }
@@ -343,8 +349,14 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     public IParticleTrajectory hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public IParticleTrajectory hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    public IParticleTrajectory setColor(IColor c){ super.setColor(c); return this; }
+    public IParticleTrajectory setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public IParticleTrajectory setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public IParticleTrajectory setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     public IParticleTrajectory setColor(Color c){ super.setColor(c); return this; }
     public IParticleTrajectory setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public IParticleTrajectory setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    public IParticleTrajectory setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public IParticleTrajectory setColor(int gray){ super.setColor(gray); return this; }
     public IParticleTrajectory setColor(float fgray){ super.setColor(fgray); return this; }
     public IParticleTrajectory setColor(double dgray){ super.setColor(dgray); return this; }

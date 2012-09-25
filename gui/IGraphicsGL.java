@@ -48,8 +48,11 @@ public class IGraphicsGL implements IGraphics3D{
     public GL gl;
     public Graphics2D g;
     public IView view;
-    
+        
     public double[][][] bgColor = new double[2][2][3];
+    
+    public boolean firstDraw=true;
+    
     
     public void IGraphicsGL(){}
     
@@ -109,9 +112,10 @@ public class IGraphicsGL implements IGraphics3D{
 	
 	// background
 	
-	gl.glDisable(GL.GL_DEPTH_TEST); // no depth for background
-	
-	drawBG(gl, view);
+	if(IConfig.clearBG || firstDraw){
+	    gl.glDisable(GL.GL_DEPTH_TEST); // no depth for background
+	    drawBG(gl, view);
+	}
 	
 	if(IConfig.depthSort) gl.glEnable(GL.GL_DEPTH_TEST);
 	// should DEPTH_TEST be changed to set to hint[ENABLE_DEPTH_TEST] later?
@@ -201,28 +205,33 @@ public class IGraphicsGL implements IGraphics3D{
 	    if(view.pane!=null && 
 	       view.pane.getBorderWidth()>0&&
 	       (view.pane.getPanel().getWidth()!=view.pane.getWidth() ||view.pane.getPanel().getHeight()!=view.pane.getHeight())){
-		g.setColor(view.pane.getBorderColor());
-		g.setStroke(view.pane.getBorderStroke());
+		g.setColor(new Color(view.pane.getBorderColor(),true));
+		//g.setStroke(view.pane.getBorderStroke());
+		g.setStroke(new BasicStroke(view.pane.getBorderWidth()));
 		//g.drawRect(view.x,view.y,view.width-1,view.height-1);
-		g.drawRect(view.pane.getX(),view.pane.getY(),view.pane.getWidth(),view.pane.getHeight());
+		g.drawRect((int)view.pane.getX(),(int)view.pane.getY(),view.pane.getWidth(),view.pane.getHeight());
 	    }
-	    
 	}
-	
     }
     
+    public boolean firstDraw(){ return firstDraw; }
+    public void firstDraw(boolean f){ firstDraw=f; }
     
-    public void clr(Color c){
+    public void clr(IColor c){
 	//clr((float)c.getRed()/255,(float)c.getGreen()/255,(float)c.getBlue()/255,(float)c.getAlpha()/255);
-	clr(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
+	//clr(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
+	//gl.glColor4f(c.red(),c.green(),c.blue(),c.alpha());
+	gl.glColor4fv(c.rgba(),0);
     }
+    public void clr(float[] rgba){ gl.glColor4fv(rgba,0); }
     public void clr(float red, float green, float blue, float alpha){
 	gl.glColor4f(red/255, green/255, blue/255, alpha/255);
     }
     public void clr(float red, float green, float blue){ clr(red,green,blue,255); }
-
+    
     /** in GL, stroke color and fill color use both same glColor */
-    public void stroke(Color c){ clr(c); }
+    public void stroke(IColor c){ clr(c); }
+    public void stroke(float[] rgba){ clr(rgba); }
     public void stroke(float red, float green, float blue, float alpha){
 	clr(red,green,blue,alpha);
     }
@@ -232,34 +241,41 @@ public class IGraphicsGL implements IGraphics3D{
     public void weight(float w){ gl.glLineWidth(w); }
     
     
+    public void diffuse(float[] rgba){
+	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, rgba, 0);
+    }
     public void diffuse(float r, float g, float b, float a){
-	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, new float[]{r/255,g/255,b/255,a/255}, 0);
+	diffuse(new float[]{r/255,g/255,b/255,a/255});
     }
     public void diffuse(float r, float g, float b){ diffuse(r,g,b,255); }
-    public void diffuse(Color c){ 
-	diffuse(c.getRed(), c.getGreen(),c.getBlue(),c.getAlpha());
+    public void diffuse(IColor c){ diffuse(c.rgba()); }
+    
+    public void ambient(float[] rgba){
+	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, rgba, 0);
     }
     public void ambient(float r, float g , float b, float a){
-	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, new float[]{r/255,g/255,b/255,a/255}, 0);
+	ambient(new float[]{r/255,g/255,b/255,a/255});
     }
     public void ambient(float r, float g , float b){ ambient(r,g,b,255); }
-    public void ambient(Color c){
-	ambient(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
+    public void ambient(IColor c){ ambient(c.rgba()); }
+    
+    public void specular(float[] rgba){
+	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, rgba, 0);
     }
     public void specular(float r, float g , float b, float a){
-	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, new float[]{r/255,g/255,b/255,a/255}, 0);
+	specular(new float[]{r/255,g/255,b/255,a/255});
     }
     public void specular(float r, float g , float b){ specular(r,g,b,255); }
-    public void specular(Color c){
-	specular(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
+    public void specular(IColor c){ specular(c.rgba()); }
+    
+    public void emissive(float[] rgba){
+	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_EMISSION, rgba, 0);
     }
     public void emissive(float r, float g , float b, float a){
-	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_EMISSION, new float[]{r/255,g/255,b/255,a/255}, 0);
+	emissive(new float[]{r/255,g/255,b/255,a/255});
     }
     public void emissive(float r, float g , float b){ emissive(r,g,b,255); }
-    public void emissive(Color c){
-	emissive(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
-    }
+    public void emissive(IColor c){ emissive(c.rgba()); }
     
     public void shininess(float s){
 	gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,s);

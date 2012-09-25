@@ -482,8 +482,14 @@ public class IPointR extends IObject implements IVecI{
     public IPointR hide(){ super.hide(); return this; }
     public IPointR show(){ super.show(); return this; }
     
+    public IPointR clr(IColor c){ super.clr(c); return this; }
+    public IPointR clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IPointR clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IPointR clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public IPointR clr(Color c){ super.clr(c); return this; }
     public IPointR clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IPointR clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public IPointR clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IPointR clr(int gray){ super.clr(gray); return this; }
     public IPointR clr(float fgray){ super.clr(fgray); return this; }
     public IPointR clr(double dgray){ super.clr(dgray); return this; }

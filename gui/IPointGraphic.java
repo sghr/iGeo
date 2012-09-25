@@ -80,36 +80,40 @@ public class IPointGraphic extends IGraphicObject{
 	    //g3d.pointSize(size);
 	    g3d.pointSize(weight);
 	    
-	    float red,green,blue,alpha;
+	    //float red,green,blue,alpha;
+	    float[] rgba = null;
 	    if(color!=null){
-		red = (float)color.getRed();
-		green = (float)color.getGreen();
-		blue = (float)color.getBlue();
-		alpha = (float)color.getAlpha();
+		rgba = color.rgba();
+		//red = (float)color.getRed();
+		//green = (float)color.getGreen();
+		//blue = (float)color.getBlue();
+		//alpha = (float)color.getAlpha();
 	    }
 	    else{
-		red = (float)IConfig.objectColor.getRed();
-		green = (float)IConfig.objectColor.getGreen();
-		blue = (float)IConfig.objectColor.getBlue();
-		alpha = (float)IConfig.objectColor.getAlpha();
+		rgba = IConfig.objectColor.rgba();
+		//red = (float)IConfig.objectColor.getRed();
+		//green = (float)IConfig.objectColor.getGreen();
+		//blue = (float)IConfig.objectColor.getBlue();
+		//alpha = (float)IConfig.objectColor.getAlpha();
 	    }
 	    
 	    if(g3d.view().mode().isTransparent()&&g3d.view().mode().isTransparentWireframe())
-		alpha = IConfig.transparentModeAlpha;
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
+		//alpha = IConfig.transparentModeAlpha;
 	    
             if(g3d.view().mode().isLight()&&g3d.view().mode().isLightWireframe()){
-		g3d.ambient(red,green,blue,alpha);
-		g3d.diffuse(red,green,blue,alpha);
+		g3d.ambient(rgba);
+		g3d.diffuse(rgba);
 		//g3d.specular(red,green,blue,alpha);
 		g3d.shininess(IConfig.shininess);
-		g3d.clr(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+		g3d.clr(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f); // ? without this, the color is tinted with the previous object's color
             }
 	    
 	    if(g3d.view().mode().isLight()&&!g3d.view().mode().isLightWireframe())
 		g3d.disableLight();
 	    
 	    //g3d.clr(red,green,blue,alpha);
-	    g3d.stroke(red,green,blue,alpha); // in PIGraphicsP3D, it should be stroke color; in IGraphicsGL, clr and stroke is same.
+	    g3d.stroke(rgba); // in PIGraphicsP3D, it should be stroke color; in IGraphicsGL, clr and stroke is same.
 	    
 	    g3d.drawPoint(pt.get());
 	    

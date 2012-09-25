@@ -23,7 +23,6 @@
 package igeo.gui;
 
 import java.util.ArrayList;
-import java.awt.Color;
 
 import igeo.*;
 

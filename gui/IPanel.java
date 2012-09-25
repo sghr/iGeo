@@ -38,7 +38,7 @@ import igeo.io.IIO;
    
    @author Satoru Sugihara
 */
-public class IPanel extends IComponent implements IServerI, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener{
+public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener{
     
     public ArrayList<IPane> panes;
     
@@ -53,6 +53,8 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     public int serverStateCount=-1;
     
     public boolean startDynamicServer=true;
+
+    public boolean sizeChanged=false;
     
     public IPanel(int x, int y, int width, int height){
 	super(x,y,width,height);
@@ -64,6 +66,7 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	this.ig = ig;
 	//for(int i=0; i<panes.size(); i++) panes.get(i).setIG(ig);
     }
+    public IG getIG(){ return ig; }
     
     public IServer server(){ return ig.server(); }
     
@@ -73,9 +76,15 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	//if(ig!=null) p.setIG(ig);
     }
     
-    public IPane getPane(int i){ return panes.get(i); }
+    public IPane pane(int i){
+	if(panes==null || i<0 || i>=panes.size()) return null;
+	return panes.get(i);
+    }
     
-    public int paneNum(){ return panes.size(); }
+    public int paneNum(){
+	if(panes==null) return 0;
+	return panes.size();
+    }
     
     public void removePane(int i){ panes.remove(i); }
     public void clearPane(){ panes.clear(); }
@@ -88,7 +97,6 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     public void focus(){
 	for(int i=0; i<panes.size(); i++) panes.get(i).focus(); 
     }
-    
     
     public void setSize(int w, int h){
 	int origW = width;
@@ -103,32 +111,61 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	}
 	width=w;
 	height=h;
+	
+	sizeChanged=true;
     }
     
     
     public void startDynamicServer(){
 	if(ig!=null &&ig.dynamicServer()!=null &&
 	   (ig.dynamicServer().num()>0 || ig.dynamicServer().addingNum()>0)){
-	    ig.dynamicServer().start();
+	    if(IConfig.syncDrawAndDynamics){ ig.dynamicServer().startWithoutThread(); }
+	    else{ ig.dynamicServer().start(); }
 	    startDynamicServer=false;
+	}
+    }
+    
+    public void predraw(IGraphics g){
+	if(startDynamicServer){
+	    // here is a point to start dynamicServer
+	    startDynamicServer();
+	}
+	if(sizeChanged){
+	    sizeChanged=false;
+	    g.firstDraw(true); //redraw bg if IConfig.clearBG=false
 	}
     }
     
     public void draw(IGraphics g){
 	// some initialization process
-	if(startDynamicServer){
-	    // here is a point to start dynamicServer
-	    startDynamicServer();
-	}
+	predraw(g);
 	
-	for(int i=0; i<panes.size(); i++){
-	    synchronized(IG.lock){
+	for(int i=0; i<panes.size(); i++){ 
+	    synchronized(IG.lock){ // shouldnt this be "ig"?
 		if(panes.get(i).isVisible()){ panes.get(i).draw(g); }
 	    }
 	}
+	
+	postdraw(g);
     }
     
-    public IPane getPaneAt(MouseEvent e){ return getPaneAt(e.getX(),e.getY()); }
+    public void postdraw(IGraphics g){
+	
+	if(IConfig.deleteGraphicObjectsAfterDraw &&
+	   ig!=null && ig.server().graphicServer()!=null){
+	    ig.server().graphicServer().clearObjects();
+	}
+	
+	
+	if(IConfig.syncDrawAndDynamics && !startDynamicServer &&
+	   ig!=null && ig.dynamicServer()!=null){
+	    ig.dynamicServer().step();
+	}
+	
+	if(g.firstDraw()){ g.firstDraw(false); }
+    }
+    
+    
     
     public IPane getPaneAt(int x, int y){
 	//for(IPane p: panes) if(p.isVisible()&&p.contains(x,y)) return p;
@@ -138,6 +175,9 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	return null;
     }
     
+    public IPane getPaneAt(IMouseEvent e){ return getPaneAt(e.getX(),e.getY()); }
+    
+    
     /** returns current pane; if null, it returns first pane. */
     public IPane currentPane(){
 	if(currentMousePane!=null) return currentMousePane;
@@ -146,34 +186,37 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
     
     
     public void mousePressed(MouseEvent e){
-	IPane p = getPaneAt(e);
+	IMouseEvent me = new IMouseEvent(e);
+	IPane p = getPaneAt(me);
 	if(p!=null){
 	    currentMousePane = p;
-	    p.mousePressed(e);
+	    p.mousePressed(me);
 	}
 	else{
 	    IOut.err("no pane"); //
 	}
     }
     public void mouseReleased(MouseEvent e){
+	IMouseEvent me = new IMouseEvent(e);
 	IPane p=null;
 	if(currentMousePane!=null){
 	    //p = currentMousePane;
-	    currentMousePane.mouseReleased(e);
+	    currentMousePane.mouseReleased(me);
 	    //currentMousePane = getPaneAt(e); // update
 	}
 	else{
-	    p = getPaneAt(e);
+	    p = getPaneAt(me);
 	    if(p!=null){
 		//currentMousePane = null;
-		p.mouseReleased(e);
+		p.mouseReleased(me);
 		currentMousePane = p;
 	    }
 	}
     }
     public void mouseClicked(MouseEvent e){
-	IPane p = getPaneAt(e);
-	if(p!=null){ p.mouseClicked(e); }
+	IMouseEvent me = new IMouseEvent(e);
+	IPane p = getPaneAt(me);
+	if(p!=null){ p.mouseClicked(me); }
 	
 	//if(fullScreenPane==null){ if(p!=null) enableFullScreen(p); }
 	//else disableFullScreen();
@@ -192,23 +235,26 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	//if(p!=null){ p.mouseExited(e); }
     }
     public void mouseMoved(MouseEvent e){
-	IPane p = getPaneAt(e);
+	IMouseEvent me = new IMouseEvent(e);
+	IPane p = getPaneAt(me);
 	if(p!=null){
-	    p.mouseMoved(e);
+	    p.mouseMoved(me);
 	}
     }
     public void mouseDragged(MouseEvent e){
+	IMouseEvent me = new IMouseEvent(e);
 	IPane p=null;
 	if(currentMousePane!=null){ p = currentMousePane; }
-	else{ p = getPaneAt(e); }
+	else{ p = getPaneAt(me); }
 	if(p!=null){
-	    p.mouseDragged(e);
+	    p.mouseDragged(me);
 	}
     }
     
     
     public void mouseWheelMoved(MouseWheelEvent e){
-	if(currentMousePane!=null){ currentMousePane.mouseWheelMoved(e); }
+	IMouseWheelEvent me = new IMouseWheelEvent(e);
+	if(currentMousePane!=null){ currentMousePane.mouseWheelMoved(me); }
 	/*
 	IPane p = getPaneAt(e);
 	if(p!=null){
@@ -290,13 +336,14 @@ public class IPanel extends IComponent implements IServerI, MouseListener, Mouse
 	    //else{ ig.resumeDynamics(); }
 	}
 	
-	if(currentMousePane!=null){ currentMousePane.keyPressed(e); }
+	//if(currentMousePane!=null){ currentMousePane.keyPressed(e); }
+	if(currentMousePane!=null){ currentMousePane.keyPressed(new IKeyEvent(e)); }
     }
     public void keyReleased(KeyEvent e){
-	if(currentMousePane!=null){ currentMousePane.keyReleased(e); }
+	if(currentMousePane!=null){ currentMousePane.keyReleased(new IKeyEvent(e)); }
     }
     public void keyTyped(KeyEvent e){
-	if(currentMousePane!=null){ currentMousePane.keyTyped(e); }
+	if(currentMousePane!=null){ currentMousePane.keyTyped(new IKeyEvent(e)); }
     }
     
     public void focusLost(FocusEvent e){

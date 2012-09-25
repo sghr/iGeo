@@ -41,7 +41,7 @@ import igeo.gui.*;
 import java.io.*;
 import java.util.*;
 import java.util.zip.CRC32;
-import java.awt.Color;
+//import java.awt.Color;
 
 import static igeo.io.IRhino3dmImporter.*;
 import static igeo.io.IRhino3dmExporter.*;
@@ -1266,12 +1266,12 @@ public class IRhino3dm{
 	public int materialIndex;
 	public String materialName;
 	public String flamingoLibrary;
-	public Color ambient;
-	public Color diffuse;
-	public Color emission;
-	public Color specular;
-	public Color reflection;
-	public Color transparent;
+	public IColor ambient;
+	public IColor diffuse;
+	public IColor emission;
+	public IColor specular;
+	public IColor reflection;
+	public IColor transparent;
 	public double indexOfRefraction;
 	public double reflectivity;
 	public double shine;
@@ -1290,12 +1290,12 @@ public class IRhino3dm{
 	    materialId = UUID.nilValue;
 	    materialName = null;
 	    flamingoLibrary = null;
-	    ambient = new Color(0,0,0);
-	    diffuse = new Color(128,128,128);
-	    emission = new Color(0,0,0);
-	    specular = new Color(255,255,255);
-	    reflection = new Color(255,255,255);
-	    transparent = new Color(255,255,255);
+	    ambient = new IColor(0,0,0);
+	    diffuse = new IColor(128,128,128);
+	    emission = new IColor(0,0,0);
+	    specular = new IColor(255,255,255);
+	    reflection = new IColor(255,255,255);
+	    transparent = new IColor(255,255,255);
 	    indexOfRefraction = 1.0;
 	    reflectivity = 0.0;
 	    shine = 0.0;
@@ -1683,8 +1683,8 @@ public class IRhino3dm{
 	public Wrap wrapU, wrapV, wrapW;
 	public boolean applyUVW;
 	public Xform uvw;
-	public Color borderColor;
-	public Color transparentColor;
+	public IColor borderColor;
+	public IColor transparentColor;
 	public UUID transparencyTextureId;
 	public Interval bumpScale;
 	
@@ -2353,9 +2353,9 @@ public class IRhino3dm{
 	public int igesLevel;
 	public int materialIndex;
 	public int linetypeIndex;
-	public Color color;
+	public IColor color;
 	public UUID displayMaterialId;
-	public Color plotColor;
+	public IColor plotColor;
 	public double plotWeightMm;
 	public String name;
 	public boolean visible;
@@ -2372,9 +2372,9 @@ public class IRhino3dm{
 	    igesLevel=-1;
 	    materialIndex=-1;
 	    linetypeIndex=-1;
-	    color = new Color(0,0,0);
+	    color = new IColor(0,0,0);
 	    displayMaterialId=null;
-	    plotColor = new Color(255,255,255);
+	    plotColor = new IColor(255,255,255);
 	    plotWeightMm=0.;
 	    visible=true;
 	    locked=false;
@@ -2394,7 +2394,7 @@ public class IRhino3dm{
 	    linetypeIndex=-1;
 	    color = ilayer.clr();
 	    displayMaterialId=null;
-	    plotColor = new Color(255,255,255,0); // with 0xFFFFFF00 plot color, plot color follows layer color, which is currently desirable behavior.
+	    plotColor = new IColor(255,255,255,0); // with 0xFFFFFF00 plot color, plot color follows layer color, which is currently desirable behavior.
 	    plotWeightMm=0.;
 	    visible=ilayer.visible(); //true;
 	    locked=false;
@@ -2638,8 +2638,8 @@ public class IRhino3dm{
 	public int linetypeIndex;
 	public int materialIndex;
 	public RenderingAttributes renderingAttributes;
-	public Color color;
-	public Color plotColor;
+	public IColor color;
+	public IColor plotColor;
 	public int displayOrder;
 	public double plotWeightMm;
 	public short objectDecoration;
@@ -2668,8 +2668,8 @@ public class IRhino3dm{
 	    linetypeIndex = -1;
 	    materialIndex = -1;
 	    renderingAttributes = new RenderingAttributes();
-	    color = Color.black;
-	    plotColor = Color.black;
+	    color = new IColor(0,0,0); //Color.black;
+	    plotColor = new IColor(0,0,0); //Color.black;
 	    displayOrder = 0;
 	    plotWeightMm = 0.;
 	    objectDecoration = 0;
@@ -3077,7 +3077,7 @@ public class IRhino3dm{
 		"materialIndex = " + materialIndex + "\n" +
 		"renderingAttributes = "+renderingAttributes + "\n" +
 		"color = " + color + "\n" +
-		"plotColor = "+ Color.black + "\n" +
+		"plotColor = "+ plotColor + "\n" +
 		"displayOrder = " + displayOrder + "\n" +
 		"plotWeightMm = " + plotWeightMm + "\n" +
 		"objectDecoration = " + objectDecoration + "\n" +
@@ -5694,7 +5694,7 @@ public class IRhino3dm{
 	public boolean packedTextureRotate;
 	public ArrayList<SurfaceCurvature> surfaceCurvature;
 	public MappingTag ctag;
-	public ArrayList<Color> color;
+	public ArrayList<IColor> color;
 	public ArrayList<Boolean> hide;
 	public int hiddenCount;
 	public RhinoObject parent;
@@ -5720,7 +5720,7 @@ public class IRhino3dm{
 	    vertices = new ArrayList<IVec>();
 	    normals = new ArrayList<IVec>();
 	    texture = new ArrayList<IVec2>();
-	    color = new ArrayList<Color>();
+	    color = new ArrayList<IColor>();
 	    surfaceCurvature = new ArrayList<SurfaceCurvature>();
 	    
 	    for(int i=0; i<mesh.vertexNum(); i++){

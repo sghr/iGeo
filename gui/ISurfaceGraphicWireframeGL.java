@@ -520,32 +520,41 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	    
 	    IGraphics3D g3d = (IGraphics3D)g;
 	    
-	    float red,green,blue,alpha;
+	    //float red,green,blue,alpha;
+	    float[] rgba = null;
 	    if(color!=null){
-		red = color.getRed();
-		green = color.getGreen();
-		blue = color.getBlue();
-		alpha = color.getAlpha();
+		rgba = color.rgba();
+		//red = color.getRed();
+		//green = color.getGreen();
+		//blue = color.getBlue();
+		//alpha = color.getAlpha();
 	    }
 	    else{
-		red = IConfig.objectColor.getRed();
-		green = IConfig.objectColor.getGreen();
-		blue = IConfig.objectColor.getBlue();
-		alpha = IConfig.objectColor.getAlpha();
+		rgba = IConfig.objectColor.rgba();
+		//red = IConfig.objectColor.getRed();
+		//green = IConfig.objectColor.getGreen();
+		//blue = IConfig.objectColor.getBlue();
+		//alpha = IConfig.objectColor.getAlpha();
 	    }
 	    
-	    if(!g3d.view().mode().isTransparentWireframe()){ alpha = 255; }
-	    else if(g3d.view().mode().isTransparent()){ alpha = IConfig.transparentModeAlpha; }
+	    if(!g3d.view().mode().isTransparentWireframe()){
+		if(rgba[3]!=1f) rgba = new float[]{ rgba[0], rgba[1], rgba[2], 1f };
+		//alpha = 255;
+	    }
+	    else if(g3d.view().mode().isTransparent()){
+		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
+		//alpha = IConfig.transparentModeAlpha;
+	    }
 	    
 	    
 	    if(g3d.view().mode().isLight() && g3d.view().mode().isLightWireframe()){
-		g3d.ambient(red,green,blue,alpha);
-		g3d.diffuse(red,green,blue,alpha);
-		//g3d.specular(red,green,blue,alpha);
+		g3d.ambient(rgba);
+		g3d.diffuse(rgba);
+		//g3d.specular(rgba);
 		g3d.shininess(IConfig.shininess);
-		g3d.stroke(red,green,blue,0f); // ? without this, the color is tinted with the previous object's color
+		g3d.stroke(rgba[0]*255, rgba[1]*255, rgba[2]*255, 0f); // ? without this, the color is tinted with the previous object's color
 	    }
-	    else{ g3d.stroke(red,green,blue,alpha); }
+	    else{ g3d.stroke(rgba); }
 	    
 	    g3d.weight(weight);
 	    
@@ -593,7 +602,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
 	    }
 	    
 	    if(!g.view().mode().isTransparentWireframe()){ alpha = 1f; }
-	    else if(g.view().mode().isTransparent()){ alpha = (float)IConfig.transparentModeAlpha/255; }
+	    else if(g.view().mode().isTransparent()){ alpha = (float)IConfig.transparentModeAlpha/255f; }
 	    
 	    if(g.view().mode().isLight() && g.view().mode().isLightWireframe()){
 		float[] colorf = new float[]{ red, green, blue, alpha };

@@ -23,7 +23,7 @@
 package igeo.gui;
 
 import java.util.ArrayList;
-import java.awt.Color;
+//import java.awt.Color;
 
 import igeo.*;
 
@@ -47,7 +47,7 @@ public class IBrepGraphicGL extends IGraphicObject{
 	}
     }
     
-    public void setColor(Color c){
+    public void setColor(IColor c){
 	super.setColor(c);
 	for(ISurfaceGraphicGL g : surfaceGraphics) g.setColor(c);
     }

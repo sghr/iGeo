@@ -106,7 +106,7 @@ public class IG implements IServerI{
      * object variables
      ************************************/
     /*protected*/ public IServer server;
-    /*protected*/ public IPanel panel = null;
+    /*protected*/ public IPanelI panel = null;
     
     /*protected*/ public String inputFile;
     /*protected*/ public String outputFile;
@@ -183,7 +183,7 @@ public class IG implements IServerI{
     /** Initialize whole IG system in graphic mode.
 	Please instantiate IPanel beforehand.
     */
-    public static IG init(IPanel owner){
+    public static IG init(IPanelI owner){
 	if(iglist==null) iglist = new ArrayList<IG>();
 	IG ig = new IG(owner);
 	iglist.add(ig);
@@ -226,7 +226,7 @@ public class IG implements IServerI{
 	IMeshCreator.server(ig);
     }
     
-    public static void setCurrent(IPanel owner){
+    public static void setCurrent(IPanelI owner){
 	for(int i=0; i<iglist.size(); i++){
 	    if(iglist.get(i).panel == owner){
 		currentId = i;
@@ -243,7 +243,7 @@ public class IG implements IServerI{
     
     
     /** Find IG instance linked with the specified IPanel instance. */
-    public static IG getIG(IPanel owner){
+    public static IG getIG(IPanelI owner){
 	for(IG ig : iglist) if(ig.panel == owner) return ig;
 	return null;
     }
@@ -619,12 +619,12 @@ public class IG implements IServerI{
     
     public static IView view(int paneIndex){
 	IG ig = cur(); if(ig==null) return null;
-	if(ig==null || ig.panel==null || ig.panel.panes==null ||
-	   ig.panel.panes.size() <= paneIndex || paneIndex<0 ){ return null; }
+	if(ig==null || ig.panel==null || ig.panel.paneNum()>0 ||
+	   ig.panel.paneNum() <= paneIndex || paneIndex<0 ){ return null; }
 	if(ig.panel instanceof IScreenTogglePanel){
-	    ((IScreenTogglePanel)(ig.panel)).enableFullScreen(ig.panel.panes.get(paneIndex));
+	    ((IScreenTogglePanel)(ig.panel)).enableFullScreen(ig.panel.pane(paneIndex));
 	}
-	return ig.panel.panes.get(paneIndex).getView();
+	return ig.panel.pane(paneIndex).getView();
     }
     
     
@@ -952,9 +952,14 @@ public class IG implements IServerI{
     //public static void setBG(Color c1, Color c2, Color c3, Color c4){}
     //public static void setBG(Image img){}
     
-    public static void bg(Color c1, Color c2, Color c3, Color c4){
+    public static void bg(IColor c1, IColor c2, IColor c3, IColor c4){
 	IG ig = cur(); if(ig==null) return;
 	ig.server().bg(c1,c2,c3,c4);
+    }
+    public static void background(IColor c1, IColor c2, IColor c3, IColor c4){ bg(c1,c2,c3,c4); }
+    
+    public static void bg(Color c1, Color c2, Color c3, Color c4){
+	bg(new IColor(c1),new IColor(c2),new IColor(c3),new IColor(c4));
     }
     
     public static void background(Color c1, Color c2, Color c3, Color c4){ bg(c1,c2,c3,c4); }
@@ -963,7 +968,7 @@ public class IG implements IServerI{
     public static void background(Color c){ bg(c); }
     
     public static void defaultBG(){ blueBG(); }
-    public static void blueBG(){ bg(IView.defaultBGColor1,IView.defaultBGColor2,IView.defaultBGColor3,IView.defaultBGColor4); } // added 2012/09/02
+    public static void blueBG(){ bg(IConfig.bgColor1,IConfig.bgColor2,IConfig.bgColor3,IConfig.bgColor4); } // added 2012/09/02
     public static void lightBG(){ bg(1.0, 1.0, 0.9, 0.8); } // added 2012/09/02
     public static void darkBG(){ bg(0.15, 0.15, 0.05, 0.0); } // added 2012/09/02
     public static void whiteBG(){ bg(1.0); } // added 2012/09/02
@@ -1091,7 +1096,14 @@ public class IG implements IServerI{
     
     /** change the debug level of IOut */
     public static void debugLevel(int level){ IOut.debugLevel(level); }
+    /** alias of debugLevel */
+    public static void debug(int level){ debugLevel(level); }
+    /** turns on all debug output */
+    public static void debug(){ debugLevel(-1); }
+    
+    /** returns the current debugLevel */
     public static int debugLevel(){ return IOut.debugLevel(); }
+    
     
     
     /*************************************************************************
@@ -1099,11 +1111,11 @@ public class IG implements IServerI{
      *************************************************************************/
     
     // anybody would want this in public?
-    protected IG(){
-	server = new IServer(this);
-    }
+    //protected
+    public IG(){ server = new IServer(this); }
     
-    protected IG(IPanel p){
+    //protected
+    public IG(IPanelI p){
 	server = new IServer(this, p);
 	panel = p; // 
 	p.setIG(this);
@@ -1218,7 +1230,7 @@ public class IG implements IServerI{
     //public void draw(IGraphics g){ server.draw(g); }
     
     //public IGPane pane(){ return pane; }
-    //public IPanel panel(){ return panel; }
+    //public IPanelI panel(){ return panel; }
     
     //public void delete(){
     public void clear(){ server.clear(); }
@@ -4070,17 +4082,17 @@ public class IG implements IServerI{
     static public IVec randDir(IVecI perpendicularAxis, double length){ return IRand.dir(perpendicularAxis,length); }
     
     
-    public static Color randClr(){ return IRand.clr(); }
-    public static Color randClr(float alpha){ return IRand.clr(alpha); }
-    public static Color randClr(int alpha){ return IRand.clr(alpha); }
+    public static IColor randClr(){ return IRand.clr(); }
+    public static IColor randClr(float alpha){ return IRand.clr(alpha); }
+    public static IColor randClr(int alpha){ return IRand.clr(alpha); }
     
-    public static Color randColor(){ return randClr(); }
-    public static Color randColor(float alpha){ return randClr(alpha); }
-    public static Color randColor(int alpha){ return randClr(alpha); }
+    public static IColor randColor(){ return randClr(); }
+    public static IColor randColor(float alpha){ return randClr(alpha); }
+    public static IColor randColor(int alpha){ return randClr(alpha); }
     
-    public static Color randGray(){ return IRand.gray(); }
-    public static Color randGray(float alpha){ return IRand.gray(alpha); }
-    public static Color randGray(int alpha){ return IRand.gray(alpha); }
+    public static IColor randGray(){ return IRand.gray(); }
+    public static IColor randGray(float alpha){ return IRand.gray(alpha); }
+    public static IColor randGray(int alpha){ return IRand.gray(alpha); }
     
     public static <T> T rand(T[] array){ return IRand.get(array); }
     public static <T> T rand(java.util.List<T> array){ return IRand.get(array); }

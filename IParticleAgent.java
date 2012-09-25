@@ -277,8 +277,14 @@ public class IParticleAgent extends IParticle{
     public IParticleAgent hide(){ super.hide(); return this; }
     
     
+    public IParticleAgent clr(IColor c){ super.clr(c); return this; }
+    public IParticleAgent clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IParticleAgent clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IParticleAgent clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public IParticleAgent clr(Color c){ super.clr(c); return this; }
     public IParticleAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IParticleAgent clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public IParticleAgent clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IParticleAgent clr(int gray){ super.clr(gray); return this; }
     public IParticleAgent clr(float fgray){ super.clr(fgray); return this; }
     public IParticleAgent clr(double dgray){ super.clr(dgray); return this; }
@@ -296,8 +302,14 @@ public class IParticleAgent extends IParticle{
     public IParticleAgent hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public IParticleAgent hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    public IParticleAgent setColor(IColor c){ super.setColor(c); return this; }
+    public IParticleAgent setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public IParticleAgent setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public IParticleAgent setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     public IParticleAgent setColor(Color c){ super.setColor(c); return this; }
     public IParticleAgent setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public IParticleAgent setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    public IParticleAgent setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public IParticleAgent setColor(int gray){ super.setColor(gray); return this; }
     public IParticleAgent setColor(float fgray){ super.setColor(fgray); return this; }
     public IParticleAgent setColor(double dgray){ super.setColor(dgray); return this; }

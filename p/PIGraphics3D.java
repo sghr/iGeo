@@ -80,6 +80,8 @@ public class PIGraphics3D extends PGraphics3D
     /** when number of objects exceeds IConfig.maxObjectNumberForDepthSort, depth sort is overwritten to be disabled */
     public boolean overrideDepthSort=false;
     
+    public boolean firstDraw=true;
+    
     // for IPane
     public int screenX=0, screenY=0;
     public float borderWidth=1f;
@@ -89,7 +91,7 @@ public class PIGraphics3D extends PGraphics3D
     public boolean visible=true;
     
     public PImage bgImage=null;
-    public Color[][] bgColorCache=new Color[2][2];
+    public IColor[][] bgColorCache=new IColor[2][2];
     
     
     public PIGraphics3D[][] subGraphics=null;
@@ -353,42 +355,7 @@ public class PIGraphics3D extends PGraphics3D
     public void start(){ if(finished) finished=false; }
     public void stop(){ if(!finished) finished=true; }
     
-    /*
-    public void mousePressed(MouseEvent e){
-    }
-    public void mouseReleased(MouseEvent e){
-    }
-    public void mouseClicked(MouseEvent e){
-    }
-    public void mouseEntered(MouseEvent e){
-    }
-    public void mouseExited(MouseEvent e){
-    }
-    public void mouseMoved(MouseEvent e){
-    }
-    public void mouseDragged(MouseEvent e){
-    }
-    public void mouseWheelMoved(MouseWheelEvent e){
-    }
-    public void keyPressed(KeyEvent e){
-    }
-    public void keyReleased(KeyEvent e){
-    }
-    public void keyTyped(KeyEvent e){
-    }
-    public void focusLost(FocusEvent e){
-    }
-    public void focusGained(FocusEvent e){
-    }
-    public void componentHidden(ComponentEvent e){
-    }
-    public void componentMoved(ComponentEvent e){
-    }
-    public void componentResized(ComponentEvent e){
-    }
-    public void componentShown(ComponentEvent e){
-    }
-    */
+    
 
     /*******************************************************************************************
      * implementation of IGraphics3D
@@ -455,6 +422,8 @@ public class PIGraphics3D extends PGraphics3D
     
     public void drawBG(IView view){
 	
+	//IG.p("firstDraw = "+firstDraw);
+	//IG.p("clearBG = "+IConfig.clearBG);
 	//IG.p("x = "+screenX+", y = "+screenY+", w = "+super.width+", h = "+super.height); //
 	
 	if(view.bgColor!=null){
@@ -532,7 +501,9 @@ public class PIGraphics3D extends PGraphics3D
     
     public void drawView(IView view){
 	
-	drawBG(view);
+	if(IConfig.clearBG || firstDraw){
+	    drawBG(view);
+	}
 	
 	viewLocation = view.location();
 	viewDirection = view.frontDirection();
@@ -722,7 +693,20 @@ public class PIGraphics3D extends PGraphics3D
 	
 	super.endDraw();
     }
-
+    
+    public boolean firstDraw(){ return firstDraw; }
+    public void firstDraw(boolean f){
+	firstDraw=f;
+	if(subGraphics!=null){
+	    for(int i=0; i<subGraphics.length; i++){
+		for(int j=0; j<subGraphics[i].length; j++){
+		    subGraphics[i][j].firstDraw(f);
+		}
+	    }
+	}
+    }
+    
+    
     /** default color mode for IG */
     public boolean isDefaultColorMode(){
 	return super.colorMode == RGB &&
@@ -750,7 +734,7 @@ public class PIGraphics3D extends PGraphics3D
 	super.colorMode(origColorMode,origColorModeX,origColorModeY,origColorModeZ,origColorModeA);
     }
     
-    public void clr(Color c){ clr(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha()); }
+    public void clr(IColor c){ clr(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha()); }
     public void clr(float r, float g, float b){ clr(r,g,b,255); }
     public void clr(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
@@ -760,8 +744,10 @@ public class PIGraphics3D extends PGraphics3D
 	}
 	else{ super.fill(r,g,b,a); }
     }
+    public void clr(float[] rgba){ clr(rgba[0],rgba[1],rgba[2],rgba[3]); }
     
-    public void stroke(Color c){ stroke(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha()); }
+    
+    public void stroke(IColor c){ stroke(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha()); }
     public void stroke(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
 	    pushColorMode();
@@ -771,12 +757,15 @@ public class PIGraphics3D extends PGraphics3D
 	else{ super.stroke(r,g,b,a); }
     }
     public void stroke(float r, float g, float b){ stroke(r,g,b,255); }
+    public void stroke(float[] rgba){ stroke(rgba[0],rgba[1],rgba[2],rgba[3]); }
     
     public void weight(float w){ /*this.weight=w;*/ super.strokeWeight(w); }
     
     public void diffuse(float r, float g, float b, float a){ clr(r,g,b,a); }
     public void diffuse(float r, float g, float b){ clr(r,g,b,255); }
-    public void diffuse(Color c){ clr(c); }
+    public void diffuse(IColor c){ clr(c); }
+    public void diffuse(float[] rgba){ clr(rgba); }
+    
     
     public void ambient(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
@@ -787,9 +776,8 @@ public class PIGraphics3D extends PGraphics3D
 	else{ super.ambient(r,g,b); }
     }
     public void ambient(float r, float g, float b){ this.ambient(r,g,b,255); }
-    public void ambient(Color c){
-	ambient(c.getRed(),c.getGreen(),c.getBlue());
-    }
+    public void ambient(float[] rgba){ ambient(rgba[0],rgba[1],rgba[2],rgba[3]); }
+    public void ambient(IColor c){ ambient(c.getRed(),c.getGreen(),c.getBlue()); }
     
     public void specular(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
@@ -800,9 +788,9 @@ public class PIGraphics3D extends PGraphics3D
 	else{ super.specular(r,g,b); }
     }
     public void specular(float r, float g, float b){ this.specular(r,g,b,255); }
-    public void specular(Color c){
-	specular(c.getRed(),c.getGreen(),c.getBlue());
-    }
+    public void specular(float[] rgba){ this.specular(rgba[0],rgba[1],rgba[2],rgba[3]); }
+    public void specular(IColor c){ specular(c.getRed(),c.getGreen(),c.getBlue()); }
+    
     public void emissive(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
 	    pushColorMode();
@@ -812,7 +800,8 @@ public class PIGraphics3D extends PGraphics3D
 	else{ super.emissive(r,g,b); }
     }
     public void emissive(float r, float g, float b){ this.emissive(r,g,b,255); }
-    public void emissive(Color c){
+    public void emissive(float[] rgba){ this.emissive(rgba[0],rgba[1],rgba[2],rgba[3]); }
+    public void emissive(IColor c){
 	emissive(c.getRed(),c.getGreen(),c.getBlue());
     }
     
@@ -1458,8 +1447,8 @@ public class PIGraphics3D extends PGraphics3D
 	screenX=x; screenY=y;
     }
     
-    public int getX(){ return screenX; }
-    public int getY(){ return screenY; }
+    public float getX(){ return screenX; }
+    public float getY(){ return screenY; }
     public int getWidth(){ return super.width; }
     public int getHeight(){ return super.height; }
     
@@ -1474,14 +1463,16 @@ public class PIGraphics3D extends PGraphics3D
         return true;
     }
     
-    public void setPanel(IPanel p){ panel = p; }
-    public IPanel getPanel(){ return panel; }
+    public void setPanel(IPanelI p){ if(p instanceof IPanel) panel = (IPanel)p; }
+    public IPanelI getPanel(){ return panel; }
     
     public void setBorderWidth(float b){ borderWidth=b; }
     public float getBorderWidth(){ return borderWidth; }
     public Stroke getBorderStroke(){ return null; }
+    public void setBorderColor(int r, int b, int g, int a){ borderColor = new Color(r,g,b,a); }
     public void setBorderColor(Color c){ borderColor = c; }
-    public Color getBorderColor(){ return borderColor; }
+    //public Color getBorderColor(){ return borderColor; }
+    public int getBorderColor(){ return borderColor.getRGB(); }
     public INavigator navigator(){ return navigator; }
     public void setView(IView v){
 	view=v;
@@ -1522,47 +1513,63 @@ public class PIGraphics3D extends PGraphics3D
     }
     
     
-    public void mousePressed(MouseEvent e){
+    public void mousePressed(MouseEvent e){ mousePressed(new IMouseEvent(e)); }
+    public void mouseReleased(MouseEvent e){ mouseReleased(new IMouseEvent(e)); }
+    public void mouseClicked(MouseEvent e){ mouseClicked(new IMouseEvent(e)); }
+    public void mouseEntered(MouseEvent e){ mouseEntered(new IMouseEvent(e)); }
+    public void mouseExited(MouseEvent e){ mouseExited(new IMouseEvent(e)); }
+    public void mouseMoved(MouseEvent e){ mouseMoved(new IMouseEvent(e)); }
+    public void mouseDragged(MouseEvent e){ mouseDragged(new IMouseEvent(e)); }
+    public void mouseWheelMoved(MouseWheelEvent e){ mouseWheelMoved(new IMouseWheelEvent(e)); }
+    public void keyPressed(KeyEvent e){ keyPressed(new IKeyEvent(e)); }
+    public void keyReleased(KeyEvent e){ keyReleased(new IKeyEvent(e)); }
+    public void keyTyped(KeyEvent e){ keyTyped(new IKeyEvent(e)); }
+    
+    
+    public void mousePressed(IMouseEvent e){
         navigator.mousePressed(e);
     }
-    public void mouseReleased(MouseEvent e){
+    public void mouseReleased(IMouseEvent e){
         navigator.mouseReleased(e);
     }
-    public void mouseClicked(MouseEvent e){
+    public void mouseClicked(IMouseEvent e){
         navigator.mouseClicked(e);
     }
-    public void mouseEntered(MouseEvent e){
+    public void mouseEntered(IMouseEvent e){
         navigator.mouseEntered(e);
     }
-    public void mouseExited(MouseEvent e){
+    public void mouseExited(IMouseEvent e){
         navigator.mouseExited(e);
     }
-    public void mouseMoved(MouseEvent e){
+    public void mouseMoved(IMouseEvent e){
         navigator.mouseMoved(e);
     }
-    public void mouseDragged(MouseEvent e){
+    public void mouseDragged(IMouseEvent e){
         navigator.mouseDragged(e);
     }
-
-    public void mouseWheelMoved(MouseWheelEvent e){
+    
+    
+    public void mouseWheelMoved(IMouseWheelEvent e){
         navigator.mouseWheelMoved(e);
     }
 
-    public void keyPressed(KeyEvent e){
-        navigator.keyPressed(e);
-    }
-    public void keyReleased(KeyEvent e){
-        navigator.keyReleased(e);
-    }
-    public void keyTyped(KeyEvent e){
-        navigator.keyTyped(e);
-    }
-
-    public void focusLost(FocusEvent e){
-    }
-    public void focusGained(FocusEvent e){
-    }
+    public void keyPressed(IKeyEvent e){ navigator.keyPressed(e); }
+    public void keyReleased(IKeyEvent e){ navigator.keyReleased(e); }
+    public void keyTyped(IKeyEvent e){ navigator.keyTyped(e); }
     
+    public void focusLost(FocusEvent e){}
+    public void focusGained(FocusEvent e){}
+    
+    /*
+    public void componentHidden(ComponentEvent e){
+    }
+    public void componentMoved(ComponentEvent e){
+    }
+    public void componentResized(ComponentEvent e){
+    }
+    public void componentShown(ComponentEvent e){
+    }
+    */
     
     
     

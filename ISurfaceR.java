@@ -582,8 +582,14 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     
     
     
+    public ISurfaceR clr(IColor c){ super.clr(c); return this; }
+    public ISurfaceR clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public ISurfaceR clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public ISurfaceR clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public ISurfaceR clr(Color c){ super.clr(c); return this; }
     public ISurfaceR clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public ISurfaceR clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public ISurfaceR clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public ISurfaceR clr(int gray){ super.clr(gray); return this; }
     public ISurfaceR clr(float fgray){ super.clr(fgray); return this; }
     public ISurfaceR clr(double dgray){ super.clr(dgray); return this; }

@@ -98,8 +98,14 @@ public class ITensionLineOnCurve extends ICurve implements ITensionI{
     public ITensionLineOnCurve hide(){ super.hide(); return this; }
     public ITensionLineOnCurve show(){ super.show(); return this; }
     
+    public ITensionLineOnCurve clr(IColor c){ super.clr(c); return this; }
+    public ITensionLineOnCurve clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public ITensionLineOnCurve clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public ITensionLineOnCurve clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public ITensionLineOnCurve clr(Color c){ super.clr(c); return this; }
     public ITensionLineOnCurve clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public ITensionLineOnCurve clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public ITensionLineOnCurve clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public ITensionLineOnCurve clr(int gray){ super.clr(gray); return this; }
     public ITensionLineOnCurve clr(float fgray){ super.clr(fgray); return this; }
     public ITensionLineOnCurve clr(double dgray){ super.clr(dgray); return this; }
@@ -117,8 +123,14 @@ public class ITensionLineOnCurve extends ICurve implements ITensionI{
     public ITensionLineOnCurve hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public ITensionLineOnCurve hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    public ITensionLineOnCurve setColor(IColor c){ super.setColor(c); return this; }
+    public ITensionLineOnCurve setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLineOnCurve setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLineOnCurve setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     public ITensionLineOnCurve setColor(Color c){ super.setColor(c); return this; }
     public ITensionLineOnCurve setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLineOnCurve setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLineOnCurve setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public ITensionLineOnCurve setColor(int gray){ super.setColor(gray); return this; }
     public ITensionLineOnCurve setColor(float fgray){ super.setColor(fgray); return this; }
     public ITensionLineOnCurve setColor(double dgray){ super.setColor(dgray); return this; }

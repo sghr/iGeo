@@ -22,7 +22,7 @@
 
 package igeo;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -403,8 +403,14 @@ public class IParticle extends IPointAgent implements IParticleI{
     
     
     
-    public IParticle clr(Color c){ super.clr(c); return this; }
-    public IParticle clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IParticle clr(IColor c){ super.clr(c); return this; }
+    public IParticle clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IParticle clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IParticle clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    //public IParticle clr(Color c){ super.clr(c); return this; }
+    //public IParticle clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    //public IParticle clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    //public IParticle clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IParticle clr(int gray){ super.clr(gray); return this; }
     public IParticle clr(float fgray){ super.clr(fgray); return this; }
     public IParticle clr(double dgray){ super.clr(dgray); return this; }
@@ -422,8 +428,14 @@ public class IParticle extends IPointAgent implements IParticleI{
     public IParticle hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public IParticle hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
-    public IParticle setColor(Color c){ super.setColor(c); return this; }
-    public IParticle setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public IParticle setColor(IColor c){ super.setColor(c); return this; }
+    public IParticle setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public IParticle setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public IParticle setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
+    //public IParticle setColor(Color c){ super.setColor(c); return this; }
+    //public IParticle setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    //public IParticle setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    //public IParticle setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public IParticle setColor(int gray){ super.setColor(gray); return this; }
     public IParticle setColor(float fgray){ super.setColor(fgray); return this; }
     public IParticle setColor(double dgray){ super.setColor(dgray); return this; }

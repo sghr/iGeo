@@ -196,8 +196,14 @@ public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! a
     public ITensionLine hide(){ super.hide(); return this; }
     public ITensionLine show(){ super.show(); return this; }
     
+    public ITensionLine clr(IColor c){ super.clr(c); return this; }
+    public ITensionLine clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public ITensionLine clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public ITensionLine clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public ITensionLine clr(Color c){ super.clr(c); return this; }
     public ITensionLine clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public ITensionLine clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    public ITensionLine clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public ITensionLine clr(int gray){ super.clr(gray); return this; }
     public ITensionLine clr(float fgray){ super.clr(fgray); return this; }
     public ITensionLine clr(double dgray){ super.clr(dgray); return this; }
@@ -215,8 +221,14 @@ public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! a
     public ITensionLine hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public ITensionLine hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    public ITensionLine setColor(IColor c){ super.setColor(c); return this; }
+    public ITensionLine setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLine setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLine setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     public ITensionLine setColor(Color c){ super.setColor(c); return this; }
     public ITensionLine setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLine setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    public ITensionLine setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public ITensionLine setColor(int gray){ super.setColor(gray); return this; }
     public ITensionLine setColor(float fgray){ super.setColor(fgray); return this; }
     public ITensionLine setColor(double dgray){ super.setColor(dgray); return this; }

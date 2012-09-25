@@ -38,7 +38,7 @@ import igeo.*;
 import igeo.gui.*;
 
 import java.io.*;
-import java.awt.Color;
+//import java.awt.Color;
 import java.util.ArrayList;
 import java.util.zip.*;
 
@@ -644,7 +644,7 @@ public class IRhino3dmExporter extends IRhino3dm{
     }
     
     
-    public static void writeColor(OutputStream os, Color color, CRC32 crc) throws IOException{
+    public static void writeColor(OutputStream os, IColor color, CRC32 crc) throws IOException{
 	int r = 0;
 	int g = 0;
 	int b = 0;
@@ -731,14 +731,14 @@ public class IRhino3dmExporter extends IRhino3dm{
 	return baos.toByteArray();
     }
     
-    public static void writeArrayColor(OutputStream os, ArrayList<Color> array, CRC32 crc) throws IOException{
+    public static void writeArrayColor(OutputStream os, ArrayList<IColor> array, CRC32 crc) throws IOException{
 	int count = 0; // write zero size when array is null
 	if(array!=null) count = array.size(); 
 	writeInt32(os,count,crc);
 	for(int i=0; array!=null && i<count; i++) writeColor(os,array.get(i),crc);
     }
     
-    public static byte[] writeArrayColor(ArrayList<Color> array, CRC32 crc) throws IOException{
+    public static byte[] writeArrayColor(ArrayList<IColor> array, CRC32 crc) throws IOException{
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	for(int i=0; array!=null && i<array.size(); i++) writeColor(baos,array.get(i),crc);
 	return baos.toByteArray();

@@ -22,7 +22,7 @@
 
 package igeo;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.util.ArrayList;
 
 /**
@@ -354,8 +354,14 @@ public class IBoidTrajectory extends IBoid implements ITrajectoryI{
     public void del(){ if(trajectory!=null){ trajectory.del(); } super.del(); }
     
     
-    public IBoidTrajectory clr(Color c){ super.clr(c); return this; }
-    public IBoidTrajectory clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    public IBoidTrajectory clr(IColor c){ super.clr(c); return this; }
+    public IBoidTrajectory clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IBoidTrajectory clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IBoidTrajectory clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    //public IBoidTrajectory clr(Color c){ super.clr(c); return this; }
+    //public IBoidTrajectory clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    //public IBoidTrajectory clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    //public IBoidTrajectory clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IBoidTrajectory clr(int gray){ super.clr(gray); return this; }
     public IBoidTrajectory clr(float fgray){ super.clr(fgray); return this; }
     public IBoidTrajectory clr(double dgray){ super.clr(dgray); return this; }
@@ -373,8 +379,14 @@ public class IBoidTrajectory extends IBoid implements ITrajectoryI{
     public IBoidTrajectory hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     public IBoidTrajectory hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
-    public IBoidTrajectory setColor(Color c){ super.setColor(c); return this; }
-    public IBoidTrajectory setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    public IBoidTrajectory setColor(IColor c){ super.setColor(c); return this; }
+    public IBoidTrajectory setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    public IBoidTrajectory setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    public IBoidTrajectory setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
+    //public IBoidTrajectory setColor(Color c){ super.setColor(c); return this; }
+    //public IBoidTrajectory setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    //public IBoidTrajectory setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    //public IBoidTrajectory setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public IBoidTrajectory setColor(int gray){ super.setColor(gray); return this; }
     public IBoidTrajectory setColor(float fgray){ super.setColor(fgray); return this; }
     public IBoidTrajectory setColor(double dgray){ super.setColor(dgray); return this; }

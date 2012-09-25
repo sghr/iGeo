@@ -41,10 +41,10 @@ public class IAttribute{
     public ILayer layer;
     
     /** object's color */
-    public Color color;
+    public IColor color;
     
     /** object's stroek color; for wireframe + fill surface */
-    public Color stroke;
+    public IColor stroke;
     
     /** object's size, used as point size or etc */
     public /*double*/ float size=1f;
@@ -74,26 +74,38 @@ public class IAttribute{
     public IAttribute dup(){ return new IAttribute(this); }
     public IAttribute cp(){ return dup(); }
     
-    public Color clr(){ return color; }
-    public IAttribute clr(Color c){ color = c; return this; }
-    public IAttribute clr(Color c, int alpha){ color = IGraphicObject.getColor(c,alpha); return this; }
-    public IAttribute clr(Color c, float alpha){ color = IGraphicObject.getColor(c,alpha); return this; }
-    public IAttribute clr(int gray){ color = IGraphicObject.getColor(gray); return this; }
-    public IAttribute clr(float fgray){ color = IGraphicObject.getColor(fgray); return this; }
+    
+    public Color color(){ return color.awt(); }
+    public Color awtColor(){ return color(); }
+    
+    public IColor clr(){ return color; }
+    public IAttribute clr(IColor c){ color = c; return this; }
+    public IAttribute clr(IColor c, int alpha){ color = new IColor(c,alpha); return this; }
+    public IAttribute clr(IColor c, float alpha){ color = new IColor(c,alpha); return this; }
+    public IAttribute clr(IColor c, double alpha){ color = new IColor(c,alpha); return this; }
+    
+    public IAttribute clr(Color c){ color = new IColor(c); return this; }
+    public IAttribute clr(Color c, int alpha){ color = new IColor(c,alpha); return this; }
+    public IAttribute clr(Color c, float alpha){ color = new IColor(c,alpha); return this; }
+    public IAttribute clr(Color c, double alpha){ color = new IColor(c,alpha); return this; }
+    
+    
+    public IAttribute clr(int gray){ color = new IColor(gray); return this; }
+    public IAttribute clr(float fgray){ color = new IColor(fgray); return this; }
     public IAttribute clr(double dgray){ clr((float)dgray); return this; }
-    public IAttribute clr(int gray, int alpha){ color = IGraphicObject.getColor(gray,alpha); return this; }
-    public IAttribute clr(float fgray, float falpha){ color = IGraphicObject.getColor(fgray,falpha); return this; }
+    public IAttribute clr(int gray, int alpha){ color = new IColor(gray,alpha); return this; }
+    public IAttribute clr(float fgray, float falpha){ color = new IColor(fgray,falpha); return this; }
     public IAttribute clr(double dgray, double dalpha){ clr((float)dgray,(float)dalpha); return this; }
-    public IAttribute clr(int r, int g, int b){ color = IGraphicObject.getColor(r,g,b); return this; }
-    public IAttribute clr(float fr, float fg, float fb){ color = IGraphicObject.getColor(fr,fg,fb); return this; }
+    public IAttribute clr(int r, int g, int b){ color = new IColor(r,g,b); return this; }
+    public IAttribute clr(float fr, float fg, float fb){ color = new IColor(fr,fg,fb); return this; }
     public IAttribute clr(double dr, double dg, double db){ clr((float)dr,(float)dg,(float)db); return this; }
-    public IAttribute clr(int r, int g, int b, int a){ color = IGraphicObject.getColor(r,g,b,a); return this; }
-    public IAttribute clr(float fr, float fg, float fb, float fa){ color = IGraphicObject.getColor(fr,fg,fb,fa); return this; }
+    public IAttribute clr(int r, int g, int b, int a){ color = new IColor(r,g,b,a); return this; }
+    public IAttribute clr(float fr, float fg, float fb, float fa){ color = new IColor(fr,fg,fb,fa); return this; }
     public IAttribute clr(double dr, double dg, double db, double da){ clr((float)dr,(float)dg,(float)db,(float)da); return this; }
-    public IAttribute hsb(float h, float s, float b, float a){ color = IGraphicObject.getHSBColor(h,s,b,a); return this; }
-    public IAttribute hsb(double h, double s, double b, double a){ hsb((float)h,(float)s,(float)b,(float)a); return this; }
-    public IAttribute hsb(float h, float s, float b){ color = IGraphicObject.getHSBColor(h,s,b); return this; }
-    public IAttribute hsb(double h, double s, double b){ hsb((float)h,(float)s,(float)b); return this; }
+    public IAttribute hsb(float h, float s, float b, float a){ color = IColor.hsb(h,s,b,a); return this; }
+    public IAttribute hsb(double h, double s, double b, double a){ return hsb((float)h,(float)s,(float)b,(float)a); }
+    public IAttribute hsb(float h, float s, float b){ color = IColor.hsb(h,s,b); return this; }
+    public IAttribute hsb(double h, double s, double b){ return hsb((float)h,(float)s,(float)b); }
     
     
     public float weight(){ return weight; }
@@ -101,7 +113,8 @@ public class IAttribute{
     public IAttribute weight(double w){ weight=(float)w; return this; }
     
     
-    public Color getColor(){ return clr(); }
+    public Color getAWTColor(){ return color(); }
+    public IColor getColor(){ return clr(); }
     public IAttribute setColor(Color c){ return clr(c); }
     public IAttribute setColor(int gray){  return clr(gray); }
     public IAttribute setColor(float fgray){  return clr(fgray); }

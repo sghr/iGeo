@@ -40,13 +40,13 @@ import igeo.*;
 */
 public class INavigator{
     
-    public final static IMouseButton defaultRotateButton=new IMouseButton(MouseEvent.BUTTON1);
-    public final static IMouseButton defaultRotateButton2=new IMouseButton(MouseEvent.BUTTON1,false,false,true);
-    public final static IMouseButton defaultPanButton=new IMouseButton(MouseEvent.BUTTON2);
-    public final static IMouseButton defaultPanButton2=new IMouseButton(MouseEvent.BUTTON1,
+    public final static IMouseEvent defaultRotateButton=new IMouseEvent(MouseEvent.BUTTON1);
+    public final static IMouseEvent defaultRotateButton2=new IMouseEvent(MouseEvent.BUTTON1,false,false,true);
+    public final static IMouseEvent defaultPanButton=new IMouseEvent(MouseEvent.BUTTON2);
+    public final static IMouseEvent defaultPanButton2=new IMouseEvent(MouseEvent.BUTTON1,
 									true, false, false);
-    public final static IMouseButton defaultZoomButton=new IMouseButton(MouseEvent.BUTTON3);
-    public final static IMouseButton defaultZoomButton2=new IMouseButton(MouseEvent.BUTTON1,
+    public final static IMouseEvent defaultZoomButton=new IMouseEvent(MouseEvent.BUTTON3);
+    public final static IMouseEvent defaultZoomButton2=new IMouseEvent(MouseEvent.BUTTON1,
 									 false, true, false);
     
     public static double minimumAxonometricMouseZoomRatio = 0.000001;
@@ -85,11 +85,11 @@ public class INavigator{
     public DragType dragType = null;
     
     
-    public ArrayList<IMouseButton> rotateButtons;
-    public ArrayList<IMouseButton> panButtons;
-    public ArrayList<IMouseButton> zoomButtons;
+    public ArrayList<IMouseEvent> rotateButtons;
+    public ArrayList<IMouseEvent> panButtons;
+    public ArrayList<IMouseEvent> zoomButtons;
     
-    public ArrayList<IMouseButton> rotateUnlockButtons;
+    public ArrayList<IMouseEvent> rotateUnlockButtons;
     
     public INavigator(IView v, IPane p){
 	this(v);
@@ -97,11 +97,11 @@ public class INavigator{
     }
     public INavigator(IView v){
 	view = v;
-	rotateButtons=new ArrayList<IMouseButton>();
-	panButtons=new ArrayList<IMouseButton>();
-	zoomButtons=new ArrayList<IMouseButton>();
+	rotateButtons=new ArrayList<IMouseEvent>();
+	panButtons=new ArrayList<IMouseEvent>();
+	zoomButtons=new ArrayList<IMouseEvent>();
 
-	rotateUnlockButtons=new ArrayList<IMouseButton>();
+	rotateUnlockButtons=new ArrayList<IMouseEvent>();
 	
 	rotateButtons.add(defaultRotateButton);
 	rotateButtons.add(defaultRotateButton2);
@@ -287,24 +287,24 @@ public class INavigator{
     }
     */
     
-    public DragType getDragType(MouseEvent e){
+    public DragType getDragType(IMouseEvent e){
 	if(rotateLock){
-	    for(IMouseButton b:rotateUnlockButtons) if(b.match(e)){
+	    for(IMouseEvent b:rotateUnlockButtons) if(b.match(e)){
 		rotateLock=false;
 		return DragType.Rotate;
 	    }
 	    // when locked, rotate becomes panning
-	    for(IMouseButton b:rotateButtons) if(b.match(e)) return DragType.Pan;
+	    for(IMouseEvent b:rotateButtons) if(b.match(e)) return DragType.Pan;
 	}
 	else{
-	    for(IMouseButton b:rotateButtons) if(b.match(e)) return DragType.Rotate;
+	    for(IMouseEvent b:rotateButtons) if(b.match(e)) return DragType.Rotate;
 	}
-	for(IMouseButton b:panButtons) if(b.match(e)) return DragType.Pan;
-	for(IMouseButton b:zoomButtons) if(b.match(e)) return DragType.Zoom;
+	for(IMouseEvent b:panButtons) if(b.match(e)) return DragType.Pan;
+	for(IMouseEvent b:zoomButtons) if(b.match(e)) return DragType.Zoom;
 	return null;
     }
     
-    public void mousePressed(MouseEvent e){
+    public void mousePressed(IMouseEvent e){
 	mouseX = e.getX();
 	mouseY = e.getY();
 	mousePressed=true;
@@ -322,27 +322,27 @@ public class INavigator{
 	viewAxonRatio = view.getAxonometricRatio();
     }
     
-    public void mouseReleased(MouseEvent e){
+    public void mouseReleased(IMouseEvent e){
 	if(dragType==DragType.Rotate){ updateRotationByMouse(e.getX(), e.getY()); }
 	else if(dragType==DragType.Pan){ updatePanByMouse(e.getX(), e.getY()); }
 	else if(dragType==DragType.Zoom){ updateZoomByMouse(e.getX(), e.getY()); }
 	mousePressed=false;
     }
-    public void mouseClicked(MouseEvent e){
+    public void mouseClicked(IMouseEvent e){
     }
-    public void mouseEntered(MouseEvent e){
+    public void mouseEntered(IMouseEvent e){
     }
-    public void mouseExited(MouseEvent e){
+    public void mouseExited(IMouseEvent e){
     }
-    public void mouseMoved(MouseEvent e){
+    public void mouseMoved(IMouseEvent e){
     }
-    public void mouseDragged(MouseEvent e){
+    public void mouseDragged(IMouseEvent e){
 	if(dragType==DragType.Rotate){ updateRotationByMouse(e.getX(), e.getY()); }
 	else if(dragType==DragType.Pan){ updatePanByMouse(e.getX(), e.getY()); }
 	else if(dragType==DragType.Zoom){ updateZoomByMouse(e.getX(), e.getY()); }
     }
     
-    public void mouseWheelMoved(MouseWheelEvent e){
+    public void mouseWheelMoved(IMouseWheelEvent e){
 	//final double zoomCoeff=40; //10; //5;
 	
 	viewPos = view.location();
@@ -352,7 +352,7 @@ public class INavigator{
 	updateZoom(wheelZoomRatio*e.getWheelRotation());
     }
     
-    public void keyPressed(KeyEvent e){
+    public void keyPressed(IKeyEvent e){
 	int key = e.getKeyCode();
 	boolean shift=e.isShiftDown();
 	boolean control=e.isControlDown();
@@ -420,9 +420,9 @@ public class INavigator{
 	}
 	
     }
-    public void keyReleased(KeyEvent e){
+    public void keyReleased(IKeyEvent e){
     }
-    public void keyTyped(KeyEvent e){
+    public void keyTyped(IKeyEvent e){
     }
     
     /*

@@ -627,8 +627,14 @@ public class ICurve extends IGeometry implements ICurveI{
     synchronized public ICurve hide(){ super.hide(); return this; }
     synchronized public ICurve show(){ super.show(); return this; }
     
+    synchronized public ICurve clr(IColor c){ super.clr(c); return this; }
+    synchronized public ICurve clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public ICurve clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public ICurve clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public ICurve clr(Color c){ super.clr(c); return this; }
     synchronized public ICurve clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public ICurve clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public ICurve clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public ICurve clr(int gray){ super.clr(gray); return this; }
     synchronized public ICurve clr(float fgray){ super.clr(fgray); return this; }
     synchronized public ICurve clr(double dgray){ super.clr(dgray); return this; }
@@ -646,8 +652,14 @@ public class ICurve extends IGeometry implements ICurveI{
     synchronized public ICurve hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     synchronized public ICurve hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    synchronized public ICurve setColor(IColor c){ super.setColor(c); return this; }
+    synchronized public ICurve setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public ICurve setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public ICurve setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public ICurve setColor(Color c){ super.setColor(c); return this; }
     synchronized public ICurve setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public ICurve setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public ICurve setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public ICurve setColor(int gray){ super.setColor(gray); return this; }
     synchronized public ICurve setColor(float fgray){ super.setColor(fgray); return this; }
     synchronized public ICurve setColor(double dgray){ super.setColor(dgray); return this; }

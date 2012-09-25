@@ -92,114 +92,114 @@ public class ITensileNet{
     
     
     /** color of node points */
-    public static Color pointColor = new Color(255,255,255);
+    public static IColor pointColor = new IColor(255,255,255);
     /** color of node points */
-    public static void pointColor(Color c){ pointColor = c; }
+    public static void pointColor(IColor c){ pointColor = c; }
     /** color of node points */
-    public static void pointColor(int r, int g, int b, int a){ pointColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void pointColor(int r, int g, int b, int a){ pointColor =new IColor(r,g,b,a); }
     /** color of node points */
-    public static void pointColor(int r, int g, int b){ pointColor = IGraphicObject.getColor(r,g,b); }
+    public static void pointColor(int r, int g, int b){ pointColor = new IColor(r,g,b); }
     /** color of node points */
-    public static void pointColor(int gray, int a){ pointColor = IGraphicObject.getColor(gray,a); }
+    public static void pointColor(int gray, int a){ pointColor = new IColor(gray,a); }
     /** color of node points */
-    public static void pointColor(int gray){ pointColor = IGraphicObject.getColor(gray); }
+    public static void pointColor(int gray){ pointColor = new IColor(gray); }
     /** color of node points */
-    public static void pointColor(float r, float g, float b, float a){ pointColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void pointColor(float r, float g, float b, float a){ pointColor = new IColor(r,g,b,a); }
     /** color of node points */
-    public static void pointColor(float r, float g, float b){ pointColor = IGraphicObject.getColor(r,g,b); }
+    public static void pointColor(float r, float g, float b){ pointColor = new IColor(r,g,b); }
     /** color of node points */
-    public static void pointColor(float gray, float a){ pointColor = IGraphicObject.getColor(gray,a); }
+    public static void pointColor(float gray, float a){ pointColor = new IColor(gray,a); }
     /** color of node points */
-    public static void pointColor(float gray){ pointColor = IGraphicObject.getColor(gray); }
+    public static void pointColor(float gray){ pointColor = new IColor(gray); }
     
     
     /** color of node points on rail curve */
-    public static Color railPointColor = new Color(192,192,192);
+    public static IColor railPointColor = new IColor(192,192,192);
     /** color of node points on rail curve */
-    public static void railPointColor(Color c){ railPointColor = c; }
+    public static void railPointColor(IColor c){ railPointColor = c; }
     /** color of node points on rail curve */
-    public static void railPointColor(int r, int g, int b, int a){ railPointColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void railPointColor(int r, int g, int b, int a){ railPointColor = new IColor(r,g,b,a); }
     /** color of node points on rail curve */
-    public static void railPointColor(int r, int g, int b){ railPointColor = IGraphicObject.getColor(r,g,b); }
+    public static void railPointColor(int r, int g, int b){ railPointColor = new IColor(r,g,b); }
     /** color of node points on rail curve */
-    public static void railPointColor(int gray, int a){ railPointColor = IGraphicObject.getColor(gray,a); }
+    public static void railPointColor(int gray, int a){ railPointColor = new IColor(gray,a); }
     /** color of node points on rail curve */
-    public static void railPointColor(int gray){ railPointColor = IGraphicObject.getColor(gray); }
+    public static void railPointColor(int gray){ railPointColor = new IColor(gray); }
     /** color of node points on rail curve */
-    public static void railPointColor(float r, float g, float b, float a){ railPointColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void railPointColor(float r, float g, float b, float a){ railPointColor = new IColor(r,g,b,a); }
     /** color of node points on rail curve */
-    public static void railPointColor(float r, float g, float b){ railPointColor = IGraphicObject.getColor(r,g,b); }
+    public static void railPointColor(float r, float g, float b){ railPointColor = new IColor(r,g,b); }
     /** color of node points on rail curve */
-    public static void railPointColor(float gray, float a){ railPointColor = IGraphicObject.getColor(gray,a); }
+    public static void railPointColor(float gray, float a){ railPointColor = new IColor(gray,a); }
     /** color of node points on rail curve */
-    public static void railPointColor(float gray){ railPointColor = IGraphicObject.getColor(gray); }
+    public static void railPointColor(float gray){ railPointColor = new IColor(gray); }
     
     
     /** color of fixed node points */
-    public static Color fixedPointColor = new Color(255,255,0);
+    public static IColor fixedPointColor = new IColor(255,255,0);
     /** color of fixed node points */
-    public static void fixedPointColor(Color c){ fixedPointColor = c; }
+    public static void fixedPointColor(IColor c){ fixedPointColor = c; }
     /** color of fixed node points */
-    public static void fixedPointColor(int r, int g, int b, int a){ fixedPointColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void fixedPointColor(int r, int g, int b, int a){ fixedPointColor = new IColor(r,g,b,a); }
     /** color of fixed node points */
-    public static void fixedPointColor(int r, int g, int b){ fixedPointColor = IGraphicObject.getColor(r,g,b); }
+    public static void fixedPointColor(int r, int g, int b){ fixedPointColor = new IColor(r,g,b); }
     /** color of fixed node points */
-    public static void fixedPointColor(int gray, int a){ fixedPointColor = IGraphicObject.getColor(gray,a); }
+    public static void fixedPointColor(int gray, int a){ fixedPointColor = new IColor(gray,a); }
     /** color of fixed node points */
-    public static void fixedPointColor(int gray){ fixedPointColor = IGraphicObject.getColor(gray); }
+    public static void fixedPointColor(int gray){ fixedPointColor = new IColor(gray); }
     /** color of fixed node points */
-    public static void fixedPointColor(float r, float g, float b, float a){ fixedPointColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void fixedPointColor(float r, float g, float b, float a){ fixedPointColor = new IColor(r,g,b,a); }
     /** color of fixed node points */
-    public static void fixedPointColor(float r, float g, float b){ fixedPointColor = IGraphicObject.getColor(r,g,b); }
+    public static void fixedPointColor(float r, float g, float b){ fixedPointColor = new IColor(r,g,b); }
     /** color of fixed node points */
-    public static void fixedPointColor(float gray, float a){ fixedPointColor = IGraphicObject.getColor(gray,a); }
+    public static void fixedPointColor(float gray, float a){ fixedPointColor = new IColor(gray,a); }
     /** color of fixed node points */
-    public static void fixedPointColor(float gray){ fixedPointColor = IGraphicObject.getColor(gray); }
+    public static void fixedPointColor(float gray){ fixedPointColor = new IColor(gray); }
     
-
+    
     
     /** color of straightener curve */
-    public static Color straightenerColor = new Color(255,128,0);
+    public static IColor straightenerColor = new IColor(255,128,0);
     /** color of straightener curve */
-    public static void straightenerColor(Color c){ straightenerColor = c; }
+    public static void straightenerColor(IColor c){ straightenerColor = c; }
     /** color of straightener curve */
-    public static void straightenerColor(int r, int g, int b, int a){ straightenerColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void straightenerColor(int r, int g, int b, int a){ straightenerColor = new IColor(r,g,b,a); }
     /** color of straightener curve */
-    public static void straightenerColor(int r, int g, int b){ straightenerColor = IGraphicObject.getColor(r,g,b); }
+    public static void straightenerColor(int r, int g, int b){ straightenerColor = new IColor(r,g,b); }
     /** color of straightener curve */
-    public static void straightenerColor(int gray, int a){ straightenerColor = IGraphicObject.getColor(gray,a); }
+    public static void straightenerColor(int gray, int a){ straightenerColor = new IColor(gray,a); }
     /** color of straightener curve */
-    public static void straightenerColor(int gray){ straightenerColor = IGraphicObject.getColor(gray); }
+    public static void straightenerColor(int gray){ straightenerColor = new IColor(gray); }
     /** color of straightener curve */
-    public static void straightenerColor(float r, float g, float b, float a){ straightenerColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void straightenerColor(float r, float g, float b, float a){ straightenerColor = new IColor(r,g,b,a); }
     /** color of straightener curve */
-    public static void straightenerColor(float r, float g, float b){ straightenerColor = IGraphicObject.getColor(r,g,b); }
+    public static void straightenerColor(float r, float g, float b){ straightenerColor = new IColor(r,g,b); }
     /** color of straightener curve */
-    public static void straightenerColor(float gray, float a){ straightenerColor = IGraphicObject.getColor(gray,a); }
+    public static void straightenerColor(float gray, float a){ straightenerColor = new IColor(gray,a); }
     /** color of straightener curve */
-    public static void straightenerColor(float gray){ straightenerColor = IGraphicObject.getColor(gray); }
+    public static void straightenerColor(float gray){ straightenerColor = new IColor(gray); }
     
     
     /** color of tension curve; default (null) is the original color of an input geometry */
-    public static Color tensionColor = null;
+    public static IColor tensionColor = null;
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(Color c){ tensionColor = c; }
+    public static void tensionColor(IColor c){ tensionColor = c; }
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(int r, int g, int b, int a){ tensionColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void tensionColor(int r, int g, int b, int a){ tensionColor = new IColor(r,g,b,a); }
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(int r, int g, int b){ tensionColor = IGraphicObject.getColor(r,g,b); }
+    public static void tensionColor(int r, int g, int b){ tensionColor = new IColor(r,g,b); }
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(int gray, int a){ tensionColor = IGraphicObject.getColor(gray,a); }
+    public static void tensionColor(int gray, int a){ tensionColor = new IColor(gray,a); }
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(int gray){ tensionColor = IGraphicObject.getColor(gray); }
+    public static void tensionColor(int gray){ tensionColor = new IColor(gray); }
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(float r, float g, float b, float a){ tensionColor = IGraphicObject.getColor(r,g,b,a); }
+    public static void tensionColor(float r, float g, float b, float a){ tensionColor = new IColor(r,g,b,a); }
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(float r, float g, float b){ tensionColor = IGraphicObject.getColor(r,g,b); }
+    public static void tensionColor(float r, float g, float b){ tensionColor = new IColor(r,g,b); }
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(float gray, float a){ tensionColor = IGraphicObject.getColor(gray,a); }
+    public static void tensionColor(float gray, float a){ tensionColor = new IColor(gray,a); }
     /** color of tension curve; default is the original color of an input geometry */
-    public static void tensionColor(float gray){ tensionColor = IGraphicObject.getColor(gray); }
+    public static void tensionColor(float gray){ tensionColor = new IColor(gray); }
     
     
     /** layer to put node points */
@@ -378,15 +378,29 @@ public class ITensileNet{
     /** parameters of constructor for a custom particle on curve class */
     //public static void particleOnCurveConstructorParameters(Class<?>[] p){ particleOnCurveConstructorParameters=p; }
     
+        
+    /** if true, it rebuilds mesh before converting into tensile net by removing all duplicated vertices and
+	edges. On the other hand, Two other parameter keepDuplicatedMeshEdge and keepDuplicatedMeshVertex
+	doesn't change mesh itself and give you control on each of edge and vertex */
+    public static boolean removeMeshDuplicates = true;
+    public static void removeMeshDuplicates(boolean flag){ removeMeshDuplicates = flag; }
     
     /** for creating tensile net out of polygon mesh; if this is false, duplicated edge on adjacent faces are ignored as tension line (duplicated edges inside the polygon mesh are kept, only tension line is not created internally). */
-    public static boolean keepDuplicatedMeshEdge = false;
+    public static boolean keepDuplicatedMeshEdge = true; //false;
     /** for creating tensile net out of polygon mesh; if this is false, duplicated edge on adjacent faces are ignored as tension line (duplicated edges inside the polygon mesh are kept, only tension line is not created internally). */
     public static void keepDuplicatedMeshEdge(boolean keep){ keepDuplicatedMeshEdge=keep; }
     
     public static boolean keepDuplicatedMeshVertex = true;
     public static void keepDuplicatedMeshVertex(boolean keep){ keepDuplicatedMeshVertex=keep; }
     
+    
+    
+    
+    
+    /******************************************************
+     * instance members
+     ******************************************************/
+
     
     //public ArrayList<ITensionLine> links;
     public ArrayList<ITensionI> links;
@@ -434,7 +448,7 @@ public class ITensileNet{
 	    endPts[i][1] = linkLines[i].end().get();
 	}
 	
-	Color[] lineColors = new Color[linkLines.length];
+	IColor[] lineColors = new IColor[linkLines.length];
 	ILayer[] lineLayers = new ILayer[linkLines.length];
 	
 	IServer server=null;
@@ -737,6 +751,8 @@ public class ITensileNet{
        @param fixedPoints if those points are on the vertices of the mesh, those vertices are fixed.
     */
     public static ITensileNet create(IMeshI mesh, IVecI[] fixedPoints){
+
+	
 	
 	ArrayList<IEdge> edges = new ArrayList<IEdge>();
 	if(keepDuplicatedMeshEdge){ 
@@ -973,7 +989,7 @@ public class ITensileNet{
     }
     
     
-    public static ArrayList<ITensionI> createTensions(IParticleI[][] links, Color[] linkColors, ILayer[] linkLayer,
+    public static ArrayList<ITensionI> createTensions(IParticleI[][] links, IColor[] linkColors, ILayer[] linkLayer,
 						      Class<? extends ITensionI> customTensionClass){
 	ArrayList<ITensionI> tlines = new ArrayList<ITensionI>();
 	for(int i=0; i
@@ -2531,7 +2547,7 @@ public class ITensileNet{
 	    endPts[i][1] = linkLines[i].end().get();
 	}
 	
-	Color[] lineColors = new Color[linkLines.length];
+	IColor[] lineColors = new IColor[linkLines.length];
 	ILayer[] lineLayer = new ILayer[linkLines.length];
 	
 	IServer server=null;

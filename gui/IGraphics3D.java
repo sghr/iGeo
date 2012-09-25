@@ -22,7 +22,7 @@
 
 package igeo.gui;
 
-import java.awt.*;
+
 import igeo.*;
 
 /**
@@ -41,16 +41,24 @@ public interface IGraphics3D extends IGraphics{
     /** diffuse color is same with color(Color c) */
     public abstract void diffuse(float r, float g, float b, float a); //{ diffuse(new Color(r,g,b,a)); }
     public abstract void diffuse(float r, float g, float b); //{ diffuse(r,g,b,0); }
-    public abstract void diffuse(Color c); //{ super.clr(c); }
+    public abstract void diffuse(float[] rgba);
+    
+    public abstract void diffuse(IColor c); //{ super.clr(c); }
+    
+    
     public abstract void ambient(float r, float g, float b, float a); //{ ambient(new Color(r,g,b,a)); }
     public abstract void ambient(float r, float g, float b); //{ ambient(r,g,b,0); }
-    public abstract void ambient(Color c); //{ ambientColor = c; }
+    public abstract void ambient(float[] rgba);
+    public abstract void ambient(IColor c); //{ ambientColor = c; }
     public abstract void specular(float r, float g, float b, float a); //{ specular(new Color(r,g,b,a)); }
     public abstract void specular(float r, float g, float b); //{ specular(r,g,b,0); }
-    public abstract void specular(Color c); //{ specularColor = c; }
+    public abstract void specular(float[] rgba);
+    public abstract void specular(IColor c); //{ specularColor = c; }
     public abstract void emissive(float r, float g, float b, float a); //{ emissive(new Color(r,g,b,a)); }
     public abstract void emissive(float r, float g, float b); //{ emissive(r,g,b,0); }
-    public abstract void emissive(Color c); //{ emissiveColor = c; }
+    public abstract void emissive(float[] rgba);
+    public abstract void emissive(IColor c); //{ emissiveColor = c; }
+    
     public abstract void shininess(float s); //{ shininess = s; }
     
     public abstract void enableLight();

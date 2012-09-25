@@ -252,6 +252,7 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 	    }
 	}
 	
+	sizeChanged=true;
     }
     
     

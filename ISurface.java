@@ -781,8 +781,14 @@ public class ISurface extends IGeometry implements ISurfaceI{
     synchronized public ISurface show(){ super.show(); return this; }
     
     
+    synchronized public ISurface clr(IColor c){ super.clr(c); return this; }
+    synchronized public ISurface clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public ISurface clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public ISurface clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public ISurface clr(Color c){ super.clr(c); return this; }
     synchronized public ISurface clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    synchronized public ISurface clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    synchronized public ISurface clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     synchronized public ISurface clr(int gray){ super.clr(gray); return this; }
     synchronized public ISurface clr(float fgray){ super.clr(fgray); return this; }
     synchronized public ISurface clr(double dgray){ super.clr(dgray); return this; }
@@ -800,8 +806,14 @@ public class ISurface extends IGeometry implements ISurfaceI{
     synchronized public ISurface hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
     synchronized public ISurface hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
     
+    synchronized public ISurface setColor(IColor c){ super.setColor(c); return this; }
+    synchronized public ISurface setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public ISurface setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public ISurface setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public ISurface setColor(Color c){ super.setColor(c); return this; }
     synchronized public ISurface setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    synchronized public ISurface setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    synchronized public ISurface setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     synchronized public ISurface setColor(int gray){ super.setColor(gray); return this; }
     synchronized public ISurface setColor(float fgray){ super.setColor(fgray); return this; }
     synchronized public ISurface setColor(double dgray){ super.setColor(dgray); return this; }

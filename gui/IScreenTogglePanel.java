@@ -43,8 +43,8 @@ public class IScreenTogglePanel extends IPanel{
     // full screen of a pane inside root panel, not full screen on the display;
     public void enableFullScreen(int paneIdx){
 	IPane p = panes.get(paneIdx);
-	fullPaneOrigX = p.getX();
-	fullPaneOrigY = p.getY();
+	fullPaneOrigX = (int)p.getX();
+	fullPaneOrigY = (int)p.getY();
 	fullPaneOrigWidth = p.getWidth();
 	fullPaneOrigHeight = p.getHeight();
 	fullScreenPane = p;
@@ -61,6 +61,8 @@ public class IScreenTogglePanel extends IPanel{
 	//IOut.err(idx);
 	if(idx>=0) enableFullScreen(idx);
 	//else{ IOut.err("no pane found"); } //
+	
+	sizeChanged=true; // added 20120923
     }
     
     public void disableFullScreen(){
@@ -73,6 +75,8 @@ public class IScreenTogglePanel extends IPanel{
 		if(panes.get(i)!=fullScreenPane) panes.get(i).setVisible(true);
 	    }
 	    fullScreenPane = null;
+	    
+	    sizeChanged=true; // added 20120923
 	}
     }
     
@@ -109,24 +113,30 @@ public class IScreenTogglePanel extends IPanel{
 	}
 	width=w;
 	height=h;
+	
+	sizeChanged=true;
     }
     
     public void draw(IGraphics g){
-	if(fullScreenPane!=null){
-	    synchronized(IG.lock){
-		if(startDynamicServer) startDynamicServer();
+	if(fullScreenPane==null){ super.draw(g); }
+	else{
+	    predraw(g);
+	    synchronized(IG.lock){ // shouldn't this be "ig"?
+		//if(startDynamicServer) startDynamicServer();
 		fullScreenPane.draw(g);
 	    }
+	    postdraw(g);
 	}
-	else{ super.draw(g); }
     }
     
     
     public void mouseClicked(MouseEvent e){
 	super.mouseClicked(e);
+	
+	IMouseEvent me = new IMouseEvent(e);
 	//IOut.p("click count="+e.getClickCount());//
 	if(e.getClickCount()>=2 &&e.getClickCount()%2==0){ // double click
-	    IPane p = getPaneAt(e);
+	    IPane p = getPaneAt(me);
 	    if(fullScreenPane==null){ if(p!=null) enableFullScreen(p); }
 	    else disableFullScreen();
 	}

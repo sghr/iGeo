@@ -22,11 +22,6 @@
 
 package igeo.gui;
 
-import java.awt.*;
-import java.util.ArrayList;
-
-import igeo.IG;
-import igeo.IGraphicI;
 
 /**
    Class of Graphics to draw 2D (Java2D)

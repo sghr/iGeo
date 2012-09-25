@@ -46,7 +46,7 @@ public class IServer implements IServerI{
     public IDynamicServer dynamicServer; // non null when dynamic subobject is used
     
     public IG ig; // parent
-    //IPanel panel; // non null in graphic mode
+    //IPanelI panel; // non null in graphic mode
     
     // for updating logic of other object referring IServer
     public int stateCount=0; // incremented when any change happens in the state
@@ -69,7 +69,7 @@ public class IServer implements IServerI{
     }
     
     // graphic mode
-    public IServer(IG ig, IPanel panel){
+    public IServer(IG ig, IPanelI panel){
 	this.ig =ig;
 	objects = new ArrayList<IObject>();
 	//graphics = new ArrayList<IGraphicObject>();
@@ -122,7 +122,7 @@ public class IServer implements IServerI{
     }
     */
     
-    //public IPanel getPanel(){ return panel; }
+    //public IPanelI getPanel(){ return panel; }
     
     public boolean isGraphicMode(){ return graphicServer!=null; }
     
@@ -131,11 +131,11 @@ public class IServer implements IServerI{
 	else{ IOut.err("graphicServer is null"); }
     }
     
-    public void bg(Color c1, Color c2, Color c3, Color c4){
+    public void bg(IColor c1, IColor c2, IColor c3, IColor c4){
 	if(graphicServer!=null) graphicServer.background(c1,c2,c3,c4);
 	else{ IOut.err("graphicServer is null"); }
     }
-    public void background(Color c1, Color c2, Color c3, Color c4){ bg(c1,c2,c3,c4); }
+    public void background(IColor c1, IColor c2, IColor c3, IColor c4){ bg(c1,c2,c3,c4); }
     
     
     public ArrayList<IObject> getAllObjects(){ return allObjects(); }
