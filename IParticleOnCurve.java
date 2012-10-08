@@ -80,6 +80,9 @@ public class IParticleOnCurve extends IPointAgent implements IParticleOnCurveI{
     }
     
     
+    // will put methods to attach geometry? 
+    
+    
     public void initParticleOnCurveAgent(ICurveI curve, IVec pos, double upos, double uvel){
 	particle = new IParticleOnCurveGeo(curve,upos,uvel,pos);
 	this.pos = particle.pos;
@@ -165,8 +168,9 @@ public class IParticleOnCurve extends IPointAgent implements IParticleOnCurveI{
     synchronized public IParticleOnCurve reset(){ particle.reset(); return this; }
     synchronized public IParticleOnCurve resetForce(){ particle.resetForce(); return this; }
     
-    /** IParticleOnCurve methods */
-    synchronized public ICurveI curve(){ return particle.curve(); }
+    /** IParticleOnCurve methods; temporarily renamed */
+    //synchronized public ICurveI curve(){ return particle.curve(); }
+    synchronized public ICurveI railCurve(){ return particle.curve(); }
     
     synchronized public IParticleOnCurve uposition(double u){ particle.upos(u); return this; }
     synchronized public IParticleOnCurve upos(double u){ particle.upos(u); return this; }

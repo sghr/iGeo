@@ -130,6 +130,17 @@ public class IColor{
     public float alpha(){ return a(); }
     public float grey(){ return (r()+g()+b())/3; } // brightness
     
+    public IColor r(float r){ rgba[0]=r; return this; }
+    public IColor g(float g){ rgba[1]=g; return this; }
+    public IColor b(float b){ rgba[2]=b; return this; }
+    public IColor a(float a){ rgba[3]=a; return this; }
+    
+    public IColor red(float r){ return r(r); }
+    public IColor green(float g){ return g(g); }
+    public IColor blue(float b){ return b(b); }
+    public IColor alpha(float a){ return a(a); }
+    public IColor grey(float grey){ r(grey); g(grey); b(grey); return this; } // brightness
+    
     public int getRed(){ return (int)(r()*255); }
     public int getGreen(){ return (int)(g()*255); }
     public int getBlue(){ return (int)(b()*255); }

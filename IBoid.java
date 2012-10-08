@@ -43,6 +43,26 @@ public class IBoid extends IParticle implements IBoidI{
     }
     public IBoid(IBoid b){ super(new IBoidGeo((IBoidGeo)b.particle));}
     
+    
+    // out of attached geometries
+    public IBoid(IGeometry... geometries){
+	super(geometries);
+	initParticleAgent(new IBoidGeo(pos));
+    }
+    
+    // out of attached geometries
+    public IBoid(IVecI geometryOrigin, IGeometry... geometries){
+	super(geometryOrigin,geometries);
+	initParticleAgent(new IBoidGeo(pos));
+    }
+    
+    public IBoid(IVecI geometryOrigin, IVecI geometryOrientation, IGeometry... geometries){
+	super(geometryOrigin, geometryOrientation, geometries);
+	initParticleAgent(new IBoidGeo(pos));
+    }
+    
+    
+    
     public IBoidGeo boid(){ return (IBoidGeo)particle; } // (IParticleGeo)particle in IParticle
     
     public double cohDist(){ return boid().cohDist(); }

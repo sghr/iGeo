@@ -22,6 +22,8 @@
 
 package igeo;
 
+import java.lang.reflect.Array;
+
 /**
    dynamic behavior for a geometry object to track particle location.
    this class needs to be added under point agent (IPointAgent class) or its subclasses like IParticle and IBoid.
@@ -70,31 +72,102 @@ public class IAgentTracker extends IDynamicsBase{
 	initTracker(geometryOrigin, geometryOrientation, p);
     }
     
-    
+    /** total number of geometries */
     public int geometryNum(){ return geometries.length; }
-    public IGeometry geometry(int i){ return geometries[i]; }
     /** returns first geomery */
     public IGeometry geometry(){ if(geometries.length==0){ return null; } return geometries[0]; }
+    /** returns n-th geometry */
+    public IGeometry geometry(int i){ return geometries[i]; }
+    /** returns all geometries */
+    public IGeometry[] geometries(){ return geometries; }
+    
+    
+    /** returns all contained geometries in a specified type */
+    @SuppressWarnings({"unchecked"})
+    public <T extends IGeometry> T[] subgeometries(Class<T> cls){
+	//T[] geo = new T[subgeometryNum<T>()];
+	T[] geo = (T[])Array.newInstance(cls, subgeometryNum(cls));
+	for(int i=0, idx=0; i<geometries.length; i++) 
+	    if(cls.isInstance(geometries[i])) geo[idx++] = (T)geometries[i];
+	return geo;
+    }
+    
+    /** returns first geometry in a specified type */
+    @SuppressWarnings({"unchecked"})
+    public <T extends IGeometry> T subgeometry(Class<T> cls){
+	for(int i=0; i<geometries.length; i++) if(cls.isInstance(geometries[i])) return (T)geometries[i];
+	return null; // not found
+    }
+    
+    /** returns n-th geometry in a specified type */
+    @SuppressWarnings({"unchecked"})
+	public <T extends IGeometry> T subgeometry(Class<T> cls, int index){
+	for(int i=0, idx=0; i<geometries.length; i++){
+	    if(cls.isInstance(geometries[i])){
+		if(idx == index) return (T)geometries[i];
+		idx++;
+	    }
+	}
+	return null; // not found
+    }
+    
+    /** returns number of geometries in a specified type */
+    public int subgeometryNum(Class<? extends IGeometry> cls){
+	int num=0;
+	for(int i=0; i<geometries.length; i++) if(cls.isInstance(geometries[i])) num++;
+	return num;
+    }
+    
+    
+    /** returns all contained points */
+    public IPoint[] points(){ return this.<IPoint>subgeometries(IPoint.class); }
+    /** returns first point */
+    public IPoint point(){ return this.<IPoint>subgeometry(IPoint.class); }
+    /** returns n-th point */
+    public IPoint point(int index){ return this.<IPoint>subgeometry(IPoint.class, index); }
+    /** returns point num */
+    public int pointNum(){ return this.subgeometryNum(IPoint.class); }
+    
+    
+    /** returns all contained curves */
+    public ICurve[] curves(){ return this.<ICurve>subgeometries(ICurve.class); }
     /** returns first curve */
-    public ICurve curve(){
-	for(int i=0; i<geometries.length; i++) if(geometries[i] instanceof ICurve) return (ICurve)geometries[i];
-	return null; // no curve found
-    }
+    public ICurve curve(){ return this.<ICurve>subgeometry(ICurve.class); }
+    /** returns n-th curve */
+    public ICurve curve(int index){ return this.<ICurve>subgeometry(ICurve.class, index); }
+    /** returns curve num */
+    public int curveNum(){ return this.subgeometryNum(ICurve.class); }
+    
+    
+    /** returns all contained surfaces */
+    public ISurface[] surfaces(){ return this.<ISurface>subgeometries(ISurface.class); }
     /** returns first surface */
-    public ISurface surface(){
-	for(int i=0; i<geometries.length; i++) if(geometries[i] instanceof ISurface) return (ISurface)geometries[i];
-	return null; // no surface found
-    }
+    public ISurface surface(){ return this.<ISurface>subgeometry(ISurface.class); }
+    /** returns n-th surface */
+    public ISurface surface(int index){ return this.<ISurface>subgeometry(ISurface.class, index); }
+    /** returns surface num */
+    public int surfaceNum(){ return this.subgeometryNum(ISurface.class); }
+    
+    
+    /** returns all contained breps */
+    public IBrep[] breps(){ return this.<IBrep>subgeometries(IBrep.class); }
     /** returns first brep */
-    public IBrep brep(){
-	for(int i=0; i<geometries.length; i++) if(geometries[i] instanceof IBrep) return (IBrep)geometries[i];
-	return null; // no brep found
-    }
+    public IBrep brep(){ return this.<IBrep>subgeometry(IBrep.class); }
+    /** returns n-th surface */
+    public IBrep brep(int index){ return this.<IBrep>subgeometry(IBrep.class, index); }
+    /** returns brep num */
+    public int brepNum(){ return this.subgeometryNum(IBrep.class); }
+    
+    /** returns all contained meshes */
+    public IMesh[] meshes(){ return this.<IMesh>subgeometries(IMesh.class); }
     /** returns first mesh */
-    public IMesh mesh(){
-	for(int i=0; i<geometries.length; i++) if(geometries[i] instanceof IMesh) return (IMesh)geometries[i];
-	return null; // no mesh found
-    }
+    public IMesh mesh(){ return this.<IMesh>subgeometry(IMesh.class); }
+    /** returns n-th surface */
+    public IMesh mesh(int index){ return this.<IMesh>subgeometry(IMesh.class, index); }
+    /** returns mesh num */
+    public int meshNum(){ return this.subgeometryNum(IMesh.class); }
+    
+    
     
     
     public IAgentTracker show(){
@@ -122,6 +195,93 @@ public class IAgentTracker extends IDynamicsBase{
     }
     
     
+    public IAgentTracker clr(IColor c){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(c);
+	return this;
+    }
+    public IAgentTracker clr(IColor c, int alpha){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(c,alpha);
+	return this;
+    }
+    public IAgentTracker clr(IColor c, float alpha){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(c,alpha);
+	return this;
+    }
+    public IAgentTracker clr(IColor c, double alpha){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(c,alpha);
+	return this;
+    }
+    //public IAgentTracker clr(Color c){ super.clr(c); point.clr(c); return this; }
+    //public IAgentTracker clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    //public IAgentTracker clr(Color c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    //public IAgentTracker clr(Color c, double alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    public IAgentTracker clr(int gray){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(gray);
+	return this;
+    }
+    public IAgentTracker clr(float fgray){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(fgray);
+	return this;
+    }
+    public IAgentTracker clr(double dgray){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(dgray);
+	return this;
+    }
+    public IAgentTracker clr(int gray, int alpha){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(gray,alpha);
+	return this;
+    }
+    public IAgentTracker clr(float fgray, float falpha){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(fgray,falpha);
+	return this;
+    }
+    public IAgentTracker clr(double dgray, double dalpha){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(dgray,dalpha);
+	return this;
+    }
+    public IAgentTracker clr(int r, int g, int b){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(r,g,b);
+	return this;
+    }
+    public IAgentTracker clr(float fr, float fg, float fb){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(fr,fg,fb);
+	return this;
+    }
+    public IAgentTracker clr(double dr, double dg, double db){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(dr,dg,db);
+	return this;
+    }
+    public IAgentTracker clr(int r, int g, int b, int a){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(r,g,b,a);
+	return this;
+    }
+    public IAgentTracker clr(float fr, float fg, float fb, float fa){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(fr,fg,fb,fa);
+	return this;
+    }
+    public IAgentTracker clr(double dr, double dg, double db, double da){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(dr,dg,db,da);
+	return this;
+    }
+    public IAgentTracker hsb(float h, float s, float b, float a){
+	for(int i=0; i<geometries.length; i++) geometries[i].hsb(h,s,b,a);
+	return this;
+    }
+    public IAgentTracker hsb(double h, double s, double b, double a){
+	for(int i=0; i<geometries.length; i++) geometries[i].hsb(h,s,b,a);
+	return this;
+    }
+    public IAgentTracker hsb(float h, float s, float b){
+	for(int i=0; i<geometries.length; i++) geometries[i].hsb(h,s,b);
+	return this;
+    }
+    public IAgentTracker hsb(double h, double s, double b){
+	for(int i=0; i<geometries.length; i++) geometries[i].hsb(h,s,b);
+	return this;
+    }
+    
+    
+    
     /** move geometries from its center to the current position of the parent agent */
     public void initTracker(IPointAgent p){
 	IVec center = new IVec();
@@ -144,10 +304,15 @@ public class IAgentTracker extends IDynamicsBase{
 	
 	if(setAgentAttributes){
 	    if(agent.attr()!=null){
-		for(int i=0; i<geometries.length; i++) geometries[i].attr(agent.attr());
+		for(int i=0; i<geometries.length; i++){
+		    if(geometries[i].attr()!=null){ geometries[i].attr().merge(agent.attr()); }
+		    else{ geometries[i].attr(agent.attr()); }
+		}
 	    }
 	    else if(agent.clr()!=null){
-		for(int i=0; i<geometries.length; i++) geometries[i].clr(agent.clr());
+		if(agent.clr()!=null){
+		    for(int i=0; i<geometries.length; i++) geometries[i].clr(agent.clr());
+		}
 	    }
 	}
 	
@@ -211,5 +376,6 @@ public class IAgentTracker extends IDynamicsBase{
 	
 	prevPos.set(agent.pos());
     }
+    
     
 }

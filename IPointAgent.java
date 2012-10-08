@@ -43,13 +43,38 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent(IVecI p){ super(); pos=p.get(); show(); }
     public IPointAgent(IPointAgent pa){ super(); pos=pa.pos.dup(); show(); }
     
+    // out of attached geometries
+    public IPointAgent(IGeometry... geometries){
+	if(geometries==null||geometries.length==0){
+	    pos = new IVec();
+	    show();
+	}
+	else{
+	    IVec center = new IVec();
+	    for(int i=0; i<geometries.length; i++) center.add(geometries[i].center());
+	    center.div(geometries.length);
+	    pos = center;
+	    show();
+	    attach(center, geometries);
+	}
+	point.hide(); // create and hide? (some methods assume point is non-null).
+    }
+    
+    // out of attached geometries
+    public IPointAgent(IVecI geometryOrigin, IGeometry... geometries){
+	pos = geometryOrigin.get();
+	show();
+	attach(geometryOrigin, geometries);
+	point.hide(); // create and hide? (some methods assume point is non-null).
+    }
+    
     
     public IVec position(){ return pos(); }
     public IPointAgent position(IVecI v){ return pos(v); }
     
     public IVec pos(){ return pos; }
     public IPointAgent pos(IVecI v){ pos.set(v); return this; }
-
+    
     
     /*********************************************
      * geometry object attachment to track agent
@@ -72,6 +97,86 @@ public class IPointAgent extends IAgent implements IVecI{
 	tracker = new IAgentTracker(this, geometryOrigin, geometries);
 	return this;
     }
+    
+    /**************************************
+     * get attached geometries 
+     **************************************/
+    /** total number of geometries */
+    public int geometryNum(){ if(tracker==null){ return 0; } return tracker.geometryNum(); }
+    /** returns first geomery */
+    public IGeometry geometry(){ if(tracker==null){ return null; } return tracker.geometry(); }
+    /** returns n-th geometry */
+    public IGeometry geometry(int i){ if(tracker==null){ return null; } return tracker.geometry(i); }
+    /** returns all geometries */
+    public IGeometry[] geometries(){ if(tracker==null){ return null; } return tracker.geometries(); }
+    
+    /** returns all contained points */
+    public IPoint[] points(){
+	if(tracker==null){ return new IPoint[]{ point }; } // return the base point
+	IPoint[] pts = tracker.points();
+	if(pts==null || pts.length==0){ return new IPoint[]{ point }; } // return the base point
+	return pts;
+    }
+    /** returns first point */
+    public IPoint point(){
+	if(tracker==null){ return point; } // return the base point
+	IPoint pt = tracker.point();
+	if(pt==null){ return point; } // return the base point
+	return pt;
+    }
+    /** returns n-th point */
+    public IPoint point(int index){
+	if(tracker==null){ return point; } // return the base point
+	IPoint pt = tracker.point(index);
+	if(pt==null){ return point; } // return the base point
+	return pt;
+    }
+    /** returns point num */
+    public int pointNum(){
+	if(tracker==null){ return 1; } // counting the base point
+	int num = tracker.pointNum();
+	if(num==0){ return 1; } // counting the base point
+	return num;
+    }
+    
+
+    /** returns all contained curves */
+    public ICurve[] curves(){ if(tracker==null){ return null; } return tracker.curves(); }
+    /** returns first curve */
+    public ICurve curve(){ if(tracker==null){ return null; } return tracker.curve(); }
+    /** returns n-th curve */
+    public ICurve curve(int index){ if(tracker==null){ return null; } return tracker.curve(index); }
+    /** returns curve num */
+    public int curveNum(){ if(tracker==null){ return 0; } return tracker.curveNum(); }
+
+
+    /** returns all contained surfaces */
+    public ISurface[] surfaces(){ if(tracker==null){ return null; } return tracker.surfaces(); }
+    /** returns first surface */
+    public ISurface surface(){ if(tracker==null){ return null; } return tracker.surface(); }
+    /** returns n-th surface */
+    public ISurface surface(int index){ if(tracker==null){ return null; } return tracker.surface(index); }
+    /** returns surface num */
+    public int surfaceNum(){ if(tracker==null){ return 0; } return tracker.surfaceNum(); }
+    
+    /** returns all contained breps */
+    public IBrep[] breps(){ if(tracker==null){ return null; } return tracker.breps(); }
+    /** returns first brep */
+    public IBrep brep(){ if(tracker==null){ return null; } return tracker.brep(); }
+    /** returns n-th surface */
+    public IBrep brep(int index){ if(tracker==null){ return null; } return tracker.brep(index); }
+    /** returns brep num */
+    public int brepNum(){ if(tracker==null){ return 0; } return tracker.brepNum(); }
+    
+    /** returns all contained meshes */
+    public IMesh[] meshes(){ if(tracker==null){ return null; } return tracker.meshes(); }
+    /** returns first mesh */
+    public IMesh mesh(){ if(tracker==null){ return null; } return tracker.mesh(); }
+    /** returns n-th surface */
+    public IMesh mesh(int index){ if(tracker==null){ return null; } return tracker.mesh(index); }
+    /** returns mesh num */
+    public int meshNum(){ if(tracker==null){ return 0; } return tracker.meshNum(); }
+    
     
     
     
@@ -451,43 +556,43 @@ public class IPointAgent extends IAgent implements IVecI{
     public void del(){ if(tracker!=null) tracker.del(); point.del(); super.del(); } //
     
     
-    public IPointAgent clr(IColor c){ super.clr(c); point.clr(c); return this; }
-    public IPointAgent clr(IColor c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
-    public IPointAgent clr(IColor c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
-    public IPointAgent clr(IColor c, double alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    public IPointAgent clr(IColor c){ super.clr(c); point.clr(c); if(tracker!=null){ tracker.clr(c); } return this; }
+    public IPointAgent clr(IColor c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); if(tracker!=null){ tracker.clr(c,alpha); } return this; }
+    public IPointAgent clr(IColor c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); if(tracker!=null){ tracker.clr(c,alpha); } return this; }
+    public IPointAgent clr(IColor c, double alpha){ super.clr(c,alpha); point.clr(c,alpha); if(tracker!=null){ tracker.clr(c,alpha); } return this; }
     //public IPointAgent clr(Color c){ super.clr(c); point.clr(c); return this; }
     //public IPointAgent clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     //public IPointAgent clr(Color c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     //public IPointAgent clr(Color c, double alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
-    public IPointAgent clr(int gray){ super.clr(gray); point.clr(gray); return this; }
-    public IPointAgent clr(float fgray){ super.clr(fgray); point.clr(fgray); return this; }
-    public IPointAgent clr(double dgray){ super.clr(dgray); point.clr(dgray); return this; }
-    public IPointAgent clr(int gray, int alpha){ super.clr(gray,alpha); point.clr(gray,alpha); return this; }
-    public IPointAgent clr(float fgray, float falpha){ super.clr(fgray,falpha); point.clr(fgray,falpha); return this; }
-    public IPointAgent clr(double dgray, double dalpha){ super.clr(dgray,dalpha); point.clr(dgray,dalpha); return this; }
-    public IPointAgent clr(int r, int g, int b){ super.clr(r,g,b); point.clr(r,g,b); return this; }
-    public IPointAgent clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); point.clr(fr,fg,fb); return this; }
-    public IPointAgent clr(double dr, double dg, double db){ super.clr(dr,dg,db); point.clr(dr,dg,db); return this; }
+    public IPointAgent clr(int gray){ super.clr(gray); point.clr(gray); if(tracker!=null){ tracker.clr(gray); } return this; }
+    public IPointAgent clr(float fgray){ super.clr(fgray); point.clr(fgray); if(tracker!=null){ tracker.clr(fgray); } return this; }
+    public IPointAgent clr(double dgray){ super.clr(dgray); point.clr(dgray); if(tracker!=null){ tracker.clr(dgray); } return this; }
+    public IPointAgent clr(int gray, int alpha){ super.clr(gray,alpha); point.clr(gray,alpha); if(tracker!=null){ tracker.clr(gray,alpha); } return this; }
+    public IPointAgent clr(float fgray, float falpha){ super.clr(fgray,falpha); point.clr(fgray,falpha); if(tracker!=null){ tracker.clr(fgray,falpha); } return this; }
+    public IPointAgent clr(double dgray, double dalpha){ super.clr(dgray,dalpha); point.clr(dgray,dalpha); if(tracker!=null){ tracker.clr(dgray,dalpha); } return this; }
+    public IPointAgent clr(int r, int g, int b){ super.clr(r,g,b); point.clr(r,g,b); if(tracker!=null){ tracker.clr(r,g,b); } return this; }
+    public IPointAgent clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); point.clr(fr,fg,fb); if(tracker!=null){ tracker.clr(fr,fg,fb); } return this; }
+    public IPointAgent clr(double dr, double dg, double db){ super.clr(dr,dg,db); point.clr(dr,dg,db); if(tracker!=null){ tracker.clr(dr,dg,db); } return this; }
     public IPointAgent clr(int r, int g, int b, int a){
-	super.clr(r,g,b,a); point.clr(r,g,b,a); return this;
+	super.clr(r,g,b,a); point.clr(r,g,b,a); if(tracker!=null){ tracker.clr(r,g,b,a); } return this;
     }
     public IPointAgent clr(float fr, float fg, float fb, float fa){
-	super.clr(fr,fg,fb,fa); point.clr(fr,fg,fb,fa); return this;
+	super.clr(fr,fg,fb,fa); point.clr(fr,fg,fb,fa); if(tracker!=null){ tracker.clr(fr,fg,fb,fa); } return this;
     }
     public IPointAgent clr(double dr, double dg, double db, double da){
-	super.clr(dr,dg,db,da); point.clr(dr,dg,db,da); return this;
+	super.clr(dr,dg,db,da); point.clr(dr,dg,db,da); if(tracker!=null){ tracker.clr(dr,dg,db,da); } return this;
     }
     public IPointAgent hsb(float h, float s, float b, float a){
-	super.hsb(h,s,b,a); point.hsb(h,s,b,a); return this;
+	super.hsb(h,s,b,a); point.hsb(h,s,b,a); if(tracker!=null){ tracker.hsb(h,s,b,a); } return this;
     }
     public IPointAgent hsb(double h, double s, double b, double a){
-	super.hsb(h,s,b,a); point.hsb(h,s,b,a); return this;
+	super.hsb(h,s,b,a); point.hsb(h,s,b,a); if(tracker!=null){ tracker.hsb(h,s,b,a); } return this;
     }
     public IPointAgent hsb(float h, float s, float b){
-	super.hsb(h,s,b); point.hsb(h,s,b); return this;
+	super.hsb(h,s,b); point.hsb(h,s,b); if(tracker!=null){ tracker.clr(h,s,b); } return this;
     }
     public IPointAgent hsb(double h, double s, double b){
-	super.hsb(h,s,b); point.hsb(h,s,b); return this;
+	super.hsb(h,s,b); point.hsb(h,s,b); if(tracker!=null){ tracker.clr(h,s,b); } return this;
     }
     
     public IPointAgent setColor(IColor c){ return clr(c); }

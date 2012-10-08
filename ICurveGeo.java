@@ -388,6 +388,17 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	    IOut.err("input pt is invalid. not added");
 	    return this; 
 	}
+	
+	// in case of first addition after the curve is instantiated with one point.
+	if(controlPoints.length==2 &&
+	   controlPoints[0].x()==controlPoints[1].x() &&
+	   controlPoints[0].y()==controlPoints[1].y() &&
+	   controlPoints[0].z()==controlPoints[1].z()){ // replace the second point with new one
+	    controlPoints[1] = pt;
+	    defaultWeights[1] = !(pt instanceof IVec4I);
+	    return this;
+	}
+	
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pt); }
 	int num = controlPoints.length;
 	//check if it started with duplicated 2 points and if so, remove one of them.
@@ -691,7 +702,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
     
     /** approximate invert projection from 3D location to interanl parameter U (closest point on curve) */
-    public double u(IVecI pt){
+    synchronized public double u(IVecI pt){
 	if(uSearchCache==null){ uSearchCache = new ICurveCache(this); }
 	return uSearchCache.u(pt.get());
     }
@@ -885,7 +896,10 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public ICurveGeo revU(){ return rev(); }
     /** alias of rev() */
     public ICurveGeo flipU(){ return rev(); }
-        
+    
+    
+    synchronized public ICurveGeo updateCache(){ uSearchCache = new ICurveCache(this); return this; }
+    
     
     /********************************************************************************
      * transformation methods

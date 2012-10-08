@@ -47,7 +47,39 @@ public class IParticle extends IPointAgent implements IParticleI{
     public IParticle(IVec p, IVec vel){ super(p); initParticleAgent(vel); }
     public IParticle(IVecI p, IVecI vel){ super(p); initParticleAgent(vel); }
     public IParticle(IParticleGeo ptcl, IVecI vel){ super(ptcl.pos); initParticleAgent(ptcl,vel); }
-    public IParticle(IParticle p, IVecI vel){ super((IPointAgent)p); initParticleAgent(vel); }    
+    public IParticle(IParticle p, IVecI vel){ super((IPointAgent)p); initParticleAgent(vel); }
+    
+    // out of attached geometries
+    public IParticle(IGeometry... geometries){
+	this();
+        if(geometries==null||geometries.length==0){
+            pos = new IVec();
+        }
+        else{
+            IVec center = new IVec();
+            for(int i=0; i<geometries.length; i++) center.add(geometries[i].center());
+            center.div(geometries.length);
+            pos(center);
+            attach(center, geometries);
+        }
+	if(point!=null){ point.hide(); } // hide point!
+    }
+    
+    // out of attached geometries
+    public IParticle(IVecI geometryOrigin, IGeometry... geometries){
+	this();
+	pos(geometryOrigin);
+        attach(geometryOrigin, geometries);
+	if(point!=null){ point.hide(); } // hide point!
+    }
+    
+    public IParticle(IVecI geometryOrigin, IVecI geometryOrientation, IGeometry... geometries){
+	this();
+	pos(geometryOrigin);
+	attach(geometryOrigin, geometryOrientation, geometries);
+	if(point!=null){ point.hide(); } // hide point!
+    }
+    
     
     public void initParticleAgent(){
 	particle = new IParticleGeo(pos, (IObject)this);

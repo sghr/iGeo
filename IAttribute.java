@@ -57,7 +57,7 @@ public class IAttribute{
     
     /** visibility switch of the object */
     public boolean visible=true;
-
+    
     public IAttribute(){}
     
     public IAttribute(IAttribute attr){
@@ -73,6 +73,26 @@ public class IAttribute{
     
     public IAttribute dup(){ return new IAttribute(this); }
     public IAttribute cp(){ return dup(); }
+    
+    public IAttribute set(IAttribute attr){
+	layer = attr.layer;
+	color = attr.color;
+	size = attr.size;
+	weight = attr.weight;
+	material = attr.material;
+	visible = attr.visible;
+	return this;
+    }
+    
+    public IAttribute merge(IAttribute attr){
+	if(layer==null) layer = attr.layer;
+	if(color==null) color = attr.color;
+	if(size!=1f) size = attr.size; // not default value
+	if(weight!=1f) weight = attr.weight; // not default value
+	if(material==null) material = attr.material;
+	if(!visible) visible = attr.visible; // not default value
+	return this;
+    }
     
     
     public Color color(){ return color.awt(); }

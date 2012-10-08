@@ -44,8 +44,7 @@ public class IAgent extends IObject implements IDynamics{
     public boolean alive=true;
     
     /** check if a child class overrides void interact(IDynamics) or not */
-    boolean interactOverridden=false;
-    
+    public boolean interactOverridden=false;
     
     public IAgent(){ super(); initAgent(); }
     

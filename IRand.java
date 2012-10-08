@@ -86,15 +86,17 @@ public class IRand{
     
     
     static public int geti(int min, int max){
-	int r = (int)get(min, max+1);
-	if(r>max){ r=max; }
+	if(max>min){
+	    int r = (int)get(min, max+1);
+	    if(r>max){ r=max; } 
+	    return r;
+	}
+	int r = (int)get(max, min+1);
+	if(r>min){ r=min; } 
 	return r;
     }
-    static public int geti(int max){
-	int r = (int)get(0, max+1);
-	if(r>max){ r=max; }
-	return r;
-    }
+    static public int geti(int max){ return geti(0,max); }
+    
     /** returns 0 or 1 */
     static public int geti(){
 	int r = (int)get(0, 2);

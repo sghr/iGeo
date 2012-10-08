@@ -52,7 +52,14 @@ public class IObject{
     public ArrayList<IDynamics> dynamics;
     
     //public ILayer layer;
+    /** object attributes like color, layer, etc. */
     public IAttribute attribute;
+    
+    
+    /** for user's custom data */
+    public Object userData;
+    
+    
     
     /** IObject is stored in default IServer (through current static IG instance) */
     public IObject(){ initObject(null); }
@@ -309,6 +316,13 @@ public class IObject{
     public IObject attr(IObject obj){ if(obj!=null && obj.attr()!=null) attr(obj.attr().dup()); return this; }
     
     
+    /** get user's custom data */
+    public Object userData(){ return userData; }
+    /** set user's custom data */
+    public IObject userData(Object data){ userData=data; return this; }
+    
+    
+    
     // shouldn't these methods be in other graphic class?
     
     
@@ -418,21 +432,25 @@ public class IObject{
     
     
     /** @return returns whatever Color of any graphics member. (first found) */
-    public Color color(){ return awtColor(); }
+    //public Color color(){ return awtColor(); }
     /** @return returns whatever Color of any graphics member. (first found) */
+    
     public Color awtColor(){
 	if(attribute!=null) return attribute.color.awt();
 	if(graphics!=null)
 	    for(IGraphicObject gr:graphics) if(gr.getColor()!=null) return gr.getColor().awt();
 	return IConfig.objectColor.awt();
     }
+    public Color getAWTColor(){ return awtColor(); }
     public IObject clr(Color c){ return clr(new IColor(c)); }
     public IObject clr(Color c, int alpha){ return clr(new IColor(c),alpha); }
     public IObject clr(Color c, float alpha){ return clr(new IColor(c),alpha); }
     public IObject clr(Color c, double alpha){ return clr(new IColor(c),alpha); }
+    
+    
     /** @return returns whatever Color of any graphics member. (first found) */
     public IColor getColor(){ return clr(); }
-    public Color getAWTColor(){ return awtColor(); }
+    
     
     
     public IObject clr(int gray){
@@ -549,10 +567,12 @@ public class IObject{
     public IObject setColor(IColor c, int alpha){ return clr(c,alpha); }
     public IObject setColor(IColor c, float alpha){ return clr(c,alpha); }
     public IObject setColor(IColor c, double alpha){ return clr(c,alpha); }
+    //
     public IObject setColor(Color c){ return clr(c); }
     public IObject setColor(Color c, int alpha){ return clr(c,alpha); }
     public IObject setColor(Color c, float alpha){ return clr(c,alpha); }
     public IObject setColor(Color c, double alpha){ return clr(c,alpha); }
+    //
     public IObject setColor(int gray){ return clr(gray); }
     public IObject setColor(float fgray){ return clr(fgray); }
     public IObject setColor(double dgray){ return clr(dgray); }

@@ -45,6 +45,23 @@ public class IBoidTrajectory extends IBoid implements ITrajectoryI{
     public IBoidTrajectory(IParticleGeo ptcl, IVecI vel){ super(ptcl,vel); initTrajectory(); }
     public IBoidTrajectory(IParticle p, IVecI vel){ super(p,vel); initTrajectory(); }
     
+    // out of attached geometries
+    public IBoidTrajectory(IGeometry... geometries){
+	super(geometries);
+	initTrajectory();
+    }
+    // out of attached geometries
+    public IBoidTrajectory(IVecI geometryOrigin, IGeometry... geometries){
+	super(geometryOrigin,geometries);
+	initTrajectory();
+    }
+    
+    public IBoidTrajectory(IVecI geometryOrigin, IVecI geometryOrientation, IGeometry... geometries){
+	super(geometryOrigin, geometryOrientation, geometries);
+	initTrajectory();
+    }
+    
+    
     public void initTrajectory(){ trajectory = new ITrajectoryGeo(this); }
     
     public int deg(){ if(trajectory!=null){ return trajectory.deg(); } return 1; }

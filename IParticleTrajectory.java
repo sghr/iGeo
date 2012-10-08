@@ -45,6 +45,23 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     public IParticleTrajectory(IParticleGeo ptcl, IVecI vel){ super(ptcl,vel); initTrajectory(); }
     public IParticleTrajectory(IParticle p, IVecI vel){ super(p,vel); initTrajectory(); }
     
+    // out of attached geometries
+    public IParticleTrajectory(IGeometry... geometries){
+	super(geometries);
+	initTrajectory();
+    }
+    
+    // out of attached geometries
+    public IParticleTrajectory(IVecI geometryOrigin, IGeometry... geometries){
+	super(geometryOrigin,geometries);
+	initTrajectory();
+    }
+    
+    public IParticleTrajectory(IVecI geometryOrigin, IVecI geometryOrientation, IGeometry... geometries){
+	super(geometryOrigin, geometryOrientation, geometries);
+	initTrajectory();
+    }
+    
     public void initTrajectory(){ trajectory = new ITrajectoryGeo(this); }
     
     public int deg(){ if(trajectory!=null){ return trajectory.deg(); } return 1; }
@@ -328,10 +345,10 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     public IParticleTrajectory clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IParticleTrajectory clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IParticleTrajectory clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
-    public IParticleTrajectory clr(Color c){ super.clr(c); return this; }
-    public IParticleTrajectory clr(Color c, int alpha){ super.clr(c,alpha); return this; }
-    public IParticleTrajectory clr(Color c, float alpha){ super.clr(c,alpha); return this; }
-    public IParticleTrajectory clr(Color c, double alpha){ super.clr(c,alpha); return this; }
+    //public IParticleTrajectory clr(Color c){ super.clr(c); return this; }
+    //public IParticleTrajectory clr(Color c, int alpha){ super.clr(c,alpha); return this; }
+    //public IParticleTrajectory clr(Color c, float alpha){ super.clr(c,alpha); return this; }
+    //public IParticleTrajectory clr(Color c, double alpha){ super.clr(c,alpha); return this; }
     public IParticleTrajectory clr(int gray){ super.clr(gray); return this; }
     public IParticleTrajectory clr(float fgray){ super.clr(fgray); return this; }
     public IParticleTrajectory clr(double dgray){ super.clr(dgray); return this; }
@@ -353,10 +370,10 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     public IParticleTrajectory setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
     public IParticleTrajectory setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
     public IParticleTrajectory setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
-    public IParticleTrajectory setColor(Color c){ super.setColor(c); return this; }
-    public IParticleTrajectory setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
-    public IParticleTrajectory setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
-    public IParticleTrajectory setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
+    //public IParticleTrajectory setColor(Color c){ super.setColor(c); return this; }
+    //public IParticleTrajectory setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
+    //public IParticleTrajectory setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
+    //public IParticleTrajectory setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
     public IParticleTrajectory setColor(int gray){ super.setColor(gray); return this; }
     public IParticleTrajectory setColor(float fgray){ super.setColor(fgray); return this; }
     public IParticleTrajectory setColor(double dgray){ super.setColor(dgray); return this; }

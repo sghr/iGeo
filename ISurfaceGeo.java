@@ -60,10 +60,10 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     /*protected*/ public ArrayList<ArrayList<ITrimCurve>> outerTrimLoop;
     /*protected*/ public boolean innerTrimClosed=false;
     /*protected*/ public boolean outerTrimClosed=false;
-
+    
     /** point cache for proximity search */
     public ISurfaceCache uvSearchCache;
-   
+    
     
     public ISurfaceGeo(){}
     
@@ -794,10 +794,10 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         int uindex = basisFunctionU.index(u);
         int vindex = basisFunctionV.index(v);
         
-        double nu[] = basisFunctionU.eval(uindex, u);
-        double nv[] = basisFunctionV.eval(vindex, v);
+        double[] nu = basisFunctionU.eval(uindex, u);
+        double[] nv = basisFunctionV.eval(vindex, v);
         
-        double dnu[] = derivativeFunctionU.eval(uindex, u);
+        double[] dnu = derivativeFunctionU.eval(uindex, u);
         
         IVec4 val1 = new IVec4();
         IVec4 val2 = new IVec4();
@@ -851,10 +851,10 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         int uindex = basisFunctionU.index(u);
         int vindex = basisFunctionV.index(v);
         
-        double nu[] = basisFunctionU.eval(uindex, u);
-        double nv[] = basisFunctionV.eval(vindex, v);
+        double[] nu = basisFunctionU.eval(uindex, u);
+        double[] nv = basisFunctionV.eval(vindex, v);
         
-        double dnv[] = derivativeFunctionV.eval(vindex, v);
+        double[] dnv = derivativeFunctionV.eval(vindex, v);
         
         IVec4 val1 = new IVec4();
         IVec4 val2 = new IVec4();
@@ -1029,12 +1029,12 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     
     
     /** approximate invert projection from 3D location to interanl UV parameter (closest point on surface) */
-    public IVec2 uv(IVecI pt){
+    synchronized public IVec2 uv(IVecI pt){
 	if(uvSearchCache==null){ uvSearchCache = new ISurfaceCache(this); }
 	return uvSearchCache.uv(pt.get());
     }
 /** approximate invert projection from 2D location to interanl UV parameter (closest point on surface) */
-    public IVec2 uv(IVec2I pt){
+    synchronized public IVec2 uv(IVec2I pt){
 	if(uvSearchCache==null){ uvSearchCache = new ISurfaceCache(this); }
 	return uvSearchCache.uv(pt.get());
     }
@@ -1830,6 +1830,9 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     public boolean isVClosed(ISwitchE e){ return isVClosed(); }
     public IBool isVClosed(ISwitchR r){ return new IBool(isVClosed()); }
+    
+    
+    synchronized public ISurfaceGeo updateCache(){ uvSearchCache = new ISurfaceCache(this); return this; }
     
     /**********************************************************************************
      * transformation methods; API of ITransformable interface
