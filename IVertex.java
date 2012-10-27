@@ -134,6 +134,11 @@ public class IVertex implements IVecI{
     */
     
     public IVec2I to2d(){ return pos.to2d(); }
+    public IVec2I to2d(IVecI projectionDir){ return pos.to2d(projectionDir); }
+    public IVec2I to2d(IVecI xaxis, IVecI yaxis){ return pos.to2d(xaxis,yaxis); }
+    public IVec2I to2d(IVecI xaxis, IVecI yaxis, IVecI origin){ return pos.to2d(xaxis,yaxis,origin); }
+    
+    
     public IVec4I to4d(){ return pos.to4d(); }
     public IVec4I to4d(double w){ return pos.to4d(w); }
     public IVec4I to4d(IDoubleI w){ return pos.to4d(w); }

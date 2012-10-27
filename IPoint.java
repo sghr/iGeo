@@ -120,6 +120,10 @@ public class IPoint extends IGeometry implements IVecI{
     synchronized public IPoint dup(){ return new IPoint(this); }
     
     synchronized public IVec2 to2d(){ return pos.to2d(); }
+    synchronized public IVec2 to2d(IVecI projectionDir){ return pos.to2d(projectionDir); }
+    synchronized public IVec2 to2d(IVecI xaxis, IVecI yaxis){ return pos.to2d(xaxis,yaxis); }
+    synchronized public IVec2 to2d(IVecI xaxis, IVecI yaxis, IVecI origin){ return pos.to2d(xaxis,yaxis,origin); }
+    
     synchronized public IVec4 to4d(){ return pos.to4d(); }
     synchronized public IVec4 to4d(double w){ return pos.to4d(w); }
     synchronized public IVec4 to4d(IDoubleI w){ return pos.to4d(w); }

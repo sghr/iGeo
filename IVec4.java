@@ -119,6 +119,10 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec to3d(){ return new IVec(this); }
     
     public IVec2 to2d(){ return new IVec2(this); }
+    public IVec2 to2d(IVecI projectionDir){ return new IVec2(this, projectionDir); }
+    public IVec2 to2d(IVecI xaxis, IVecI yaxis){ return new IVec2(this, xaxis, yaxis); }
+    public IVec2 to2d(IVecI xaxis, IVecI yaxis, IVecI origin){ return new IVec2(this, xaxis, yaxis, origin); }
+    
     public IVec4 to4d(){ return new IVec4(this); }
     public IVec4 to4d(double w){ return new IVec4(this,w); }
     public IVec4 to4d(IDoubleI w){ return new IVec4(this,w); }

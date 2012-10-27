@@ -83,6 +83,13 @@ public class IAttractor extends I3DField{
     
     public void del(){ point.del(); super.del(); }
     
+    /** stop agent with option of deleting/keeping the geometry the agent owns */
+    public void del(boolean deleteGeometry){ 
+	if(deleteGeometry){ point.del(); }
+	super.del(deleteGeometry);
+    }
+    
+    
     public IAttractor clr(Color c){ super.clr(c); point.clr(c); return this; }
     public IAttractor clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     public IAttractor clr(int gray){ super.clr(gray); point.clr(gray); return this; }

@@ -210,6 +210,10 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent dup(){ return new IPointAgent(this); }
     
     public IVec2 to2d(){ return pos.to2d(); }
+    public IVec2 to2d(IVecI projectionDir){ return pos.to2d(projectionDir); }
+    public IVec2 to2d(IVecI xaxis, IVecI yaxis){ return pos.to2d(xaxis,yaxis); }
+    public IVec2 to2d(IVecI xaxis, IVecI yaxis, IVecI origin){ return pos.to2d(xaxis,yaxis,origin); }
+    
     public IVec4 to4d(){ return pos.to4d(); }
     public IVec4 to4d(double w){ return pos.to4d(w); }
     public IVec4 to4d(IDoubleI w){ return pos.to4d(w); }
@@ -554,6 +558,14 @@ public class IPointAgent extends IAgent implements IVecI{
     
     
     public void del(){ if(tracker!=null) tracker.del(); point.del(); super.del(); } //
+    
+    /** stop agent with option of deleting/keeping the geometry the agent owns */
+    public void del(boolean deleteGeometry){ 
+	if(deleteGeometry){
+	    if(tracker!=null) tracker.del(); point.del();
+	}
+	super.del();
+    }
     
     
     public IPointAgent clr(IColor c){ super.clr(c); point.clr(c); if(tracker!=null){ tracker.clr(c); } return this; }

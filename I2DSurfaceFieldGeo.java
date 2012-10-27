@@ -138,4 +138,13 @@ public class I2DSurfaceFieldGeo extends IFieldGeo implements I2DFieldI{
     public I2DSurfaceFieldGeo threshold(double t){ super.threshold(t); return this; }
     public I2DSurfaceFieldGeo intensity(double i){ super.intensity(i); return this; }
     
+    public void del(){
+	if(surface!=null && surface==fieldSurface){
+	    if(surface instanceof IObject){ ((IObject)surface).del(); }
+	}
+	else{
+	    if(surface!=null && surface instanceof IObject){ ((IObject)surface).del(); }
+	    if(fieldSurface!=null && fieldSurface instanceof IObject){ ((IObject)fieldSurface).del(); }
+	}
+    }
 }

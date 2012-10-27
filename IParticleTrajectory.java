@@ -340,6 +340,7 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     
     public void del(){ if(trajectory!=null){ trajectory.del(); } super.del(); }
     
+    public void del(boolean deleteTrajectory){ if(trajectory!=null&&deleteTrajectory){ trajectory.del(); } super.del(); } // added 20121027
     
     public IParticleTrajectory clr(IColor c){ super.clr(c); return this; }
     public IParticleTrajectory clr(IColor c, int alpha){ super.clr(c,alpha); return this; }

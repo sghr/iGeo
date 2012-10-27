@@ -94,7 +94,16 @@ public class IAgent extends IObject implements IDynamics{
         if(server!=null && server.dynamicServer!=null) server.dynamicServer.remove(dyn);
         localDynamics.remove(dyn);
     }
+
+    /** delete agent and stop it by removing it from dynamics server */
     @Override public void del(){
+	alive=false;
+	this.deleteDynamics();
+	super.del();
+    }
+    
+    /** stop agent with option of deleting/keeping the geometry the agent owns */
+    public void del(boolean deleteGeometry){ 
 	alive=false;
 	this.deleteDynamics();
 	super.del();

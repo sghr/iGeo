@@ -455,7 +455,17 @@ public class ICurve extends IGeometry implements ICurveI{
     synchronized public ICurve revU(){ return rev(); }
     synchronized public ICurve flipU(){ return rev(); }
     
-
+    
+    
+    /** check if the input point is inside a closed curve. if not closed, it supposes closed by connecting the start and end point */
+    public boolean isInside2d(IVecI pt, IVecI projectionDir){ return curve.isInside2d(pt,projectionDir); }
+    
+    
+    /** check if the input point is inside a closed curve. if not closed, it supposes closed by connecting the start and end point */
+    public boolean isInside2d(IVecI pt){ return curve.isInside2d(pt); }
+    
+    
+    
     /******************************************************************************
      * transformation methods; API of ITransformable interface
      ******************************************************************************/

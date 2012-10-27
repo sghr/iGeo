@@ -157,7 +157,7 @@ public class IObjFileImporter {
 	    return d;
 	}
 	public class Data extends EntityData{
-	    double u, v, w=1;
+	    public double u, v, w=1;
 	    public IVec getVertex(){ return new IVec(u,v,w); }
 	}
     }
@@ -204,7 +204,7 @@ public class IObjFileImporter {
 	    return d;
 	}
 	public class Data extends EntityData{
-	    double u, v, w=1;
+	    public double u, v, w=1;
 	}
     }
     
@@ -560,7 +560,7 @@ public class IObjFileImporter {
 		knots = d;
 	    }
 	    public void instantiate(){
-		IVec cpts[] = new IVec[vertices.size()];
+		IVec[] cpts = new IVec[vertices.size()];
 		for(int i=0; i<vertices.size(); i++){
 		    GeometricVertex.Data v = vertices.get(i);
 		    if(v.w!=1.0) cpts[i] = new IVec4(v.x,v.y,v.z,v.w);
@@ -625,7 +625,7 @@ public class IObjFileImporter {
 	    public ITrimCurve getCurve(){ return curve; }
 	    
 	    public void instantiate(){
-		IVec cpts[] = new IVec[parameterSpaceVertices.size()];
+		IVec[] cpts = new IVec[parameterSpaceVertices.size()];
 		for(int i=0; i<parameterSpaceVertices.size(); i++){
 		    ParameterSpaceVertex.Data v = parameterSpaceVertices.get(i);
 		    if(v.w!=1.0) cpts[i] = new IVec4(v.u,v.v,0,v.w);
@@ -688,7 +688,7 @@ public class IObjFileImporter {
 		    }
 		    
 		    if( (index.length>2) && (index[2].length()>0) ){
-			int vnnum = Integer.parseInt(index[1]);
+			int vnnum = Integer.parseInt(index[2]); //Integer.parseInt(index[1]); // bug
 			VertexNormal.Data vn =
 			    (VertexNormal.Data)vertexNormal.getData(vnnum);
 			d.vertexNormals.add(vn);
@@ -737,7 +737,7 @@ public class IObjFileImporter {
 	    public void instantiate(){
 		int unum = uknots.size() - degree.udegree - 1;
 		int vnum = vknots.size() - degree.vdegree - 1;
-		IVec cpts[][] = new IVec[unum][vnum];
+		IVec[][] cpts = new IVec[unum][vnum];
 		
 		for(int i=0; i<vertices.size(); i++){
 		    GeometricVertex.Data v = vertices.get(i);
@@ -1288,7 +1288,7 @@ public class IObjFileImporter {
 		    
 		    for(int i=0; i<entityProcessors.size()&&currentEntity==null; i++){
 			Entity e = entityProcessors.get(i);
-			if((line.split(" +"))[0].equals(e.getLabel())) currentEntity = e;
+			if((line.split(" +"))[0].equals(e.getLabel())) currentEntity = e; // better split beforehand?
 			//if(line.startsWith(e.getLabel())) currentEntity = e;
 		    }
 		    

@@ -34,7 +34,6 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public final static IVec yaxis = new IVec(0,1,0);
     public final static IVec zaxis = new IVec(0,0,1);
     
-    
     public double x,y,z;
     public IVec(){}
     public IVec(double x, double y, double z){ this.x=x; this.y=y; this.z=z; }
@@ -99,6 +98,11 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     
     
     public IVec2 to2d(){ return new IVec2(this); }
+    
+    public IVec2 to2d(IVecI projectionDir){ return new IVec2(this,projectionDir); } //
+    public IVec2 to2d(IVecI xaxis, IVecI yaxis){ return new IVec2(this,xaxis,yaxis); } //
+    public IVec2 to2d(IVecI xaxis, IVecI yaxis, IVecI origin){ return new IVec2(this,xaxis,yaxis,origin); } //
+    
     public IVec4 to4d(){ return new IVec4(this); }
     public IVec4 to4d(double w){ return new IVec4(this,w); }
     public IVec4 to4d(IDoubleI w){ return new IVec4(this,w); }
@@ -911,6 +915,25 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public boolean isOnSegment(IVecI v1, IVecI v2){ return isOnLine(v1,v2); }
     /** alias of isOnLine */
     public boolean isOnSegment(IVecI v1, IVecI v2, double tolerance){ return isOnLine(v1,v2,tolerance); }
+    
+    
+    public boolean isInside2d(IVecI[] pts){
+	// should IVec2 has isInside(projectionDir, IVecI[] pts)?
+	IVec2I[] pts2 = new IVec2I[pts.length];
+	for(int i=0; i<pts.length; i++) pts2[i] = pts[i].to2d();
+	return isInside2d(pts2);
+    }
+    public boolean isInside2d(IVec2I[] pts){ return to2d().isInside(pts); }
+    
+    public boolean isInside2d(IVecI projectionDir, IVecI[] pts){
+	// should IVec2 has isInside(projectionDir, IVecI[] pts)?
+	IVec2I[] pts2 = new IVec2I[pts.length];
+	for(int i=0; i<pts.length; i++) pts2[i] = pts[i].to2d(projectionDir);
+	return isInside2d(projectionDir, pts2);
+    }
+    public boolean isInside2d(IVecI projectionDir, IVec2I[] pts){
+	return to2d(projectionDir).isInside(pts);
+    }
     
     
     

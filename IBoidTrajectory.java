@@ -369,6 +369,7 @@ public class IBoidTrajectory extends IBoid implements ITrajectoryI{
     public IBoidTrajectory hideTrajectory(){ if(trajectory!=null){ trajectory.hide(); } return this; }
     
     public void del(){ if(trajectory!=null){ trajectory.del(); } super.del(); }
+    public void del(boolean deleteTrajectory){ if(trajectory!=null&&deleteTrajectory){ trajectory.del(); } super.del(); } // added 20121027
     
     
     public IBoidTrajectory clr(IColor c){ super.clr(c); return this; }

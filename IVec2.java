@@ -38,6 +38,9 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public IVec2(IVec2I v){ IVec2 u=v.get(); x=u.x; y=u.y; }
     public IVec2(IDoubleI x, IDoubleI y){ this.x=x.x(); this.y=y.x(); }
     public IVec2(IVecI v){ x = v.x(); y = v.y(); }
+    public IVec2(IVecI v, IVecI projectionDir){ set(v,projectionDir); }
+    public IVec2(IVecI v, IVecI xaxis, IVecI yaxis){ set(v,xaxis,yaxis); }
+    public IVec2(IVecI v, IVecI xaxis, IVecI yaxis, IVecI origin){ set(v,xaxis,yaxis,origin); }
     
     public IVec2(IServerI s){ super(s); }
     public IVec2(IServerI s, double x, double y){ super(s); this.x=x; this.y=y; }
@@ -45,6 +48,9 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public IVec2(IServerI s, IVec2I v){ super(s); IVec2 u=v.get(); x=u.x; y=u.y; }
     public IVec2(IServerI s, IDoubleI x, IDoubleI y){ super(s); this.x=x.x(); this.y=y.x(); }
     public IVec2(IServerI s, IVecI v){ super(s); x = v.x(); y = v.y(); }
+    public IVec2(IServerI s, IVecI v, IVecI projectionDir){ super(s); set(v,projectionDir); }
+    public IVec2(IServerI s, IVecI v, IVecI xaxis, IVecI yaxis){ super(s); set(v,xaxis,yaxis); }
+    public IVec2(IServerI s, IVecI v, IVecI xaxis, IVecI yaxis, IVecI origin){ super(s); set(v,xaxis,yaxis,origin); }
     
     
     public double x(){ return x; }
@@ -89,7 +95,25 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     public IVec2 set(IVec2 v){ x=v.x; y=v.y; return this; }
     public IVec2 set(IVec2I v){ return set(v.get()); }
     public IVec2 set(IDoubleI x, IDoubleI y){ this.x=x.x(); this.y=y.x(); return this; }
-
+    
+    public IVec2 set(IVecI v){ x = v.x(); y = v.y(); return this; }
+    public IVec2 set(IVecI v, IVecI projectionDir){
+	IVec axis2=null;
+	if(projectionDir.get().isParallel(IG.xaxis)){ axis2 = projectionDir.get().cross(IG.yaxis).unit(); }
+	else{ axis2 = projectionDir.get().cross(IG.xaxis).unit(); }
+	IVec axis1 = axis2.cross(projectionDir).unit();
+	return set(v,axis1,axis2);
+    }
+    public IVec2 set(IVecI v, IVecI xaxis, IVecI yaxis){
+	x = v.dot(xaxis); y = v.dot(yaxis); return this;
+    }
+    public IVec2 set(IVecI v, IVecI xaxis, IVecI yaxis, IVecI origin){
+	IVec d = v.get().dif(origin);
+	x = d.dot(xaxis); y = d.dot(yaxis); return this;
+    }
+    //public IVec2 set(IVecI v, IMatrix mat){}
+    
+    
     public IVec2 add(double x, double y){ this.x+=x; this.y+=y; return this; }
     public IVec2 add(IDoubleI x, IDoubleI y){ this.x+=x.x(); this.y+=y.x(); return this; }
     public IVec2 add(IVec2 v){ x+=v.x; y+=v.y; return this; }
@@ -774,18 +798,34 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
        
     */
     public boolean isInside(IVec2I[] pts){
-	
+    	
 	double angle=0;
 	int n = pts.length;
 	for(int i=0; i<n; i++){
 	    IVec2 v1 = pts[i].get().diff(this);
 	    IVec2 v2 = pts[(i+1)%n].get().diff(this);
-	    angle += v1.angle(v2);
+	    double a = v1.angle(v2);
+	    if( Math.abs(a-Math.PI) < IConfig.angleTolerance ||
+		Math.abs(a+Math.PI) < IConfig.angleTolerance ||
+		v1.len()< IConfig.tolerance ||
+		v2.len()< IConfig.tolerance ){
+		// point is on the edge
+		return true;
+	    }
+	    angle += a;
 	}
 	
+	int idx = (int)(Math.abs(angle/(2*Math.PI)) + 0.5);
+	
+	if( idx%2==0 ){ return false; } // outside
+	
+	return true; // inside
+	
+	/*
 	final double minAngle = 0.1;
 	if(Math.abs(angle)<minAngle) return true;
 	return false;
+	*/
     }
     
     
@@ -794,11 +834,7 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
        true if the point is on the edge of polygon
     */
     public boolean isInside(IVec2[] pts){
-	
-	//IOut.p("this="+this);
-	//for(int i=0;i<pts.length; i++) IOut.p("pts["+i+"]="+pts[i]);
-	
-	
+    	
 	double angle=0;
 	int n = pts.length;
 	for(int i=0; i<n; i++){
@@ -811,30 +847,21 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 		v1.len()< IConfig.tolerance ||
 		v2.len()< IConfig.tolerance ){
 		// point is on the edge
-		//IOut.p("true (on the edge)"); //
-		
 		return true;
 	    }
 	    angle += a;
 	}
 	
-	//IOut.p("angle = "+angle); //
-	
 	int idx = (int)(Math.abs(angle/(2*Math.PI)) + 0.5);
 	
 	if( idx%2==0 ){
-	    //IOut.p("false");
-	    //IOut.p("this="+this);
-	    //for(int i=0;i<pts.length; i++) IOut.p("pts["+i+"]="+pts[i]);
-	    //IOut.p("angle = "+angle); //
-	    
 	    return false; // outside
 	}
 	
 	//IOut.p("true");
 	return true; // inside
-	
     }
+    
     
     /** checking x, y is valid number (not Infinite, nor NaN). */
     public boolean isValid(){

@@ -22,7 +22,6 @@
 
 package igeo;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 /**

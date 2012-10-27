@@ -79,6 +79,17 @@ public class IVecR extends IParameterObject implements IVecI, IReferenceParamete
     public IVecR dup(){ return new IVecR(op); }
     
     public IVec2R to2d(){ return new IVec2R(new ToVec2(this)); }
+    public IVec2R to2d(IVecI projectionDir){
+	return new IVec2R(new ToVec2WithProjection(this,projectionDir));
+    }
+    public IVec2R to2d(IVecI xaxis, IVecI yaxis){
+	return new IVec2R(new ToVec2WithAxis(this,xaxis,yaxis));
+    }
+    public IVec2R to2d(IVecI xaxis, IVecI yaxis, IVecI origin){
+	return new IVec2R(new ToVec2WithAxisAndOrigin(this,xaxis,yaxis,origin));
+    }
+    
+    
     public IVec4R to4d(){ return new IVec4R(this); }
     public IVec4R to4d(double w){ return new IVec4R(this, w); }
     public IVec4R to4d(IDoubleI w){ return new IVec4R(this, w); }
@@ -560,6 +571,26 @@ public class IVecR extends IParameterObject implements IVecI, IReferenceParamete
 	public IVecOp v;
 	public ToVec2(IVecOp v){ this.v=v; }
 	public IVec2 get(){ return new IVec2(v.get()); }
+    }
+    
+    static public class ToVec2WithProjection extends IParameterObject implements IVec2Op{
+	public IVecOp v, projectionDir;
+	public ToVec2WithProjection(IVecOp v, IVecOp proj){ this.v=v; projectionDir=proj; }
+	public IVec2 get(){ return new IVec2(v.get(),projectionDir.get()); }
+    }
+    
+    static public class ToVec2WithAxis extends IParameterObject implements IVec2Op{
+	public IVecOp v, xaxis, yaxis;
+	public ToVec2WithAxis(IVecOp v, IVecOp xaxis, IVecOp yaxis){ this.v=v; this.xaxis=xaxis; this.yaxis=yaxis; }
+	public IVec2 get(){ return new IVec2(v.get(),xaxis.get(),yaxis.get()); }
+    }
+    
+    static public class ToVec2WithAxisAndOrigin extends IParameterObject implements IVec2Op{
+	public IVecOp v, xaxis, yaxis, origin;
+	public ToVec2WithAxisAndOrigin(IVecOp v, IVecOp xaxis, IVecOp yaxis, IVecOp orig){
+	    this.v=v; this.xaxis=xaxis; this.yaxis=yaxis; origin=orig;
+	}
+	public IVec2 get(){ return new IVec2(v.get(),xaxis.get(),yaxis.get(),origin.get()); }
     }
     
     static public class Dot extends IParameterObject implements IDoubleOp{

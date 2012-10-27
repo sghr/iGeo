@@ -120,4 +120,13 @@ public class I2DCurveFieldGeo extends IFieldGeo implements I2DFieldI{
     public I2DCurveFieldGeo threshold(double t){ super.threshold(t); return this; }
     public I2DCurveFieldGeo intensity(double i){ super.intensity(i); return this; }
     
+    public void del(){
+	if(curve!=null && curve==fieldCurve){
+	    if(curve instanceof IObject){ ((IObject)curve).del(); }
+	}
+	else{
+	    if(curve!=null && curve instanceof IObject){ ((IObject)curve).del(); }
+	    if(fieldCurve!=null && fieldCurve instanceof IObject){ ((IObject)fieldCurve).del(); }
+	}
+    }
 }

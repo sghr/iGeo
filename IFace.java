@@ -740,4 +740,14 @@ public class IFace{
     }
     
     
+    /** calculate closest distance to face taking normal into consideration. if input point is different side of normal vector, it returns negative value */
+    public double dist(IVecI pt){
+	if(vertices.length==3){
+	}
+	else{
+	}
+	return 0;
+    }
+    
+    
 }

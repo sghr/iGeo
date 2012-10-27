@@ -64,4 +64,11 @@ abstract public class I2DField extends IField implements I2DFieldI{
     public I2DField intensity(double i){ field.intensity(i); return this; }
     /** get output intensity */
     public double intensity(){ return field.intensity(); }
+
+    public void del(){ field.del(); super.del(); }
+    /** stop agent with option of deleting/keeping the geometry the agent owns */
+    public void del(boolean deleteGeometry){ 
+	if(deleteGeometry) field.del();
+	super.del(deleteGeometry);
+    }
 }

@@ -75,6 +75,11 @@ public interface IVecI extends IVecOp, ITransformable{
     public IVecI dup();
     
     public IVec2I to2d();
+    public IVec2I to2d(IVecI projectionDir);
+    public IVec2I to2d(IVecI xaxis, IVecI yaxis);
+    public IVec2I to2d(IVecI xaxis, IVecI yaxis, IVecI origin);
+    
+    
     public IVec4I to4d();
     public IVec4I to4d(double w);
     public IVec4I to4d(IDoubleI w);

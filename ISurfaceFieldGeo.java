@@ -123,4 +123,13 @@ public class ISurfaceFieldGeo extends IFieldGeo implements I3DFieldI{ //extends 
     public ISurfaceFieldGeo threshold(double t){ super.threshold(t); return this; }
     public ISurfaceFieldGeo intensity(double i){ super.intensity(i); return this; }
     
+    public void del(){
+	if(surface!=null && surface==fieldSurface){
+	    if(surface instanceof IObject){ ((IObject)surface).del(); }
+	}
+	else{
+	    if(surface!=null && surface instanceof IObject){ ((IObject)surface).del(); }
+	    if(fieldSurface!=null && fieldSurface instanceof IObject){ ((IObject)fieldSurface).del(); }
+	}
+    }
 }

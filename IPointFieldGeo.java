@@ -82,7 +82,13 @@ public class IPointFieldGeo extends IFieldGeo implements I3DFieldI{
     }
     public IPointFieldGeo threshold(double t){ super.threshold(t); return this; }
     public IPointFieldGeo intensity(double i){ super.intensity(i); return this; }
+
     
+    
+    public void del(){
+	if(pos!=null && pos instanceof IObject){ ((IObject)pos).del(); }
+	if(dir!=null && dir instanceof IObject){ ((IObject)dir).del(); }
+    }
     
     /*
     public static void main(String[] a){
@@ -93,5 +99,7 @@ public class IPointFieldGeo extends IFieldGeo implements I3DFieldI{
 	}catch(Exception e){}
     }
     */
+    
+    
     
 }

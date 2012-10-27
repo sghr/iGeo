@@ -124,4 +124,14 @@ public class ICurveFieldGeo extends IFieldGeo implements I3DFieldI{
     public ICurveFieldGeo threshold(double t){ super.threshold(t); return this; }
     public ICurveFieldGeo intensity(double i){ super.intensity(i); return this; }
     
+    
+    public void del(){
+	if(curve!=null && curve==fieldCurve){
+	    if(curve instanceof IObject){ ((IObject)curve).del(); }
+	}
+	else{
+	    if(curve!=null && curve instanceof IObject){ ((IObject)curve).del(); }
+	    if(fieldCurve!=null && fieldCurve instanceof IObject){ ((IObject)fieldCurve).del(); }
+	}
+    }
 }

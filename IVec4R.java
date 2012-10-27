@@ -113,6 +113,16 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
     
     
     public IVec2R to2d(){ return new IVec2R(new ToVec2(op)); }
+    public IVec2R to2d(IVecI projectionDir){
+        return new IVec2R(new ToVec2WithProjection(this,projectionDir));
+    }
+    public IVec2R to2d(IVecI xaxis, IVecI yaxis){
+        return new IVec2R(new ToVec2WithAxis(this,xaxis,yaxis));
+    }
+    public IVec2R to2d(IVecI xaxis, IVecI yaxis, IVecI origin){
+        return new IVec2R(new ToVec2WithAxisAndOrigin(this,xaxis,yaxis,origin));
+    }
+    
     public IVecR to3d(){ return new IVecR(new ToVec(op)); }
     public IVec4R to4d(){ return dup(); }
     public IVec4R to4d(double w){ return new IVec4R(this,w); }
@@ -594,6 +604,28 @@ public class IVec4R extends IParameterObject implements IVec4I, IVecI, IReferenc
 	public IVec4Op v;
 	public ToVec2(IVec4Op v){ this.v=v; }
 	public IVec2 get(){ return new IVec2(v.get()); }
+    }
+    static public class ToVec2WithProjection extends IParameterObject implements IVec2Op{
+        public IVec4Op v;
+	public IVecOp projectionDir;
+        public ToVec2WithProjection(IVec4Op v, IVecOp proj){ this.v=v; projectionDir=proj; }
+        public IVec2 get(){ return new IVec2(v.get(),projectionDir.get()); }
+    }
+
+    static public class ToVec2WithAxis extends IParameterObject implements IVec2Op{
+        public IVec4Op v;
+	public IVecOp xaxis, yaxis;
+        public ToVec2WithAxis(IVec4Op v, IVecOp xaxis, IVecOp yaxis){ this.v=v; this.xaxis=xaxis; this.yaxis=yaxis; }
+        public IVec2 get(){ return new IVec2(v.get(),xaxis.get(),yaxis.get()); }
+    }
+
+    static public class ToVec2WithAxisAndOrigin extends IParameterObject implements IVec2Op{
+        public IVec4Op v;
+	public IVecOp xaxis, yaxis, origin;
+        public ToVec2WithAxisAndOrigin(IVec4Op v, IVecOp xaxis, IVecOp yaxis, IVecOp orig){
+            this.v=v; this.xaxis=xaxis; this.yaxis=yaxis; origin=orig;
+        }
+        public IVec2 get(){ return new IVec2(v.get(),xaxis.get(),yaxis.get(),origin.get()); }
     }
     
     static public class Add extends IParameterObject implements IVec4Op{

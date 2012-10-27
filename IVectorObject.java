@@ -118,6 +118,10 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject dup(){ return new IVectorObject(this); }
     
     public IVec2I to2d(){ return vec.to2d(); }
+    public IVec2I to2d(IVecI projectionDir){ return vec.to2d(projectionDir); }
+    public IVec2I to2d(IVecI xaxis, IVecI yaxis){ return vec.to2d(xaxis,yaxis); }
+    public IVec2I to2d(IVecI xaxis, IVecI yaxis, IVecI origin){ return vec.to2d(xaxis,yaxis,origin); }
+    
     public IVec4I to4d(){ return vec.to4d(); }
     public IVec4I to4d(double w){ return vec.to4d(w); }
     public IVec4I to4d(IDoubleI w){ return vec.to4d(w); }

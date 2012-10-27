@@ -47,7 +47,8 @@ public class ICompoundField extends I3DField{
     
     public ICompoundField add(I3DFieldI field){
 	if(field instanceof I3DField){
-	    ((I3DField)field).del(); // field is managed by this, not by server.
+	    //((I3DField)field).del(); // field is managed by this, not by server.
+	    ((I3DField)field).del(false); // field is managed by this, not by server.
 	    I3DFieldI f = ((I3DField)field).field();
 	    if(f==null){ otherFields.add(field); }
 	    else if(f instanceof IPointFieldGeo){ pointFields.add((IPointFieldGeo)f); }

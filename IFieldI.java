@@ -63,5 +63,8 @@ public interface IFieldI{// extends ITransformable{
     public IFieldI intensity(double i);
     /** get output intensity */
     public double intensity();
+
+    // delete associated geometry, etc.
+    public void del();
     
 }

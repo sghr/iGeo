@@ -898,6 +898,62 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public ICurveGeo flipU(){ return rev(); }
     
     
+    /** check if the input point is inside a closed curve. if not closed, it supposes closed by connecting the start and end point */
+    public boolean isInside2d(IVecI pt, IVecI projectionDir){
+	IVec2[] pts2 = null;
+	if(deg()==1){
+	    if(isClosed()){
+		pts2 = new IVec2[cpNum()-1];
+		for(int i=0; i<cpNum()-1; i++) pts2[i] = cp(i).get().to2d(projectionDir);
+	    }
+	    else{
+		pts2 = new IVec2[cpNum()];
+		for(int i=0; i<cpNum(); i++) pts2[i] = cp(i).get().to2d(projectionDir);
+	    }
+	}
+	else{
+	    int reso = IConfig.segmentResolution;
+            int epnum = epNum() ;
+            pts2 = new IVec2[(epnum-1)*reso+1];
+            for(int i=0; i<epnum; i++){
+                for(int j=0; j<reso; j++){
+                    if(i<epnum-1 || j==0){
+			pts2[i*reso + j] = pt(u(i,(double)j/reso)).to2d(projectionDir);
+                    }
+                }
+            }
+	}
+	return pt.get().to2d(projectionDir).isInside(pts2);
+    }
+
+    /** check if the input point is inside a closed curve. if not closed, it supposes closed by connecting the start and end point */
+    public boolean isInside2d(IVecI pt){
+	IVec2[] pts2 = null;
+	if(deg()==1){
+	    if(isClosed()){
+		pts2 = new IVec2[cpNum()-1];
+		for(int i=0; i<cpNum()-1; i++) pts2[i] = cp(i).get().to2d();
+	    }
+	    else{
+		pts2 = new IVec2[cpNum()];
+		for(int i=0; i<cpNum(); i++) pts2[i] = cp(i).get().to2d();
+	    }
+	}
+	else{
+	    int reso = IConfig.segmentResolution;
+            int epnum = epNum() ;
+            pts2 = new IVec2[(epnum-1)*reso+1];
+            for(int i=0; i<epnum; i++){
+                for(int j=0; j<reso; j++){
+                    if(i<epnum-1 || j==0){ pts2[i*reso + j] = pt(u(i,(double)j/reso)).to2d(); }
+                }
+            }
+	}
+	return pt.get().to2d().isInside(pts2);
+    }
+    
+    
+    
     synchronized public ICurveGeo updateCache(){ uSearchCache = new ICurveCache(this); return this; }
     
     
