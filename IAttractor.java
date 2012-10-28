@@ -90,8 +90,10 @@ public class IAttractor extends I3DField{
     }
     
     
-    public IAttractor clr(Color c){ super.clr(c); point.clr(c); return this; }
-    public IAttractor clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    public IAttractor clr(IColor c){ super.clr(c); point.clr(c); return this; }
+    public IAttractor clr(IColor c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    //public IAttractor clr(Color c){ super.clr(c); point.clr(c); return this; }
+    //public IAttractor clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     public IAttractor clr(int gray){ super.clr(gray); point.clr(gray); return this; }
     public IAttractor clr(float fgray){ super.clr(fgray); point.clr(fgray); return this; }
     public IAttractor clr(double dgray){ super.clr(dgray); point.clr(dgray); return this; }
@@ -122,8 +124,10 @@ public class IAttractor extends I3DField{
     public IAttractor hsb(double h, double s, double b){
         super.hsb(h,s,b); point.hsb(h,s,b); return this;
     }
-    public IAttractor setColor(Color c){ return clr(c); }
-    public IAttractor setColor(Color c, int alpha){ return clr(c,alpha); }
+    public IAttractor setColor(IColor c){ return clr(c); }
+    public IAttractor setColor(IColor c, int alpha){ return clr(c,alpha); }
+    //public IAttractor setColor(Color c){ return clr(c); }
+    //public IAttractor setColor(Color c, int alpha){ return clr(c,alpha); }
     public IAttractor setColor(int gray){ return clr(gray); }
     public IAttractor setColor(float fgray){ return clr(fgray); }
     public IAttractor setColor(double dgray){ return clr(dgray); }

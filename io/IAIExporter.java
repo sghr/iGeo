@@ -46,7 +46,8 @@ class IAIExporter {
     //public static double defaultLineWeight=0.25;
     //public static double defaultLineWeight=0.05;
     //public static double defaultLineWeight=0.025;
-    public static double defaultLineWeight=0.1;
+    public static double defaultLineWeight=0.25; //0.1;
+    public static double defaultPointWeight=0.5;
     
     public static boolean writeSubsurfaceAsMesh=false; //true; // mesh or bezier shape
     public static boolean writeOutlineWhenMesh=false; //
@@ -54,6 +55,9 @@ class IAIExporter {
     public static double internalScaleFactor=4.667;
     public static double internalXShift=-49.9; // inch
     public static double internalYShift=-39.9; // inch
+    
+    static public enum CapType { Butt, Round, Square };
+    static public enum JoinType { Miter, Round, Bevel };
     
     
     public static NumberFormat f;
@@ -484,7 +488,6 @@ class IAIExporter {
     }
     
     public static void writePolylinePath(PrintStream ps, ArrayList<IVec2> pts, boolean newline){
-	
 	for(int j=0; j<pts.size(); j++){
 	    IVec2 pt = pts.get(j);
 	    
@@ -505,6 +508,13 @@ class IAIExporter {
 		else ps.println("l");
 	    }
 	}
+    }
+    
+    public static void writePointPath(PrintStream ps, IVec2 pt){
+	ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
+	ps.println("m");
+	ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
+	ps.println("L");
     }
 
     /*
@@ -543,6 +553,49 @@ class IAIExporter {
 
     
     public static void writePaintStyle(PrintStream ps,
+				       IColor fillColor, IColor strokeColor, double lineWidth,
+				       CapType capType, JoinType joinType){
+	ps.println("0 A"); // lock
+	if(fillColor!=null) ps.println("0 O"); // overprint color
+	if(strokeColor!=null) ps.println("0 R"); // overprint color
+	
+	double opacity=1.0;
+	
+	if(fillColor!=null){
+	    ps.println( f.format((double)fillColor.getRed()/255) + " " +
+			f.format((double)fillColor.getGreen()/255) + " " +
+			f.format((double)fillColor.getBlue()/255) + " " +
+			"Xa");
+	    opacity = (double)fillColor.getAlpha()/255;
+	}
+	if(strokeColor!=null){
+	    ps.println( f.format((double)strokeColor.getRed()/255) + " " +
+			f.format((double)strokeColor.getGreen()/255) + " " +
+			f.format((double)strokeColor.getBlue()/255) + " " +
+			"XA");
+	    if(fillColor==null) opacity = (double)strokeColor.getAlpha()/255;
+	}
+	ps.println("0 "+f.format(opacity)+" 0 0 0 Xy");
+	
+	
+	int capValue = 0;
+	switch(capType){
+	case Butt: capValue = 0; break; 
+	case Round: capValue = 1; break; 
+	case Square: capValue = 2; break; 
+	}
+	
+	int joinValue = 0;
+	switch(joinType){
+	case Miter: joinValue = 0; break; 
+	case Round: joinValue = 1; break; 
+	case Bevel: joinValue = 2; break; 
+	}
+	
+	ps.println(capValue+" J "+joinValue+" j "+f.format(lineWidth)+" w 4 M []0 d");
+    }
+    
+    public static void writePaintStyle(PrintStream ps,
 				       IColor fillColor, IColor strokeColor, double lineWidth){
 	ps.println("0 A"); // lock
 	if(fillColor!=null) ps.println("0 O"); // overprint color
@@ -572,7 +625,7 @@ class IAIExporter {
     public static ArrayList<ArrayList<IVec2>> convertTo2DPoints(ICurveI curve,double scale, IView view){
 	IVec2[] pts=null;
 	boolean inscreen=false;
-
+	
 	if(curve.deg()==1 && (!(curve instanceof ITrimCurveI) ||
 			      (curve instanceof ITrimCurveI) && ((ITrimCurveI)curve).surface().isFlat()) ){
 	    
@@ -628,6 +681,32 @@ class IAIExporter {
     }
     
     
+    public static IVec2 convertTo2DPoint(IVecI pt,double scale, IView view){
+	IVec2 pt2=new IVec2();
+	boolean inscreen=false;
+	
+	boolean flag = view.convert(pt, pt2);
+	if(!flag) return null;
+	
+	convertCoordinates(pt2, scale, view);
+	return pt2;
+    }
+    
+    
+    public static void writePoint(PrintStream ps, IVecI point, double scale, IView view){
+	IVec2 pt2=convertTo2DPoint(point,scale,view);
+	if(pt2==null) return;
+	
+	double lineWeight = defaultPointWeight;
+	IColor color = null;
+	if(point instanceof IObject) color = ((IObject)point).clr();
+	
+	writePaintStyle(ps,null,color,lineWeight,CapType.Round,JoinType.Round);
+	writePointPath(ps,pt2);
+	ps.println("S"); // open curve without filling
+    }
+    
+    
     
     public static void writeNurbsCurve(PrintStream ps, ICurveI curve, double scale, IView view){
 	//if(IGNurbsElement.saveMemoryMode) curve.updateGeometry();
@@ -639,7 +718,7 @@ class IAIExporter {
 	final boolean useCurveColor=true; //false;
 	
 	double lineWeight = defaultLineWeight;
-
+	
 	IColor color = null;
 	if(curve instanceof IObject) color = ((IObject)curve).clr();
 	
@@ -1483,6 +1562,15 @@ class IAIExporter {
 		//if(updateGeometry) curve.updateGeometry(); //
                 writeNurbsCurve(ps, curve, scale, view); //
             }
+	    else if( objects.get(i) instanceof IPoint){ // how about IPointAgent, etc
+                IPoint point = (IPoint)objects.get(i);
+                writePoint(ps, point, scale, view); //
+            }
+	    else if( objects.get(i) instanceof IPointR){ // how about IPointAgent, etc
+                IPointR point = (IPointR)objects.get(i);
+                writePoint(ps, point, scale, view); //
+            }
+	    
 	    /*
             else if(elements.get(i) instanceof TextLabel){
                 TextLabel tx = (TextLabel)elements.get(i);

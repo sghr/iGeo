@@ -397,6 +397,9 @@ public class ISurfaceR extends IObject implements ISurfaceI{
     //public IBoolI isVClosed(ISwitchR r){ return surface.isVClosed(r); } // should have new VClosed(this)
     public IBoolI isVClosed(ISwitchR r){ return new IBoolR(new IsVClosed(surface)); } // need to be checked
     
+    //public boolean isInsideTrim(double u, double v);
+    //public boolean isInsideTrim(IVec2 v);
+    //public boolean isInsideTrim(IVec2I v);
     
     
     /*********************************************************************************

@@ -596,6 +596,11 @@ public class ISurface extends IGeometry implements ISurfaceI{
     synchronized public IBool isVClosed(ISwitchR r){ return surface.isVClosed(r); }
     
     
+    synchronized public boolean isInsideTrim(double u, double v){ return surface.isInsideTrim(u,v); }
+    synchronized public boolean isInsideTrim(IVec2 v){ return surface.isInsideTrim(v); }
+    synchronized public boolean isInsideTrim(IVec2I v){ return surface.isInsideTrim(v); }
+    
+    
     /*********************************************************************************
      * transformation methods; API of ITransformable interface
      *********************************************************************************/

@@ -63,6 +63,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     
     /** point cache for proximity search */
     public ISurfaceCache uvSearchCache;
+    public ITrimCache trimCache;
     
     
     public ISurfaceGeo(){}
@@ -1830,6 +1831,22 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     public boolean isVClosed(ISwitchE e){ return isVClosed(); }
     public IBool isVClosed(ISwitchR r){ return new IBool(isVClosed()); }
+    
+    
+    public boolean isInsideTrim(IVec2I v){ return isInsideTrim(v.get()); }
+    public boolean isInsideTrim(double u, double v){ return isInsideTrim(new IVec2(u,v)); }
+    
+    /** check if a u-v point is inside trim curves. the condition where out-trim loop is inside in-trim loop is ignored and it'd be false. */
+    public boolean isInsideTrim(IVec2 v){
+	if(trimCache==null){
+	    if(!hasTrim()){
+		if(v.x<0. || v.x>1. || v.y<0. || v.y>1.) return false;
+		return true;
+	    }
+	    trimCache = new ITrimCache(this);
+	}
+	return trimCache.isInside(v);
+    }
     
     
     synchronized public ISurfaceGeo updateCache(){ uvSearchCache = new ISurfaceCache(this); return this; }

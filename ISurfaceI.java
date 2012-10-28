@@ -336,6 +336,12 @@ public interface ISurfaceI extends ISurfaceOp, ITransformable{
     public IBoolI isVClosed(ISwitchR r);
     
     
+    //public boolean isInsideTrim(double u, double v);
+    //public boolean isInsideTrim(IVec2 v);
+    //public boolean isInsideTrim(IVec2I v);
+    
+    
+    
     /**************************************************************************************
      * transformation methods; API of ITransformable interface
      *************************************************************************************/
