@@ -394,6 +394,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	   controlPoints[0].x()==controlPoints[1].x() &&
 	   controlPoints[0].y()==controlPoints[1].y() &&
 	   controlPoints[0].z()==controlPoints[1].z()){ // replace the second point with new one
+	    
+	    if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pt); } // added 20121111
+	    
 	    controlPoints[1] = pt;
 	    defaultWeights[1] = !(pt instanceof IVec4I);
 	    return this;
@@ -402,7 +405,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(controlPoints, pt); }
 	int num = controlPoints.length;
 	//check if it started with duplicated 2 points and if so, remove one of them.
-	if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; }
+	if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; } // isn't taken care of already above?
 	
 	IVecI[] controlPoints2 = new IVecI[num+1];
 	for(int i=0; i<num; i++){ controlPoints2[i] = controlPoints[i]; }
@@ -658,6 +661,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	defaultWeights = defaultWeights2;
 	return this;
     }
+    
     
     /** close curve with the current control points.
 	it changes total number of control points and knot vector dependng on the degree.

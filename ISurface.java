@@ -355,6 +355,27 @@ public class ISurface extends IGeometry implements ISurfaceI{
     synchronized public IVec corner(IIntegerI i, IIntegerI j){ return surface.corner(i,j); }
     synchronized public IVec cornerCP(int i, int j){ return surface.cornerCP(i,j); }
     synchronized public IVecI cornerCP(IIntegerI i, IIntegerI j){ return surface.cornerCP(i,j); }
+
+
+
+    /** add u control point at the end and rebuild the surface.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    synchronized public ISurface addUCP(IVecI[] pts){
+	surface.addUCP(pts); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
+    /** add v control point at the end and rebuild the surface.
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    synchronized public ISurface addVCP(IVecI[] pts){
+	surface.addVCP(pts); updateGraphic(); if(server!=null){ server.updateState(); }
+	return this;
+    }
+    
     
     /** mid in UV parameter (u=0.5, v=0.5) point on a surface */
     synchronized public IVec mid(){ return surface.mid(); }

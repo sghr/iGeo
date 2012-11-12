@@ -55,6 +55,10 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     
     public boolean initialized=false;
     
+    
+    public int uepnum, vepnum; // added 20121111
+    
+    
     public ISurfaceGraphicWireframeGL(ISurface srf){
 	super(srf); surface = srf.surface;
     }
@@ -243,20 +247,23 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     */
     
     public void initSurface(){
-
+	
 	synchronized(parent){
-	
-	//if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
-	//else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
-	
-	int uepnum = surface.uepNum();
-	int vepnum = surface.vepNum();
-	
-	isoparmNumU = isoparmNumRatio*(vepnum-1)+1;
-	isoparmNumV = isoparmNumRatio*(uepnum-1)+1;
-	
-	ITrimLoopGraphic[] outtrims=null;
-	ITrimLoopGraphic[] intrims=null;
+	    
+	    //if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
+	    //else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
+	    
+	    //int uepnum = surface.uepNum();
+	    //int vepnum = surface.vepNum();
+	    
+	    uepnum = surface.uepNum();
+	    vepnum = surface.vepNum();
+	    
+	    isoparmNumU = isoparmNumRatio*(vepnum-1)+1;
+	    isoparmNumV = isoparmNumRatio*(uepnum-1)+1;
+	    
+	    ITrimLoopGraphic[] outtrims=null;
+	    ITrimLoopGraphic[] intrims=null;
 	
 	if(surface.hasOuterTrim()){
 	    outtrims = new ITrimLoopGraphic[surface.outerTrimLoopNum()];
@@ -363,8 +370,16 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     
     
     public void updateSurface(){
-
+	
 	synchronized(parent){
+	    
+	    //if(true){initSurface();return;}
+	    
+	    if(uepnum != surface.uepNum() || vepnum != surface.vepNum()){
+		initSurface();
+		return;
+	    }
+	    
 	
 	if(simpleFlat && !surface.isFlat()){
 	    // if not flat anymore, rebuild whole points

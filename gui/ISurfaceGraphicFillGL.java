@@ -59,7 +59,8 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     public IVec2[][] triangles2DCache;
     
     public boolean initialized=false;
-    
+
+    int uepnum,vepnum; // added 20121111
     
     public ISurfaceGraphicFillGL(ISurface srf){
 	super(srf);
@@ -96,6 +97,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     public void initSurface(){
 	//if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
 	//else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
+	
+	uepnum = surface.uepNum();
+	vepnum = surface.vepNum();
 	
 	if(!surface.hasTrim()||!surface.hasInnerTrim()&&surface.hasDefaultTrim())
 	    initWithoutTrim(); // initialize IGLQuadMatrix
@@ -490,6 +494,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     }
     
     public void updateSurface(){
+
+	if(uepnum!=surface.uepNum() || vepnum!=surface.vepNum()){ initSurface(); return; }
+	
 	if(quads!=null) updateWithoutTrim();
 	if(triangles!=null) updateWithTrim();
 	//if(quadMatrix!=null) updateWithoutTrim();

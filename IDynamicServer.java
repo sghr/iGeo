@@ -61,13 +61,19 @@ public class IDynamicServer implements Runnable{
     }
     
     public synchronized void add(IDynamics e){
-	// added object is once buffered in addingDynamics and actually added in the update cycle
 	
-	if(!addingDynamics.contains(e) &&
-	   !dynamics.contains(e) ){ // isn't this heavy?
-	    
-	    addingDynamics.add(e);
-	    if(removingDynamics.contains(e)){ removingDynamics.remove(e); }
+	// when not running, simply adding
+	if(!runningDynamics){
+	    if(!dynamics.contains(e)){ dynamics.add(e); }
+	}
+	else{
+	    // added object is once buffered in addingDynamics and actually added in the update cycle
+	    if(!addingDynamics.contains(e) &&
+	       !dynamics.contains(e) ){ // isn't this heavy?
+		
+		addingDynamics.add(e);
+		if(removingDynamics.contains(e)){ removingDynamics.remove(e); }
+	    }
 	}
 	
 	/*

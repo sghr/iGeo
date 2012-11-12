@@ -22,8 +22,6 @@
 
 package igeo;
 
-import java.util.ArrayList;
-
 /**
    abstract field function
    

@@ -639,6 +639,16 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		    cpts[j/vn][j%vn] = cpts[i/vn][i%vn].dup();
     }
     
+    public static void checkDuplicatedCP(IVecI[][] cpts, IVecI[] pts){
+	for(int i=0; i<cpts.length; i++){
+	    for(int j=0; j<cpts[i].length; j++){
+		for(int k=0; k<pts.length; k++){
+		    if(pts[k] == cpts[i][j]){ pts[k] = pts[k].dup(); }
+		}
+	    }
+	}
+    }
+    
     public static void checkDuplicatedCPOnEdge(IVecI[][] cpts){
 	int un = cpts.length;
 	int vn = cpts[0].length;
@@ -965,6 +975,153 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	if(u.x()!=0) ui=ucpNum()-1;
 	if(v.x()!=0) vi=vcpNum()-1;
 	return controlPoints[ui][vi];
+    }
+    
+    
+    
+    // adding CP after instantiated
+    
+    /** add control point at the end and rebuild the surface
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ISurfaceGeo addUCP(IVecI[] pts){
+	if(pts.length != vnum()){
+	    IOut.err("vnum ("+vnum()+") and point array size ("+pts.length+") don't match.");
+	    return this;
+	}
+	
+	for(int i=0; i<pts.length; i++){
+	    if(pts[i]==null || !pts[i].isValid()){
+		IOut.err("input pts["+i+"] is invalid. not added");
+		return this;
+	    }
+	}
+	
+	// in case of first addition after the surface is instantiated with one row.
+	if(controlPoints.length==2){
+	    boolean allSame=true;
+	    for(int i=0; i<controlPoints[0].length && allSame; i++){
+		if(controlPoints[0][i].x()!=controlPoints[1][i].x() ||
+		   controlPoints[0][i].y()!=controlPoints[1][i].y() ||
+		   controlPoints[0][i].z()!=controlPoints[1][i].z()){ // replace the second point with new one
+		    allSame=false;
+		}
+	    }
+	    if(allSame){
+		if(IConfig.checkDuplicatedControlPoint){
+		    checkDuplicatedCP(controlPoints, pts);
+		}
+		for(int i=0; i<controlPoints[0].length; i++){
+		    controlPoints[1][i] = pts[i];
+		    defaultWeights[1][i] = !(pts[i] instanceof IVec4I);
+		}
+		return this;
+	    }
+	}
+	
+	if(IConfig.checkDuplicatedControlPoint){
+	    checkDuplicatedCP(controlPoints, pts);
+	}
+	int unum = controlPoints.length;
+	int vnum = controlPoints[0].length;
+	//check if it started with duplicated 2 points and if so, remove one of them.
+	//if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; } // isn't taken care of already above?
+	
+	IVecI[][] controlPoints2 = new IVecI[unum+1][vnum];
+	for(int i=0; i<unum; i++){
+	    for(int j=0; j<vnum; j++){ controlPoints2[i][j] = controlPoints[i][j]; }
+	}
+	
+	for(int j=0; j<vnum; j++){ controlPoints2[unum][j] = pts[j]; }
+	
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] uknots2  =createKnots(udegree, unum+1);
+	IBSplineBasisFunction basisFunctionU2 = new IBSplineBasisFunction(udegree, uknots2);
+	boolean[][] defaultWeights2 = new boolean[unum+1][vnum];
+	for(int i=0; i<unum; i++){
+	    for(int j=0; j<vnum; j++){ defaultWeights2[i][j] = defaultWeights[i][j]; }
+	}
+	
+	for(int j=0; j<vnum; j++){ defaultWeights2[unum][j] = !(pts[j] instanceof IVec4I); }
+	
+	controlPoints = controlPoints2;
+	uknots = uknots2;
+	basisFunctionU = basisFunctionU2;
+	defaultWeights = defaultWeights2;
+	return this;
+    }
+    
+    
+    /** add control point at the end and rebuild the surface
+	note that a knots is rebuilt with default equal intervals
+	and destroy original knot intervals if variable, like circle.
+    */
+    public ISurfaceGeo addVCP(IVecI[] pts){
+	if(pts.length != unum()){
+	    IOut.err("unum ("+unum()+") and point array size ("+pts.length+") don't match.");
+	    return this;
+	}
+	
+	for(int i=0; i<pts.length; i++){
+	    if(pts[i]==null || !pts[i].isValid()){
+		IOut.err("input pts["+i+"] is invalid. not added");
+		return this;
+	    }
+	}
+	
+	// in case of first addition after the surface is instantiated with one row.
+	if(controlPoints[0].length==2){
+	    boolean allSame=true;
+	    for(int i=0; i<controlPoints.length && allSame; i++){
+		if(controlPoints[i][0].x()!=controlPoints[i][1].x() ||
+		   controlPoints[i][0].y()!=controlPoints[i][1].y() ||
+		   controlPoints[i][0].z()!=controlPoints[i][1].z()){ // replace the second point with new one
+		    allSame=false;
+		}
+	    }
+	    if(allSame){
+		if(IConfig.checkDuplicatedControlPoint){
+		    checkDuplicatedCP(controlPoints, pts);
+		}
+		for(int i=0; i<controlPoints.length; i++){
+		    controlPoints[i][1] = pts[i];
+		    defaultWeights[i][1] = !(pts[i] instanceof IVec4I);
+		}
+		return this;
+	    }
+	}
+	
+	if(IConfig.checkDuplicatedControlPoint){
+	    checkDuplicatedCP(controlPoints, pts);
+	}
+	int unum = controlPoints.length;
+	int vnum = controlPoints[0].length;
+	//check if it started with duplicated 2 points and if so, remove one of them.
+	//if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; } // isn't taken care of already above?
+	
+	IVecI[][] controlPoints2 = new IVecI[unum][vnum+1];
+	for(int i=0; i<unum; i++){
+	    for(int j=0; j<vnum; j++){ controlPoints2[i][j] = controlPoints[i][j]; }
+	}
+	
+	for(int i=0; i<unum; i++){ controlPoints2[i][vnum] = pts[i]; }
+	
+	// rebuild knots; because it's adding, ignoring the case of closed curve.
+	double[] vknots2  =createKnots(vdegree, vnum+1);
+	IBSplineBasisFunction basisFunctionV2 = new IBSplineBasisFunction(vdegree, vknots2);
+	boolean[][] defaultWeights2 = new boolean[unum][vnum+1];
+	for(int i=0; i<unum; i++){
+	    for(int j=0; j<vnum; j++){ defaultWeights2[i][j] = defaultWeights[i][j]; }
+	}
+	
+	for(int i=0; i<unum; i++){ defaultWeights2[i][vnum] = !(pts[i] instanceof IVec4I); }
+	
+	controlPoints = controlPoints2;
+	vknots = vknots2;
+	basisFunctionV = basisFunctionV2;
+	defaultWeights = defaultWeights2;
+	return this;
     }
     
     
