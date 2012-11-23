@@ -1704,7 +1704,9 @@ public class IRhino3dm{
 	public void read(Rhino3dmFile context, InputStream is) throws IOException{
 	    
 	    Chunk chunk = readChunk(is);
-	    if(chunk.content==null){
+
+	    //if(chunk.content==null){
+	    if(chunk==null || chunk.content==null){ // chunk==null added 20121122
 		IOut.err("no chunk content"); //
 		throw new IOException("no chunk content"); 
 	    }

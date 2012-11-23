@@ -537,6 +537,10 @@ public class IRhino3dmImporter extends IRhino3dm{
 	    IOut.err("length of content isn't positive: "+body);
 	    return null;
 	}
+	else if(body > 1000000000){ // 1GB chunk // temporary fix: 20121122
+	    IOut.err("length of content seems too big: "+body);
+	    return null;
+	}
 	// if file is corrupted, body (byte length) would be enormous number
 	// max int is 2,147,483,647
 	byte[] content = read(is,body);
