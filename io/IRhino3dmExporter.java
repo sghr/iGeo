@@ -654,13 +654,17 @@ public class IRhino3dmExporter extends IRhino3dm{
 	    g = color.getGreen();
 	    b = color.getBlue();
 	    a = 255 - color.getAlpha();
+	    if(r<0) r=0; else if(r>255) r=255; // added 20130202
+	    if(g<0) g=0; else if(g>255) g=255;
+	    if(b<0) b=0; else if(b>255) b=255;
+	    if(a<0) a=0; else if(a>255) a=255;
 	}
 	writeByte(os, (byte)(r&0xFF), crc);
 	writeByte(os, (byte)(g&0xFF), crc);
 	writeByte(os, (byte)(b&0xFF), crc);
 	writeByte(os, (byte)(a&0xFF), crc);
     }
-
+    
     public static void writeBoundingBox(OutputStream os, BoundingBox bbox, CRC32 crc)throws IOException{
 	writeDouble(os,bbox.min.x,crc);
 	writeDouble(os,bbox.min.y,crc);

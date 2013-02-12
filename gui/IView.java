@@ -312,7 +312,7 @@ public class IView{
     public void setTarget(IVecI t){ target.set(t); }
     
     public void enableRotationAroundTarget(){ rotateAroundTarget=true; }
-    public void disableRotationAroundTarget(){ rotateAroundTarget=true; }
+    public void disableRotationAroundTarget(){ rotateAroundTarget=false; /*true;*/ }
     
     public double distanceToTarget(){
 	//return(Math.sqrt((tx-x)*(tx-x)+(ty-y)*(ty-y)+(tz-z)*(tz-z)));

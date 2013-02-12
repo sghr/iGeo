@@ -30,7 +30,6 @@ import java.util.ArrayList;
    @author Satoru Sugihara
 */
 public class IBoidGeo extends IParticleGeo implements IBoidI{
-    
     public double cohesionDist = 100;
     public double cohesionRatio = 5;
     public double cohesionLimit = -1; // no limit
@@ -44,6 +43,10 @@ public class IBoidGeo extends IParticleGeo implements IBoidI{
     IVec cohesionForce = new IVec();
     IVec separationForce = new IVec();
     IVec alignmentForce = new IVec();
+
+    public ArrayList<Class<? extends IBoidI>> targetClasses;
+    
+
     
     public IBoidGeo(){ super(); initBoid(); }
     public IBoidGeo(IVecI pt){ super(pt); initBoid(); }
@@ -139,6 +142,41 @@ public class IBoidGeo extends IParticleGeo implements IBoidI{
 	alignmentDist = aliDist;
 	return this;
     }
+
+
+
+
+    /** make the field applicable only to the specified target class */
+    public IBoidGeo targetClass(Class<? extends IBoidI> targetClass){
+	targetClasses = new ArrayList<Class<? extends IBoidI>>();
+	targetClasses.add(targetClass);
+	return this;
+    }
+    /** alias */
+    public IBoidGeo target(Class<? extends IBoidI> targetClass){ return targetClass(targetClass); }
+    
+    
+    /** make the field applicable only to the specified target classes */
+    public IBoidGeo targetClass(Class<? extends IBoidI>... targets){
+	targetClasses = new ArrayList<Class<? extends IBoidI>>();
+	for(Class<? extends IBoidI> tgt : targets){ targetClasses.add(tgt); }
+	return this;
+    }
+    /** alias */
+    public IBoidGeo target(Class<? extends IBoidI>... targets){ return targetClass(targets); }
+    
+    public boolean isTargetClass(Object obj){
+	for(int i=0; i<targetClasses.size(); i++){
+	    if(targetClasses.get(i).isInstance(obj)) return true;
+	}
+	return false;
+    }
+    
+    /** alias */
+    public boolean isTarget(Object obj){ return isTargetClass(obj); }
+
+
+
     
     synchronized public void interact(ArrayList<IDynamics> dynamics){
 	
@@ -161,7 +199,9 @@ public class IBoidGeo extends IParticleGeo implements IBoidI{
 	    // what happens if IBoidGeo is grandchild of IAgent?
 	    // (boid in local dynamics of IAgent which is also local dynamics of IAgent)
 	    dy = dynamics.get(i);
-	    if(dy instanceof IBoidI && dy != this && dy != parent){
+	    if( ( (targetClasses==null && dy instanceof IBoidI) || targetClasses!=null && isTargetClass(dy) )
+		&& dy != this && dy != parent ){
+		
 		IBoidI b = (IBoidI)dy;
 		IVec dif = b.pos().dif(pos());
 		double dist = dif.len();

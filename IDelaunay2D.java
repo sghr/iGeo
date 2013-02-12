@@ -33,6 +33,8 @@ import igeo.gui.*;
 */
 public class IDelaunay2D {
     
+    public static double maxDistToCheck = -1;
+    
     /**
        Calculates Delaunay triangles out of array of 2D points
        
@@ -227,11 +229,23 @@ public class IDelaunay2D {
 	
 	for(int i=0; i<pts.length-2; i++){
 	    //IOut.p((i+1)+"/"+(pts.length-2)); //
+	    IOut.debug(40, (i+1)+"/"+(pts.length-2)); //
 	    for(int j=i+1; j<pts.length-1; j++){
 		
+		if(maxDistToCheck < 0 ||
+		   maxDistToCheck >= 0 && pts[i].dist(pts[j]) <= maxDistToCheck){
+		    
+		    
 		for(int k=j+1; k<pts.length; k++){
+
+		    if(maxDistToCheck < 0 ||
+		       maxDistToCheck >= 0 && pts[i].dist(pts[k]) <= maxDistToCheck){
+			
+			
 		    boolean anyInside=false;
 		    for(int l=0; l<pts.length && !anyInside; l++)
+			
+			
 			if(l!=i && l!=j && l!=k){
 			    //IOut.p("<"+i+","+j+","+k+","+l+">"); //
 			    if(isInsideCircumcircle(pts[l],pts[i],pts[j],pts[k])){
@@ -252,6 +266,9 @@ public class IDelaunay2D {
 			    triangles.add(new IVec2[]{ pts[i], pts[j], pts[k] });
 		    }
 		    //else IOut.p("pt out"); //
+		    }
+		}
+		    
 		}
 	    }
 	}

@@ -83,7 +83,7 @@ public class IColor{
     public IColor set(int r, int g, int b, int a){
 	rgba[0] = r; rgba[1] = g; rgba[2] = b; rgba[3] = a; return this;
     }
-
+    
     
     public static IColor hsb(float h, float s, float b, float a){
 	if(h<0f) h+= (int)(-h+1f); else if(h>1f) h-=(int)h;
@@ -163,5 +163,18 @@ public class IColor{
 	return "(r="+String.valueOf(rgba[0])+",g="+String.valueOf(rgba[1])+",b="
 	    +String.valueOf(rgba[2])+",a="+String.valueOf(rgba[3])+")";
     }
+    
+    
+    public IColor dup(){ return new IColor(this); }
+    public IColor cp(){ return dup(); }
+    
+    public IColor blend(IColor c, float weight){
+	rgba[0] = rgba[0]*(1f-weight)+c.r()*weight;
+	rgba[1] = rgba[1]*(1f-weight)+c.g()*weight;
+	rgba[2] = rgba[2]*(1f-weight)+c.b()*weight;
+	rgba[3] = rgba[3]*(1f-weight)+c.a()*weight;
+	return this;
+    }
+    public IColor blend(IColor c){ return blend(c, 0.5f); }
     
 }

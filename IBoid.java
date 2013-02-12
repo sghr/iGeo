@@ -178,6 +178,29 @@ public class IBoid extends IParticle implements IBoidI{
     }
     
     
+
+    /**************************************
+     * target class
+     *************************************/
+    /** make the field applicable only to the specified target class */
+    public IBoid targetClass(Class<? extends IBoidI> targetClass){
+	boid().targetClass(targetClass); return this;
+    }
+    /** alias */
+    public IBoid target(Class<? extends IBoidI> targetClass){ return targetClass(targetClass); }
+    
+    
+    /** make the field applicable only to the specified target classes */
+    public IBoid targetClass(Class<? extends IBoidI>... targets){
+	boid().targetClass(targets); return this;
+    }
+    /** alias */
+    public IBoid target(Class<? extends IBoidI>... targets){ return targetClass(targets); }
+    
+    public boolean isTargetClass(Object obj){ return boid().isTargetClass(obj); }
+    /** alias */
+    public boolean isTarget(Object obj){ return isTargetClass(obj); }
+    
     
     /**************************************
      * methods of IVecI

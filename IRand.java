@@ -267,6 +267,8 @@ public class IRand{
 	return percent(percent);
     }
     static public boolean percent(double percent){
+	if(percent>=100) return true;
+	if(percent<=0) return false;
 	return get()<(percent/100);
     }
     static public boolean pct(double percent){return percent(percent); }

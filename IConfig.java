@@ -239,8 +239,8 @@ public /*interface*/ class IConfig{
     /** enable postupdate method in IDynamicServer. Default is true. If false, some functionalities of IDynamics inheriting class like IAgent are disabled. */
     public static boolean enablePostupdate=true;
     
-    /** put preinteract method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is false. */
-    public static boolean loopPreinteract=false;
+    /** put preinteract method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. Default is true. */
+    public static boolean loopPreinteract=true; //false;
     /** put postinteract method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. To have accurate physical simulation, this need to be true. Default is true. */
     public static boolean loopPostinteract=true;
     /** put preupdate method in another independent for-loop in IDynamicServer. Execution order will change but the execution speed might be slower. To have accurate physical simulation, this need to be true.  Default is true. */
@@ -361,7 +361,7 @@ public /*interface*/ class IConfig{
     /** default perspective ratio */
     public static double perspectiveRatio = 0.5;
     /** default view distance */
-    public static double viewDistance = 100;
+    public static double viewDistance = 10000; // 100;
     
     
     
