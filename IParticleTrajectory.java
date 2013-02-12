@@ -342,59 +342,59 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     
     public void del(boolean deleteTrajectory){ if(trajectory!=null&&deleteTrajectory){ trajectory.del(); } super.del(); } // added 20121027
     
-    public IParticleTrajectory clr(IColor c){ super.clr(c); return this; }
-    public IParticleTrajectory clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
-    public IParticleTrajectory clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
-    public IParticleTrajectory clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
-    //public IParticleTrajectory clr(Color c){ super.clr(c); return this; }
-    //public IParticleTrajectory clr(Color c, int alpha){ super.clr(c,alpha); return this; }
-    //public IParticleTrajectory clr(Color c, float alpha){ super.clr(c,alpha); return this; }
-    //public IParticleTrajectory clr(Color c, double alpha){ super.clr(c,alpha); return this; }
-    public IParticleTrajectory clr(int gray){ super.clr(gray); return this; }
-    public IParticleTrajectory clr(float fgray){ super.clr(fgray); return this; }
-    public IParticleTrajectory clr(double dgray){ super.clr(dgray); return this; }
-    public IParticleTrajectory clr(int gray, int alpha){ super.clr(gray,alpha); return this; }
-    public IParticleTrajectory clr(float fgray, float falpha){ super.clr(fgray,falpha); return this; }
-    public IParticleTrajectory clr(double dgray, double dalpha){ super.clr(dgray,dalpha); return this; }
-    public IParticleTrajectory clr(int r, int g, int b){ super.clr(r,g,b); return this; }
-    public IParticleTrajectory clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); return this; }
-    public IParticleTrajectory clr(double dr, double dg, double db){ super.clr(dr,dg,db); return this; }
-    public IParticleTrajectory clr(int r, int g, int b, int a){ super.clr(r,g,b,a); return this; }
-    public IParticleTrajectory clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); return this; }
-    public IParticleTrajectory clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); return this; }
-    public IParticleTrajectory hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); return this; }
-    public IParticleTrajectory hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); return this; }
-    public IParticleTrajectory hsb(float h, float s, float b){ super.hsb(h,s,b); return this; }
-    public IParticleTrajectory hsb(double h, double s, double b){ super.hsb(h,s,b); return this; }
+    public IParticleTrajectory clr(IColor c){ super.clr(c); if(trajectory!=null){ trajectory.clr(c); } return this; }
+    public IParticleTrajectory clr(IColor c, int alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
+    public IParticleTrajectory clr(IColor c, float alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
+    public IParticleTrajectory clr(IColor c, double alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
+    //public IParticleTrajectory clr(Color c){ super.clr(c); if(trajectory!=null){ trajectory.clr(c); } return this; }
+    //public IParticleTrajectory clr(Color c, int alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
+    //public IParticleTrajectory clr(Color c, float alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
+    //public IParticleTrajectory clr(Color c, double alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
+    public IParticleTrajectory clr(int gray){ super.clr(gray); if(trajectory!=null){ trajectory.clr(gray); }  return this; }
+    public IParticleTrajectory clr(float fgray){ super.clr(fgray); if(trajectory!=null){ trajectory.clr(fgray); } return this; }
+    public IParticleTrajectory clr(double dgray){ super.clr(dgray); if(trajectory!=null){ trajectory.clr(dgray); } return this; }
+    public IParticleTrajectory clr(int gray, int alpha){ super.clr(gray,alpha); if(trajectory!=null){ trajectory.clr(gray,alpha); } return this; }
+    public IParticleTrajectory clr(float fgray, float falpha){ super.clr(fgray,falpha); if(trajectory!=null){ trajectory.clr(fgray,falpha); } return this; }
+    public IParticleTrajectory clr(double dgray, double dalpha){ super.clr(dgray,dalpha); if(trajectory!=null){ trajectory.clr(dgray,dalpha); } return this; }
+    public IParticleTrajectory clr(int r, int g, int b){ super.clr(r,g,b); if(trajectory!=null){ trajectory.clr(r,g,b); } return this; }
+    public IParticleTrajectory clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); if(trajectory!=null){ trajectory.clr(fr,fg,fb); } return this; }
+    public IParticleTrajectory clr(double dr, double dg, double db){ super.clr(dr,dg,db); if(trajectory!=null){ trajectory.clr(dr,dg,db); } return this; }
+    public IParticleTrajectory clr(int r, int g, int b, int a){ super.clr(r,g,b,a); if(trajectory!=null){ trajectory.clr(r,g,b,a); } return this; }
+    public IParticleTrajectory clr(float fr, float fg, float fb, float fa){ super.clr(fr,fg,fb,fa); if(trajectory!=null){ trajectory.clr(fr,fg,fb,fa); } return this; }
+    public IParticleTrajectory clr(double dr, double dg, double db, double da){ super.clr(dr,dg,db,da); if(trajectory!=null){ trajectory.clr(dr,dg,db,da); } return this; }
+    public IParticleTrajectory hsb(float h, float s, float b, float a){ super.hsb(h,s,b,a); if(trajectory!=null){ trajectory.hsb(h,s,b,a); } return this; }
+    public IParticleTrajectory hsb(double h, double s, double b, double a){ super.hsb(h,s,b,a); if(trajectory!=null){ trajectory.hsb(h,s,b,a); } return this; }
+    public IParticleTrajectory hsb(float h, float s, float b){ super.hsb(h,s,b); if(trajectory!=null){ trajectory.hsb(h,s,b); } return this; }
+    public IParticleTrajectory hsb(double h, double s, double b){ super.hsb(h,s,b); if(trajectory!=null){ trajectory.hsb(h,s,b); } return this; }
     
-    public IParticleTrajectory setColor(IColor c){ super.setColor(c); return this; }
-    public IParticleTrajectory setColor(IColor c, int alpha){ super.setColor(c,alpha); return this; }
-    public IParticleTrajectory setColor(IColor c, float alpha){ super.setColor(c,alpha); return this; }
-    public IParticleTrajectory setColor(IColor c, double alpha){ super.setColor(c,alpha); return this; }
-    //public IParticleTrajectory setColor(Color c){ super.setColor(c); return this; }
-    //public IParticleTrajectory setColor(Color c, int alpha){ super.setColor(c,alpha); return this; }
-    //public IParticleTrajectory setColor(Color c, float alpha){ super.setColor(c,alpha); return this; }
-    //public IParticleTrajectory setColor(Color c, double alpha){ super.setColor(c,alpha); return this; }
-    public IParticleTrajectory setColor(int gray){ super.setColor(gray); return this; }
-    public IParticleTrajectory setColor(float fgray){ super.setColor(fgray); return this; }
-    public IParticleTrajectory setColor(double dgray){ super.setColor(dgray); return this; }
-    public IParticleTrajectory setColor(int gray, int alpha){ super.setColor(gray,alpha); return this; }
-    public IParticleTrajectory setColor(float fgray, float falpha){ super.setColor(fgray,falpha); return this; }
-    public IParticleTrajectory setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha); return this; }
-    public IParticleTrajectory setColor(int r, int g, int b){ super.setColor(r,g,b); return this; }
-    public IParticleTrajectory setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb); return this; }
-    public IParticleTrajectory setColor(double dr, double dg, double db){ super.setColor(dr,dg,db); return this; }
-    public IParticleTrajectory setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a); return this; }
-    public IParticleTrajectory setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa); return this; }
-    public IParticleTrajectory setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da); return this; }
-    public IParticleTrajectory setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); return this; }
-    public IParticleTrajectory setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); return this; }
-    public IParticleTrajectory setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); return this; }
-    public IParticleTrajectory setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); return this; }
+    public IParticleTrajectory setColor(IColor c){ super.setColor(c); if(trajectory!=null){ trajectory.setColor(c); } return this; }
+    public IParticleTrajectory setColor(IColor c, int alpha){ super.setColor(c,alpha); if(trajectory!=null){ trajectory.setColor(c,alpha); } return this; }
+    public IParticleTrajectory setColor(IColor c, float alpha){ super.setColor(c,alpha); if(trajectory!=null){ trajectory.setColor(c,alpha); } return this; }
+    public IParticleTrajectory setColor(IColor c, double alpha){ super.setColor(c,alpha); if(trajectory!=null){ trajectory.setColor(c,alpha); } return this; }
+    //public IParticleTrajectory setColor(Color c){ super.setColor(c); if(trajectory!=null){ trajectory.setColor(c); } return this; }
+    //public IParticleTrajectory setColor(Color c, int alpha){ super.setColor(c,alpha); if(trajectory!=null){ trajectory.setColor(c,alpha); } return this; }
+    //public IParticleTrajectory setColor(Color c, float alpha){ super.setColor(c,alpha); if(trajectory!=null){ trajectory.setColor(c,alpha); } return this; }
+    //public IParticleTrajectory setColor(Color c, double alpha){ super.setColor(c,alpha); if(trajectory!=null){ trajectory.setColor(c,alpha); } return this; }
+    public IParticleTrajectory setColor(int gray){ super.setColor(gray); if(trajectory!=null){ trajectory.setColor(gray); } return this; }
+    public IParticleTrajectory setColor(float fgray){ super.setColor(fgray); if(trajectory!=null){ trajectory.setColor(fgray); } return this; }
+    public IParticleTrajectory setColor(double dgray){ super.setColor(dgray); if(trajectory!=null){ trajectory.setColor(dgray); } return this; }
+    public IParticleTrajectory setColor(int gray, int alpha){ super.setColor(gray,alpha);  if(trajectory!=null){ trajectory.setColor(gray,alpha); }return this; }
+    public IParticleTrajectory setColor(float fgray, float falpha){ super.setColor(fgray,falpha);  if(trajectory!=null){ trajectory.setColor(fgray,falpha); }return this; }
+    public IParticleTrajectory setColor(double dgray, double dalpha){ super.setColor(dgray,dalpha);  if(trajectory!=null){ trajectory.setColor(dgray,dalpha); }return this; }
+    public IParticleTrajectory setColor(int r, int g, int b){ super.setColor(r,g,b);  if(trajectory!=null){ trajectory.setColor(r,g,b); }return this; }
+    public IParticleTrajectory setColor(float fr, float fg, float fb){ super.setColor(fr,fg,fb);  if(trajectory!=null){ trajectory.setColor(fr,fg,fb); }return this; }
+    public IParticleTrajectory setColor(double dr, double dg, double db){ super.setColor(dr,dg,db);  if(trajectory!=null){ trajectory.setColor(dr,dg,db); }return this; }
+    public IParticleTrajectory setColor(int r, int g, int b, int a){ super.setColor(r,g,b,a);  if(trajectory!=null){ trajectory.setColor(r,g,b,a); }return this; }
+    public IParticleTrajectory setColor(float fr, float fg, float fb, float fa){ super.setColor(fr,fg,fb,fa);  if(trajectory!=null){ trajectory.setColor(fr,fg,fb,fa); }return this; }
+    public IParticleTrajectory setColor(double dr, double dg, double db, double da){ super.setColor(dr,dg,db,da);  if(trajectory!=null){ trajectory.setColor(dr,dg,db,da); }return this; }
+    public IParticleTrajectory setHSBColor(float h, float s, float b, float a){ super.setHSBColor(h,s,b,a); if(trajectory!=null){ trajectory.setHSBColor(h,s,b,a); } return this; }
+    public IParticleTrajectory setHSBColor(double h, double s, double b, double a){ super.setHSBColor(h,s,b,a); if(trajectory!=null){ trajectory.setHSBColor(h,s,b,a); } return this; }
+    public IParticleTrajectory setHSBColor(float h, float s, float b){ super.setHSBColor(h,s,b); if(trajectory!=null){ trajectory.setHSBColor(h,s,b); } return this; }
+    public IParticleTrajectory setHSBColor(double h, double s, double b){ super.setHSBColor(h,s,b); if(trajectory!=null){ trajectory.setHSBColor(h,s,b); } return this; }
     
     
-    public IParticleTrajectory weight(double w){ super.weight(w); return this; }
-    public IParticleTrajectory weight(float w){ super.weight(w); return this; }
+    public IParticleTrajectory weight(double w){ super.weight(w); if(trajectory!=null){ trajectory.weight(w); } return this; }
+    public IParticleTrajectory weight(float w){ super.weight(w); if(trajectory!=null){ trajectory.weight(w); } return this; }
 
     
     // partial methods of IDynamics
