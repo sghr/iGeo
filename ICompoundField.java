@@ -124,4 +124,12 @@ public class ICompoundField extends I3DField{
 	return closestField.get(pt);
     }
     
+    /* // child fields are aready deleted when added
+    public void del(){ if(field!=null){ field.del(); } super.del(); }
+    public void del(boolean deleteGeometry){ 
+	if(deleteGeometry && field!=null) field.del();
+	super.del(deleteGeometry);
+    }
+    */
+    
 }

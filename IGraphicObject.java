@@ -38,14 +38,14 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     //public static float defaultBlue = .4f; //.5f; //1f;
     //public static float defaultAlpha = 1f;
     
-    static int colorRange1i = 255;  
-    static int colorRange2i = 255;
-    static int colorRange3i = 255;
-    static int colorRange4i = 255;
-    static float colorRange1f = 1f;
-    static float colorRange2f = 1f;
-    static float colorRange3f = 1f;
-    static float colorRange4f = 1f;
+    public static int colorRange1i = 255;  
+    public static int colorRange2i = 255;
+    public static int colorRange3i = 255;
+    public static int colorRange4i = 255;
+    public static float colorRange1f = 1f;
+    public static float colorRange2f = 1f;
+    public static float colorRange3f = 1f;
+    public static float colorRange4f = 1f;
     
     //static public double transparentModeAlpha=0.4;
     
@@ -89,14 +89,18 @@ abstract public class IGraphicObject /*extends ISubobject*/ implements ISubobjec
     public void update(){ update=true; }
 
     public void setAttribute(IAttribute attr){
-	color = attr.color;
-	visible = attr.visible; //
+	//color = attr.color;
+	//visible = attr.visible(); //
+        setColor(attr.clr());
+        setVisible(attr.visible());
+        setWeight(attr.weight());
     }
     
     public void setWeight(float w){} // implemented in child class if necessary
     public float getWeight(){ return -1f; } // implemented in child class if necessary
     
-    
+    public void setVisible(boolean v){ visible=v; }
+
     public void setColor(IColor c){ color=c; }
     public void setColor(Color c){ color=new IColor(c); }
     

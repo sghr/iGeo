@@ -354,6 +354,19 @@ public class IG implements IServerI{
     /** get all curves in the current server; alias */
     public static ICurve[] crvs(){ return curves(); }
     
+    /** get all curves in the current server 
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+	ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    public static IPolycurve[] polycurves(){
+	IG ig = cur(); return ig==null?null:ig.getPolycurves();
+    }
+    /** get all curves in the current server; alias.
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+        ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    //public static ICurve[] pcrvs(){ return polycurves(); }
+    
     /** get all surfaces in the current server */
     public static ISurface[] surfaces(){
 	IG ig = cur(); return ig==null?null:ig.getSurfaces();
@@ -403,6 +416,19 @@ public class IG implements IServerI{
     }
     /** get a curve in the current server; alias */
     public static ICurve crv(int i){ return curve(i); }
+
+    /** get a polycurve in the current server 
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+	ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    public static IPolycurve polycurve(int i){
+	IG ig = cur(); return ig==null?null:ig.getPolycurve(i);
+    }
+    /** get a curve in the current server; alias.
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+	ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    //public static IPolycurve pcrv(int i){ return polycurve(i); }
     
     /** get a surface in the current server */
     public static ISurface surface(int i){
@@ -455,6 +481,19 @@ public class IG implements IServerI{
     }
     /** number of curves in the current server; alias */
     public static int crvNum(){ return curveNum(); }
+    
+    /** number of polycurves in the current server.
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+	ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    public static int polycurveNum(){
+	IG ig = cur(); return ig==null?0:ig.getPolycurveNum();
+    }
+    /** number of polycurves in the current server; alias.
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+	ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    //fpublic static int pcrvNum(){ return polycurveNum(); }
     
     /** number of surfaces in the current server */
     public static int surfaceNum(){
@@ -1177,6 +1216,7 @@ public class IG implements IServerI{
     
     public IPoint[] getPoints(){ return server.points(); }
     public ICurve[] getCurves(){ return server.curves(); }
+    public IPolycurve[] getPolycurves(){ return server.polycurves(); }
     public ISurface[] getSurfaces(){ return server.surfaces(); }
     public IMesh[] getMeshes(){ return server.meshes(); }
     public IBrep[] getBreps(){ return server.breps(); }
@@ -1186,6 +1226,7 @@ public class IG implements IServerI{
     
     public IPoint getPoint(int i){ return server.point(i); }
     public ICurve getCurve(int i){ return server.curve(i); }
+    public IPolycurve getPolycurve(int i){ return server.polycurve(i); }
     public ISurface getSurface(int i){ return server.surface(i); }
     public IMesh getMesh(int i){ return server.mesh(i); }
     public IBrep getBrep(int i){ return server.brep(i); }
@@ -1195,6 +1236,7 @@ public class IG implements IServerI{
     
     public int getPointNum(){ return server.pointNum(); }
     public int getCurveNum(){ return server.curveNum(); }
+    public int getPolycurveNum(){ return server.polycurveNum(); }
     public int getSurfaceNum(){ return server.surfaceNum(); }
     public int getMeshNum(){ return server.meshNum(); }
     public int getBrepNum(){ return server.brepNum(); }

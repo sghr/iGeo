@@ -548,13 +548,16 @@ public class IPointAgent extends IAgent implements IVecI{
 	if(point==null){ point = new IPoint(pos).clr(super.clr()); } else{ point.show(); }
 	super.show(); return this;
     }
-    public IPointAgent hidePoint(){ if(point!=null) point.hide(); super.hide(); return this; }
+    public IPointAgent hidePoint(){ 
+	if(point!=null) point.hide();
+	//super.hide(); // point agent might have other geometry and as a parent it's visible.
+	return this; 
+    }
     
     /** show attached geometry */
     public IPointAgent showGeometry(){ if(tracker!=null){ tracker.show(); } return this; }
     /** hide attached geometry */
     public IPointAgent hideGeometry(){ if(tracker!=null){ tracker.hide(); } return this; }
-    
     
     
     public void del(){ if(tracker!=null) tracker.del(); point.del(); super.del(); } //

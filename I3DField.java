@@ -31,19 +31,19 @@ package igeo;
 abstract public class I3DField extends IField implements I3DFieldI{
     public I3DFieldI field;
     public I3DField(I3DFieldI f){ field=f; }
-    public IVecI get(IVecI pt){ return field.get(pt); }
+    public IVecI get(IVecI pt){ if(field==null){ return null; } return field.get(pt); }
     public void applyField(IParticleI p){ p.push(get(p.pos())); }
     public I3DFieldI field(){ return field; }
     /** set no decay */
-    public I3DField noDecay(){ field.noDecay(); return this; }
+    public I3DField noDecay(){ if(field!=null){ field.noDecay(); } return this; }
     /** set linear decay with threshold; When distance is equal to threshold, output is zero.*/
-    public I3DField linearDecay(double threshold){ field.linearDecay(threshold); return this; }
+    public I3DField linearDecay(double threshold){ if(field!=null){ field.linearDecay(threshold); } return this; }
     /** alias of linearDecay */
     public I3DField linear(double threshold){ return linearDecay(threshold); }
     
     /** set Gaussian decay with threshold; Threshold is used as double of standard deviation (when distance is eqaul to threshold, output is 13.5% of original).
     */
-    public I3DField gaussianDecay(double threshold){ field.gaussianDecay(threshold); return this; }
+    public I3DField gaussianDecay(double threshold){ if(field!=null){ field.gaussianDecay(threshold); } return this; }
     /** alias of gaussianDecay */
     public I3DField gaussian(double threshold){ return gaussianDecay(threshold); }
     /** this returns current decay type */
@@ -51,23 +51,23 @@ abstract public class I3DField extends IField implements I3DFieldI{
     
     
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
-    public I3DField constantIntensity(boolean b){ field.constantIntensity(b); return this; }
+    public I3DField constantIntensity(boolean b){ if(field!=null){ field.constantIntensity(b); } return this; }
     
     
     /** set decay threshold */
-    public I3DField threshold(double t){ field.threshold(t); return this; }
+    public I3DField threshold(double t){ if(field!=null){ field.threshold(t); } return this; }
     /** get decay threshold */
-    public double threshold(){ return field.threshold(); }
+    public double threshold(){ if(field==null){ return 0; } return field.threshold(); }
     
     /** set output intensity */
-    public I3DField intensity(double i){ field.intensity(i); return this; }
+    public I3DField intensity(double i){ if(field!=null){ field.intensity(i); } return this; }
     /** get output intensity */
-    public double intensity(){ return field.intensity(); }
+    public double intensity(){ if(field==null){ return 0; } return field.intensity(); }
     
-    public void del(){ field.del(); super.del(); }
+    public void del(){ if(field!=null){ field.del(); } super.del(); }
     /** stop agent with option of deleting/keeping the geometry the agent owns */
     public void del(boolean deleteGeometry){ 
-	if(deleteGeometry) field.del();
+	if(deleteGeometry && field!=null) field.del();
 	super.del(deleteGeometry);
     }
     

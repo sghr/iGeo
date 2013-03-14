@@ -278,6 +278,8 @@ public class ISun {
 	    SaoTome, // Sao Tome and Principe
 	    Sarajevo, // Bosnia and Herzegovina
 	    Seoul, // South Korea
+	    Shanghai, // China
+	    Shenzhen, // China
 	    Singapore, // Singapore
 	    Skopje, // Macedonia
 	    Sofia, // Bulgaria
@@ -728,6 +730,11 @@ public class ISun {
 		return new Location(43.8608, 18.4214, 577, +1);
 	    case Seoul: // South Korea
 		return new Location(37.5139, 126.9828, 33, +9);
+	    case Shanghai: // China
+		return new Location(31.230708, 121.472916, 4, +8);
+	    case Shenzhen: // China
+		//return new Location(22.543447, 114.057818, 4, +8);
+		return new Location(22., 114., 4, +8);
 	    case Singapore: // Singapore
 		return new Location(1.2894, 103.8500, 0, +8);
 	    case Skopje: // Macedonia

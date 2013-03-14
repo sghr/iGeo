@@ -35,20 +35,24 @@ public class ITrajectoryGeo extends IDynamicsBase implements ITrajectoryI{
     public ICurve curve;
     public IVecI pos;
     
-    public ITrajectoryGeo(IVecI pos){ this.pos = pos; degree=1; }
-    public ITrajectoryGeo(IVecI pos, int curveDegree){ this.pos = pos; degree=curveDegree; }
+    public ITrajectoryGeo(IVecI pos){ this.pos = pos; degree=1; initTrajectory(); }
+    public ITrajectoryGeo(IVecI pos, int curveDegree){ this.pos = pos; degree=curveDegree; initTrajectory(); }
     
-    public ITrajectoryGeo(IObject obj, IVecI pos){ super(obj); this.pos = pos; degree=1; }
-    public ITrajectoryGeo(IObject obj, IVecI pos, int curveDegree){ super(obj); this.pos = pos; degree=curveDegree; }
+    public ITrajectoryGeo(IObject obj, IVecI pos){ super(obj); this.pos = pos; degree=1; initTrajectory(); }
+    public ITrajectoryGeo(IObject obj, IVecI pos, int curveDegree){ super(obj); this.pos = pos; degree=curveDegree; initTrajectory(); }
     
-    public ITrajectoryGeo(IPointAgent agent){ super(agent); pos = agent.pos(); degree=1; }
-    public ITrajectoryGeo(IPointAgent agent, int curveDegree){ super(agent); pos = agent.pos(); degree=curveDegree; }
+    public ITrajectoryGeo(IPointAgent agent){ super(agent); pos = agent.pos(); degree=1; initTrajectory(); }
+    public ITrajectoryGeo(IPointAgent agent, int curveDegree){ super(agent); pos = agent.pos(); degree=curveDegree; initTrajectory(); }
+    
+    public void initTrajectory(){
+	update(); // add first point // added 2013/02/13
+    }
     
     public int deg(){ return degree; }
     public ITrajectoryGeo deg(int deg){ degree=deg; return this; }
     
-    public void hide(){ curve.hide(); }
-    public void show(){ curve.show(); }
+    public void hide(){ if(curve!=null) curve.hide(); }
+    public void show(){ if(curve!=null) curve.show(); }
     public void del(){ if(curve!=null){ curve.del(); } if(parent!=null){ parent.deleteDynamics(this); } }
     
     public ICurve curve(){ return curve; }

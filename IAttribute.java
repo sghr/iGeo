@@ -94,7 +94,12 @@ public class IAttribute{
 	return this;
     }
     
-    
+    public void show(){ visible=true; }
+    public void hide(){ visible=false; }
+    public IAttribute visible(boolean v){ visible=v; return this; }
+    public boolean visible(){ return visible; }
+    public boolean isVisible(){ return visible(); }
+
     public Color color(){ return color.awt(); }
     public Color awtColor(){ return color(); }
     

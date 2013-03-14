@@ -292,6 +292,24 @@ public class IServer implements IServerI{
     /** alias of curves() */
     public ICurve[] getCurves(){ return curves(); }
     
+    
+    /** Returns all polycurve objects contained in objects.
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+	ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    public IPolycurve[] polycurves(){
+	ArrayList<IPolycurve> polycurves = new ArrayList<IPolycurve>();
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IPolycurve)
+		    polycurves.add((IPolycurve)objects.get(i));
+	}
+	return polycurves.toArray(new IPolycurve[polycurves.size()]);
+    }
+    /** alias of curves() */
+    public IPolycurve[] getPolycurves(){ return polycurves(); }
+    
+    
     /** Returns all surface objects contained in objects.
 	ISurfaceR objects are not included.
     */
@@ -401,6 +419,23 @@ public class IServer implements IServerI{
     public ICurve getCurve(int i){ return curve(i); }
     
     
+    /** Returns i-th IPolycurve object contained in objects or null if not found.
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+	ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    public IPolycurve polycurve(int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(objects.get(j) instanceof IPolycurve)
+		    if(i==curIdx++) return (IPolycurve)objects.get(j);
+	}
+	return null;
+    }
+    /** alias of polycurve(int) */
+    public IPolycurve getPolycurve(int i){ return polycurve(i); }
+    
+    
     /** Returns i-th ISurface object contained in objects or null if not found.
 	ISurfaceR objects are not included.
     */
@@ -500,6 +535,21 @@ public class IServer implements IServerI{
     }
     /** alias of curveNum() */
     public int getCurveNum(){ return curveNum(); }
+    
+    /** number of IPolycurve in objects 
+	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
+	ICurve - IPolycurve relationship is still under work. This is temporary measure.
+    */
+    public int polycurveNum(){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IPolycurve) num++;
+	}
+	return num;
+    }
+    /** alias of polycurveNum() */
+    public int getPolycurveNum(){ return polycurveNum(); }
     
     /** number of ISurface in objects */
     public int surfaceNum(){

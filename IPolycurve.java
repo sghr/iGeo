@@ -37,7 +37,7 @@ public class IPolycurve extends IObject /*implements ICurveI*/{
     
     // currently just implemented as a group of ICurve
     
-    public ArrayList<ICurve> curves; // public?
+    public ArrayList<ICurve> curves; // public? // not ArrayList<ICurveI>?
     //public ArrayList<IDouble> knots;
     
     public IPolycurve(){ this((IServerI)null); }
@@ -49,7 +49,7 @@ public class IPolycurve extends IObject /*implements ICurveI*/{
 	curves = new ArrayList<ICurve>();
 	for(int i=0; i<crvs.length; i++){ curves.add(crvs[i]); }
     }
-
+    
     public IPolycurve(ArrayList<ICurve> crvs){ this(null,crvs); }
     public IPolycurve(IServerI s, ArrayList<ICurve> crvs){
 	super(s);
@@ -74,7 +74,25 @@ public class IPolycurve extends IObject /*implements ICurveI*/{
         for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).del();
     }
     
-        
+    
+    public int curveNum(){ return curves.size(); }
+    public ICurve curve(int i){
+	return curves.get(i);
+    }
+    public ICurve[] curves(){ return curves.toArray(new ICurve[curves.size()]); }
+    public boolean contains(ICurve c){ return curves.contains(c); }
+    
+    public boolean isClosed(){ 
+	return curves.get(0).start().eq(curves.get(curves.size()-1).end());
+    }
+    
+    
+    
+
+    /****************************************************
+     * IObject methods
+     ****************************************************/
+    
     public IPolycurve name(String nm){
         super.name(nm);
         for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).name(nm+"_s"+i);

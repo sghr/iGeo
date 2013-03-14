@@ -177,4 +177,16 @@ public class IColor{
     }
     public IColor blend(IColor c){ return blend(c, 0.5f); }
     
+    public boolean eq(IColor c){
+	return c.r()==r() && c.g()==g() && c.b()==b() && c.a()==a();
+    }
+    
+    public boolean eq(float r, float g, float b, float a){
+	return r()==r && g()==g && b()==b && a()==a;
+    }
+    
+    public boolean eq(float r, float g, float b){
+	return r()==r && g()==g && b()==b;
+    }
+    
 }

@@ -708,6 +708,15 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		if(vvec.isParallel(uvec)) vvec=null;
 	    }
         }
+	
+	if(pts.length < 3){
+	    IOut.err("too less trim points ("+pts.length+"). needs to be 3 or more");
+	    return null;
+	}
+	if(vvec==null){
+	    IOut.err("trim curve has no width");
+	    vvec = uvec.rot(IG.zaxis, Math.PI/2);
+	}
 	return new IVec[]{ uvec.unit(), uvec.cross(vvec).cross(uvec).unit() };
     }
     

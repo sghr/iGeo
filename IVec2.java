@@ -289,11 +289,10 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     
     /** @return angle of two vector. From -Pi to Pi. Sign follows right-handed screw rule */
     public double angle(IVec2 v){
-	double dot = x*v.x+y*v.y;
 	double len1 = len(); if(len1==0) return 0;
 	double len2 = v.len(); if(len2==0) return 0;
 	double cross = x*v.y-y*v.x; //if(cross==0) return 0;
-	double cos = dot/(len1*len2);
+	double cos = (x*v.x+y*v.y)/(len1*len2);
 	if(cos>1.) cos=1; else if(cos<-1.) cos=-1; // in case of rounding error
 	double angle = Math.acos(cos);
 	if(cross<0) return -angle; // negative
@@ -301,11 +300,10 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     }
     /** @return angle of two vector. From -Pi to Pi. Sign follows right-handed screw rule */
     public double angle(double vx, double vy){
-	double dot = x*vx+y*vy;
 	double len1 = len(); if(len1==0) return 0;
 	double len2 = Math.sqrt(vx*vx+vy*vy); if(len2==0) return 0;
 	double cross = x*vy-y*vx; //if(cross==0) return 0;
-	double cos = dot/(len1*len2);
+	double cos = (x*vx+y*vy)/(len1*len2);
 	if(cos>1.) cos=1; else if(cos<-1.) cos=-1; // in case of rounding error
 	double angle = Math.acos(cos);
 	if(cross<0) return -angle; // negative

@@ -405,23 +405,23 @@ public class ILayer extends IObject{
     
     public ILayer name(String layerName){ attribute.name = layerName; return this; }
     
-    @Override public boolean visible(){ return attribute.visible; }
+    @Override public boolean visible(){ return attribute.visible(); }
     
     public ILayer setVisible(boolean v){ return visible(v); }
     public ILayer visible(boolean v){
-	attribute.visible=v;
-	if(attribute.visible) show(); else hide();
+	attribute.visible(v);
+	if(attribute.visible()) show(); else hide();
 	return this;
     }
     public ILayer hide(){
 	super.hide();
-	attribute.visible=false;
+	attribute.hide();
 	for(IObject o: objects) o.hide();
 	return this;
     }
     public ILayer show(){
 	super.show();
-	attribute.visible=true;
+	attribute.show();
 	for(IObject o: objects) o.show();
 	return this;
     }

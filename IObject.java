@@ -311,7 +311,14 @@ public class IObject{
     /** get attributes */
     public IAttribute attr(){ return attribute; }
     /** set attributes */
-    public IObject attr(IAttribute at){ attribute=at; syncGraphic(); return this; }
+    public IObject attr(IAttribute at){ 
+	attribute=at; 
+	//syncGraphic();
+	if(attribute!=null && graphics!=null){
+	    for(int i=0; i<graphics.size(); i++){ graphics.get(i).setAttribute(attribute); }
+	}
+	return this; 
+    }
     /** set a duplicate of attributes of another object. if obj is null or its attributes is null, ignored. */
     public IObject attr(IObject obj){ if(obj!=null && obj.attr()!=null) attr(obj.attr().dup()); return this; }
     
@@ -329,8 +336,8 @@ public class IObject{
     public boolean visible(){
 	//if(attribute==null) attribute=new IAttribute(); // default true?
 	//return attribute.visible;
-	if(graphics==null) return false;
-	if(attribute!=null) return attribute.visible;
+	//if(graphics==null) return false; // some objects like agent which have no graphics but as attributes it's visible
+	if(attribute!=null) return attribute.visible();
 	if(graphics!=null) for(IGraphicObject gr:graphics) if(gr.visible()) return true;
 	return false;
     }
@@ -339,31 +346,43 @@ public class IObject{
     public IObject hide(){
 	if(graphics!=null) for(IGraphicObject gr:graphics) gr.hide();
 	if(attribute==null) attribute=new IAttribute();
-	attribute.visible=false;
+	//attribute.visible=false;
+	attribute.hide();
 	return this;
     }
     
     public IObject show(){
+
 	if(graphics!=null) for(IGraphicObject gr:graphics) gr.show();
 	if(attribute==null) attribute=new IAttribute();
-	attribute.visible=true;
+	//attribute.visible=true;
+	attribute.show();
 	return this;
     }
 
     /** update all graphics by the attribute */
-    public void syncGraphic(){ syncColor(); syncWeight(); }
+    public void syncGraphic(){ 
+	syncColor(); syncWeight(); syncVisibility();
+    }
     
     /** update color of all graphics by the color in attribute */
     public void syncColor(){
 	if(attribute!=null && graphics!=null){
-	    for(IGraphicObject gr:graphics) gr.setColor(attribute.color);
+	    for(IGraphicObject gr:graphics) gr.setColor(attribute.clr());
+	}
+    }
+
+    /** update color of all graphics by the color in attribute */
+    public void syncVisibility(){
+	if(attribute!=null && graphics!=null){
+	    for(IGraphicObject gr:graphics) gr.setVisible(attribute.visible());
 	}
     }
     
     /** update weight of all graphics by the color in attribute */
     public void syncWeight(){
 	if(attribute!=null && graphics!=null){
-	    for(IGraphicObject gr:graphics) gr.setWeight(attribute.weight);
+	    for(IGraphicObject gr:graphics) gr.setWeight(attribute.weight());
 	}
     }
     
