@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2012 Satoru Sugihara
+    Copyright (c) 2002-2013 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -150,6 +150,13 @@ public class IBounds{
 		IVectorObject vobj = (IVectorObject)e;
 		compare(vobj.vec.get());
 		compare(vobj.root.get());
+	    }
+	    else if(e instanceof IText){
+		IText txt = (IText)e;
+		compare(txt.corner(0,0));
+		compare(txt.corner(1,0));
+		compare(txt.corner(0,1));
+		compare(txt.corner(1,1));
 	    }
 	}
     }

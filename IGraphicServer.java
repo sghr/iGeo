@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2012 Satoru Sugihara
+    Copyright (c) 2002-2013 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with iGeo.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 ---*/
 
 package igeo;

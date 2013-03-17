@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2012 Satoru Sugihara
+    Copyright (c) 2002-2013 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -218,5 +218,19 @@ public class IMatrix implements IMatrixI{
 	}
 	return str;
     }
+    
+    
+    public double[] toArray(boolean perRow){
+	double[] ret = new double[rowNum*columnNum];
+	for(int i=0; i<rowNum; i++){
+	    for(int j=0; j<columnNum; j++){
+		if(perRow) ret[j*rowNum+i] = val[i][j];
+		else ret[i*columnNum+j] = val[i][j];
+	    }
+	}
+	return ret;
+    }
+    
+    public double[] toArray(){ return toArray(true); }
     
 }

@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2012 Satoru Sugihara
+    Copyright (c) 2002-2013 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -354,6 +354,76 @@ public class IRhino3dm{
 	int i=1;
 	if( ((i>>>24)&0xFF) == 1) return Endian.LittleEndian;
 	return Endian.BigEndian;
+    }
+    
+    
+    public enum AnnotationType{
+	dtNothing,
+	    dtDimLinear,
+	    dtDimAligned,
+	    dtDimAngular,
+	    dtDimDiameter,
+	    dtDimRadius,
+	    dtLeader,
+	    dtTextBlock,
+	    dtDimOrdinate
+	    };
+
+    public static int annotationType(AnnotationType t){
+	switch(t){
+	case dtNothing: return 0;
+	case dtDimLinear: return 1;
+	case dtDimAligned: return 2;
+	case dtDimAngular: return 3;
+	case dtDimDiameter: return 4;
+	case dtDimRadius: return 5;
+	case dtLeader: return 6;
+	case dtTextBlock: return 7;
+	case dtDimOrdinate: return 8;
+	}
+	return 0;
+    }
+    
+    public static AnnotationType annotationType(int i){
+	switch(i){
+	case 0: return AnnotationType.dtNothing;
+	case 1: return AnnotationType.dtDimLinear;
+	case 2: return AnnotationType.dtDimAligned;
+	case 3: return AnnotationType.dtDimAngular;
+	case 4: return AnnotationType.dtDimDiameter;
+	case 5: return AnnotationType.dtDimRadius;
+	case 6: return AnnotationType.dtLeader;
+	case 7: return AnnotationType.dtTextBlock;
+	case 8: return AnnotationType.dtDimOrdinate;
+	}
+	return AnnotationType.dtNothing;
+    }
+    
+    public enum TextDisplayMode{
+	dtNormal,
+	    dtHorizontal,
+	    dtAboveLine,
+	    dtInLine
+	    };
+    
+    public static int textDisplayMode(TextDisplayMode m){
+	switch(m){
+	case dtNormal: return 0;
+	case dtHorizontal: return 1;
+	case dtAboveLine: return 2;
+	case dtInLine: return 3;
+	}
+	return 0;
+    }
+    
+    public static TextDisplayMode textDisplayMode(int i){
+	switch(i){
+	case 0: return TextDisplayMode.dtNormal;
+	case 1: return TextDisplayMode.dtHorizontal;
+	case 2: return TextDisplayMode.dtAboveLine;
+	case 3: return TextDisplayMode.dtInLine;
+	}
+	return TextDisplayMode.dtNormal;
     }
     
     
@@ -903,9 +973,6 @@ public class IRhino3dm{
 	    throw new NumberFormatException("invalid character \""+c+"\"");
 	}
 	
-	
-	
-	
     }
     
     public static class UUIDIndex{
@@ -998,6 +1065,19 @@ public class IRhino3dm{
 		    if(i==j) xform[i][j]=1.0;
 		    else xform[i][j] = 0.0;
 	}
+    }
+
+    public static class Rect{
+	int left;
+	int top;
+	int right;
+	int bottom;
+    }
+    
+    public static class Annotation2Text{
+	public String text;
+	public Rect rect;
+	Annotation2Text(String s){ text=s; }
     }
     
     
@@ -3204,9 +3284,155 @@ public class IRhino3dm{
     }
     public static class Annotation2 extends Geometry{
 	public static final String uuid = "8D820224-BC6C-46b4-9066-BF39CC13AEFB";
-
+	
+	public AnnotationType type;
+	public TextDisplayMode textDisplayMode;
+	public Plane plane;
+	//public Point2Array points;
+	public ArrayList<IVec2> points;
+	public Annotation2Text userText;
+	public boolean userPositionedText;
+	public int index = 1; // default 1?
+	public double textHeight;
+	public int justification;	
+	
 	public UUID getClassUUID(){ return new UUID(uuid); }
 	public int getType(){ return objectTypeAnnotation; }
+	
+	
+	public void read(Rhino3dmFile context, InputStream is)throws IOException{
+	    
+	    if(context.version >= 5 && context.openNurbsVersion >= 200710180){
+		Chunk chunk = readChunk(is);
+		if(chunk.header != tcodeAnonymousChunk) throw new IOException("invalid type code = "+hex(chunk.header));
+		is = new ByteArrayInputStream(chunk.content);
+		// ?
+		
+	    }
+	    else{
+		int[] version = readChunkVersion(is);
+		
+		int majorVersion = version[0];
+		int minorVersion = version[1];
+		
+		//if(majorVersion==1){ return; }
+		
+		int i;
+		i = readInt(is);
+		type = annotationType(i);
+		
+		i = readInt(is);
+		textDisplayMode = textDisplayMode(i);
+		
+		plane = readPlane(is);
+		
+		points = readArrayPoint2(is);
+		
+		String str = readString(is);
+		userText = new Annotation2Text(str);
+		
+		i = readInt(is);
+		userPositionedText = i!=0;
+		
+		index = readInt(is);
+		
+		textHeight = readDouble(is);
+		
+		/*
+		IG.debug(20,"type = "+type);
+		IG.debug(20,"displayMode = "+textDisplayMode); 
+		IG.debug(20,"plane = "+plane.toString());
+		IG.debug(20,"points.size()="+points.size());
+		IG.debug(20,"userText = "+userText.text);
+		IG.debug(20,"userPositionedText = "+userPositionedText);
+		IG.debug(20,"index = "+index);
+		IG.debug(20,"textHeight = "+textHeight);
+		*/
+		
+		switch(type){
+		case dtDimAligned:
+		case dtDimLinear:
+		    if(points.size()<5){ userPositionedText = false; }
+		    break;
+		case dtDimAngular:
+		    if(points.size() <= 0){ userPositionedText = false; }
+		    break;
+		case dtDimRadius:
+		case dtDimDiameter:
+		    if( points.size()==5){
+			points.remove(4);
+		    }
+		    userPositionedText = false;
+		    break;
+		default:
+		    userPositionedText = false;
+		}
+		
+	    }
+	}
+	
+	
+	
+	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
+	    
+	    boolean v5 = context.version >= 5;
+	    OutputStream os2 = os;
+	    CRC32 crc2 = crc;
+	    if(v5){
+		os2 = new ChunkOutputStream(tcodeAnonymousChunk, 1, 0);
+		crc2 = ((ChunkOutputStream)os2).getCRC();
+	    }
+	    else{
+		writeChunkVersion(os2, 1, 0, crc);
+	    }
+	    
+	    writeInt32(os2, annotationType(type), crc2);
+	    writeInt32(os2, textDisplayMode(textDisplayMode), crc2);
+	    writePlane(os2, plane, crc2);
+	    
+	    boolean userPosText = userPositionedText;
+	    
+	    switch(type){
+	    case dtDimAligned:
+	    case dtDimLinear:
+		if(points.size()==4){
+		    IVec2 p = new IVec2(0.5*(points.get(0).x+points.get(2).x), points.get(1).y);
+		    points.add(p);
+		    userPosText=false;
+		}
+		break;
+	    case dtDimAngular:
+		break;
+	    case dtDimRadius:
+	    case dtDimDiameter:
+		if(points.size()==4){
+		    points.add(new IVec2());
+		}
+		if(points.size()>=5){
+		    points.get(4).set(points.get(2));
+		}
+		userPosText=false;
+		break;
+	    default:
+		userPosText=false;
+	    }
+	    
+	    writeArrayPoint2(os2, points, crc2);
+	    writeString(os2, userText.text, crc2);
+	    writeInt32(os2, userPosText?1:0, crc2);
+	    writeInt32(os2, index, crc2);
+	    writeDouble(os2, textHeight, crc2);
+	    
+	    if(v5){
+		writeInt32(os2, justification, crc2);
+	    }
+	    	    
+	    if(v5){
+		writeChunk(os, ((ChunkOutputStream)os2).getChunk());
+	    }
+	    
+	}
+	
     }
     public static abstract class Curve extends Geometry{
 	public static final String uuid = "4ED7D4D7-E947-11d3-BFE5-0010830122F0";
@@ -3353,8 +3579,59 @@ public class IRhino3dm{
     }
     public static class TextEntity2 extends Annotation2{
 	public static final String uuid = "46F75541-F46B-48be-AA7E-B353BBE068A7";
+	
+	public TextEntity2(IText text){
+	    
+	    type = AnnotationType.dtTextBlock;
+	    textDisplayMode = TextDisplayMode.dtNormal;
+	    
+	    plane = new Plane();
+	    plane.origin = text.pos();
+	    plane.xaxis = text.uvec().cp().unit();
+	    plane.yaxis = text.vvec().cp().unit();
+	    plane.zaxis = text.uvec().cross(text.vvec()).unit();
+	    plane.planeEquation = new PlaneEquation(plane.zaxis,plane.origin);
+	    
+	    userText = new Annotation2Text(text.text());
+	    userPositionedText = false;
+	    index = 1; // this should be a font index number?
+	    textHeight = text.vvec().len();
+	    justification = 0; //?
+	    
+	}
+	public TextEntity2(){
+	}
+	
 	public UUID getClassUUID(){ return new UUID(uuid); }
 	//public int getType(){ return objectTypeAnnotation; }
+	
+	
+	public void read(Rhino3dmFile context, InputStream is)throws IOException{
+	    if(context.version >= 5 && context.openNurbsVersion >= 200710180){
+		
+		Chunk chunk = readChunk(is);
+		if(chunk.header != tcodeAnonymousChunk) throw new IOException("invalid type code = "+hex(chunk.header));
+		is = new ByteArrayInputStream(chunk.content);
+		super.read(context,is);
+	    }
+	    else{
+		super.read(context,is);
+	    }
+	    
+	}
+	
+	
+	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
+	    if(context.version >= 5){
+		ChunkOutputStream cos = new ChunkOutputStream(tcodeAnonymousChunk, 1, 0);
+		super.write(context, cos, cos.getCRC());
+		writeChunk(os, cos.getChunk());
+	    }
+	    else{
+		super.write(context, os, crc);
+	    }
+	}
+	
     }
     public static class Leader2 extends Annotation2{
 	public static final String uuid = "14922B7A-5B65-4f11-8345-D415A9637129";
@@ -3379,6 +3656,14 @@ public class IRhino3dm{
     
     public static class PlaneEquation{
 	public double x,y,z,d;
+	PlaneEquation(){}
+	PlaneEquation(double x, double y, double z, double d){ this.x=x; this.y=y; this.z=z; this.d=d; }
+	PlaneEquation(IVec planeNml, IVec planePt){
+	    x = planeNml.x;
+	    y = planeNml.y;
+	    z = planeNml.z;
+	    d = -planeNml.dot(planePt);
+	}
 	public String toString(){
 	    return "plane equation {"+x+","+y+","+z+","+d+"}";
 	}
@@ -4271,8 +4556,6 @@ public class IRhino3dm{
 	    int[] version = readChunkVersion(is);
 	    int majorVersion = version[0];
 	    int minorVersion = version[1];
-	    
-	    //IOut.p("majorVersion = "+majorVersion+", minorVersion = "+minorVersion); //
 	    
 	    if(majorVersion==1){
 		int count = readInt(is);
@@ -7627,6 +7910,10 @@ public class IRhino3dm{
     public static class PointArray extends ArrayList<IVec>{
 	public PointArray(){ super(); }
 	public PointArray(int c){ super(c); }
+    }
+    public static class Point2Array extends ArrayList<IVec2>{
+	public Point2Array(){ super(); }
+	public Point2Array(int c){ super(c); }
     }
     public static class Polyline extends PointArray{
 	public boolean isValid(){ return true; } // skipped

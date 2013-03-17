@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2012 Satoru Sugihara
+    Copyright (c) 2002-2013 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -273,6 +273,11 @@ public class IView{
     
     public void setScreenSize(int w, int h){ screenWidth=w; screenHeight=h; update(); }
     public void setScreenPosition(int x, int y){ screenX=x; screenY=y; }
+
+    public double getScreenWidth(){ return screenWidth; }
+    public double getScreenHeight(){ return screenHeight; }
+    public double getScreenX(){ return screenX; }
+    public double getScreenY(){ return screenY; }
     
     public double getAxonometricRatio(){ return axonRatio; }
     public double getPerspectiveRatio(){ return persRatio; }

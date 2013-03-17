@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2012 Satoru Sugihara
+    Copyright (c) 2002-2013 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -335,7 +335,8 @@ public class IRhino3dmExporter extends IRhino3dm{
 	    
 	    IObject obj = server.server().getObject(i);
 	    if(obj.isValid()){
-		Chunk objChunk = getObjectChunk(server.server().getObject(i));
+		//Chunk objChunk = getObjectChunk(server.server().getObject(i));
+		Chunk objChunk = getObjectChunk(obj);
 		
 		if(obj instanceof IMesh){ // somehow this prevent saving meshes from crashing. why!? timing of GC?
 		    IOut.debug(100,i+": chunk ="+objChunk); //
@@ -396,6 +397,9 @@ public class IRhino3dmExporter extends IRhino3dm{
 	else if(e instanceof IBrep){
 	    obj = getRhinoBrep( (IBrep)e );
 	}
+	else if(e instanceof IText){
+	    obj = getRhinoText( (IText)e );
+	}
 	
 	if(obj!=null) obj.setAttributes(new ObjectAttributes(e,context));
 	
@@ -419,6 +423,8 @@ public class IRhino3dmExporter extends IRhino3dm{
     
     static public Mesh getRhinoMesh(IMeshI mesh){ return new Mesh(mesh); }
         
+    static public TextEntity2 getRhinoText(IText text){ return new TextEntity2(text); }
+    
     public Chunk getObjectChunk(IObject e) throws IOException{
 	//IOut.p("e = "+e); //
 	
@@ -601,6 +607,23 @@ public class IRhino3dmExporter extends IRhino3dm{
     public static void writePoint2f(OutputStream os, IVec2I v, CRC32 crc) throws IOException{
 	writeFloat(os,(float)v.x(),crc);
 	writeFloat(os,(float)v.y(),crc);
+    }
+    
+    public static void writeVector(OutputStream os, IVecI v, CRC32 crc) throws IOException{
+	writePoint(os,v,crc);
+    }
+    public static void writeVector(OutputStream os, IVec2I v, CRC32 crc) throws IOException{
+	writePoint2(os,v,crc);
+    }
+    public static void writePlane(OutputStream os, Plane plane, CRC32 crc) throws IOException{
+	writePoint(os,plane.origin,crc);
+	writeVector(os,plane.xaxis,crc);
+	writeVector(os,plane.yaxis,crc);
+	writeVector(os,plane.zaxis,crc);
+	writeDouble(os,plane.planeEquation.x,crc);
+	writeDouble(os,plane.planeEquation.y,crc);
+	writeDouble(os,plane.planeEquation.z,crc);
+	writeDouble(os,plane.planeEquation.d,crc);
     }
     
     public static void writeInterval(OutputStream os, Interval interval, CRC32 crc) throws IOException{

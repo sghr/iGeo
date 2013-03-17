@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2012 Satoru Sugihara
+    Copyright (c) 2002-2013 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -383,6 +383,11 @@ public /*interface*/ class IConfig{
      * AI Export
      ************************************************************************************/
     public static double defaultAIExportScale = 0.01;
+
     
+    /*************************************************************************************
+     * Text Object Property
+     ************************************************************************************/
+    //public static int defaultFontResolution=200;
 }
-    
+
