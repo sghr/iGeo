@@ -245,16 +245,22 @@ public class IMatrix4 extends IMatrix implements IMatrix4I{
     /** applying transformation matrix to 3D vector */
     public IVec transform(IVecI v){ return mul(v); }
     
-    
-    public IMatrix3 getMatrix3(){
+    /** get matrix without translation part */
+    public IMatrix3 matrix3(){
 	return new IMatrix3(val[0][0], val[0][1], val[0][2],
 			    val[1][0], val[1][1], val[1][2],
 			    val[2][0], val[2][1], val[2][2]);
     }
+    /** alias of matrix3() */
+    public IMatrix3 getMatrix3(){ return matrix3(); }
     
-    public IVec getTranslateVector(){
+    /** get only translate vector */
+    public IVec translate(){
 	return new IVec(val[0][3], val[1][3], val[2][3]);
     }
+    /** alias of translate() */
+    public IVec getTranslateVector(){ return translate(); }
+    
     
     
     public static IMatrix4 getXRotation(double angle){

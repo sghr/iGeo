@@ -367,7 +367,7 @@ public class IObject{
     
     /** update color of all graphics by the color in attribute */
     public void syncColor(){
-	if(attribute!=null && graphics!=null){
+	if(attribute!=null && attribute.clr()!=null && graphics!=null){
 	    for(IGraphicObject gr:graphics) gr.setColor(attribute.clr());
 	}
     }
@@ -389,7 +389,7 @@ public class IObject{
     
     /** @return returns whatever Color of any graphics member. (first found) */
     public IColor clr(){
-	if(attribute!=null) return attribute.color;
+	if(attribute!=null && attribute.clr()!=null) return attribute.clr();
 	if(graphics!=null)
 	    for(IGraphicObject gr:graphics)
 		if(gr.getColor()!=null) return gr.getColor();
@@ -424,12 +424,12 @@ public class IObject{
     
     
     public IObject clr(IColor c){
+	if(c==null) return this; // if null, do nothing, don't create attribute
 	if(attribute==null) attribute = new IAttribute();
 	attribute.clr(c);
 	syncColor();
 	return this;
     }
-    
     
     /** to set color, with alpha value overwritten */
     public IObject clr(IColor c, int alpha){

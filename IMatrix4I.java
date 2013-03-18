@@ -52,6 +52,13 @@ public interface IMatrix4I extends IMatrixI, IMatrix4Op{
     /**
        same with mul(IVecI)
     */
-    public IVecI transform(IVecI m); 
+    public IVecI transform(IVecI m);
+    
+    /** get matrix without translation part */
+    public IMatrix3I matrix3();
+    /** get only translate vector */
+    public IVecI translate();
+    
+    
     
 }
