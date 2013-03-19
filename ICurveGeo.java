@@ -421,6 +421,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	knots = knots2;
 	basisFunction = basisFunction2;
 	defaultWeights = defaultWeights2;
+	
+	uSearchCache = null; // to update cache when used. // added 20130318
+	
 	return this;
     }
     
@@ -473,6 +476,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	knots = knots2;
 	basisFunction = basisFunction2;
 	defaultWeights = defaultWeights2;
+	
+	uSearchCache = null; // to update cache when used. // added 20130318
+	
 	return this;
     }
     
@@ -521,6 +527,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	knots = knots2;
 	basisFunction = basisFunction2;
 	defaultWeights = defaultWeights2;
+	
+	uSearchCache = null; // to update cache when used. // added 20130318
+	
 	return this;
     }
     
@@ -575,6 +584,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	knots = knots2;
 	basisFunction = basisFunction2;
 	defaultWeights = defaultWeights2;
+
+	uSearchCache = null; // to update cache when used. // added 20130318
+	
 	return this;
     }
     
@@ -601,6 +613,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	knots = knots2;
 	basisFunction = basisFunction2;
 	defaultWeights = defaultWeights2;
+	
+	uSearchCache = null; // to update cache when used. // added 20130318
+	
 	return this;
     }
     /** removing control point at i and rebuild the curve 
@@ -629,6 +644,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	knots = knots2;
 	basisFunction = basisFunction2;
 	defaultWeights = defaultWeights2;
+	
+	uSearchCache = null; // to update cache when used. // added 20130318
+	
 	return this;
     }
     /** removing control point from indexFrom to indexTo-1 and rebuild the curve.
@@ -659,6 +677,9 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	knots = knots2;
 	basisFunction = basisFunction2;
 	defaultWeights = defaultWeights2;
+	
+	uSearchCache = null; // to update cache when used. // added 20130318
+	
 	return this;
     }
     
@@ -668,8 +689,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	new knot vector has equal default intervals destroying original variable intervals.
     */
     //public ICurveGeo close();
-
-
+    
     
     
     public IVec ep(int i){ return pt(knots[i+degree]); }
