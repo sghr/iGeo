@@ -340,9 +340,7 @@ public class IServer implements IServerI{
     /** alias of meshes() */
     public IMesh[] getMeshes(){ return meshes(); }
     
-    /** Returns all meshe objects contained in objects.
-	IMeshR objects are not included.
-    */
+    /** Returns all brep objects contained in objects. */
     public IBrep[] breps(){
 	ArrayList<IBrep> breps = new ArrayList<IBrep>();
 	synchronized(ig){
@@ -354,6 +352,19 @@ public class IServer implements IServerI{
     }
     /** alias of breps */
     public IBrep[] getBreps(){ return breps(); }
+    
+    /** Returns all text objects contained in objects. */
+    public IText[] texts(){
+	ArrayList<IText> texts = new ArrayList<IText>();
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IText)
+		    texts.add((IText)objects.get(i));
+	}
+	return texts.toArray(new IText[texts.size()]);
+    }
+    /** alias of texts */
+    public IText[] getTexts(){ return texts(); }
     
     /** Returns all geometry objects contained in objects. */
     public IGeometry[] geometries(){
@@ -481,6 +492,20 @@ public class IServer implements IServerI{
     /** alias of brep(int) */
     public IBrep getBrep(int i){ return brep(i); }
     
+    /** Returns i-th IText object contained in objects or null if not found.
+     */
+    public IText text(int i){
+	int curIdx=0;
+	synchronized(ig){
+	    for(int j=0; j<objects.size(); j++)
+		if(objects.get(j) instanceof IText)
+		    if(i==curIdx++) return (IText)objects.get(j);
+	}
+	return null;
+    }
+    /** alias of text(int) */
+    public IText getText(int i){ return text(i); }
+    
     
     /** Returns i-th IGeometry object contained in objects or null if not found.
     */
@@ -588,6 +613,18 @@ public class IServer implements IServerI{
     }
     /** alias of brepNum() */
     public int getBrepNum(){ return brepNum(); }
+    
+    /** number of IText in objects */
+    public int textNum(){
+	int num=0;
+	synchronized(ig){
+	    for(int i=0; i<objects.size(); i++)
+		if(objects.get(i) instanceof IText) num++;
+	}
+	return num;
+    }
+    /** alias of textNum() */
+    public int getTextNum(){ return textNum(); }
     
     /** number of the IGeometry in objects */
     public int geometryNum(){

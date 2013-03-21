@@ -151,6 +151,10 @@ public class IText extends IGeometry{
 	return null;
     }
     
+    /** 
+	@param i 0 is left corner, 1 is right corner
+	@param j 0 is bottom corner, 1 is top corner
+    */
     public IVec corner(int i, int j){
 	for(int k=0; k<graphicsNum(); k++){
 	    if(getGraphic(k) instanceof ITextGraphicGL){

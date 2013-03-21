@@ -153,6 +153,7 @@ public class IOut {
 	}
     }
     
+    /** error output with prefix nor new line */
     public static void err(Object str){
 	if(errEnabled){
 	    if(printErrorPrefix){
@@ -162,7 +163,8 @@ public class IOut {
 	    err.println(str);
 	}
     }
-
+    
+    /** error output only with prefix nor new line */
     public static void err(){
 	if(errEnabled){
 	    if(printErrorPrefix){
@@ -172,6 +174,15 @@ public class IOut {
 	    err.println();
 	}
     }
+    
+    /** error output without prefix nor new line */
+    public static void error(Object str){
+	if(errEnabled){
+	    err.print(str);
+	}
+    }
+    
+    
     
     /**
        @param stackOffset offset of the depth of stack of calling subroutines, to controll what subroutine name to be printed

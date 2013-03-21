@@ -115,8 +115,12 @@ public class ITextGraphicGL extends IGraphicObject{
 	}
     }
     
+    /** 
+	@param i 0 is left corner, 1 is right corner
+	@param j 0 is bottom corner, 1 is top corner
+    */
     public IVec corner(int i, int j){
-	//if(renderer==null) initText(); ?
+	if(renderer==null) initText(); // is this ok?
 	
 	IVec corner = text.pos().cp();
 	if(i==0){
@@ -129,13 +133,20 @@ public class ITextGraphicGL extends IGraphicObject{
 	}
 	
 	if(j==0){
-	    if(text.isAlignMiddle()){ corner.add(text.vvec(),-textHeight/2); }
-	    else if(text.isAlignBottom()){ corner.add(text.vvec(),-textHeight); }
+	    if(text.isAlignTop()){ corner.add(text.vvec(),-textHeight); }
+	    else if(text.isAlignMiddle()){ corner.add(text.vvec(),-textHeight/2); }
+	    
+	    //if(text.isAlignMiddle()){ corner.add(text.vvec(),-textHeight/2); }
+	    //else if(text.isAlignBottom()){ corner.add(text.vvec(),-textHeight); }
 	}
 	else{
-	    if(text.isAlignTop()){ corner.add(text.vvec(),textHeight); }
-	    else if(text.isAlignMiddle()){ corner.add(text.vvec(),textHeight/2); }
+	    if(text.isAlignMiddle()){ corner.add(text.vvec(),textHeight/2); }
+	    else if(text.isAlignBottom()){ corner.add(text.vvec(),textHeight); }
+	    
+	    //if(text.isAlignTop()){ corner.add(text.vvec(),textHeight); }
+	    //else if(text.isAlignMiddle()){ corner.add(text.vvec(),textHeight/2); }
 	}
+	
 	return corner;
     }
     

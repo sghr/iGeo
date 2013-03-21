@@ -1077,7 +1077,26 @@ public class IRhino3dm{
     public static class Annotation2Text{
 	public String text;
 	public Rect rect;
-	Annotation2Text(String s){ text=s; }
+	public Annotation2Text(String s){ 
+	    //text=s;
+	    text = insertCRToLF(s);
+	}
+	public String insertCRToLF(String s){
+	    if(s==null) return s;
+	    String out = "";
+	    int start = 0;
+	    int idx = s.indexOf("\n", start);
+	    while(idx>=0 && idx<s.length() && start<s.length()){
+		out+=s.substring(start, idx);
+		if(idx==0 || idx>0 && s.charAt(idx-1)!='\r'){ out+="\r"; }
+		out+="\n";
+		start = idx+1;
+		if(start<s.length()){ idx = s.indexOf("\n", start); }
+		else{ idx=-1; }
+	    }
+	    if(idx<0 && start<s.length()){ out+=s.substring(start); }
+	    return out;
+	}
     }
     
     
@@ -3306,68 +3325,68 @@ public class IRhino3dm{
 		Chunk chunk = readChunk(is);
 		if(chunk.header != tcodeAnonymousChunk) throw new IOException("invalid type code = "+hex(chunk.header));
 		is = new ByteArrayInputStream(chunk.content);
-		// ?
+		
 		
 	    }
 	    else{
+		
 		int[] version = readChunkVersion(is);
 		
 		int majorVersion = version[0];
 		int minorVersion = version[1];
 		
-		//if(majorVersion==1){ return; }
+		if(majorVersion!=1){ return; }
 		
-		int i;
-		i = readInt(is);
-		type = annotationType(i);
-		
-		i = readInt(is);
-		textDisplayMode = textDisplayMode(i);
-		
-		plane = readPlane(is);
-		
-		points = readArrayPoint2(is);
-		
-		String str = readString(is);
-		userText = new Annotation2Text(str);
-		
-		i = readInt(is);
-		userPositionedText = i!=0;
-		
-		index = readInt(is);
-		
-		textHeight = readDouble(is);
-		
-		/*
-		IG.debug(20,"type = "+type);
-		IG.debug(20,"displayMode = "+textDisplayMode); 
-		IG.debug(20,"plane = "+plane.toString());
-		IG.debug(20,"points.size()="+points.size());
-		IG.debug(20,"userText = "+userText.text);
-		IG.debug(20,"userPositionedText = "+userPositionedText);
-		IG.debug(20,"index = "+index);
-		IG.debug(20,"textHeight = "+textHeight);
-		*/
-		
-		switch(type){
-		case dtDimAligned:
-		case dtDimLinear:
-		    if(points.size()<5){ userPositionedText = false; }
-		    break;
-		case dtDimAngular:
-		    if(points.size() <= 0){ userPositionedText = false; }
-		    break;
-		case dtDimRadius:
-		case dtDimDiameter:
-		    if( points.size()==5){
-			points.remove(4);
-		    }
-		    userPositionedText = false;
-		    break;
-		default:
-		    userPositionedText = false;
+	    }
+	    
+	    int i;
+	    i = readInt(is);
+	    type = annotationType(i);
+	    
+	    i = readInt(is);
+	    textDisplayMode = textDisplayMode(i);
+	    
+	    plane = readPlane(is);
+	    
+	    points = readArrayPoint2(is);
+	    
+	    String str = readString(is);
+	    userText = new Annotation2Text(str);
+	    
+	    i = readInt(is);
+	    userPositionedText = i!=0;
+	    
+	    index = readInt(is);
+	    textHeight = readDouble(is);
+	    
+	    /*
+	      IG.debug(20,"type = "+type);
+	      IG.debug(20,"displayMode = "+textDisplayMode); 
+	      IG.debug(20,"plane = "+plane.toString());
+	      IG.debug(20,"points.size()="+points.size());
+	      IG.debug(20,"userText = "+userText.text);
+	      IG.debug(20,"userPositionedText = "+userPositionedText);
+	      IG.debug(20,"index = "+index);
+	      IG.debug(20,"textHeight = "+textHeight);
+	    */
+	    
+	    switch(type){
+	    case dtDimAligned:
+	    case dtDimLinear:
+		if(points.size()<5){ userPositionedText = false; }
+		break;
+	    case dtDimAngular:
+		if(points.size() <= 0){ userPositionedText = false; }
+		break;
+	    case dtDimRadius:
+	    case dtDimDiameter:
+		if( points.size()==5){
+		    points.remove(4);
 		}
-		
+		userPositionedText = false;
+		break;
+	    default:
+		userPositionedText = false;
 	    }
 	}
 	
@@ -3586,7 +3605,10 @@ public class IRhino3dm{
 	    textDisplayMode = TextDisplayMode.dtNormal;
 	    
 	    plane = new Plane();
-	    plane.origin = text.pos();
+	    
+	    
+	    //plane.origin = text.pos();
+	    plane.origin = text.corner(0,1).sub(text.vvec()); // left bottom of first line.
 	    plane.xaxis = text.uvec().cp().unit();
 	    plane.yaxis = text.vvec().cp().unit();
 	    plane.zaxis = text.uvec().cross(text.vvec()).unit();
@@ -3599,12 +3621,29 @@ public class IRhino3dm{
 	    justification = 0; //?
 	    
 	}
+	
 	public TextEntity2(){
 	}
 	
 	public UUID getClassUUID(){ return new UUID(uuid); }
 	//public int getType(){ return objectTypeAnnotation; }
 	
+	public IObject createIObject(Rhino3dmFile context, IServerI s){
+	    if(type == AnnotationType.dtTextBlock &&plane!=null && userText.text!=null){
+		//index; // font type; to be implemented later
+		
+		// rhino text origin is at the left bottom of th first line; it seems line height is not necessarily same with textHeight.
+		plane.origin.add(plane.yaxis.cp().len(textHeight)); 
+		
+		IText text = new IText(userText.text, textHeight, plane.origin, plane.xaxis, plane.yaxis);
+		text.alignLeft();
+		text.alignTop();
+		return text;
+	    }
+	    return null;
+	}
+	
+
 	
 	public void read(Rhino3dmFile context, InputStream is)throws IOException{
 	    if(context.version >= 5 && context.openNurbsVersion >= 200710180){

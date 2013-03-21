@@ -50,8 +50,8 @@ public class IG implements IServerI{
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 8; }
     public static int buildVersion(){ return 2; }
-    public static int revisionVersion(){ return 3; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 03, 18); }
+    public static int revisionVersion(){ return 4; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2013, 03, 20); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -382,11 +382,15 @@ public class IG implements IServerI{
     public static IBrep[] breps(){
 	IG ig = cur(); return ig==null?null:ig.getBreps();
     }
-    /** get all breps in the current server */
+    /** get all texts in the current server */
+    public static IText[] texts(){
+	IG ig = cur(); return ig==null?null:ig.getTexts();
+    }
+    /** get all geometry objects in the current server */
     public static IGeometry[] geometries(){
 	IG ig = cur(); return ig==null?null:ig.getGeometries();
     }
-    /** get all breps in the current server */
+    /** get all geometry objects in the current server */
     public static IGeometry[] geos(){ return geometries(); }
     
     /** get all objects of the specified class in the current server */
@@ -447,6 +451,11 @@ public class IG implements IServerI{
 	IG ig = cur(); return ig==null?null:ig.getBrep(i);
     }
 
+    /** get a text in the current server */
+    public static IText text(int i){
+	IG ig = cur(); return ig==null?null:ig.getText(i);
+    }
+    
     /** get a geometry in the current server */
     public static IGeometry geometry(int i){
 	IG ig = cur(); return ig==null?null:ig.getGeometry(i);
@@ -509,6 +518,10 @@ public class IG implements IServerI{
     /** number of breps in the current server */
     public static int brepNum(){
 	IG ig = cur(); return ig==null?0:ig.getBrepNum();
+    }
+    /** number of texts in the current server */
+    public static int textNum(){
+	IG ig = cur(); return ig==null?0:ig.getTextNum();
     }
     /** number of geometries in the cubrrent server */
     public static int geometryNum(){
@@ -1116,21 +1129,36 @@ public class IG implements IServerI{
     
     
     
-    /** Print method.
+    /** Print method with header and new line.
 	This is a wrapper of IOut.p(), which is 
-	also a wrapper of System.out.println() in most part.
+	also a wrapper of System.out.println().
     */
     public static void p(Object obj){ IOut.printlnWithOffset(obj,1); }
+    /** Print method only with header and new line. */
     public static void p(){ IOut.printlnWithOffset(1); }
+    
+    /** Print method without header nor new line
+	This is a wrapper of IOut.p(), which is 
+	also a wrapper of System.out.print().
+    */
+    public static void print(Object obj){ IOut.print(obj); }
+    
+    /** enable print prefix (executing method name)*/
     public static void enabePrintPrefix(){ IOut.enablePrefix(); }
+    /** disble print prefix (executing method name)*/
     public static void disablePrintPrefix(){ IOut.disablePrefix(); }
     
-    /** Error print method.
-	This is a wrapper of IOut.err()
-    */
+    /** Error print method with header and new line.
+	This is a wrapper of IOut.err() */
     public static void err(Object obj){ IOut.errWithOffset(obj,1); }
+    /** Error print method only with header and new line. */
     public static void err(){ IOut.errWithOffset(1); }
+    /** Error print method without header nor new line. */
+    public static void error(Object obj){ IOut.error(obj); }
+    
+    /** enable error print prefix (executing method name)*/
     public static void enabeErrorPrefix(){ IOut.enablePrefix(); }
+    /** disable error print prefix (executing method name)*/
     public static void disableErrorPrefix(){ IOut.disablePrefix(); }
     
     /** change the debug level of IOut */
@@ -1220,6 +1248,7 @@ public class IG implements IServerI{
     public ISurface[] getSurfaces(){ return server.surfaces(); }
     public IMesh[] getMeshes(){ return server.meshes(); }
     public IBrep[] getBreps(){ return server.breps(); }
+    public IText[] getTexts(){ return server.texts(); }
     public IGeometry[] getGeometries(){ return server.geometries(); }
     public IObject[] getObjects(Class cls){ return server.objects(cls); }
     public IObject[] getObjects(){ return server.objects(); }
@@ -1230,6 +1259,7 @@ public class IG implements IServerI{
     public ISurface getSurface(int i){ return server.surface(i); }
     public IMesh getMesh(int i){ return server.mesh(i); }
     public IBrep getBrep(int i){ return server.brep(i); }
+    public IText getText(int i){ return server.text(i); }
     public IGeometry getGeometry(int i){ return server.geometry(i); }
     public IObject getObject(Class cls,int i){ return server.object(cls,i); }
     public IObject getObject(int i){ return server.object(i); }
@@ -1240,6 +1270,7 @@ public class IG implements IServerI{
     public int getSurfaceNum(){ return server.surfaceNum(); }
     public int getMeshNum(){ return server.meshNum(); }
     public int getBrepNum(){ return server.brepNum(); }
+    public int getTextNum(){ return server.textNum(); }
     public int getGeometryNum(){ return server.geometryNum(); }
     public int getObjectNum(Class cls){ return server.objectNum(cls); }
     public int getObjectNum(){ return server.objectNum(); }
