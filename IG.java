@@ -50,8 +50,8 @@ public class IG implements IServerI{
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 8; }
     public static int buildVersion(){ return 2; }
-    public static int revisionVersion(){ return 4; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 03, 20); }
+    public static int revisionVersion(){ return 5; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2013, 03, 29); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
