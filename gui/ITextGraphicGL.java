@@ -69,10 +69,14 @@ public class ITextGraphicGL extends IGraphicObject{
 	textHeight = (float)textHeight(lines);
     }
     
-    public String[] lines(){ return text.text().split("\n"); }
+    public String[] lines(){
+	if(text==null || text.text()==null) return null;
+	return text.text().split("\n");
+    }
     
     public double textWidth(String[] lines){
 	if(renderer==null) renderer = new TextRenderer(font, true, true);
+	if(lines==null) return 0;
 	double maxWidth=0;
 	for(int i=0; i<lines.length; i++){
 	    Rectangle2D bounds = renderer.getBounds(lines[i]);
@@ -81,7 +85,7 @@ public class ITextGraphicGL extends IGraphicObject{
 	return maxWidth/renderer.getFont().getSize();
     }
     
-    public double textHeight(String[] lines){ return lines.length; }
+    public double textHeight(String[] lines){ if(lines==null){ return 0; } return lines.length; }
     
     synchronized public void draw(IGraphics g){
 	if(text.text()==null) return;
@@ -121,6 +125,8 @@ public class ITextGraphicGL extends IGraphicObject{
     */
     public IVec corner(int i, int j){
 	if(renderer==null) initText(); // is this ok?
+	
+	if(text==null) return null;
 	
 	IVec corner = text.pos().cp();
 	if(i==0){

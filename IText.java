@@ -158,7 +158,8 @@ public class IText extends IGeometry{
     public IVec corner(int i, int j){
 	for(int k=0; k<graphicsNum(); k++){
 	    if(getGraphic(k) instanceof ITextGraphicGL){
-		return ((ITextGraphicGL)getGraphic(k)).corner(i,j);
+		IVec c = ((ITextGraphicGL)getGraphic(k)).corner(i,j);
+		if(c!=null) return c;
 	    }
 	}
 	return pos().cp();

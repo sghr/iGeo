@@ -640,9 +640,123 @@ public class IMeshCreator{
     
     
     // sphere
+    
+    /** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+     @param sideDir length of vector is radius in holizontal direction. sideDir is re-orthogonalized to topDir
+    */
+    public static IMesh sphere(IVecI center, IVecI topDir, IVecI sideDir, int resolution){
+	double topRadius = topDir.len();
+	double sideRadius = sideDir.len();
+	IVec top = topDir.get();
+	IVec side2 = topDir.get().cross(sideDir); // other side dir
+	IVec side1 = side2.cross(topDir).len(sideRadius); // re-orthogonalized side dir
+	
+	int unum = resolution;
+	int vnum = (resolution+1)/2;
+	IVertex[][] vtx = new IVertex[unum][vnum+1];
+	for(int j=0; j<=vnum; j++){
+	    if(j==0){
+		IVertex v = new IVertex(top.cp(center));
+		for(int i=0; i<unum; i++){ vtx[i][j] = v; }
+	    }
+	    else if(j==vnum){
+		IVertex v = new IVertex(top.cp().neg().add(center));
+		for(int i=0; i<unum; i++){ vtx[i][j] = v; }
+	    }
+	    else{
+		double phi = Math.PI/vnum*j;
+		for(int i=0; i<unum; i++){
+		    double theta = 2*Math.PI/unum*i;
+		    vtx[i][j] = new IVertex(top.cp().rot(side2,phi).scale1d(side1,sideRadius/topRadius).rot(top,theta).add(center));
+		}
+	    }
+	}
+	
+	IMesh mesh = new IMesh(server);
+	for(int j=0; j<vnum; j++){
+	    for(int i=0; i<unum; i++){
+		if(j==0){ // triangle
+		    mesh.addFace(new IFace(vtx[0][j], vtx[i][j+1], vtx[(i+1)%unum][j+1]));
+		}
+		else if(j==vnum-1){ // triangle
+		    mesh.addFace(new IFace(vtx[i][j], vtx[0][j+1], vtx[(i+1)%unum][j] ));
+		}
+		else{ // quad
+		    mesh.addFace(new IFace(vtx[i][j], vtx[i][j+1], vtx[(i+1)%unum][j+1], vtx[(i+1)%unum][j]));
+		}
+	    }
+	}
+	return mesh;
+    }
+    
+    /** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+     @param sideDir length of vector is radius in holizontal direction. sideDir is re-orthogonalized to topDir
+    */
+    public static IMesh sphere(IVecI center, IVecI topDir, IVecI sideDir){
+	return sphere(center,topDir,sideDir,IConfig.meshCircleResolution);
+    }
+    
+    /** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+    */
+    public static IMesh sphere(IVecI center, IVecI topDir, int resolution){
+	IVec sideDir = new IVec(topDir.len(),0,0);
+	if(sideDir.isParallel(topDir)){ sideDir = new IVec(0,topDir.len(),0); }
+	return sphere(center,topDir,sideDir,resolution);
+    }
+    
+    
+    /** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+    */
+    public static IMesh sphere(IVecI center, IVecI topDir){
+	return sphere(center,topDir,IConfig.meshCircleResolution);
+    }
+    
+    /** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+    */
+    public static IMesh sphere(IVecI center, IVecI topDir, double radius, int resolution){
+	return sphere(center,topDir,radius,radius,resolution);
+    }
+    public static IMesh sphere(IVecI center, IVecI topDir, double topRadius, double sideRadius, int resolution){
+	IVec topD = topDir.get().cp().len(topRadius);
+	IVec sideDir = new IVec(sideRadius,0,0);
+	if(sideDir.isParallel(topDir)){ sideDir = new IVec(0,sideRadius,0); }
+	return sphere(center,topD,sideDir,resolution);
+    }
+    
+    public static IMesh sphere(IVecI center, IVecI topDir, double radius){
+	return sphere(center,topDir,radius,IConfig.meshCircleResolution);
+    }
+    public static IMesh sphere(IVecI center, IVecI topDir, double topRadius, double sideRadius){
+	return sphere(center,topDir,topRadius,sideRadius,IConfig.meshCircleResolution);
+    }
+    
+    public static IMesh sphere(IVecI center, double radius, int resolution){
+	return sphere(center,new IVec(0,0,radius),new IVec(radius,0,0),resolution);
+    }
+    public static IMesh sphere(IVecI center, double radius){
+	return sphere(center,radius,IConfig.meshCircleResolution);
+    }
+    
+    public static IMesh sphere(IVecI center, double zradius, double xyradius, int resolution){
+	return sphere(center,new IVec(0,0,zradius),new IVec(xyradius,0,0),resolution);
+    }
+    public static IMesh sphere(IVecI center, double zradius, double xyradius){
+	return sphere(center,zradius,xyradius,IConfig.meshCircleResolution);
+    }
+    
+    
+    
     // pipe, cylinder
     // rectPipe, squarePipe, polygonPipe
     // stick, roundStick(==stick), rectStick, squareStick, polygonStick
+    
+    
+    
     
 
     public static IVec[] polygonProfile(IVecI center, IVecI normal, IVecI rollDir,

@@ -50,8 +50,8 @@ public class IG implements IServerI{
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 8; }
     public static int buildVersion(){ return 2; }
-    public static int revisionVersion(){ return 5; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 03, 29); }
+    public static int revisionVersion(){ return 6; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2013, 04, 1); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -2535,6 +2535,76 @@ public class IG implements IServerI{
     }
     public static IMesh meshBox(IVecI[][][] corners){ return IMeshCreator.box(corners); }
     public static IMesh meshBox(IVertex[][][] corners){ return IMeshCreator.box(corners); }
+
+
+
+
+/** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+     @param sideDir length of vector is radius in holizontal direction. sideDir is re-orthogonalized to topDir
+*/
+    public static IMesh meshSphere(IVecI center, IVecI topDir, IVecI sideDir, int resolution){
+	return IMeshCreator.sphere(center,topDir,sideDir,resolution);
+    }
+    
+    /** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+     @param sideDir length of vector is radius in holizontal direction. sideDir is re-orthogonalized to topDir
+    */
+    public static IMesh meshSphere(IVecI center, IVecI topDir, IVecI sideDir){
+	return IMeshCreator.sphere(center,topDir,sideDir);
+    }
+    
+    /** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+    */
+    public static IMesh meshSphere(IVecI center, IVecI topDir, int resolution){
+	return IMeshCreator.sphere(center,topDir,resolution);
+    }
+    
+    
+    /** mesh sphere
+     @param topDir length of vector is radius in vertical direction
+    */
+    public static IMesh meshSphere(IVecI center, IVecI topDir){
+	return IMeshCreator.sphere(center,topDir);
+    }
+    
+    /** mesh sphere */
+    public static IMesh meshSphere(IVecI center, IVecI topDir, double radius, int resolution){
+	return IMeshCreator.sphere(center,topDir,radius,resolution);
+    }
+    /** mesh sphere */
+    public static IMesh meshSphere(IVecI center, IVecI topDir, double topRadius, double sideRadius, int resolution){
+	return IMeshCreator.sphere(center,topDir,topRadius,sideRadius,resolution);
+    }
+    
+    /** mesh sphere */
+    public static IMesh meshSphere(IVecI center, IVecI topDir, double radius){
+	return IMeshCreator.sphere(center,topDir,radius);
+    }
+    /** mesh sphere */
+    public static IMesh meshSphere(IVecI center, IVecI topDir, double topRadius, double sideRadius){
+	return IMeshCreator.sphere(center,topDir,topRadius,sideRadius);
+    }
+    /** mesh sphere */
+    public static IMesh meshSphere(IVecI center, double radius, int resolution){
+	return IMeshCreator.sphere(center,radius,resolution);
+    }
+    /** mesh sphere */
+    public static IMesh meshSphere(IVecI center, double radius){
+	return IMeshCreator.sphere(center,radius);
+    }
+    /** mesh sphere */
+    public static IMesh meshSphere(IVecI center, double zradius, double xyradius, int resolution){
+	return IMeshCreator.sphere(center,zradius,xyradius,resolution);
+    }
+    /** mesh sphere */
+    public static IMesh meshSphere(IVecI center, double zradius, double xyradius){
+	return IMeshCreator.sphere(center,zradius,xyradius);
+    }
+    
+
     
     public static IMesh meshRectStick(IVecI pt1, IVecI pt2, IVecI udir, IVecI vdir){
 	return IMeshCreator.rectStick(pt1,pt2,udir,vdir);
