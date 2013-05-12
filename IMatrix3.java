@@ -193,6 +193,17 @@ public class IMatrix3 extends IMatrix implements IMatrix3I{
 	     a.x*a.z*ic-a.y*s, a.y*a.z*ic+a.x*s, a.z*a.z*ic+c);
     }
     
+    public static IMatrix3 getTranslate(double x, double y){
+	return new IMatrix3(1,0,x,
+			    0,1,y,
+			    0,0,1);
+
+    }
+    public static IMatrix3 getTranslate(IVec p){
+	return new IMatrix3(1,0,p.x,
+			    0,1,p.y,
+			    0,0,1);
+    }
     
     
 }

@@ -99,7 +99,7 @@ public class IAttribute{
     public IAttribute visible(boolean v){ visible=v; return this; }
     public boolean visible(){ return visible; }
     public boolean isVisible(){ return visible(); }
-
+    
     public Color color(){ return color.awt(); }
     public Color awtColor(){ return color(); }
     
@@ -161,4 +161,16 @@ public class IAttribute{
     
     public IAttribute setWeight(float w){ return weight(w); }
     
+    
+    public String toString(){
+	return "id="+id+
+	    ", name="+name+
+	    ", layer="+layer+
+	    ", color="+color+
+	    ", stroke="+stroke+
+	    ", size="+size+
+	    ", weight="+weight+
+	    ", material="+material+
+	    ", visible="+visible;
+    }
 }

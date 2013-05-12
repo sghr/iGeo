@@ -700,8 +700,8 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	    return null;
 	}
 	
-	IVec2 isct = intersect(line1pt1, line1pt2.get().diff(line1pt1),
-				line2pt1, line2pt2.get().diff(line2pt1));
+	IVec2 isct = intersect(line1pt1, line1pt2.get().dif(line1pt1),
+				line2pt1, line2pt2.get().dif(line2pt1));
 
 	if(isct==null) return null;
 
@@ -732,7 +732,7 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 						  double y){
 	if(Math.max(linePt1.y(),linePt2.y()) < y ||
 	   Math.min(linePt1.y(),linePt2.y()) > y ) return null;
-	IVec2 diff = linePt2.get().diff(linePt1);
+	IVec2 diff = linePt2.get().dif(linePt1);
 	if(diff.y==0) return linePt1.get().dup();
 	diff.mul((y-linePt1.y())/diff.y);
 	diff.add(linePt1);
@@ -743,7 +743,7 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 						  double x){
 	if(Math.max(linePt1.x(),linePt2.x()) < x ||
 	   Math.min(linePt1.x(),linePt2.x()) > x ) return null;
-	IVec2 diff = linePt2.get().diff(linePt1);
+	IVec2 diff = linePt2.get().dif(linePt1);
 	if(diff.x==0) return linePt1.get().dup();
 	diff.mul((x-linePt1.x())/diff.x);
 	diff.add(linePt1);
@@ -800,8 +800,8 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	double angle=0;
 	int n = pts.length;
 	for(int i=0; i<n; i++){
-	    IVec2 v1 = pts[i].get().diff(this);
-	    IVec2 v2 = pts[(i+1)%n].get().diff(this);
+	    IVec2 v1 = pts[i].get().dif(this);
+	    IVec2 v2 = pts[(i+1)%n].get().dif(this);
 	    double a = v1.angle(v2);
 	    if( Math.abs(a-Math.PI) < IConfig.angleTolerance ||
 		Math.abs(a+Math.PI) < IConfig.angleTolerance ||
@@ -836,8 +836,8 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	double angle=0;
 	int n = pts.length;
 	for(int i=0; i<n; i++){
-	    IVec2 v1 = pts[i].diff(this);
-	    IVec2 v2 = pts[(i+1)%n].diff(this);
+	    IVec2 v1 = pts[i].dif(this);
+	    IVec2 v2 = pts[(i+1)%n].dif(this);
 	    
 	    double a = v1.angle(v2);
 	    if( Math.abs(a-Math.PI) < IConfig.angleTolerance ||
@@ -885,8 +885,8 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     }
     
     public boolean isBetween(IVec2I pt1, IVec2I pt2){
-	IVec2 diff1 = diff(pt1);
-	IVec2 diff2 = pt2.get().diff(pt1);
+	IVec2 diff1 = dif(pt1);
+	IVec2 diff2 = pt2.get().dif(pt1);
 	double ip = diff1.dot(diff2);
 	if(ip<0) return false;
 	if(ip>diff2.len2()) return false;

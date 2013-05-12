@@ -705,17 +705,19 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     /** parametrically mid point of a curve */
     public IVec mid(){ return pt(0.5); }
     
-    /** returns center of geometry object */
+    /** Returns center of geometry object.
+	This is approximation calculated only by control points */
     public IVec center(){
 	int count = cpNum();
+	
 	// check if it's closed and having overlapping control points
-	if(knots[0] != 0.0 || knots[knots.length-1] != 1.0){
-	    // check by cp
-	    if(cp(0).eq(cp(cpNum()-deg()))){ count = cpNum()-deg(); }
-	}
-	else if(cp(0).eq(cp(cpNum()-1))){
-	    count = cpNum()-1;
-	}
+	//if(knots[0] != 0.0 || knots[knots.length-1] != 1.0){
+	//    if(cp(0).eq(cp(cpNum()-deg()))){ count = cpNum()-deg(); }// check by cp
+	//}
+	//else if(cp(0).eq(cp(cpNum()-1))){ count = cpNum()-1; }
+	
+	if(isClosed()){ count -= overlapCPNum(); }
+	
 	// calc average of control points
 	IVec cnt = new IVec();
 	for(int i=0; i<count; i++){ cnt.add(cp(i)); }
@@ -863,13 +865,15 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
 	*/
 	//if(knots[0] != 0.0 || knots[knots.length-1] != 1.0) knotsEndMatch=false;
 	
+	/*
+	//this is not necessarily true. sometimes just the end points match with non standard knots and non overlapping control points
 	if(knots[0] != 0.0 || knots[knots.length-1] != 1.0){
 	    // check by cp
 	    //if(cp(0).eq(cp(cpNum()-1))) return true;
 	    if(cp(0).eq(cp(cpNum()-degree))) return true; // added 20120310
 	    return false;
 	}
-	
+	*/
 	// check by ep
 	//if(ep(0).eq(ep(epNum()-1))) return true;
 	//return true;
@@ -881,7 +885,7 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
     public boolean isClosed(ISwitchE e){ return isClosed(); }
     public IBool isClosed(ISwitchR r){ return new IBool(isClosed()); }
-
+    
     public ICurveGeo rev(){
 	synchronized(IG.lock){
 	    IVecI[] cpts2 = new IVecI[controlPoints.length];
@@ -920,6 +924,22 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     public ICurveGeo revU(){ return rev(); }
     /** alias of rev() */
     public ICurveGeo flipU(){ return rev(); }
+
+
+    /**
+       number of overlapping control points at the end and the beginning when the curve is closed.
+       this should be used after checking curve is closed. if it's open it checks all the control points.
+    */
+    public int overlapCPNum(){
+	int i=0;
+	for(; i<num()-1 && !cp(i).eq(cp(num()-1)); i++);
+	// each point of overlapping sequence needs to be all matching.
+	if(i>=num()-1) return 0; // none matches
+	for(int j=0; j<i; j++){
+	    if(!cp(j).eq(cp(num()-1-i+j))) return 0; // one of them not matching -> 0
+	}
+	return i+1;
+    }
     
     
     /** check if the input point is inside a closed curve. if not closed, it supposes closed by connecting the start and end point */

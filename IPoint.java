@@ -479,6 +479,12 @@ public class IPoint extends IGeometry implements IVecI{
 	return pos.toString();
     }
     
+    /** default setting in each object class; to be overridden in a child class */
+    public IAttribute defaultAttribute(){
+	IAttribute a = new IAttribute();
+	a.weight = IConfig.pointSize;
+	return a;
+    }
     
     /** set size of dot in graphic ; it's just alias of weight() */
     synchronized public IPoint setSize(double sz){ return weight(sz); }

@@ -66,6 +66,8 @@ public class IMatrix implements IMatrixI{
 	    for(int j=0; j<columnNum; j++) val[i][j] = 0;
 	return this;
     }
+
+    public IMatrix zero(){ return setZero(); }
     
     public /*void*/ IMatrix setId(){
 	for(int i=0; i<rowNum; i++)
@@ -74,6 +76,9 @@ public class IMatrix implements IMatrixI{
 		else val[i][j] = 0;
 	return this;
     }
+    
+    public IMatrix id(){ return setId(); }
+    
     
     public double get(int row, int column){ return val[row][column]; }
     //public IDouble getR(IIntegerI row, IIntegerI column){ return new IDouble(get(row.x(),column.x())); }
@@ -167,7 +172,7 @@ public class IMatrix implements IMatrixI{
     
     
     /**
-       currently mul returns new instance different from this.
+       currently mul returns new instance different from this with different row x column num.
        but it should change the content without generating new instance.
     */
     public IMatrix mul(IMatrix m){

@@ -321,7 +321,8 @@ public class IView{
     
     public double distanceToTarget(){
 	//return(Math.sqrt((tx-x)*(tx-x)+(ty-y)*(ty-y)+(tz-z)*(tz-z)));
-	return target.diff(pos).len();
+	//return target.diff(pos).len();
+	return target.dist(pos);
     }
     
     public void set(double x, double y, double z){ setLocation(x,y,z); }

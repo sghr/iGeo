@@ -264,7 +264,7 @@ public class IObject{
 	return null;
     }
     public IObject name(String name){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute(); 
 	attribute.name = name;
 	return this;
     }
@@ -283,7 +283,7 @@ public class IObject{
 	}
 	else{
 	    if(attribute==null){
-		attribute = new IAttribute();
+		attribute = defaultAttribute();
 		if(!l.contains(this)) l.add(this);
 		attribute.layer = l;
 	    }
@@ -323,6 +323,11 @@ public class IObject{
     public IObject attr(IObject obj){ if(obj!=null && obj.attr()!=null) attr(obj.attr().dup()); return this; }
     
     
+    /** default setting in each object class; to be overridden in a child class */
+    public IAttribute defaultAttribute(){
+	return new IAttribute();
+    }
+    
     /** get user's custom data */
     public Object userData(){ return userData; }
     /** set user's custom data */
@@ -334,7 +339,7 @@ public class IObject{
     
     
     public boolean visible(){
-	//if(attribute==null) attribute=new IAttribute(); // default true?
+	//if(attribute==null) attribute=defaultAttribute(); // default true?
 	//return attribute.visible;
 	//if(graphics==null) return false; // some objects like agent which have no graphics but as attributes it's visible
 	if(attribute!=null) return attribute.visible();
@@ -345,7 +350,7 @@ public class IObject{
     
     public IObject hide(){
 	if(graphics!=null) for(IGraphicObject gr:graphics) gr.hide();
-	if(attribute==null) attribute=new IAttribute();
+	if(attribute==null) attribute=defaultAttribute();
 	//attribute.visible=false;
 	attribute.hide();
 	return this;
@@ -354,7 +359,7 @@ public class IObject{
     public IObject show(){
 
 	if(graphics!=null) for(IGraphicObject gr:graphics) gr.show();
-	if(attribute==null) attribute=new IAttribute();
+	if(attribute==null) attribute=defaultAttribute();
 	//attribute.visible=true;
 	attribute.show();
 	return this;
@@ -425,7 +430,7 @@ public class IObject{
     
     public IObject clr(IColor c){
 	if(c==null) return this; // if null, do nothing, don't create attribute
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(c);
 	syncColor();
 	return this;
@@ -433,14 +438,14 @@ public class IObject{
     
     /** to set color, with alpha value overwritten */
     public IObject clr(IColor c, int alpha){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(c,alpha);
 	syncColor();
 	return this;
     }
     /** to set color, with alpha value overwritten */
     public IObject clr(IColor c, float alpha){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(c,alpha);
 	syncColor();
 	return this;
@@ -473,7 +478,7 @@ public class IObject{
     
     
     public IObject clr(int gray){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(gray);
 	syncColor();
 	return this;
@@ -481,91 +486,91 @@ public class IObject{
     
     
     public IObject clr(double dgray){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(dgray);
 	syncColor();
 	return this;
     }
     public IObject clr(float fgray){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(fgray);
 	syncColor();
 	return this;
     }
     public IObject clr(int gray, int alpha){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(gray,alpha);
 	syncColor();
 	return this;
     }
     public IObject clr(double dgray, double dalpha){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(dgray, dalpha);
 	syncColor();
 	return this;
     }
     public IObject clr(float fgray, float falpha){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(fgray, falpha);
 	syncColor();
 	return this;
     }
     public IObject clr(int r, int g, int b){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(r,g,b);
 	syncColor();
 	return this;
     }
     public IObject clr(double dr, double dg, double db){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(dr,dg,db);
 	syncColor();
 	return this;
     }
     public IObject clr(float fr, float fg, float fb){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(fr,fg,fb);
 	syncColor();
 	return this;
     }
     public IObject clr(int r, int g, int b, int a){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(r,g,b,a);
 	syncColor();
 	return this;
     }
     public IObject clr(double dr, double dg, double db, double da){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(dr,dg,db,da);
 	syncColor();
 	return this;
     }
     public IObject clr(float fr, float fg, float fb, float fa){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.clr(fr,fg,fb,fa);
 	syncColor();
 	return this;
     }
     public IObject hsb(double dh, double ds, double db, double da){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.hsb(dh,ds,db,da);
 	syncColor();
 	return this;
     }
     public IObject hsb(float h, float s, float b, float a){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.hsb(h,s,b,a);
 	syncColor();
 	return this;
     }
     public IObject hsb(double dh, double ds, double db){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.hsb(dh,ds,db);
 	syncColor();
 	return this;
     }
     public IObject hsb(float h, float s, float b){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.hsb(h,s,b);
 	syncColor();
 	return this;
@@ -573,7 +578,7 @@ public class IObject{
     
     public IObject weight(double w){ return weight((float)w); }
     public IObject weight(float w){
-	if(attribute==null) attribute = new IAttribute();
+	if(attribute==null) attribute = defaultAttribute();
 	attribute.weight(w);
 	syncWeight();
 	return this;

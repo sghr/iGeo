@@ -1605,54 +1605,72 @@ public class IG implements IServerI{
     }
     
     
-    /************
-     * offset points
-     ***********/
-    
-    public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal){
-	return IVec.offset(pts,width,planeNormal);
-    }    
-    public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal, boolean close){
-	return IVec.offset(pts,width,planeNormal,close);
-    }
-    
-    public static IVecI[] offset(IVecI[] pts, double width, IVecI planeNormal, boolean close){
-        return IVec.offset(pts,width,planeNormal,close);
-    }
-    public static IVecI[] offset(IVecI[] pts, double width, IVecI planeNormal){
-	return IVec.offset(pts,width,planeNormal);
-    }
-    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI planeNormal, boolean close){
-	return IVec.offset(pts,width,planeNormal,close);
-    }
-    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI planeNormal){
-	return IVec.offset(pts,width,planeNormal);
-    }
-    
-    public static IVecI[] offset(IVecI[] pts, IVecI[] normal, double width){
-	return IVec.offset(pts,normal,width);
-    }
-    public static IVecI[] offset(IVecI[] pts, IVecI[] normal, IDoubleI width){
-        return IVec.offset(pts, normal, width);
-    }
+    /**
+       offset points. normal direction is automatically detected.
+     */
     public static IVec[] offset(IVec[] pts, double width){
 	return IVec.offset(pts,width);
     }
     public static IVec[] offset(IVec[] pts, double width, boolean close){
 	return IVec.offset(pts,width,close);
     }
-    public static IVecI[] offset(IVecI[] pts, double width, boolean close){
-	return IVec.offset(pts,width,close);
-    }
     public static IVecI[] offset(IVecI[] pts, double width){
 	return IVec.offset(pts,width);
     }       
-    public static IVecI[] offset(IVecI[] pts, IDoubleI width, boolean close){
+    public static IVecI[] offset(IVecI[] pts, double width, boolean close){
 	return IVec.offset(pts,width,close);
     }
     public static IVecI[] offset(IVecI[] pts, IDoubleI width){
 	return IVec.offset(pts,width);
     }
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, boolean close){
+	return IVec.offset(pts,width,close);
+    }
+
+    /**
+       offset points with specific normal direction
+    */
+    public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal){
+	return IVec.offset(pts,width,planeNormal);
+    }
+    public static IVec[] offset(IVec[] pts, double width, IVecI planeNormal, boolean close){
+	return IVec.offset(pts,width,planeNormal,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, double width, IVecI planeNormal){
+	return IVec.offset(pts,width,planeNormal);
+    }
+    public static IVecI[] offset(IVecI[] pts, double width, IVecI planeNormal, boolean close){
+        return IVec.offset(pts,width,planeNormal,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI planeNormal){
+	return IVec.offset(pts,width,planeNormal);
+    }
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI planeNormal, boolean close){
+	return IVec.offset(pts,width,planeNormal,close);
+    }
+    
+    /**
+       offset points with specific normal vector for each point
+    */
+    public static IVec[] offset(IVec[] pts, double width, IVecI[] normals){
+	return IVec.offset(pts,width,normals);
+    }
+    public static IVec[] offset(IVec[] pts, double width, IVecI[] normals, boolean close){
+	return IVec.offset(pts,width,normals,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, double width, IVecI[] normals){
+	return IVec.offset(pts,width,normals);
+    }
+    public static IVecI[] offset(IVecI[] pts, double width, IVecI[] normals, boolean close){
+	return IVec.offset(pts,width,normals,close);
+    }
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI[] normals){
+        return IVec.offset(pts, width, normals);
+    }
+    public static IVecI[] offset(IVecI[] pts, IDoubleI width, IVecI[] normals, boolean close){
+        return IVec.offset(pts, width, normals, close);
+    }
+    
     
     
     

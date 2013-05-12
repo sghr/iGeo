@@ -318,17 +318,17 @@ public class IMatrix4 extends IMatrix implements IMatrix4I{
     
     // mapping coordinates from xyz (origin 0) coordinates to xvector-yvectro-zvector (origin translate) coordinates
     public static IMatrix4 getTransform(IVec xvector,
-					 IVec yvector,
-					 IVec zvector,
-					 IVec translate){
+					IVec yvector,
+					IVec zvector,
+					IVec translate){
 	return new IMatrix4(xvector.x, yvector.x, zvector.x, translate.x,
-			     xvector.y, yvector.y, zvector.y, translate.y,
-			     xvector.z, yvector.z, zvector.z, translate.z,
-			     0,0,0,1);
+			    xvector.y, yvector.y, zvector.y, translate.y,
+			    xvector.z, yvector.z, zvector.z, translate.z,
+			    0,0,0,1);
     }
     
     public static IMatrix4 convertCoordinates(IVec xvec1, IVec yvec1, IVec zvec1, IVec orig1,
-					       IVec xvec2, IVec yvec2, IVec zvec2, IVec orig2){
+					      IVec xvec2, IVec yvec2, IVec zvec2, IVec orig2){
 	IMatrix4 mat1 = getTransform(xvec1,yvec1,zvec1,orig1);
 	IMatrix4 mat2 = getTransform(xvec2,yvec2,zvec2,orig2);
 	mat1.invert();
