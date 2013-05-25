@@ -281,8 +281,15 @@ public /*interface*/ class IConfig{
     /**
        Speed of panning in mouse 3D navigation in perspective view in INavigator class.
        The unit is unit of length in 3D space per pixel of the mouse move.
+       -> now zoom speed is controlled by mousePerspectivePanResolution.
     */
-    public static double mousePerspectivePanSpeed = 0.2; //1; //0.25;
+    //public static double mousePerspectivePanSpeed = 0.2; //1; //0.25;
+    
+    /**
+       Amount of panning in perspective view by one pixel move of mouse is equal to bounding box size of existing geometry devided by this resolution. 
+       Bounding box is updated when view is focused to existing geometry. Size of boundary box is average of width, height and depth.
+    */
+    public static double mousePerspectivePanResolution = 200;
     
     /**
        Speed of panning in mouse 3D navigation in axonometric view in INavigator class.
@@ -293,9 +300,17 @@ public /*interface*/ class IConfig{
     /**
        Speed of zooming in mouse 3D navigation in perspective view in INavigator class.
        The unit is distance of front/back view move per pixel of the mouse move.
+       -> now zoom speed is controlled by mousePerspectiveZoomResolution.
     */
-    public static double mousePerspectiveZoomSpeed = 1.; //1.25;
-        
+    //public static double mousePerspectiveZoomSpeed = 1.; //1.25;
+    
+    
+    /**
+       Amount of zoom in perspective view by one pixel move of mouse is equal to bounding box size of existing geometry devided by this resolution. 
+       Bounding box is updated when view is focused to existing geometry. Size of boundary box is average of width, height and depth.
+    */
+    public static double mousePerspectiveZoomResolution = 200;
+    
     /**
        Speed of zooming in mouse 3D navigation in axonometric view in INavigator class.
        The unit is increment/decrement of percentage per pixel of the mouse move.
@@ -307,6 +322,13 @@ public /*interface*/ class IConfig{
        The unit is equivalent pixel move of mouse per a increment/decrement of the wheel.
     */
     public static double mouseWheelZoomSpeed = 40;
+    
+    
+    /**
+       enable focus after geometries created in setup method
+    */
+    public static boolean autoFocusAtStart = true;
+    
     
     
     /*****************************
@@ -346,22 +368,36 @@ public /*interface*/ class IConfig{
     /**
        Minimum size to create bounding box and to zoom into.
     */
-    public static double minimumBounds = 0.002;
+    //public static double minimumBounds = 0.001; //0.002; -> use IConfig.tolerance
     
     
     /**
        default parameters for IView class
     */
-    /** default near clipping distance */
-    public static double nearView = 0.1; //0.001;
-    /** default far clipping distance */
-    public static double farView = 100000;
+    /** default near clipping distance -> replaced by nearViewRatio */
+    //public static double nearView = 0.1; //0.001;
+    /** default far clipping distance replaced by farViewRatio */
+    //public static double farView = 100000;
+    
+    /** default near clipping distance. 
+	ratio to existing geometry bounding box */
+    public static double nearViewRatio = 0.001;
+    
+    /** default far clipping distance.
+	ratio to existing geometry bounding box */
+    public static double farViewRatio = 1000;
+    
+    /** view distance ration. ratio to bounding box size */
+    public static double viewDistanceRatio = 10;
+    
+    
+    /** default view distance */
+    public static double viewDistance = 10000; // 100;
+    
     /** default axonometric ratio */
     public static double axonometricRatio = 1.0;
     /** default perspective ratio */
     public static double perspectiveRatio = 0.5;
-    /** default view distance */
-    public static double viewDistance = 10000; // 100;
     
     
     

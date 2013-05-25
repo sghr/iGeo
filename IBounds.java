@@ -278,11 +278,11 @@ public class IBounds{
 	    }
 	}
 	
-	if(min!=null && max!=null && min.eq(max, IConfig.minimumBounds)){
+	if(min!=null && max!=null && min.eq(max, IConfig.tolerance)){
 	    IOut.err("bounding box is too small. minimum size is set");
-	    IVec sz = new IVec(IConfig.minimumBounds,
-			       IConfig.minimumBounds,
-			       IConfig.minimumBounds);
+	    IVec sz = new IVec(IConfig.tolerance,
+			       IConfig.tolerance,
+			       IConfig.tolerance);
 	    sz.div(2);
 	    max.set(min).add(sz);
 	    min.sub(sz);

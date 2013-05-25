@@ -38,13 +38,19 @@ import igeo.io.IIO;
    
    @author Satoru Sugihara
 */
-public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener{
+public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener, WindowListener{
     
     public ArrayList<IPane> panes;
     
     public IG ig;
     
     public IPane currentMousePane=null;
+    
+    /** to control parent GUIs */
+    //public IPanelAdapter adapter;
+    
+    /** AWT parent component */
+    public Container parentContainer; 
     
     //public IPane fullScreenPane=null;
     //public int fullPaneOrigX, fullPaneOrigY, fullPaneOrigWidth, fullPaneOrigHeight;
@@ -53,6 +59,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     public int serverStateCount=-1;
     
     public boolean startDynamicServer=true;
+    
+    public boolean firstDraw=true;
 
     public boolean sizeChanged=false;
     
@@ -69,7 +77,12 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     public IG getIG(){ return ig; }
     
     public IServer server(){ return ig.server(); }
-    
+
+    public void setParent(Container container){
+	parentContainer = container;
+    }
+    //public void setAdapter(IPanelAdapter adp){ adapter = adp; }
+        
     public void addPane(IPane p){
 	panes.add(p);
 	p.setPanel(this);
@@ -126,6 +139,10 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     }
     
     public void predraw(IGraphics g){
+	if(firstDraw){
+	    if(ig!=null){ ig.focusView(); }
+	    firstDraw=false;
+	}
 	if(startDynamicServer){
 	    // here is a point to start dynamicServer
 	    startDynamicServer();
@@ -145,7 +162,6 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 		if(panes.get(i).isVisible()){ panes.get(i).draw(g); }
 	    }
 	}
-	
 	postdraw(g);
     }
     
@@ -274,7 +290,6 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	if(e.isMetaDown()){ control = true; }
 	
 	
-	
 	if(key==KeyEvent.VK_F && /*!shift &&*/!control){
 	    currentMousePane.focus();
 	}
@@ -317,7 +332,10 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	//else if(key==KeyEvent.VK_Q && control&& !shift){
 	else if( (key==KeyEvent.VK_W || key==KeyEvent.VK_Q)
 		 && control&& !shift){ // to match with Processing closing behavior
-	    System.exit(0); // temporary.
+	    if(!ig.isOnline()){
+		System.exit(0); // temporary.
+	    }
+	    // if applet, this doesn't quit by key
 	}
 	else if(key==KeyEvent.VK_S && control&& !shift){
 	    // save
@@ -363,15 +381,56 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     }
     public void componentShown(ComponentEvent e){
     }
+
+    
+    public void windowActivated(WindowEvent e){
+    }
+    public void windowClosed(WindowEvent e){
+	if(ig.online){
+	    // nothing, yet.
+	    
+	    //if(adapter!=null){ adapter.close(); }
+	    
+	    /*
+	    if(parentCotainer!=null && parentContainer instanceof Applet){
+		((Applet)parentContainer).stop(); // to prevent stopping whole java vm when other applets exist.
+	    }
+	    */
+	}
+	else{
+	    System.exit(0);
+	}
+    }
+    public void windowClosing(WindowEvent e){
+    }
+    public void windowDeactivated(WindowEvent e){
+    }
+    public void windowDeiconified(WindowEvent e){
+    }
+    public void windowIconified(WindowEvent e){
+    }
+    public void windowOpened(WindowEvent e){
+    }
+    
+    
+    
+    
+	    
     
     public IBounds getBounds(){ return bounds; } 
     
     public void setBounds(){
 	if(bounds==null) bounds = new IBounds();
 	if(ig.server().stateCount()!=serverStateCount){
-	    bounds.setObjects(ig.server());
+	    
+	    if(ig.server.objectNum()>0){
+		bounds.setObjects(ig.server());
+		for(int i=0; i<panes.size(); i++){ 
+		    panes.get(i).navigator().setRatioByBounds(bounds); // added 20130519
+		    panes.get(i).getView().setParametersByBounds(bounds); // added 20130519
+		}
+	    }
 	    serverStateCount = ig.server().stateCount();
-	    //IOut.err("bounds Updated: "+bounds); //
 	}
     }
 

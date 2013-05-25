@@ -28,7 +28,7 @@ import com.sun.opengl.util.*;
 
 import igeo.gui.*;
 
-public class IApplicationGL implements GLEventListener{
+public class IApplicationGL implements GLEventListener /*, IPanelAdapter*/{
     
     public static void main(String[] args){
 	
@@ -36,7 +36,9 @@ public class IApplicationGL implements GLEventListener{
 	frame.setSize(1024,768);
 	
 	GLCanvas canvas = new GLCanvas();
-	canvas.addGLEventListener(new IApplicationGL());
+	IApplicationGL application = new IApplicationGL();
+	application.setFrame(frame);
+	canvas.addGLEventListener(application);
 	frame.add(canvas);
 	
 	final Animator animator = new Animator(canvas);
@@ -58,6 +60,7 @@ public class IApplicationGL implements GLEventListener{
     public IPanel panel;
     public IG ig;
     public IGraphicsGL igg;
+    public Frame frame;
     
     public void init(GLAutoDrawable drawable){
 	GL gl = drawable.getGL();
@@ -65,6 +68,8 @@ public class IApplicationGL implements GLEventListener{
 	
 	panel = new IGridPanel(0,0,drawable.getWidth(),drawable.getHeight(),2,2);
 	panel.setVisible(true);
+	panel.setParent(frame);
+	//panel.setAdapter(this);
 	
 	ig = IG.init(panel);
 	ig.server().graphicServer().enableGL();
@@ -77,10 +82,12 @@ public class IApplicationGL implements GLEventListener{
 	drawable.addKeyListener(panel);
 	drawable.addFocusListener(panel);
 	drawable.addComponentListener(panel);
+	frame.addWindowListener(panel);
 	
 	initObjects(); // init geometry objects
     }
     
+    public void setFrame(Frame f){ frame = f; }
     
     // copied from PIGraphicsGL.java
     public void setGLProperties(GL gl){
@@ -125,5 +132,7 @@ public class IApplicationGL implements GLEventListener{
 	}
 	IG.focus();
     }
+    
+    public void close(){} // doing nothing
     
 }

@@ -49,20 +49,22 @@ public class INavigator{
     public final static IMouseEvent defaultZoomButton2=new IMouseEvent(MouseEvent.BUTTON1,
 									 false, true, false);
     
-    public static double minimumAxonometricMouseZoomRatio = 0.000001;
+    public static double minimumAxonMouseZoomRatio = 0.000001;
     
     public double rotationYawRatio = IConfig.mouseRotationSpeed/180*Math.PI;
     public double rotationPitchRatio = IConfig.mouseRotationSpeed/180*Math.PI;
-    public double perspectivePanRatio = IConfig.mousePerspectivePanSpeed;
-    public double axonometricPanRatio = IConfig.mouseAxonometricPanSpeed;
+    //public double persPanRatio = IConfig.mousePerspectivePanSpeed;
+    public double persPanRatio = 100.0/IConfig.mousePerspectivePanResolution; //100.0=default size
+    public double axonPanRatio = IConfig.mouseAxonometricPanSpeed;
     public double axonZoomRatio= IConfig.mouseAxonometricZoomSpeed/100; // percent to ratio
-    public double persZoomRatio= IConfig.mousePerspectiveZoomSpeed;
+    //public double persZoomRatio= IConfig.mousePerspectiveZoomSpeed;
+    public double persZoomRatio= 100.0/IConfig.mousePerspectiveZoomResolution; //100.0=default size
     public double wheelZoomRatio = IConfig.mouseWheelZoomSpeed;
     
     public double keyRotationYawInc = IConfig.keyRotationSpeed/180*Math.PI;
     public double keyRotationPitchInc = IConfig.keyRotationSpeed/180*Math.PI;
-    public double keyPerspectivePanInc = IConfig.keyPerspectivePanSpeed;
-    public double keyAxonometricPanInc = IConfig.keyAxonometricPanSpeed;
+    public double keyPersPanInc = IConfig.keyPerspectivePanSpeed;
+    public double keyAxonPanInc = IConfig.keyAxonometricPanSpeed;
     public double keyZoomInc = IConfig.keyZoomSpeed;
     
     /** for orthogonal view not to rotate. lock can be turned off with ALT+drag */
@@ -124,14 +126,22 @@ public class INavigator{
 	rotationYawRatio = yawRatio;
 	rotationPitchRatio = pitchRatio;
     }
-    public void setPerspectivePanRatio(double panRatio){ perspectivePanRatio = panRatio; }
-    public void setAxonometricPanRatio(double axonRatio){ axonometricPanRatio = axonRatio; }
+    public void setPerspectivePanRatio(double panRatio){ persPanRatio = panRatio; }
+    public void setAxonometricPanRatio(double axonRatio){ axonPanRatio = axonRatio; }
     public void setPerspectiveZoomRatio(double zoomRatio){ persZoomRatio = zoomRatio; }
     public void setAxonometricZoomRatio(double zoomRatio){ axonZoomRatio = zoomRatio; }
     public void wheelZoomRatio(double zoomRatio){ wheelZoomRatio = zoomRatio; }
 
     public void setRotateLock(boolean lock){ rotateLock = lock; }
     
+    public void setRatioByBounds(IBounds bounds){
+	double avgSize = (bounds.width()+bounds.height()+bounds.depth())/3;
+	
+	if(avgSize < IConfig.tolerance){ avgSize = IConfig.tolerance; }
+	
+	persZoomRatio = avgSize / IConfig.mousePerspectiveZoomResolution;
+	persPanRatio = avgSize / IConfig.mousePerspectivePanResolution;
+    }
     
     public void updateRotationByMouse(int x, int y){
 	if(mousePressed){
@@ -179,10 +189,10 @@ public class INavigator{
 	    //double panRatio = 0.25; //-0.25; //-0.5; //-2;
 	    double panRatio;
 	    if(view.isAxonometric()){
-		panRatio = view.getAxonometricRatio() * axonometricPanRatio;
+		panRatio = view.getAxonometricRatio() * axonPanRatio;
 	    }
 	    else{
-		panRatio = perspectivePanRatio;
+		panRatio = persPanRatio;
 	    }
 	    
 	    updatePan(-xdiff*panRatio, ydiff*panRatio);
@@ -214,29 +224,6 @@ public class INavigator{
     public void updateZoomByMouse(int x, int y){
 	if(mousePressed){
 	    updateZoom(y-mouseY);
-	    
-	    /*
-	    int ydiff = y-mouseY;
-	    //final double axonZoomRatio=0.00125; //0.005;
-	    //final double persZoomRatio=1.25; //5; //10;
-	    if(view.isAxonometric()){
-		double axonRatio;
-		if(ydiff>0) axonRatio = (1.+ydiff*axonZoomRatio)*viewAxonRatio;
-		else axonRatio = 1./(1.-ydiff*axonZoomRatio)*viewAxonRatio;
-		if(axonRatio<minimumAxonometricMouseZoomRatio){
-		    axonRatio = minimumAxonometricMouseZoomRatio;
-		}
-		view.setAxonometricRatio(axonRatio); 
-	    }
-	    else{
-		double moveDist = -ydiff*persZoomRatio;
-		//view.moveForward(moveDist);
-		IVec dir = view.frontDirection().len(moveDist);
-		view.setLocation(viewPos.dup().add(dir));
-		//view.setTarget(viewTarget.dup().add(dir));
-		view.update();
-	    }
-	    */
 	}
     }
     
@@ -246,8 +233,8 @@ public class INavigator{
 	    if(diff>0) axonRatio = (1.+diff*axonZoomRatio)*viewAxonRatio;
 	    else axonRatio = 1./(1.-diff*axonZoomRatio)*viewAxonRatio;
 	    
-	    if(axonRatio<minimumAxonometricMouseZoomRatio){
-		axonRatio = minimumAxonometricMouseZoomRatio;
+	    if(axonRatio<minimumAxonMouseZoomRatio){
+		axonRatio = minimumAxonMouseZoomRatio;
 	    }
 	    view.setAxonometricRatio(axonRatio);
 	    //view.update(); //
@@ -269,8 +256,8 @@ public class INavigator{
 	    if(zoomInc>0) axonRatio=(1.+zoomInc*axonZoomRatio)*view.getAxonometricRatio();
 	    else axonRatio=1./(1.-zoomInc*axonZoomRatio)*view.getAxonometricRatio();
 	    
-	    if(axonRatio<minimumAxonometricMouseZoomRatio){
-		axonRatio = minimumAxonometricMouseZoomRatio;
+	    if(axonRatio<minimumAxoncMouseZoomRatio){
+		axonRatio = minimumAxonMouseZoomRatio;
 	    }
 	    view.setAxonometricRatio(axonRatio); 
 	}
@@ -379,8 +366,8 @@ public class INavigator{
 	}
 	else if(shift&&!control){ // pan
 	    double panInc;
-	    if(view.isAxonometric()) panInc = view.getAxonometricRatio()*keyAxonometricPanInc;
-	    else panInc = keyPerspectivePanInc;
+	    if(view.isAxonometric()) panInc = view.getAxonometricRatio()*keyAxonPanInc;
+	    else panInc = keyPersPanInc;
 	    
 	    if(key==KeyEvent.VK_UP){
 		viewPos = view.location();

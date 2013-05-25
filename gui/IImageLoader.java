@@ -26,6 +26,8 @@ import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 
+import javax.imageio.ImageIO;
+
 import igeo.*;
 
 /**
@@ -38,7 +40,6 @@ public class IImageLoader implements ImageObserver{
 
     public static boolean convertFilePath=true;
     
-    
     public static Image getImage(String filename){
 	return getImage(filename, new Container());
 	//return getImage(filename, null);
@@ -46,21 +47,59 @@ public class IImageLoader implements ImageObserver{
     
     public static Image getImage(String filename, Component component){
 	
+	IOut.debug(10,"opening image of "+filename); //
+	
+	InputStream is = null;
 	if(convertFilePath){
-	    File f = new File(filename);
-	    if(!f.isAbsolute()){
-		IG ig = IG.current();
-		if(ig!=null && ig.getBasePath()!=null){
-		    filename = ig.getBasePath() + File.separator + filename;
+	    IG ig = IG.current();
+	    if(ig!=null && ig.inputWrapper!=null){
+		is = ig.inputWrapper.getStream(filename);
+	    }
+	    else{ // should be removed
+		File f = new File(filename);
+		if(!f.isAbsolute()){
+		    ig = IG.current();
+		    if(ig!=null && ig.getBasePath()!=null){
+			filename = ig.getBasePath() + File.separator + filename;
+		    }
+		}
+		
+		File file = new File(filename);
+		if(!file.exists()){
+		    IOut.err("file does not exist: "+filename); //
+		    return null;
+		}
+		try{
+		    is = new FileInputStream(filename);
+		}
+		catch(IOException e){
+		    IOut.err("IOException"); //
+		    e.printStackTrace();
+		    return null;
 		}
 	    }
 	}
 	
+	if(is==null){
+	    IOut.err("InputStream is null"); //
+	    return null;
+	}
+
+	BufferedImage img=null;
+	try{
+	    img = ImageIO.read(is);
+	}
+	catch(Exception e){
+	    IOut.err("ImageIO exception"); //
+	    e.printStackTrace();
+	    return null;
+	}
 	
+	return img;
+	
+	/*
 	MediaTracker mt = new MediaTracker(component);
 	Image image=null;
-	IOut.debug(10,"opening image of "+filename); //
-	
 	File file = new File(filename);
 	if(!file.exists()){
 	    IOut.err("file does not exist: "+filename); //
@@ -74,6 +113,7 @@ public class IImageLoader implements ImageObserver{
 	    IOut.err("failed to open "+filename); //
 	}
 	return(image);
+	*/
     }
     
     /* to be implemented

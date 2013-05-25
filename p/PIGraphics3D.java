@@ -39,7 +39,7 @@ import igeo.gui.*;
    @author Satoru Sugihara
 */
 public class PIGraphics3D extends PGraphics3D
-    implements IGraphics3D, IPane
+    implements IGraphics3D, IPane/*, IPanelAdapter*/
 	       /*, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener*/
 {
     
@@ -153,12 +153,17 @@ public class PIGraphics3D extends PGraphics3D
 	    
 	    panel.setVisible(true); // ?
 	    
+	    panel.setParent(parent);
+	    //panel.setAdapter(this);
+	    
 	    // initialize iGeo 
 	    IG ig = IG.init(panel);
 	    
 	    ig.server().graphicServer().enableGL(); //
 	    
 	    //ig.setBasePath(parent.sketchPath("")); // not sketchPath
+	    
+	    ig.setOnline(parent.online);
 	    
 	    if(!parent.online){ // only when running local
 		ig.setBasePath(parent.dataPath("")); // for default path to read/write files
@@ -173,6 +178,9 @@ public class PIGraphics3D extends PGraphics3D
 	    parent.addFocusListener(panel);
 	    parent.addComponentListener(panel);
 	    
+	    if(parent.frame!=null){
+		parent.frame.addWindowListener(panel);
+	    }
 	    //noSmooth();
 	    
 	    if(PIConfig.drawBeforeProcessing) parent.registerPre(this);
@@ -1560,6 +1568,8 @@ public class PIGraphics3D extends PGraphics3D
     public void focusLost(FocusEvent e){}
     public void focusGained(FocusEvent e){}
     
+    public void close(){}
+    
     /*
     public void componentHidden(ComponentEvent e){
     }
@@ -1668,5 +1678,6 @@ public class PIGraphics3D extends PGraphics3D
     }
     */
     
+
 }
 

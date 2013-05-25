@@ -50,8 +50,8 @@ public class IG implements IServerI{
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 8; }
     public static int buildVersion(){ return 2; }
-    public static int revisionVersion(){ return 6; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 04, 1); }
+    public static int revisionVersion(){ return 7; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2013, 05, 11); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -113,9 +113,12 @@ public class IG implements IServerI{
     
     /** base file path for file I/O */
     public String basePath = null; //".";
-
+    
     /** wrapping inputs in different environment. replacing basePath. */
     public IInputWrapper inputWrapper=null;
+    
+    /** if it's applet. online == true */
+    public boolean online=false; 
     
     /* *
        initialize whole IG system with IServer and graphical components
@@ -1198,7 +1201,7 @@ public class IG implements IServerI{
 	}
 	server.updateState(); // update server status
 	inputFile = file;
-	focusView();
+	//focusView(); // instead of here, focused at the end of setup if IConfig.autoFocusAtStart is true
 	return retval;
     }
     
@@ -1232,6 +1235,9 @@ public class IG implements IServerI{
     
     public String getBasePath(){ return basePath; }
     public String setBasePath(String path){ return basePath=path; }
+    
+    public void setOnline(boolean f){ online=f; }
+    public boolean isOnline(){ return online; }
     
     public void setInputWrapper(IInputWrapper wrapper){ inputWrapper = wrapper; }
     

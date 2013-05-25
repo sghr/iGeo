@@ -30,6 +30,7 @@ import javax.media.opengl.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.*;
+import java.util.Enumeration;
 
 import com.sun.opengl.util.j2d.Overlay;
 
@@ -42,7 +43,7 @@ import igeo.gui.*;
    
    @author Satoru Sugihara
 */
-public class PIGraphicsGL extends PGraphicsOpenGL /*implements*/ /*MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener,*/ /*ComponentListener*/{
+public class PIGraphicsGL extends PGraphicsOpenGL /*implements IPanelAdapter*/ /*MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener,*/ /*ComponentListener*/{
     
     public IPanel panel;
     public IGraphicsGL igg;
@@ -78,11 +79,15 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements*/ /*MouseListener
 	panel = new IGridPanel(0,0,parent.getWidth(),parent.getHeight(),2,2);
 	panel.setVisible(true); 
 	
+	panel.setParent(parent);
+	//panel.setAdapter(this);
+	
 	// initialize iGeo 
 	IG ig = IG.init(panel);
-	
 	ig.server().graphicServer().enableGL(); //
 	//ig.setBasePath(parent.sketchPath("")); // not sketchPath
+	
+	ig.setOnline(parent.online);
 	
 	if(!parent.online){ // only when running local
 	    ig.setBasePath(parent.dataPath("")); // for default path to read/write files
@@ -96,17 +101,23 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements*/ /*MouseListener
 	parent.addKeyListener(panel);
 	parent.addFocusListener(panel);
 	parent.addComponentListener(panel);
+
+	if(parent.frame!=null){
+	    parent.frame.addWindowListener(panel);
+	}
 	
 	//igg = new IGraphics();
 	igg = new IGraphicsGL();
 	
 	//noSmooth();
-	
+		
 	if(PIConfig.drawBeforeProcessing) parent.registerPre(this);
 	else parent.registerDraw(this);
 	parent.registerPost(this);
 	
-	if(PIConfig.resizable){ parent.frame.setResizable(true); }
+	if(PIConfig.resizable && parent.frame!=null){ // frame seems to be null in exported applet
+	    parent.frame.setResizable(true);
+	}
 	
 	super.hints[DISABLE_OPENGL_2X_SMOOTH]=true;  //
 	super.hints[ENABLE_OPENGL_4X_SMOOTH]=true;  //
@@ -273,6 +284,16 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements*/ /*MouseListener
 	setSize(w,h);
     }
     public void componentShown(ComponentEvent e){
+    }
+    */
+    
+    /*
+    public void close(){
+	Enumeration applets = parent.getAppletContext().getApplets();
+	while(applets.hasMoreElements() && !anyother){
+	    if(applets.nextElement() != parent){
+	    }
+	}
     }
     */
 }

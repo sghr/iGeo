@@ -43,7 +43,6 @@ public class IView{
     //public static double defaultPersRatio = IConfig.perspectiveRatio; //0.5;
     //public static double defaultViewDistance = IConfig.viewDistance; //100; //1000;
     
-    
     public static float[] defaultGLLightPosition = {0f, 0f, 1f, 0f};
     public static float[] defaultGLAmbientLight = {.4f,.4f,.4f,1f};
     public static float[] defaultGLDiffuseLight = {.7f,.7f,.7f,1f};
@@ -92,7 +91,10 @@ public class IView{
     /** scale to window size */
     public double axonRatio=IConfig.axonometricRatio; //defaultAxonRatio;
     
-    public double near=IConfig.nearView, far=IConfig.farView;
+    public double near=100.0*IConfig.nearViewRatio; //IConfig.nearView;
+    public double far=100.0*IConfig.farViewRatio; //IConfig.farView;
+    
+    public double viewDistance = IConfig.viewDistance;
     
     //double tx, ty, tz;
     /** view target location */
@@ -281,7 +283,7 @@ public class IView{
     
     public double getAxonometricRatio(){ return axonRatio; }
     public double getPerspectiveRatio(){ return persRatio; }
-    
+
     public void setAxonometricRatio(double r){
 	axonRatio = r; 
 	axonometric = true;
@@ -309,6 +311,15 @@ public class IView{
     public void axonometric(){ axonometric=true; }
     
     public boolean isAxonometric(){ return axonometric; }
+    
+    
+    /** update near, far, viewDistance by bounding box */
+    public void setParametersByBounds(IBounds bounds){
+	double avgSz = (bounds.width()+bounds.height()+bounds.depth())/3;
+	near = avgSz * IConfig.nearViewRatio;
+	far = avgSz * IConfig.farViewRatio;
+	viewDistance =  avgSz * IConfig.viewDistanceRatio;
+    }
     
     public void setTarget(double x, double y, double z){
 	//this.tx = x; this.ty=y; this.tz = z;
@@ -381,7 +392,7 @@ public class IView{
 	
 	if(updateTarget){ // update to the angle with the default view distance
 	    IVec dir = frontDirection();
-	    dir.len(IConfig.viewDistance);
+	    dir.len(viewDistance);
 	    target.set(dir.add(pos));
 	}
 	else if(rotateAroundTarget){
@@ -491,7 +502,7 @@ public class IView{
 	    double r = wid/(screenWidth/2);
 	    if(hei/(screenHeight/2) > r) r = hei/(screenHeight/2);
 	    
-	    dir.len(-IConfig.viewDistance);
+	    dir.len(-viewDistance);
 	    axonRatio = r;
 	}
 	else{
@@ -798,7 +809,7 @@ public class IView{
     }
     
     public void setTop(){ setTop(0,0); }
-    public void setTop(double x, double y){ setTop(x,y,IConfig.viewDistance); }
+    public void setTop(double x, double y){ setTop(x,y,viewDistance); }
     public void setTop(double x, double y, double z){ setTop(x,y,z,axonRatio); }
     public void setTop(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -806,7 +817,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setBottom(){ setBottom(0,0); }
-    public void setBottom(double x, double y){ setBottom(x,y,-IConfig.viewDistance); }
+    public void setBottom(double x, double y){ setBottom(x,y,-viewDistance); }
     public void setBottom(double x, double y, double z){ setBottom(x,y,z,axonRatio); }
     public void setBottom(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -814,7 +825,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setLeft(){ setLeft(0,0); }
-    public void setLeft(double y, double z){ setLeft(-IConfig.viewDistance,y,z); }
+    public void setLeft(double y, double z){ setLeft(-viewDistance,y,z); }
     public void setLeft(double x, double y, double z){ setLeft(x,y,z,axonRatio); }
     public void setLeft(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -822,7 +833,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setRight(){ setRight(0,0); }
-    public void setRight(double y, double z){ setRight(IConfig.viewDistance,y,z); }
+    public void setRight(double y, double z){ setRight(viewDistance,y,z); }
     public void setRight(double x, double y, double z){ setRight(x,y,z,axonRatio); }
     public void setRight(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -830,7 +841,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setFront(){ setFront(0,0); }
-    public void setFront(double x, double z){ setFront(x,-IConfig.viewDistance,z); }
+    public void setFront(double x, double z){ setFront(x,-viewDistance,z); }
     public void setFront(double x, double y, double z){ setFront(x,y,z,axonRatio); }
     public void setFront(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -838,7 +849,7 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
     }
     public void setBack(){ setBack(0,0); }
-    public void setBack(double x, double z){ setBack(x,IConfig.viewDistance,z); }
+    public void setBack(double x, double z){ setBack(x,viewDistance,z); }
     public void setBack(double x, double y, double z){ setBack(x,y,z,axonRatio); }
     public void setBack(double x, double y, double z, double axonometricRatio){
 	setLocation(x,y,z);
@@ -847,9 +858,9 @@ public class IView{
     }
     
     public void setPerspective(){
-	setPerspective(-IConfig.viewDistance/Math.sqrt(3),
-		       -IConfig.viewDistance/Math.sqrt(3),
-		       IConfig.viewDistance/Math.sqrt(3));
+	setPerspective(-viewDistance/Math.sqrt(3),
+		       -viewDistance/Math.sqrt(3),
+		       viewDistance/Math.sqrt(3));
     }
     public void setPerspective(double x, double y, double z){
 	setPerspective(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
@@ -864,9 +875,9 @@ public class IView{
     }
     
     public void setPerspective(double perspectiveAngle){
-	setPerspective(-IConfig.viewDistance/Math.sqrt(3),
-		       -IConfig.viewDistance/Math.sqrt(3),
-		       IConfig.viewDistance/Math.sqrt(3), perspectiveAngle);
+	setPerspective(-viewDistance/Math.sqrt(3),
+		       -viewDistance/Math.sqrt(3),
+		       viewDistance/Math.sqrt(3), perspectiveAngle);
 	setAngle(Math.PI/4,Math.atan(Math.sqrt(2)/2),true);
 	perspective();
 	setPerspectiveAngle(perspectiveAngle);
@@ -884,9 +895,9 @@ public class IView{
     }
     
     public void setAxonometric(){
-	setAxonometric(-IConfig.viewDistance/Math.sqrt(3),
-		       -IConfig.viewDistance/Math.sqrt(3),
-		       IConfig.viewDistance/Math.sqrt(3));
+	setAxonometric(-viewDistance/Math.sqrt(3),
+		       -viewDistance/Math.sqrt(3),
+		       viewDistance/Math.sqrt(3));
     }
     public void setAxonometric(double x, double y, double z){
 	setAxonometric(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
