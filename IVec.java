@@ -1366,9 +1366,14 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	if(n<=2){
 	    //IOut.err("number of pts is too small: "+pts.length);
 	    if(n<=1) return new IVec(0,0,1);
-	    IVec nml = pts[1].get().dif(pts[0]).cross(xaxis); /*default*/
-	    if(!nml.eq(origin)) return nml.unit();
-	    return pts[1].get().dif(pts[0]).cross(yaxis).unit(); /*default*/
+	    IVec dif = pts[1].get().dif(pts[0]);
+	    if(dif.isParallel(xaxis)){
+		return dif.icross(yaxis).unit();
+	    }
+	    return dif.icross(xaxis).unit();
+	    //IVec nml = pts[1].get().dif(pts[0]).cross(xaxis); /*default*/
+	    //if(!nml.eq(origin)) return nml.unit();
+	    //return pts[1].get().dif(pts[0]).cross(yaxis).unit(); /*default*/
 	}
 	
         if(n==3) return pts[1].get().dif(pts[0]).cross(pts[2].get().dif(pts[1])).unit();
@@ -1377,7 +1382,10 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
         for(int i=0; i<n; i++){
             IVec diff1 = pts[(i+1)%n].get().dif(pts[i]);
             IVec diff2 = pts[(i+2)%n].get().dif(pts[(i+1)%n]);
-            nml.add(diff1.cross(diff2));
+            //nml.add(diff1.cross(diff2));
+	    diff1.icross(diff2);
+	    if(diff1.dot(nml)<0){ diff1.neg(); } // when convex & concave
+	    nml.add(diff1);
         }
 	
 	// when all the points are on a stragiht line

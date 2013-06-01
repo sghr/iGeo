@@ -100,7 +100,7 @@ public class IView{
     /** view target location */
     public IVec target;
     public boolean rotateAroundTarget=false;
-    public double distToTarget;
+    //public double distToTarget;
     
     //public IPoint targetPt; // for debug
     
@@ -315,7 +315,17 @@ public class IView{
     
     /** update near, far, viewDistance by bounding box */
     public void setParametersByBounds(IBounds bounds){
+
+	if(bounds==null || bounds.min==null || bounds.max==null){ return; } // do nothing
+	
 	double avgSz = (bounds.width()+bounds.height()+bounds.depth())/3;
+
+	if(avgSz == 0){ // just a point
+	    return; // do nothing
+	}
+	
+	if(avgSz < IConfig.tolerance){ avgSz = IConfig.tolerance; }
+	
 	near = avgSz * IConfig.nearViewRatio;
 	far = avgSz * IConfig.farViewRatio;
 	viewDistance =  avgSz * IConfig.viewDistanceRatio;
@@ -328,11 +338,15 @@ public class IView{
     public void setTarget(IVecI t){ target.set(t); }
     
     public void enableRotationAroundTarget(){ rotateAroundTarget=true; }
-    public void disableRotationAroundTarget(){ rotateAroundTarget=false; /*true;*/ }
+    public void disableRotationAroundTarget(){ rotateAroundTarget=false; }
     
-    public double distanceToTarget(){
+    //public double distanceToTarget(){
+    public double targetDistance(){
 	//return(Math.sqrt((tx-x)*(tx-x)+(ty-y)*(ty-y)+(tz-z)*(tz-z)));
 	//return target.diff(pos).len();
+	
+	//if(!rotateAroundTarget) return 0;
+	if(target==null) return 0;
 	return target.dist(pos);
     }
     
@@ -471,63 +485,74 @@ public class IView{
 	if(bb==null || bb.min==null || bb.max==null) return;
 	IVec center = bb.min.mid(bb.max);
 	IVec dir = frontDirection();
-	IVec[] pts = new IVec[8];
-	pts[0] = new IVec(bb.min.x,bb.min.y,bb.min.z);
-	pts[1] = new IVec(bb.max.x,bb.min.y,bb.min.z);
-	pts[2] = new IVec(bb.min.x,bb.max.y,bb.min.z);
-	pts[3] = new IVec(bb.max.x,bb.max.y,bb.min.z);
-	pts[4] = new IVec(bb.min.x,bb.min.y,bb.max.z);
-	pts[5] = new IVec(bb.max.x,bb.min.y,bb.max.z);
-	pts[6] = new IVec(bb.min.x,bb.max.y,bb.max.z);
-	pts[7] = new IVec(bb.max.x,bb.max.y,bb.max.z);
 	
-	IVec cnt = transformMatrix.transform(center);
-	for(int i=0; i<pts.length; i++) pts[i]=transformMatrix.transform(pts[i]);
-	if(axonometric){
-	    double xmin=0, ymin=0, xmax=0, ymax=0;
-	    for(int i=0; i<pts.length; i++){
-		if(i==0){ xmin=xmax=pts[i].x; ymin=ymax=pts[i].y; }
-		else{
-		    if(pts[i].x<xmin) xmin=pts[i].x;
-		    else if(pts[i].x>xmax) xmax=pts[i].x;
-		    if(pts[i].y<ymin) ymin=pts[i].y;
-		    else if(pts[i].y>ymax) ymax=pts[i].y;
-		}
+	if(bb.min.x==bb.max.x&&bb.min.y==bb.max.y&&bb.min.z==bb.max.z){ // just point
+	    if(axonometric){
+		dir.len(-viewDistance);
 	    }
-	    double wid = cnt.x-xmin;
-	    if(xmax-cnt.x > wid) wid=xmax-cnt.x;
-	    double hei = cnt.y-ymin;
-	    if(ymax-cnt.y > hei) hei=ymax-cnt.y;
-	    
-	    double r = wid/(screenWidth/2);
-	    if(hei/(screenHeight/2) > r) r = hei/(screenHeight/2);
-	    
-	    dir.len(-viewDistance);
-	    axonRatio = r;
+	    else{
+		dir.len(-targetDistance());
+	    }
 	}
 	else{
-	    double maxz=0;
-	    for(int i=0; i<pts.length; i++){
-		double z = 0;
-		// check x
-		//if(pts[i].x < cnt.x) z = pts[i].z+(cnt.x-pts[i].x)/persRatio;
-		//else z = pts[i].z+(pts[i].x-cnt.x)/persRatio;
+	    IVec[] pts = new IVec[8];
+	    pts[0] = new IVec(bb.min.x,bb.min.y,bb.min.z);
+	    pts[1] = new IVec(bb.max.x,bb.min.y,bb.min.z);
+	    pts[2] = new IVec(bb.min.x,bb.max.y,bb.min.z);
+	    pts[3] = new IVec(bb.max.x,bb.max.y,bb.min.z);
+	    pts[4] = new IVec(bb.min.x,bb.min.y,bb.max.z);
+	    pts[5] = new IVec(bb.max.x,bb.min.y,bb.max.z);
+	    pts[6] = new IVec(bb.min.x,bb.max.y,bb.max.z);
+	    pts[7] = new IVec(bb.max.x,bb.max.y,bb.max.z);
+	    
+	    IVec cnt = transformMatrix.transform(center);
+	    for(int i=0; i<pts.length; i++) pts[i]=transformMatrix.transform(pts[i]);
+	    if(axonometric){
+		double xmin=0, ymin=0, xmax=0, ymax=0;
+		for(int i=0; i<pts.length; i++){
+		    if(i==0){ xmin=xmax=pts[i].x; ymin=ymax=pts[i].y; }
+		    else{
+			if(pts[i].x<xmin) xmin=pts[i].x;
+			else if(pts[i].x>xmax) xmax=pts[i].x;
+			if(pts[i].y<ymin) ymin=pts[i].y;
+			else if(pts[i].y>ymax) ymax=pts[i].y;
+		    }
+		}
+		double wid = cnt.x-xmin;
+		if(xmax-cnt.x > wid) wid=xmax-cnt.x;
+		double hei = cnt.y-ymin;
+		if(ymax-cnt.y > hei) hei=ymax-cnt.y;
 		
-		//z = pts[i].z+Math.abs(cnt.x-pts[i].x)/persRatio;
-		z = pts[i].z+Math.abs(cnt.x-pts[i].x)/(persRatio * screenWidth/screenHeight);
-		
-		if(i==0) maxz=z;
-		else if(z>maxz) maxz=z;
-		// check y
-		//if(pts[i].y < cnt.y) z = pts[i].z+(cnt.y-pts[i].y)/persRatio;
-		//else z = pts[i].z+(pts[i].y-cnt.y)/persRatio;
-		
-		z = pts[i].z+Math.abs(cnt.y-pts[i].y)/persRatio;
-		
-		if(z>maxz) maxz=z;
+		double r = wid/(screenWidth/2);
+		if(hei/(screenHeight/2) > r) r = hei/(screenHeight/2);
+	    
+		dir.len(-viewDistance);
+		axonRatio = r;
 	    }
-	    maxz -= cnt.z;
-	    dir.len(-maxz);
+	    else{
+		double maxz=0;
+		for(int i=0; i<pts.length; i++){
+		    double z = 0;
+		    // check x
+		    //if(pts[i].x < cnt.x) z = pts[i].z+(cnt.x-pts[i].x)/persRatio;
+		    //else z = pts[i].z+(pts[i].x-cnt.x)/persRatio;
+		    
+		    //z = pts[i].z+Math.abs(cnt.x-pts[i].x)/persRatio;
+		    z = pts[i].z+Math.abs(cnt.x-pts[i].x)/(persRatio * screenWidth/screenHeight);
+		    
+		    if(i==0) maxz=z;
+		    else if(z>maxz) maxz=z;
+		    // check y
+		    //if(pts[i].y < cnt.y) z = pts[i].z+(cnt.y-pts[i].y)/persRatio;
+		    //else z = pts[i].z+(pts[i].y-cnt.y)/persRatio;
+		    
+		    z = pts[i].z+Math.abs(cnt.y-pts[i].y)/persRatio;
+		    
+		if(z>maxz) maxz=z;
+		}
+		maxz -= cnt.z;
+		dir.len(-maxz);
+	    }
 	}
 	setLocation(dir.add(center));
 	setTarget(center);

@@ -97,6 +97,11 @@ public class ICylinder extends ISurface{
     public ICylinder hide(){ super.hide(); return this; }
     public ICylinder show(){ super.show(); return this; }
     
+    public ICylinder clr(IColor c){ super.clr(c); return this; }
+    public ICylinder clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public ICylinder clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public ICylinder clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    
     public ICylinder clr(Color c){ super.clr(c); return this; }
     public ICylinder clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ICylinder clr(int gray){ super.clr(gray); return this; }

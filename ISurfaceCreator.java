@@ -633,16 +633,16 @@ public class ISurfaceCreator{
 	for(int i=0; i<rail.length; i++){
 	    IVecI dir = null;
 	    if(i==0){ // start point
-		if(!railClosed && i<rail.length-1) dir = rail[i+1].diff(rail[i]);
+		if(!railClosed && i<rail.length-1) dir = rail[i+1].dif(rail[i]);
 		else if(railClosed && rail.length-railDeg>0){
-		    dir = rail[rail.length-railDeg].diff(rail[rail.length-railDeg-1]);
+		    dir = rail[rail.length-railDeg].dif(rail[rail.length-railDeg-1]);
 		}
 		
 		//IVecI[] ppts2 = orient(ppts, profileCenter, profileNormal, rail[i], dir);
 		IVecI[] ppts2 = orient(ppts, profileCenter, profileNormal, profileDir,
 				       rail[i], dir, railNormal);
 		if(railClosed){
-		    if(i<rail.length-1){ dir = rail[i+1].diff(rail[i]); }
+		    if(i<rail.length-1){ dir = rail[i+1].dif(rail[i]); }
 		    //ppts2 = orientAndBisect(ppts, profileCenter, profileNormal, rail[i], dir);
 		    ppts2 = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
 					    rail[i], dir, railNormal);
@@ -660,8 +660,8 @@ public class ISurfaceCreator{
 		cpts[i] = ppts;
 	    }
 	    else{
-		if(i<rail.length-1) dir = rail[i+1].diff(rail[i]);
-		else dir = rail[i].diff(rail[i-1]);
+		if(i<rail.length-1) dir = rail[i+1].dif(rail[i]);
+		else dir = rail[i].dif(rail[i-1]);
 		
 		//IVecI[] bsct = orientAndBisect(ppts, profileCenter, profileNormal, rail[i], dir);
 		IVecI[] bsct = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
@@ -711,14 +711,17 @@ public class ISurfaceCreator{
 	for(int i=0; i<rail.length; i++){
 	    IVecI dir = null;
 	    if(i==0){ // start point
-		if(!railClosed && i<rail.length-1) dir = rail[i+1].diff(rail[i]);
+		if(!railClosed && i<rail.length-1) dir = rail[i+1].dif(rail[i]);
 		else if(railClosed && rail.length-railDeg>0){
-		    dir = rail[rail.length-railDeg].diff(rail[rail.length-railDeg-1]);
+		    dir = rail[rail.length-railDeg].dif(rail[rail.length-railDeg-1]);
 		}
+		// auto adjust profileNormal to the first rail direction 
+		if(profileNormal.dot(dir) < 0){ profileNormal.neg(); } // added 20130525
+		
 		IVecI[] ppts2 = orient(ppts, profileCenter, profileNormal, profileDir,
 				       rail[i], dir, railNormal);
 		if(railClosed){
-		    if(i<rail.length-1){ dir = rail[i+1].diff(rail[i]); }
+		    if(i<rail.length-1){ dir = rail[i+1].dif(rail[i]); }
 		    ppts2 = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
 					    rail[i], dir, railNormal);
 		}
@@ -733,8 +736,8 @@ public class ISurfaceCreator{
 		cpts[i] = ppts;
 	    }
 	    else{
-		if(i<rail.length-1) dir = rail[i+1].diff(rail[i]);
-		else dir = rail[i].diff(rail[i-1]);
+		if(i<rail.length-1) dir = rail[i+1].dif(rail[i]);
+		else dir = rail[i].dif(rail[i-1]);
 		IVecI[] bsct = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
 					       rail[i], dir, railNormal);
 		cpts[i] = bsct;
@@ -770,7 +773,7 @@ public class ISurfaceCreator{
     */
     public static IVecI[] orient(IVecI[] profile, IVecI profCenter, IVecI railPt){
 	
-	IVec diff = railPt.get().diff(profCenter);
+	IVec diff = railPt.get().dif(profCenter);
 	for(IVecI p:profile) p.add(diff);
 	profCenter.set(railPt);
 	return profile;
@@ -790,31 +793,39 @@ public class ISurfaceCreator{
 				 IVecI railPt, IVecI railDir, IVecI railNml){
 	IVec axis = null;
 	double angle = 0;
-	//boolean parallel = true;
-	if(railDir!=null && !profNml.get().isParallel(railDir)){
-	    axis = profNml.get().cross(railDir);
-	    angle = profNml.angle(railDir,axis);
-	    //parallel = angle < IConfig.angleTolerance;
+	
+	if(railDir!=null){
+	    if(!profNml.get().isParallel(railDir)){
+		axis = profNml.get().cross(railDir);
+		angle = profNml.angle(railDir,axis);
+	    }
+	    else if(profNml.get().dot(railDir) < 0){ // parallel but opposite // added 20130525
+		profNml.neg(); 
+	    }
 	}
 	
 	for(IVecI p:profile){
 	    p.sub(profCenter);
-	    /*if(!parallel)*/
 	    if(axis!=null) p.rot(axis,angle);
 	    //p.add(railPt);
 	}
-	
-	//if(!parallel){
+
 	if(axis!=null) profNml.rot(axis,angle);
 	if(profDir!=null){
 	    if(axis!=null) profDir.rot(axis,angle);
 	    if(railNml!=null && !profDir.get().isParallel(railNml)){
-		angle = profDir.angle(railNml, railDir);
+
+		if(profDir.get().dot(railNml) < 0){ // added 20130525
+		    angle = profDir.angle(railNml, railDir.get().dup().neg());
+		}
+		else{
+		    angle = profDir.angle(railNml, railDir);
+		}
+		
 		for(IVecI p:profile) p.rot(railDir,angle);
 		profDir.rot(railDir,angle);
 	    }
 	}
-	//}
 	
 	for(IVecI p:profile) p.add(railPt);
 	profCenter.set(railPt);
@@ -833,11 +844,15 @@ public class ISurfaceCreator{
 					  IVecI railPt, IVecI railDir, IVecI railNml){
 	IVec axis = null;
 	double angle = 0;
-	//boolean parallel = true;
-	if(railDir!=null && !profNml.get().isParallel(railDir)){
-	    axis = profNml.get().cross(railDir);
-	    angle = profNml.angle(railDir,axis);
-	    //parallel = angle < IConfig.angleTolerance;
+	if(railDir!=null){
+	    if(!profNml.get().isParallel(railDir)){
+		axis = profNml.get().cross(railDir);
+		angle = profNml.angle(railDir,axis);
+		//parallel = angle < IConfig.angleTolerance;
+	    }
+	    else if(profNml.get().dot(railDir) < 0){ // parallel but opposite // added 20130525
+		profNml.neg(); // ok?? test it.
+	    }
 	}
 	
 	for(IVecI p:profile) p.sub(profCenter);
@@ -845,6 +860,7 @@ public class ISurfaceCreator{
 	double bangle = angle/2;
 	IVec bisectDir = null;
 	if(axis!=null){
+	    
 	    for(IVecI p:profile){
 		//p.sub(profCenter);
 		//if(!parallel)
@@ -862,7 +878,12 @@ public class ISurfaceCreator{
 	}
 	
 	if(profDir!=null && railNml!=null && !profDir.get().isParallel(railNml)){
-	    angle = profDir.angle(railNml, railDir);
+	    if(profDir.get().dot(railNml) < 0){ // added 20130525
+		angle = profDir.angle(railNml, railDir.get().dup().neg());
+	    }
+	    else{
+		angle = profDir.angle(railNml, railDir);
+	    }
 	    for(IVecI p:profile) p.rot(railDir,angle);
 	    profDir.rot(railDir,angle);
 	}
@@ -944,15 +965,16 @@ public class ISurfaceCreator{
 	return pipe(rail.cps(),rail.deg(),rail.knots(),radius);
     }
     public static ISurface pipe(IVecI[] rail, int railDeg, double[] railKnots, double radius){
-	IVec n = IVec.averageNormal(rail);
-	IVec dir = rail[1].get().diff(rail[0]);
+	IVec nml = IVec.averageNormal(rail); 
+	//IVec dir = rail[1].get().dif(rail[0]);
+	IVec dir = rail[0].get().dif(rail[1]);
 	IVec center = rail[0].get();
-	IVec roll = dir.cross(n);
-	IVec[] profile = ICircleGeo.circleCP(center, dir, roll, radius);
+	//IVec roll = dir.cross(n);
+	IVec[] profile = ICircleGeo.circleCP(center, dir, nml, radius);
 	int profDeg = ICircleGeo.circleDeg();
 	double[] profKnots = ICircleGeo.circleKnots();
 	//return sweep(profile, profDeg, profKnots, center, rail, railDeg, railKnots);
-	return sweep(profile, profDeg, profKnots, center, roll, rail, railDeg, railKnots);
+	return sweep(profile, profDeg, profKnots, center, nml, rail, railDeg, railKnots);
     }
     
     public static ISurface squarePipe(IVecI pt1, IVecI pt2, double size){
@@ -1056,7 +1078,7 @@ public class ISurfaceCreator{
 	return rectPipe(rail,deg,knots,-width/2,width/2,-height/2,height/2);
 	/*
 	IVec n = IVec.averageNormal(rail);
-	IVec dir = rail[1].get().diff(rail[0]);
+	IVec dir = rail[1].get().dif(rail[0]);
 	IVec center = rail[0].get();
 	IVec wdir = dir.cross(n);
 	if(wdir.eq(new IVec(0,0,0))) wdir=new IVec(1,0,0);
@@ -1079,20 +1101,30 @@ public class ISurfaceCreator{
     
     
     public static ISurface rectPipe(IVecI[] rail, int deg, double[] knots, double left, double right, double bottom, double top){
-	IVec n = IVec.averageNormal(rail);
-	IVec dir = rail[1].get().diff(rail[0]);
+	IVec n = IVec.averageNormal(rail); // what if rail.length==2?
+	IVec dir = rail[1].get().dif(rail[0]);
 	IVec center = rail[0].get();
-	IVec wdir = dir.cross(n);
-	if(wdir.eq(new IVec(0,0,0))) wdir=new IVec(1,0,0);
-	IVec hdir = dir.cross(wdir);
-	if(hdir.eq(new IVec(0,0,0))) wdir=new IVec(0,1,0);
+		
+	//IVec wdir = dir.cross(n);
+	//if(wdir.eq(IVec.origin)) wdir=new IVec(1,0,0);
+	//IVec hdir = dir.cross(wdir);
+	//if(hdir.eq(IVec.origin)) wdir=new IVec(0,1,0);
+	
+	// changed 20130525
+	IVec hdir = n;
+	IVec wdir = dir.cross(hdir);
+	if(wdir.eq(IVec.origin)){ // dir and hdir is parallel
+	    if(!hdir.isParallel(IVec.zaxis)){ wdir = dir.cross(IVec.zaxis); }
+	    else{ wdir = dir.cross(IVec.xaxis); }
+	}
+	
 	IVec[] profile = new IVec[5];
 	profile[0] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(bottom));
-	//profile[1] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
-	profile[1] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
+	profile[1] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
+	//profile[1] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
 	profile[2] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(top));
-	//profile[3] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
-	profile[3] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
+	profile[3] = center.cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
+	//profile[3] = center.cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
 	profile[4] = profile[0].cp();
 	double[] profKnots = INurbsGeo.createClosedKnots(1,profile.length);
 	//return sweep(profile, 1, profKnots, center, rail, deg, knots);

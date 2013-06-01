@@ -135,7 +135,13 @@ public class INavigator{
     public void setRotateLock(boolean lock){ rotateLock = lock; }
     
     public void setRatioByBounds(IBounds bounds){
+	if(bounds==null || bounds.min==null || bounds.max==null) return;
+	
 	double avgSize = (bounds.width()+bounds.height()+bounds.depth())/3;
+	
+	if(avgSize==0){ // just point
+	    return; // do nothing
+	}
 	
 	if(avgSize < IConfig.tolerance){ avgSize = IConfig.tolerance; }
 	

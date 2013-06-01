@@ -283,6 +283,11 @@ public class ICircle extends ICurve{
     public ICircle hide(){ super.hide(); return this; }
     public ICircle show(){ super.show(); return this; }
     
+    public ICircle clr(IColor c){ super.clr(c); return this; }
+    public ICircle clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public ICircle clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public ICircle clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+
     public ICircle clr(Color c){ super.clr(c); return this; }
     public ICircle clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ICircle clr(int gray){ super.clr(gray); return this; }

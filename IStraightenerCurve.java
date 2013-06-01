@@ -114,6 +114,11 @@ public class IStraightenerCurve extends ICurve implements IStraightenerI{
     public IStraightenerCurve hide(){ super.hide(); return this; }
     public IStraightenerCurve show(){ super.show(); return this; }
     
+    public IStraightenerCurve clr(IColor c){ super.clr(c); return this; }
+    public IStraightenerCurve clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IStraightenerCurve clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IStraightenerCurve clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    
     public IStraightenerCurve clr(Color c){ super.clr(c); return this; }
     public IStraightenerCurve clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IStraightenerCurve clr(int gray){ super.clr(gray); return this; }

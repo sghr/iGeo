@@ -422,12 +422,13 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     public void setBounds(){
 	if(bounds==null) bounds = new IBounds();
 	if(ig.server().stateCount()!=serverStateCount){
-	    
 	    if(ig.server.objectNum()>0){
 		bounds.setObjects(ig.server());
-		for(int i=0; i<panes.size(); i++){ 
-		    panes.get(i).navigator().setRatioByBounds(bounds); // added 20130519
-		    panes.get(i).getView().setParametersByBounds(bounds); // added 20130519
+		if(bounds.min!=null && bounds.max!=null){
+		    for(int i=0; i<panes.size(); i++){ 
+			panes.get(i).navigator().setRatioByBounds(bounds); // added 20130519
+			panes.get(i).getView().setParametersByBounds(bounds); // added 20130519
+		    }
 		}
 	    }
 	    serverStateCount = ig.server().stateCount();

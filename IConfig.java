@@ -392,7 +392,7 @@ public /*interface*/ class IConfig{
     
     
     /** default view distance */
-    public static double viewDistance = 10000; // 100;
+    public static double viewDistance = 500; //10000; // 100;
     
     /** default axonometric ratio */
     public static double axonometricRatio = 1.0;

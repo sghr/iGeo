@@ -158,6 +158,11 @@ public class IBox extends IBrep{
     
     public IBox hide(){ super.hide(); return this; }
     public IBox show(){ super.show(); return this; }
+
+    public IBox clr(IColor c){ super.clr(c); return this; }
+    public IBox clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
+    public IBox clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
+    public IBox clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     
     public IBox clr(Color c){ super.clr(c); return this; }
     public IBox clr(Color c, int alpha){ super.clr(c,alpha); return this; }
