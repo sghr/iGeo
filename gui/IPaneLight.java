@@ -43,7 +43,7 @@ import igeo.*;
 public class IPaneLight extends IComponent implements IPane{
     
     //IG ig;
-    public IPanel parent;
+    public IPanel parent; // IPanelI?
     public IView view;
     
     public INavigator navigator;

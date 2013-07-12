@@ -88,4 +88,6 @@ public interface IPanelI extends IServerI /*, MouseListener, MouseMotionListener
     public float getY();
     public int getWidth();
     public int getHeight();
+
+    public void skipAutoFocus();
 }

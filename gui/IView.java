@@ -840,6 +840,9 @@ public class IView{
 	setLocation(x,y,z);
 	setAngle(Math.PI/2, Math.PI/2, true);
 	setAxonometricRatio(axonometricRatio);
+
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
+	
     }
     public void setBottom(){ setBottom(0,0); }
     public void setBottom(double x, double y){ setBottom(x,y,-viewDistance); }
@@ -848,6 +851,8 @@ public class IView{
 	setLocation(x,y,z);
 	setAngle(Math.PI/2, -Math.PI/2, true);
 	setAxonometricRatio(axonometricRatio);
+
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     public void setLeft(){ setLeft(0,0); }
     public void setLeft(double y, double z){ setLeft(-viewDistance,y,z); }
@@ -856,6 +861,8 @@ public class IView{
 	setLocation(x,y,z);
 	setAngle(0,0,true);
 	setAxonometricRatio(axonometricRatio);
+
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     public void setRight(){ setRight(0,0); }
     public void setRight(double y, double z){ setRight(viewDistance,y,z); }
@@ -864,6 +871,8 @@ public class IView{
 	setLocation(x,y,z);
 	setAngle(Math.PI,0,true);
 	setAxonometricRatio(axonometricRatio);
+
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     public void setFront(){ setFront(0,0); }
     public void setFront(double x, double z){ setFront(x,-viewDistance,z); }
@@ -872,6 +881,8 @@ public class IView{
 	setLocation(x,y,z);
 	setAngle(Math.PI/2,0,true);
 	setAxonometricRatio(axonometricRatio);
+
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     public void setBack(){ setBack(0,0); }
     public void setBack(double x, double z){ setBack(x,viewDistance,z); }
@@ -880,6 +891,8 @@ public class IView{
 	setLocation(x,y,z);
 	setAngle(-Math.PI/2,0,true);
 	setAxonometricRatio(axonometricRatio);
+
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     
     public void setPerspective(){
@@ -897,6 +910,8 @@ public class IView{
 	perspective();
 	//setPerspectiveRatio(defaultPersRatio); // keep the original perspective ratio
 	update();
+
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     
     public void setPerspective(double perspectiveAngle){
@@ -917,6 +932,8 @@ public class IView{
 	setAngle(yaw,pitch,true);
 	perspective();
 	setPerspectiveAngle(perspectiveAngle);
+
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     
     public void setAxonometric(){
@@ -938,6 +955,8 @@ public class IView{
 	setLocation(x,y,z);
 	setAngle(yaw,pitch,true);
 	setAxonometricRatio(axonometricRatio);
+	
+	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     
     

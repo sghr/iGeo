@@ -90,6 +90,8 @@ public class IEdge{
     }
     public IVec pos(double ratio){ return getPointOnEdge(ratio); }
     public IVec mid(){ return getPointOnEdge(0.5); }
+    /** alias of mid */
+    public IVec center(){ return mid(); }
     
     public boolean contains(IVertex v){
 	if(vertices[0]==v || vertices[1]==v) return true;

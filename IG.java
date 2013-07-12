@@ -49,9 +49,9 @@ public class IG implements IServerI{
     
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 8; }
-    public static int buildVersion(){ return 2; }
-    public static int revisionVersion(){ return 9; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 05, 31); }
+    public static int buildVersion(){ return 3; }
+    public static int revisionVersion(){ return 0; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2013, 07, 12); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());

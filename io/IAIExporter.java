@@ -1541,6 +1541,37 @@ class IAIExporter {
 	ps.close();
 	return true;
     }
+
+
+    static public ArrayList<IObject> sortObjectsByView(ArrayList<IObject> objects, IView view){
+	
+	ArrayList<IGeometry> geoms = new ArrayList<IGeometry>();
+	
+	for(int i=0; i<objects.size(); i++){
+	    if(objects.get(i) instanceof IGeometry){
+		geoms.add((IGeometry)objects.get(i));
+	    }
+	}
+	ISort.sort(geoms, new IViewSort(view));
+	ArrayList<IObject> objects2 = new ArrayList<IObject>();
+	for(int i=0; i<geoms.size(); i++){
+	    objects2.add(geoms.get(i));
+	}
+	return objects2;
+    }
+    
+    static public class IViewSort implements IComparator<IGeometry>{
+	public IView view;
+	IViewSort(IView v){ view = v; }
+	public int compare(IGeometry o1, IGeometry o2){
+	    IVec pos1 =view.convert(o1.center());
+	    IVec pos2 =view.convert(o2.center());
+	    
+	    if(pos1.z < pos2.z){ return 1; }
+	    if(pos1.z > pos2.z){ return -1; }
+	    return 0;
+	}
+    }
     
     static public void write(PrintStream ps, ArrayList<IObject> objects, double scale, IView view){
 	
@@ -1548,6 +1579,11 @@ class IAIExporter {
 	
 	writeHeader(ps);
         startLayer(ps,"default",0,false);
+	
+	final boolean sortObjectsByView = true;
+	if(sortObjectsByView){
+	    objects = sortObjectsByView(objects, view);
+	}
 	
 	final boolean updateGeometry=true; //false; //
 	

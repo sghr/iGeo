@@ -303,13 +303,15 @@ public class IFace{
     }
     
     
-    public IVec getCenter(){
+    public IVec center(){
 	IVec center = new IVec();
 	for(int i=0; i<vertices.length; i++) center.add(vertices[i].pos);
 	center.div(vertices.length);
 	return center;
     }
     
+    /** alias of center */
+    public IVec getCenter(){ return center(); }
     
     public void del(){
 	deleted=true;

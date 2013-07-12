@@ -62,6 +62,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     
     public boolean firstDraw=true;
 
+    public boolean skipAutoFocus=false;
+    
     public boolean sizeChanged=false;
     
     public IPanel(int x, int y, int width, int height){
@@ -138,9 +140,11 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	}
     }
     
+    public void skipAutoFocus(){ skipAutoFocus=true; }
+    
     public void predraw(IGraphics g){
 	if(firstDraw){
-	    if(ig!=null){ ig.focusView(); }
+	    if(ig!=null && IConfig.autoFocusAtStart && !skipAutoFocus){ ig.focusView(); skipAutoFocus=true; }
 	    firstDraw=false;
 	}
 	if(startDynamicServer){
