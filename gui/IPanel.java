@@ -206,6 +206,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     
     
     public void mousePressed(MouseEvent e){
+	//IG.err();
+	
 	IMouseEvent me = new IMouseEvent(e);
 	IPane p = getPaneAt(me);
 	if(p!=null){
@@ -244,6 +246,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	currentMousePane = p; // update
     }
     public void mouseEntered(MouseEvent e){
+	//IG.err();
+	
 	//IPane p = getPaneAt(e);
 	//if(p!=null){ currentMousePane = p; }
 	
@@ -255,6 +259,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	//if(p!=null){ p.mouseExited(e); }
     }
     public void mouseMoved(MouseEvent e){
+	//IG.err();
+	
 	IMouseEvent me = new IMouseEvent(e);
 	IPane p = getPaneAt(me);
 	if(p!=null){
@@ -262,6 +268,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	}
     }
     public void mouseDragged(MouseEvent e){
+	//IG.err();
+	
 	IMouseEvent me = new IMouseEvent(e);
 	IPane p=null;
 	if(currentMousePane!=null){ p = currentMousePane; }
@@ -273,6 +281,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     
     
     public void mouseWheelMoved(MouseWheelEvent e){
+	//IG.err();
+	
 	IMouseWheelEvent me = new IMouseWheelEvent(e);
 	if(currentMousePane!=null){ currentMousePane.mouseWheelMoved(me); }
 	/*
@@ -286,6 +296,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
     
     
     public void keyPressed(KeyEvent e){
+	//IG.err();
+	
 	int key = e.getKeyCode();
 	boolean shift = e.isShiftDown();
 	boolean control = e.isControlDown();
@@ -362,28 +374,44 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	if(currentMousePane!=null){ currentMousePane.keyPressed(new IKeyEvent(e)); }
     }
     public void keyReleased(KeyEvent e){
+	//IG.err();
 	if(currentMousePane!=null){ currentMousePane.keyReleased(new IKeyEvent(e)); }
     }
     public void keyTyped(KeyEvent e){
+	//IG.err();
 	if(currentMousePane!=null){ currentMousePane.keyTyped(new IKeyEvent(e)); }
     }
     
     public void focusLost(FocusEvent e){
+	//IG.err();
     }
     public void focusGained(FocusEvent e){
+	//IG.err();
     }
     
     
     public void componentHidden(ComponentEvent e){
+	//IG.err();
     }
     public void componentMoved(ComponentEvent e){
+	//IG.err();
     }
     public void componentResized(ComponentEvent e){
+	
+	//IG.err("componentResized: e = "+e); //
+	
 	int w = e.getComponent().getBounds().width;
 	int h = e.getComponent().getBounds().height;
+	
+	//IG.err("componentResized: "+w+"x"+h); //
+	
 	setSize(w,h);
+
+	
+	//IG.err("componentResized: end"); //
     }
     public void componentShown(ComponentEvent e){
+	//IG.err();
     }
 
     

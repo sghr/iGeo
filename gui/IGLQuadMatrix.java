@@ -78,10 +78,10 @@ public class IGLQuadMatrix extends IGLElement{
 	normal[y*width+x] = nrm;
     }
     
-    public void draw(GL gl){
+    public void draw(GL2 gl){
 	if(normal!=null){
 	    for(int i=0; i<height-1; i++){
-		gl.glBegin(GL.GL_QUAD_STRIP);
+		gl.glBegin(GL2.GL_QUAD_STRIP);
 		for(int j=0; j<width; j++){
 		    IVec n1 = normal[i*width+j];
 		    gl.glNormal3d(n1.x,n1.y,n1.z);
@@ -99,7 +99,7 @@ public class IGLQuadMatrix extends IGLElement{
 	}
 	else{
 	    for(int i=0; i<height-1; i++){
-		gl.glBegin(GL.GL_QUAD_STRIP);
+		gl.glBegin(GL2.GL_QUAD_STRIP);
 		for(int j=0; j<width; j++){
 		    IVec pt1 = pts[i*width+j];
 		    gl.glVertex3d(pt1.x,pt1.y,pt1.z);

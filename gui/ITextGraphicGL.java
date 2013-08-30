@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import igeo.*;
 
 import javax.media.opengl.*;
-import com.sun.opengl.util.j2d.TextRenderer;
+//import com.sun.opengl.util.j2d.TextRenderer;
+import com.jogamp.opengl.util.awt.TextRenderer; // processing 2.0
 
 /**
    Base class of OpenGL graphic vertex data collection
@@ -79,10 +80,20 @@ public class ITextGraphicGL extends IGraphicObject{
 	if(lines==null) return 0;
 	double maxWidth=0;
 	for(int i=0; i<lines.length; i++){
-	    Rectangle2D bounds = renderer.getBounds(lines[i]);
-	    if(bounds.getWidth()>maxWidth){ maxWidth=bounds.getWidth(); }
+	    try{
+		Rectangle2D bounds = renderer.getBounds(lines[i]);
+		if(bounds.getWidth()>maxWidth){ maxWidth=bounds.getWidth(); }
+	    }catch(Exception e){ // renderer occasionally throw exception not finding GLContext
+		e.printStackTrace();
+	    }
 	}
-	return maxWidth/renderer.getFont().getSize();
+	double sz = 1;
+	try{
+	    sz = renderer.getFont().getSize();
+	}catch(Exception e){ // renderer occasionally throw exception not finding GLContext
+	    e.printStackTrace();
+	}
+	return maxWidth/sz;
     }
     
     public double textHeight(String[] lines){ if(lines==null){ return 0; } return lines.length; }
@@ -91,7 +102,7 @@ public class ITextGraphicGL extends IGraphicObject{
 	if(text.text()==null) return;
 	
 	if(g.type()==IGraphicMode.GraphicType.GL){
-	    IGraphicsGL ggl = (IGraphicsGL)g;
+	    IGraphicsGL2 ggl = (IGraphicsGL2)g;
 	    if(ggl.firstDraw() || renderer==null){ update(); } // when resized, it's firstDraw too.
 	    
 	    float halign=0, valign=0;
@@ -106,8 +117,8 @@ public class ITextGraphicGL extends IGraphicObject{
 						 text.vvec(),
 						 text.uvec().cross(text.vvec()),
 						 text.pos());
-	    ggl.getGL().glPushMatrix();
-	    ggl.getGL().glMultMatrixd(mat.toArray(),0);
+	    ggl.getGL2().glPushMatrix();
+	    ggl.getGL2().glMultMatrixd(mat.toArray(),0);
 	    renderer.begin3DRendering();
 	    renderer.setColor((float)text.red(),(float)text.green(),(float)text.blue(),(float)text.alpha());
 	    for(int i=0; i<lines.length; i++){
@@ -115,7 +126,7 @@ public class ITextGraphicGL extends IGraphicObject{
 		//renderer.flush(); // necessary?
 	    }
 	    renderer.end3DRendering();
-	    ggl.getGL().glPopMatrix();
+	    ggl.getGL2().glPopMatrix();
 	}
     }
     

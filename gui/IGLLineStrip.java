@@ -39,8 +39,8 @@ public class IGLLineStrip extends IGLElement{
     private IGLLineStrip(IVec[] pts){ super(pts); }
     private IGLLineStrip(IPolyline pl){ super(pl.get()); }
     
-    public void draw(GL gl){
-	gl.glBegin(GL.GL_LINE_STRIP);
+    public void draw(GL2 gl){
+	gl.glBegin(GL2.GL_LINE_STRIP);
 	drawPoints(gl);
 	gl.glEnd();
     }

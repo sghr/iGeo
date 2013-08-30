@@ -37,8 +37,8 @@ public class IGLLineLoop extends IGLElement{
     
     private IGLLineLoop(IPolyline pl){ super(pl.get()); }
     
-    public void draw(GL gl){
-	gl.glBegin(GL.GL_LINE_LOOP);
+    public void draw(GL2 gl){
+	gl.glBegin(GL2.GL_LINE_LOOP);
 	drawPoints(gl);
 	gl.glEnd();
     }

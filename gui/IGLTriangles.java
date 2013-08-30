@@ -67,8 +67,8 @@ public class IGLTriangles extends IGLElement{
 	normal[triangleIdx*3 + vertexIdx] = nml;
     }
     
-    public void draw(GL gl){
-	gl.glBegin(GL.GL_TRIANGLES);
+    public void draw(GL2 gl){
+	gl.glBegin(GL2.GL_TRIANGLES);
 	drawPoints(gl);
 	gl.glEnd();
     }

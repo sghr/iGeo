@@ -100,7 +100,7 @@ public abstract class IGLElement{
 	}
     }
     
-    public void drawPoints(GL gl){
+    public void drawPoints(GL2 gl){
 	if(normal!=null){
 	    for(int i=0; i<pts.length; i++){
 		gl.glNormal3d(normal[i].x,normal[i].y,normal[i].z);
@@ -116,5 +116,5 @@ public abstract class IGLElement{
 	}
     }
     
-    public abstract void draw(GL gl);
+    public abstract void draw(GL2 gl);
 }

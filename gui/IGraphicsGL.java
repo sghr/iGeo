@@ -46,6 +46,7 @@ public class IGraphicsGL implements IGraphics3D{
     
     
     public GL gl;
+    public GL2 gl2;
     public Graphics2D g;
     public IView view;
         
@@ -54,20 +55,23 @@ public class IGraphicsGL implements IGraphics3D{
     public boolean firstDraw=true;
     
     
-    public void IGraphicsGL(){}
+    public IGraphicsGL(){}
     
     public IView view(){ return view; }
     
     
-    public void setGL(GL gl){ this.gl=gl; }
+    public void setGL(GL gl){ this.gl=gl; gl2 = gl.getGL2(); }
     public void setGraphics(Graphics2D g){ this.g=g; }
     
     public GL getGL(){ return gl; }
+    public GL2 getGL2(){ return gl2; }
     public Graphics2D getGraphics(){ return g; }
     
     public IGraphicMode.GraphicType type(){ return IGraphicMode.GraphicType.GL; }
     
     public void drawBG(GL gl, IView v){
+	
+	GL2 gl2 = gl.getGL2(); // jogl 2.0
 	
 	if(view.bgColor!=null){
 	    for(int i=0; i<bgColor.length; i++){
@@ -78,97 +82,99 @@ public class IGraphicsGL implements IGraphics3D{
 		}
 	    }
 	    
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
-	    gl.glPushMatrix();
-	    gl.glLoadIdentity();
-	    gl.glMatrixMode(GL.GL_PROJECTION);
-	    gl.glPushMatrix();
-	    gl.glLoadIdentity();
-	    //if(IConfig.depthSort) gl.glDisable(GL.GL_DEPTH_TEST);
-	    //if(mode.isLight()) gl.glDisable(GL.GL_LIGHTING);
-	    gl.glBegin(GL.GL_QUADS);
-	    gl.glColor3dv(bgColor[0][1],0);
-	    gl.glVertex3d(-1.,-1.,0);
-	    gl.glColor3dv(bgColor[1][1],0);
-	    gl.glVertex3d(1.,-1.,0);
-	    gl.glColor3dv(bgColor[1][0],0);
-	    gl.glVertex3d(1.,1.,0);
-	    gl.glColor3dv(bgColor[0][0],0);
-	    gl.glVertex3d(-1.,1.,0);
-	    gl.glEnd();
-	    //if(IConfig.depthSort) gl.glEnable(GL.GL_DEPTH_TEST);
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
-	    gl.glPopMatrix();
-	    gl.glMatrixMode(GL.GL_PROJECTION);
-	    gl.glPopMatrix();
+	    //  jogl2?
+	    gl2.glMatrixMode(GL2.GL_MODELVIEW); // not in processing 2.0
+	    gl2.glPushMatrix(); // not in processing 2.0
+	    gl2.glLoadIdentity(); // not in processing 2.0
+	    gl2.glMatrixMode(GL2.GL_PROJECTION); // not in processing 2.0
+	    gl2.glPushMatrix(); // not in processing 2.0
+	    gl2.glLoadIdentity(); // not in processing 2.0
+	    
+	    //if(IConfig.depthSort) gl2.glDisable(GL2.GL_DEPTH_TEST);
+	    //if(mode.isLight()) gl2.glDisable(GL2.GL_LIGHTING);
+	    gl2.glBegin(GL2.GL_QUADS);
+	    gl2.glColor3dv(bgColor[0][1],0);
+	    gl2.glVertex3d(-1.,-1.,0);
+	    gl2.glColor3dv(bgColor[1][1],0);
+	    gl2.glVertex3d(1.,-1.,0);
+	    gl2.glColor3dv(bgColor[1][0],0);
+	    gl2.glVertex3d(1.,1.,0);
+	    gl2.glColor3dv(bgColor[0][0],0);
+	    gl2.glVertex3d(-1.,1.,0);
+	    gl2.glEnd();
+	    //if(IConfig.depthSort) gl2.glEnable(GL2.GL_DEPTH_TEST);
+	    gl2.glMatrixMode(GL2.GL_MODELVIEW);
+	    gl2.glPopMatrix();
+	    gl2.glMatrixMode(GL2.GL_PROJECTION);
+	    gl2.glPopMatrix();
 	}
     }
     
     public void drawView(IView view){
 	
-	gl.glViewport(view.screenX, view.screenY, view.screenWidth, view.screenHeight);
+	gl2.glViewport(view.screenX, view.screenY, view.screenWidth, view.screenHeight);
 	
-	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT); //
+	//gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT); //
 	
 	// background
 	
 	if(IConfig.clearBG || firstDraw){
-	    gl.glDisable(GL.GL_DEPTH_TEST); // no depth for background
+	    gl2.glDisable(GL2.GL_DEPTH_TEST); // no depth for background
 	    drawBG(gl, view);
 	}
 	
-	if(IConfig.depthSort) gl.glEnable(GL.GL_DEPTH_TEST);
+	if(IConfig.depthSort) gl2.glEnable(GL2.GL_DEPTH_TEST);
 	// should DEPTH_TEST be changed to set to hint[ENABLE_DEPTH_TEST] later?
 	
 	
-	//gl.glDisable(GL.GL_DEPTH_TEST); // !! for transparency
-	//gl.glEnable(GL.GL_DEPTH_TEST);
+	//gl2.glDisable(GL2.GL_DEPTH_TEST); // !! for transparency
+	//gl2.glEnable(GL2.GL_DEPTH_TEST);
 	
 	// default light
 	if(view.mode.isLight()){
 	    //
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
-	    gl.glPushMatrix();
-	    gl.glLoadIdentity();
+	    gl2.glMatrixMode(GL2.GL_MODELVIEW);
+	    gl2.glPushMatrix();
+	    gl2.glLoadIdentity();
 	    
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, defaultGLLightPosition, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, defaultGLAmbientLight, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, defaultGLDiffuseLight, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR,defaultGLSpecularLight, 0);
+	    gl2.glLightfv(GL2.GL_LIGHT1, GL2.GL_POSITION, defaultGLLightPosition, 0);
+	    gl2.glLightfv(GL2.GL_LIGHT1, GL2.GL_AMBIENT, defaultGLAmbientLight, 0);
+	    gl2.glLightfv(GL2.GL_LIGHT1, GL2.GL_DIFFUSE, defaultGLDiffuseLight, 0);
+	    gl2.glLightfv(GL2.GL_LIGHT1, GL2.GL_SPECULAR,defaultGLSpecularLight, 0);
 	    
-	    //gl.glLightModeli(GL.GL_LIGHT_MODEL_LOCAL_VIEWER, 1); //
+	    //gl2.glLightModeli(GL2.GL_LIGHT_MODEL_LOCAL_VIEWER, 1); //
 	    if(defaultGLTwoSidedLighting)
-		gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1); // this seems to cause weird behavior looking like some of normals are flipped or messed up
+		gl2.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 1); // this seems to cause weird behavior looking like some of normals are flipped or messed up
 	    
-	    //gl.glEnable(GL.GL_NORMALIZE); //
-	    //gl.glEnable(GL.GL_AUTO_NORMAL); //
+	    //gl2.glEnable(GL2.GL_NORMALIZE); //
+	    //gl2.glEnable(GL2.GL_AUTO_NORMAL); //
 	    
-	    gl.glEnable(GL.GL_LIGHT1);
-	    gl.glEnable(GL.GL_LIGHTING);
+	    gl2.glEnable(GL2.GL_LIGHT1);
+	    gl2.glEnable(GL2.GL_LIGHTING);
 	    	    	    
-	    gl.glPopMatrix();
+	    gl2.glPopMatrix();
 	}
 	
-	gl.glMatrixMode(GL.GL_PROJECTION);
-	gl.glLoadIdentity();
-	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+	gl2.glMatrixMode(GL2.GL_PROJECTION);
+	gl2.glLoadIdentity();
+	//gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT);
 	
 	if(view.axonometric){
 	    double glWidth = view.screenWidth*view.axonRatio;
 	    double glHeight = view.screenHeight*view.axonRatio;
-	    gl.glOrtho(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,view.near,view.far);
+	    gl2.glOrtho(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,view.near,view.far);
 	}
 	else{
 	    double glHeight = view.near*view.persRatio*2;
 	    double glWidth = glHeight*view.screenWidth/view.screenHeight;
-	    gl.glFrustum(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,view.near,view.far);
+	    gl2.glFrustum(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,view.near,view.far);
 	}
 	
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-	//gl.glLoadIdentity();
-	//gl.glTranslated(-x,-y,-z);
+	gl2.glMatrixMode(GL2.GL_MODELVIEW);
+	//gl2.glLoadIdentity();
+	//gl2.glTranslated(-x,-y,-z);
 	
-	gl.glLoadMatrixd(view.transformArray,0);
+	gl2.glLoadMatrixd(view.transformArray,0);
 	
     }
     
@@ -194,8 +200,8 @@ public class IGraphicsGL implements IGraphics3D{
 	}
 	
 	if(view.mode().isLight()){
-	    gl.glDisable(GL.GL_LIGHTING);
-	    gl.glDisable(GL.GL_LIGHT1);
+	    gl2.glDisable(GL2.GL_LIGHTING);
+	    gl2.glDisable(GL2.GL_LIGHT1);
 	}
 	
 	if(g!=null){ // overlay
@@ -220,12 +226,12 @@ public class IGraphicsGL implements IGraphics3D{
     public void clr(IColor c){
 	//clr((float)c.getRed()/255,(float)c.getGreen()/255,(float)c.getBlue()/255,(float)c.getAlpha()/255);
 	//clr(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha());
-	//gl.glColor4f(c.red(),c.green(),c.blue(),c.alpha());
-	gl.glColor4fv(c.rgba(),0);
+	//gl2.glColor4f(c.red(),c.green(),c.blue(),c.alpha());
+	gl2.glColor4fv(c.rgba(),0);
     }
-    public void clr(float[] rgba){ gl.glColor4fv(rgba,0); }
+    public void clr(float[] rgba){ gl2.glColor4fv(rgba,0); }
     public void clr(float red, float green, float blue, float alpha){
-	gl.glColor4f(red/255, green/255, blue/255, alpha/255);
+	gl2.glColor4f(red/255, green/255, blue/255, alpha/255);
     }
     public void clr(float red, float green, float blue){ clr(red,green,blue,255); }
     
@@ -237,12 +243,12 @@ public class IGraphicsGL implements IGraphics3D{
     }
     public void stroke(float red, float green, float blue){ clr(red,green,blue); }
     
-    public void weight(double w){ gl.glLineWidth((float)w); }
-    public void weight(float w){ gl.glLineWidth(w); }
+    public void weight(double w){ gl2.glLineWidth((float)w); }
+    public void weight(float w){ gl2.glLineWidth(w); }
     
     
     public void diffuse(float[] rgba){
-	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, rgba, 0);
+	gl2.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, rgba, 0);
     }
     public void diffuse(float r, float g, float b, float a){
 	diffuse(new float[]{r/255,g/255,b/255,a/255});
@@ -251,7 +257,7 @@ public class IGraphicsGL implements IGraphics3D{
     public void diffuse(IColor c){ diffuse(c.rgba()); }
     
     public void ambient(float[] rgba){
-	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, rgba, 0);
+	gl2.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, rgba, 0);
     }
     public void ambient(float r, float g , float b, float a){
 	ambient(new float[]{r/255,g/255,b/255,a/255});
@@ -260,7 +266,7 @@ public class IGraphicsGL implements IGraphics3D{
     public void ambient(IColor c){ ambient(c.rgba()); }
     
     public void specular(float[] rgba){
-	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, rgba, 0);
+	gl2.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, rgba, 0);
     }
     public void specular(float r, float g , float b, float a){
 	specular(new float[]{r/255,g/255,b/255,a/255});
@@ -269,7 +275,7 @@ public class IGraphicsGL implements IGraphics3D{
     public void specular(IColor c){ specular(c.rgba()); }
     
     public void emissive(float[] rgba){
-	gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_EMISSION, rgba, 0);
+	gl2.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, rgba, 0);
     }
     public void emissive(float r, float g , float b, float a){
 	emissive(new float[]{r/255,g/255,b/255,a/255});
@@ -278,144 +284,144 @@ public class IGraphicsGL implements IGraphics3D{
     public void emissive(IColor c){ emissive(c.rgba()); }
     
     public void shininess(float s){
-	gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS,s);
+	gl2.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS,s);
     }
     
     public void enableLight(){
-	gl.glEnable(GL.GL_LIGHT1);
-	gl.glEnable(GL.GL_LIGHTING);
+	gl2.glEnable(GL2.GL_LIGHT1);
+	gl2.glEnable(GL2.GL_LIGHTING);
     }
     public void disableLight(){
-	gl.glDisable(GL.GL_LIGHTING);
-	gl.glDisable(GL.GL_LIGHT1);
+	gl2.glDisable(GL2.GL_LIGHTING);
+	gl2.glDisable(GL2.GL_LIGHT1);
     }
     
-    public void pointSize(float sz){ gl.glPointSize(sz); }
+    public void pointSize(float sz){ gl2.glPointSize(sz); }
     
     public void drawPoint(IVec p){
-	gl.glBegin(GL.GL_POINTS);
-	gl.glVertex3d(p.x,p.y,p.z);
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_POINTS);
+	gl2.glVertex3d(p.x,p.y,p.z);
+        gl2.glEnd();
     }
     public void drawPoints(IVec[] p){
-	gl.glBegin(GL.GL_POINTS);
-	for(int i=0; i<p.length; i++){ gl.glVertex3d(p[i].x,p[i].y,p[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_POINTS);
+	for(int i=0; i<p.length; i++){ gl2.glVertex3d(p[i].x,p[i].y,p[i].z); }
+        gl2.glEnd();
     }
     public void drawLines(IVec[] p){
-	gl.glBegin(GL.GL_LINES);
-	for(int i=0; i<p.length; i++){ gl.glVertex3d(p[i].x,p[i].y,p[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_LINES);
+	for(int i=0; i<p.length; i++){ gl2.glVertex3d(p[i].x,p[i].y,p[i].z); }
+        gl2.glEnd();
     }
     public void drawLineStrip(IVec[] p){
-	gl.glBegin(GL.GL_LINE_STRIP);
-	for(int i=0; i<p.length; i++){ gl.glVertex3d(p[i].x,p[i].y,p[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_LINE_STRIP);
+	for(int i=0; i<p.length; i++){ gl2.glVertex3d(p[i].x,p[i].y,p[i].z); }
+        gl2.glEnd();
     }
     public void drawLineLoop(IVec[] p){
-	gl.glBegin(GL.GL_LINE_LOOP);
-	for(int i=0; i<p.length; i++){ gl.glVertex3d(p[i].x,p[i].y,p[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_LINE_LOOP);
+	for(int i=0; i<p.length; i++){ gl2.glVertex3d(p[i].x,p[i].y,p[i].z); }
+        gl2.glEnd();
     }
     public void drawPolygon(IVec[] pts, IVec[] nml){
-	gl.glBegin(GL.GL_POLYGON);
+	gl2.glBegin(GL2.GL_POLYGON);
 	for(int i=0; i<pts.length; i++){
-	    gl.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
-	    gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
 	}
-        gl.glEnd();
+        gl2.glEnd();
     }
     public void drawPolygon(IVec[] pts){
-	gl.glBegin(GL.GL_POLYGON);
-	for(int i=0; i<pts.length; i++){ gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_POLYGON);
+	for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
+        gl2.glEnd();
     }
     public void drawQuads(IVec[] pts){
-	gl.glBegin(GL.GL_QUADS);
-	for(int i=0; i<pts.length; i++){ gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_QUADS);
+	for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
+        gl2.glEnd();
     }
     public void drawQuads(IVec[] pts, IVec[] nml){
-	gl.glBegin(GL.GL_QUADS);
+	gl2.glBegin(GL2.GL_QUADS);
 	for(int i=0; i<pts.length; i++){
-	    gl.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
-	    gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
 	}
-        gl.glEnd();
+        gl2.glEnd();
     }
     public void drawQuadStrip(IVec[] pts){
-	gl.glBegin(GL.GL_QUAD_STRIP);
-	for(int i=0; i<pts.length; i++){ gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_QUAD_STRIP);
+	for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
+        gl2.glEnd();
     }
     public void drawQuadStrip(IVec[] pts, IVec[] nml){
-	gl.glBegin(GL.GL_QUAD_STRIP);
+	gl2.glBegin(GL2.GL_QUAD_STRIP);
 	for(int i=0; i<pts.length; i++){
-	    gl.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
-	    gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
 	}
-        gl.glEnd();
+        gl2.glEnd();
     }
     public void drawQuadMatrix(IVec[][] pts){
 	for(int i=0; i<pts.length-1; i++){
-	    gl.glBegin(GL.GL_QUAD_STRIP);
+	    gl2.glBegin(GL2.GL_QUAD_STRIP);
 	    for(int j=0; j<pts[i].length; j++){
-		gl.glVertex3d(pts[i][j].x,pts[i][j].y,pts[i][j].z);
-		gl.glVertex3d(pts[i+1][j].x,pts[i+1][j].y,pts[i+1][j].z);
+		gl2.glVertex3d(pts[i][j].x,pts[i][j].y,pts[i][j].z);
+		gl2.glVertex3d(pts[i+1][j].x,pts[i+1][j].y,pts[i+1][j].z);
 	    }
-	    gl.glEnd();
+	    gl2.glEnd();
 	}
     }
     public void drawQuadMatrix(IVec[][] pts, IVec[][] nml){
 	for(int i=0; i<pts.length-1; i++){
-	    gl.glBegin(GL.GL_QUAD_STRIP);
+	    gl2.glBegin(GL2.GL_QUAD_STRIP);
 	    for(int j=0; j<pts[i].length; j++){
-		gl.glNormal3d(nml[i][j].x,nml[i][j].y,nml[i][j].z);
-		gl.glVertex3d(pts[i][j].x,pts[i][j].y,pts[i][j].z);
-		gl.glNormal3d(nml[i+1][j].x,nml[i+1][j].y,nml[i+1][j].z);
-		gl.glVertex3d(pts[i+1][j].x,pts[i+1][j].y,pts[i+1][j].z);
+		gl2.glNormal3d(nml[i][j].x,nml[i][j].y,nml[i][j].z);
+		gl2.glVertex3d(pts[i][j].x,pts[i][j].y,pts[i][j].z);
+		gl2.glNormal3d(nml[i+1][j].x,nml[i+1][j].y,nml[i+1][j].z);
+		gl2.glVertex3d(pts[i+1][j].x,pts[i+1][j].y,pts[i+1][j].z);
 	    }
-	    gl.glEnd();
+	    gl2.glEnd();
 	}
     }
     public void drawTriangles(IVec[] pts, IVec[] nml){
-	gl.glBegin(GL.GL_TRIANGLES);
+	gl2.glBegin(GL2.GL_TRIANGLES);
 	for(int i=0; i<pts.length; i++){
-	    gl.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
-	    gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
 	}
-        gl.glEnd();
+        gl2.glEnd();
     }
     public void drawTriangles(IVec[] pts){
-	gl.glBegin(GL.GL_TRIANGLES);
-	for(int i=0; i<pts.length; i++){ gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_TRIANGLES);
+	for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
+        gl2.glEnd();
     }
     public void drawTriangleStrip(IVec[] pts, IVec[] nml){
-	gl.glBegin(GL.GL_TRIANGLE_STRIP);
+	gl2.glBegin(GL2.GL_TRIANGLE_STRIP);
 	for(int i=0; i<pts.length; i++){
-	    gl.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
-	    gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
 	}
-        gl.glEnd();
+        gl2.glEnd();
     }
     public void drawTriangleStrip(IVec[] pts){
-	gl.glBegin(GL.GL_TRIANGLE_STRIP);
-	for(int i=0; i<pts.length; i++){ gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_TRIANGLE_STRIP);
+	for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
+        gl2.glEnd();
     }
     public void drawTriangleFan(IVec[] pts, IVec[] nml){
-	gl.glBegin(GL.GL_TRIANGLE_FAN);
+	gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 	for(int i=0; i<pts.length; i++){
-	    gl.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
-	    gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
 	}
-        gl.glEnd();
+        gl2.glEnd();
     }
     public void drawTriangleFan(IVec[] pts){
-	gl.glBegin(GL.GL_TRIANGLE_FAN);
-	for(int i=0; i<pts.length; i++){ gl.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
-        gl.glEnd();
+	gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+	for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
+        gl2.glEnd();
     }
     
 }

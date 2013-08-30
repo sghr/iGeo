@@ -23,6 +23,7 @@
 package igeo.p;
 
 import processing.core.*;
+import processing.opengl.*;
 
 import java.awt.event.*;
 import java.awt.*;
@@ -213,7 +214,7 @@ public class PIGraphics3D extends PGraphics3D
 	if(hints[ENABLE_DEPTH_SORT] &&
 	   shape == POLYGON &&
 	   vertexCount > 0 &&
-	   vertexCount == shapeFirst && // first vertex
+	   /* vertexCount == shapeFirst && */ // first vertex
 	   (Math.abs(vertices[vertexCount-1][X] - x) < EPSILON) &&
 	   (Math.abs(vertices[vertexCount-1][Y] - y) < EPSILON) &&
 	   (Math.abs(vertices[vertexCount-1][Z] - z) < EPSILON)) {

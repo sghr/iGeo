@@ -30,12 +30,14 @@ import javax.media.opengl.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.*;
-import java.util.Enumeration;
+import java.util.*;
 
-import com.sun.opengl.util.j2d.Overlay;
+//import com.sun.opengl.util.j2d.Overlay;
+import com.jogamp.opengl.util.awt.Overlay; // processing 2.0
 
 import igeo.*;
 import igeo.gui.*;
+
 
 /**
    A child class of Processing's PGraphic to draw on Processing using OpenGL.
@@ -43,10 +45,13 @@ import igeo.gui.*;
    
    @author Satoru Sugihara
 */
-public class PIGraphicsGL extends PGraphicsOpenGL /*implements IPanelAdapter*/ /*MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener,*/ /*ComponentListener*/{
+public class PIGraphicsGL extends PGraphics3D /*PGraphicsOpenGL*/ 
+				   //implements IGraphics3D
+    /*implements IPanelAdapter*/ /*MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener,*/ /*ComponentListener*/
+{
     
     public IPanel panel;
-    public IGraphicsGL igg;
+    public IGraphics3D igg;
     
     /** To draw Java2D graphic over OpenGL graphic. */
     public Overlay overlay;
@@ -95,145 +100,140 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements IPanelAdapter*/ /
 	
 	ig.setInputWrapper(new PIInput(parent));
 	
+
+	parent.removeMouseListener(parent);
+	parent.removeMouseMotionListener(parent);
+	parent.removeMouseWheelListener(parent);
+	parent.removeKeyListener(parent);
+	parent.removeFocusListener(parent);
+	//parent.removeComponentListener(parent);
+	
 	parent.addMouseListener(panel);
 	parent.addMouseMotionListener(panel);
 	parent.addMouseWheelListener(panel);
 	parent.addKeyListener(panel);
 	parent.addFocusListener(panel);
 	parent.addComponentListener(panel);
-
+	
+	
 	if(parent.frame!=null){
 	    parent.frame.addWindowListener(panel);
 	}
 	
+	
 	//igg = new IGraphics();
-	igg = new IGraphicsGL();
+	//igg = new IGraphicsGL();
+	//igg = this;
+	igg = new IGraphicsGL2();
 	
 	//noSmooth();
-		
-	if(PIConfig.drawBeforeProcessing) parent.registerPre(this);
-	else parent.registerDraw(this);
+	
+	
+	if(PIConfig.drawBeforeProcessing){ parent.registerPre(this); }
+	else{ parent.registerDraw(this); }
 	parent.registerPost(this);
+	
 	
 	if(PIConfig.resizable && parent.frame!=null){ // frame seems to be null in exported applet
 	    parent.frame.setResizable(true);
 	}
 	
-	super.hints[DISABLE_OPENGL_2X_SMOOTH]=true;  //
-	super.hints[ENABLE_OPENGL_4X_SMOOTH]=true;  //
+	//super.hints[DISABLE_OPENGL_2X_SMOOTH]=true;  //
+	//super.hints[ENABLE_OPENGL_4X_SMOOTH]=true;  //
+
+
+
+	// shader test
+	//String vertexShader = "#version 110\n attribute vec2 position;\n varying vec2 texcoord;\n void main(){\n gl_Position = vec4(position, 0.0, 1.0);\n texcoord = position * vec2(0.5) + vec2(0.5);\n }";
+	//String fragmentShader = "#version 110\n uniform float fade_factor;\n uniform sampler2D textures[2];\n varying vec2 texcoord;\n void main(){\n gl_FragColor = mix( texture2D(textures[0], texcoord), texture2D(textures[1], texcoord), fade_factor); }";
+	
     }
     
+    @Override
+    public void initPrimary(){
+	super.initPrimary();
+	
+	pgl.canvas.addMouseListener(panel);
+	pgl.canvas.addMouseMotionListener(panel);
+	pgl.canvas.addMouseWheelListener(panel);
+	pgl.canvas.addKeyListener(panel);
+	pgl.canvas.addFocusListener(panel);
+	pgl.canvas.addComponentListener(panel);
+    }
+    
+    
+    /* // debug
     public void setGLProperties(){
-	gl.glEnable(GL.GL_MULTISAMPLE); //
-	gl.glEnable(GL.GL_POINT_SMOOTH); //
-	gl.glEnable(GL.GL_LINE_SMOOTH); //
-	gl.glEnable(GL.GL_POLYGON_SMOOTH); //
 	
-	gl.glEnable(GL.GL_ALPHA_TEST); //
-	//gl.glEnable(GL.GL_BLEND); //
-	//gl.glDisable(GL.GL_BLEND); //
-	//gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA); //
-	//gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE); //
+	GL2 gl = pgl.gl.getGL2(); // processing 2.0
 	
-	gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST); //
-	gl.glHint(GL.GL_POINT_SMOOTH_HINT, GL.GL_NICEST); //
-	gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST); //
+	gl.glEnable(GL2.GL_MULTISAMPLE); //
+	gl.glEnable(GL2.GL_POINT_SMOOTH); //
+	gl.glEnable(GL2.GL_LINE_SMOOTH); //
+	gl.glEnable(GL2.GL_POLYGON_SMOOTH); //
 	
-	//gl.glEnable(GL.GL_NORMALIZE); //
-	//gl.glEnable(GL.GL_AUTO_NORMAL); //
-	//gl.glShadeModel(GL.GL_SMOOTH); //
+	gl.glEnable(GL2.GL_ALPHA_TEST); //
+	//gl.glEnable(GL2.GL_BLEND); //
+	//gl.glDisable(GL2.GL_BLEND); //
+	//gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA); //
+	//gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE); //
 	
-	//gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1); //
+	gl.glHint(GL2.GL_LINE_SMOOTH_HINT, GL2.GL_NICEST); //
+	gl.glHint(GL2.GL_POINT_SMOOTH_HINT, GL2.GL_NICEST); //
+	gl.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST); //
 	
-	//gl.glEnable(GL.GL_DEPTH_TEST); // already enabled in super
-	//gl.glDisable(GL.GL_DEPTH_TEST); // ? for transparency
+	//gl.glEnable(GL2.GL_NORMALIZE); //
+	//gl.glEnable(GL2.GL_AUTO_NORMAL); //
+	//gl.glShadeModel(GL2.GL_SMOOTH); //
 	
-	//gl.glEnable(GL.GL_LIGHTING); // test!
-	//gl.glEnable(GL.GL_LIGHT1); // test!
+	//gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 1); //
+	
+	//gl.glEnable(GL2.GL_DEPTH_TEST); // already enabled in super
+	//gl.glDisable(GL2.GL_DEPTH_TEST); // ? for transparency
+	
+	//gl.glEnable(GL2.GL_LIGHTING); // test!
+	//gl.glEnable(GL2.GL_LIGHT1); // test!
 	
     }
-    
+    */
     
     public void pre(){ drawIG(); }
     public void draw(){ drawIG(); }
     
+
     /**
        Drawing all the iGeo objects through IPanel.
        Overlay is also used to draw 2D graphics on top of OpenGL 3D graphics.
     */
     public synchronized void drawIG(){
+
+	((IGraphicsGL2)igg).setGL(pgl.gl);
 	
-	int[] viewport=null;
-	if(PIConfig.restoreGLViewport){
-	    viewport = new int[4];
-	    gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
-	}
+	super.beginPGL();
 	
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPushMatrix();
-	
-        gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glPushMatrix();
-	
-	if(PIConfig.resetGLDepthBefore) gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-	
-	//gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-	
-	//gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-	
-	setGLProperties();
-	
-	if(igg.getGraphics()==null){
-	    setOverlay();
-	}
-	
-	//igg.setGraphics(overlay.createGraphics());
-	
-	igg.getGraphics().clearRect(0,0,parent.getWidth(),parent.getHeight()); //
-	
-	//overlay = new Overlay(drawable); //
-	//Graphics2D g = overlay.createGraphics();
-	//igg.setGraphics(g);
-	
-	igg.setGL(gl);
-		
 	panel.draw(igg);
 	
-	if(PIConfig.resetGLDepthAfter) gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-	
-	gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glPopMatrix();
-	
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPopMatrix();
-	
-	
-	// bring the original viewport back
-	if(PIConfig.restoreGLViewport && viewport!=null){
-	    gl.glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-	}
-	
-	if(overlay!=null){
-	    overlay.markDirty(0,0,parent.getWidth(),parent.getHeight());
-	    overlay.drawAll();
-	}
-	
-	//g.dispose();
-	//igg.getGraphics().dispose();
+	super.endPGL();
+
     }
     
-    public void setOverlay(){
-	overlay = new Overlay(drawable); //
-	igg.setGraphics(overlay.createGraphics());
-	igg.getGraphics().setBackground(overlayBG);
+    public void setOverlay(){ // doing nothing for now
+	/*
+	if(pgl.canvas instanceof GLDrawable){
+	    //overlay = new Overlay(drawable); // processing 1.5
+	    overlay = new Overlay((GLDrawable)pgl.canvas); // processing 2.0
+	    igg.setGraphics(overlay.createGraphics());
+	    igg.getGraphics().setBackground(overlayBG);
+	}
+	*/
     }
     
     public void setSize(int w, int h){
 	super.setSize(w,h);
-	setOverlay(); // update overlay
+	//setOverlay(); // update overlay
+	//panel.setSize(w,h); //
     }
-    
-    
+        
     public void post(){
 	if(overwritePAppletFinish) parent.finished=finished;
 	if(overwritePAppletLoop) if(looping) parent.loop(); else parent.noLoop();
@@ -245,56 +245,5 @@ public class PIGraphicsGL extends PGraphicsOpenGL /*implements IPanelAdapter*/ /
     public void start(){ if(finished) finished=false; }
     public void stop(){ if(!finished) finished=true; }
     
-    /*
-    public void mousePressed(MouseEvent e){
-    }
-    public void mouseReleased(MouseEvent e){
-    }
-    public void mouseClicked(MouseEvent e){
-    }
-    public void mouseEntered(MouseEvent e){
-    }
-    public void mouseExited(MouseEvent e){
-    }
-    public void mouseMoved(MouseEvent e){
-    }
-    public void mouseDragged(MouseEvent e){
-    }
-    public void mouseWheelMoved(MouseWheelEvent e){
-    }
-    public void keyPressed(KeyEvent e){
-    }
-    public void keyReleased(KeyEvent e){
-    }
-    public void keyTyped(KeyEvent e){
-    }
-    public void focusLost(FocusEvent e){
-    }
-    public void focusGained(FocusEvent e){
-    }
-    */
-    /*
-    public void componentHidden(ComponentEvent e){
-    }
-    public void componentMoved(ComponentEvent e){
-    }
-    public synchronized void componentResized(ComponentEvent e){
-	int w = e.getComponent().getBounds().width;
-	int h = e.getComponent().getBounds().height;
-	setSize(w,h);
-    }
-    public void componentShown(ComponentEvent e){
-    }
-    */
-    
-    /*
-    public void close(){
-	Enumeration applets = parent.getAppletContext().getApplets();
-	while(applets.hasMoreElements() && !anyother){
-	    if(applets.nextElement() != parent){
-	    }
-	}
-    }
-    */
 }
 

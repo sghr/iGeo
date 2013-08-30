@@ -38,8 +38,8 @@ public class IGLPolygon extends IGLElement{
     //public IGLPolygon(IPolyline pl){ super(pl.get()); }
     private IGLPolygon(IVec[] pts){ super(pts); }
     
-    public void draw(GL gl){
-	gl.glBegin(GL.GL_POLYGON);
+    public void draw(GL2 gl){
+	gl.glBegin(GL2.GL_POLYGON);
 	drawPoints(gl);
 	gl.glEnd();
     }

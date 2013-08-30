@@ -48,10 +48,10 @@ import igeo.io.*;
 public class IG implements IServerI{
     
     public static int majorVersion(){ return 0; }
-    public static int minorVersion(){ return 8; }
-    public static int buildVersion(){ return 3; }
+    public static int minorVersion(){ return 9; }
+    public static int buildVersion(){ return 0; }
     public static int revisionVersion(){ return 0; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 07, 12); }
+    public static Calendar versionDate(){ return new GregorianCalendar(2013, 8, 30); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -63,13 +63,14 @@ public class IG implements IServerI{
     public static final Object lock = new Object();
     
     /** Processing Graphics using OpenGL to be put in size() method in Processing */
+    //public static final String GL = "igeo.p.PIGraphicsGL";
     public static final String GL = "igeo.p.PIGraphicsGL"; 
     
     /** Processing Graphics using P3D to be put in size() method in Processing; under development. do not use yet. */
-    public static final String P3D = "igeo.p.PIGraphics3D";
+    //public static final String P3D = "igeo.p.PIGraphics3D";
     
     /** alias of IG.P3D */
-    public static final String P3 = P3D;
+    //public static final String P3 = P3D;
     
     /** Processing Graphics using JAVA to be put in size() method in Processing; to be implemented */
     //public static final String JAVA = "igeo.p.PIGraphicsJava";
@@ -341,8 +342,7 @@ public class IG implements IServerI{
 	if(ig==null) return null;
 	return ig.getInputFile();
     }
-
-
+    
     /** get all points in the current server */
     public static IPoint[] points(){
 	IG ig = cur(); return ig==null?null:ig.getPoints();

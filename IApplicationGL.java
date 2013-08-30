@@ -24,7 +24,9 @@ package igeo;
 import java.awt.*;
 import java.awt.event.*;
 import javax.media.opengl.*;
-import com.sun.opengl.util.*;
+//import com.sun.opengl.util.*;
+import com.jogamp.opengl.util.*; // processing 2.0
+import javax.media.opengl.awt.*; // processing 2.0
 
 import igeo.gui.*;
 
@@ -76,12 +78,12 @@ public class IApplicationGL implements GLEventListener /*, IPanelAdapter*/{
 	
 	igg = new IGraphicsGL();
 	
-	drawable.addMouseListener(panel);
-	drawable.addMouseMotionListener(panel);
-	drawable.addMouseWheelListener(panel);
-	drawable.addKeyListener(panel);
-	drawable.addFocusListener(panel);
-	drawable.addComponentListener(panel);
+	((Component)drawable).addMouseListener((MouseListener)panel);
+	((Component)drawable).addMouseMotionListener((MouseMotionListener)panel);
+	((Component)drawable).addMouseWheelListener((MouseWheelListener)panel);
+	((Component)drawable).addKeyListener((KeyListener)panel);
+	((Component)drawable).addFocusListener((FocusListener)panel);
+	((Component)drawable).addComponentListener((ComponentListener)panel);
 	frame.addWindowListener(panel);
 	
 	initObjects(); // init geometry objects
@@ -92,15 +94,15 @@ public class IApplicationGL implements GLEventListener /*, IPanelAdapter*/{
     // copied from PIGraphicsGL.java
     public void setGLProperties(GL gl){
         gl.glEnable(GL.GL_MULTISAMPLE); 
-        gl.glEnable(GL.GL_POINT_SMOOTH); 
+        //gl.glEnable(GL.GL_POINT_SMOOTH); 
         gl.glEnable(GL.GL_LINE_SMOOTH); 
-        gl.glEnable(GL.GL_POLYGON_SMOOTH); 
+        //gl.glEnable(GL.GL_POLYGON_SMOOTH); 
 	
-        gl.glEnable(GL.GL_ALPHA_TEST); 
+        //gl.glEnable(GL.GL_ALPHA_TEST); 
 	
         gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST); 
-        gl.glHint(GL.GL_POINT_SMOOTH_HINT, GL.GL_NICEST); 
-        gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST); 
+        //gl.glHint(GL.GL_POINT_SMOOTH_HINT, GL.GL_NICEST); 
+        //gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST); 
     }
     
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {}
@@ -117,6 +119,10 @@ public class IApplicationGL implements GLEventListener /*, IPanelAdapter*/{
 	igg.setGL(gl);
 	panel.draw(igg);
     }
+
+    
+    public void dispose(GLAutoDrawable drawable){} // added 20130731
+    
     
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {}
     
