@@ -50,8 +50,8 @@ public class IG implements IServerI{
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 9; }
     public static int buildVersion(){ return 0; }
-    public static int revisionVersion(){ return 0; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 8, 30); }
+    public static int revisionVersion(){ return 1; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2013, 9, 5); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -1205,7 +1205,8 @@ public class IG implements IServerI{
 	return retval;
     }
     
-    public boolean saveFile(String file){
+    
+    public String formatOutputFilePath(String file){
 	File f = new File(file);
 	if(!f.isAbsolute() && basePath!=null){
 	    file = basePath + File.separator + file;
@@ -1217,6 +1218,24 @@ public class IG implements IServerI{
 		}
 	    }
 	}
+	return file;
+    }
+    
+    public boolean saveFile(String file){
+	file = formatOutputFilePath(file);
+	/*
+	File f = new File(file);
+	if(!f.isAbsolute() && basePath!=null){
+	    file = basePath + File.separator + file;
+	    File baseDir = new File(basePath);
+	    if(!baseDir.isDirectory()){
+		IOut.debug(20, "creating directory"+baseDir.toString());
+		if(!baseDir.mkdir()){
+		    IOut.err("failed to create directory: "+baseDir.toString());
+		}
+	    }
+	}
+	*/
 	return IIO.save(file,this);
     }
     

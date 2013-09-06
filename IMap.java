@@ -27,6 +27,8 @@ import igeo.gui.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.ArrayList;
+import java.io.*;
+import javax.imageio.*;
 
 /**
    A base class of map classes to provide mapping function to set values on a 2D map and extract value out of the map. The value contained on the map is double in the range of 0.0 - 1.0.
@@ -34,8 +36,11 @@ import java.util.ArrayList;
    @author Satoru Sugihara
 */
 public class IMap{
-    public static final int defaultDensityWidth=100;
-    public static final int defaultDensityHeight=100;
+    public static int defaultDensityWidth=100;
+    public static int defaultDensityHeight=100;
+
+    public static int defaultExportWidth=256;
+    public static int defaultExportHeight=256;
     
     public static final double densityMinDelta = 1.0/10000;
     
@@ -125,12 +130,59 @@ public class IMap{
     }
     
     
+    
+    public void saveAsJPEG(String filePath){
+	filePath = IG.cur().formatOutputFilePath(filePath);
+	IOut.debug(0,"saving jpg file: "+filePath);
+	BufferedImage img = createImage();
+        try{ ImageIO.write(img,"jpeg",new File(filePath)); }
+        catch(IOException ioe){ ioe.printStackTrace(); }
+    }
+    
+    public void saveAsJPEG(String filePath, int imgWidth, int imgHeight){
+	filePath = IG.cur().formatOutputFilePath(filePath);
+	IOut.debug(0,"saving jpg file: "+filePath);
+	BufferedImage img = createImage(imgWidth,imgHeight);
+        try{ ImageIO.write(img,"jpeg",new File(filePath)); }
+        catch(IOException ioe){ ioe.printStackTrace(); }
+    }
+    
+    public void saveAsPNG(String filePath){
+	filePath = IG.cur().formatOutputFilePath(filePath);
+	IOut.debug(0,"saving png file: "+filePath);
+	BufferedImage img = createImage();
+        try{ ImageIO.write(img,"png",new File(filePath)); }
+        catch(IOException ioe){ ioe.printStackTrace(); }
+    }
+    
+    public void saveAsPNG(String filePath, int imgWidth, int imgHeight){
+	filePath = IG.cur().formatOutputFilePath(filePath);
+	IOut.debug(0,"saving png file: "+filePath);
+	BufferedImage img = createImage(imgWidth,imgHeight);
+        try{ ImageIO.write(img,"png",new File(filePath)); }
+        catch(IOException ioe){ ioe.printStackTrace(); }
+    }
+    
+    
+    
+    public BufferedImage createImage(){
+	int w = defaultExportWidth;
+	int h = defaultExportHeight;
+	if(this instanceof IDoubleMap){
+	    IDoubleMap dmap = (IDoubleMap)this;
+	    w = dmap.width;
+	    h = dmap.height;
+	}
+	return createImage(w,h);
+    }
+    
     public BufferedImage createImage(int imgWidth, int imgHeight){
 	BufferedImage bi = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_INT_RGB);
 	for(int i=0; i<imgWidth; i++){
 	    for(int j=0; j<imgHeight; j++){
 		double val = get( (double)i/(imgWidth-1),  (double)j/(imgHeight-1) );
 		int grayval = (int)(val*255);
+		if(grayval<0) grayval=0; else if(grayval>255) grayval=255;
 		int rgb = grayval*256*256+grayval*256+grayval;
 		bi.setRGB(i,j,rgb);
 	    }

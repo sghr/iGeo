@@ -108,7 +108,7 @@ public class ISurfaceDepthMap extends IMap{
     }
     
     public double get(double u, double v){
-	IVec diff = surface.pt(u,u).get().diff(minDepthPt);
+	IVec diff = surface.pt(u,v).get().diff(minDepthPt);
 	return depthDir.dot(diff)/maxDepth;
     }
 }
