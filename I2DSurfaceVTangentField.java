@@ -40,7 +40,11 @@ public class I2DSurfaceVTangentField extends I2DField{
     public I2DSurfaceVTangentField linear(double threshold){ super.linear(threshold); return this; }
     public I2DSurfaceVTangentField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public I2DSurfaceVTangentField gaussian(double threshold){ super.gaussian(threshold); return this; }
+    public I2DSurfaceVTangentField gauss(double threshold){ super.gauss(threshold); return this; }
     public I2DSurfaceVTangentField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
+/** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public I2DSurfaceVTangentField bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
     public I2DSurfaceVTangentField threshold(double t){ super.threshold(t); return this; }
     public I2DSurfaceVTangentField intensity(double i){ super.intensity(i); return this; }
     

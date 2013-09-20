@@ -35,28 +35,38 @@ public class IPointFieldGeo extends IFieldGeo implements I3DFieldI{
     public IPointFieldGeo(IVecI p, IVecI d){ pos=p; dir=d; }
     
     /** get original field value out of curve parameter u */
-    public IVecI get(IVecI v, IVecI orig){ return dir.dup(); }
-        
+    public IVecI getForce(IVecI v, IVecI orig){ return dir.dup(); } // default direction force (gravity)
+    
+    /** get original field value out of curve parameter u */
+    public IVecI getForce(IVecI pos, IVecI vel, IVecI orig){ return getForce(pos,orig); } // ignore vel as default
+    
     /** get 3D vector field value */
-    public IVecI get(IVecI v){
+    public IVecI get(IVecI v){ return get(v, null); }
+    
+    /** get 3D vector field value */
+    public IVecI get(IVecI pos, IVecI vel){
 	double r = intensity;
 	if(pos!=null){
 	    if(decay == Decay.Linear){
-		double dist = pos.dist(v);
+		double dist = pos.dist(pos);
 		if(dist >= threshold) return new IVec(); // zero
 		if(threshold>0) r *= (threshold-dist)/threshold;
 	    }
 	    else if(decay == Decay.Gaussian){
-		double dist = pos.dist(v);
+		double dist = pos.dist(pos);
 		if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	    }
 	}
-	IVecI vec = get(v,pos);
+	IVecI vec = getForce(pos,vel,pos);
+	
+	if(bidirectional && vec.get().dot(vel) < 0){ r=-r; }
+	
 	if(constantIntensity){
 	    double len = vec.len();
 	    if(len<IConfig.tolerance){ return vec.zero(); }
 	    return vec.len(r);
 	}
+	
 	return vec.mul(r);
     }
     
@@ -80,6 +90,8 @@ public class IPointFieldGeo extends IFieldGeo implements I3DFieldI{
     public IPointFieldGeo gaussian(double threshold){
 	super.gaussian(threshold); return this;
     }
+    public IPointFieldGeo gauss(double threshold){ super.gauss(threshold); return this; }
+    
     public IPointFieldGeo threshold(double t){ super.threshold(t); return this; }
     public IPointFieldGeo intensity(double i){ super.intensity(i); return this; }
 

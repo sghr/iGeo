@@ -337,15 +337,18 @@ public class IRhino3dmExporter extends IRhino3dm{
 	    if(obj.isValid()){
 		//Chunk objChunk = getObjectChunk(server.server().getObject(i));
 		Chunk objChunk = getObjectChunk(obj);
+
 		
 		if(obj instanceof IMesh){ // somehow this prevent saving meshes from crashing. why!? timing of GC?
-		    IOut.debug(100,i+": chunk ="+objChunk); //
-		    if(objChunk!=null) IOut.debug(100,i+": chunk size="+objChunk.contentLength()); //
+		    //IOut.debug(100,i+": chunk ="+objChunk); // ??
+		    //if(objChunk!=null) IOut.debug(100,i+": chunk size="+objChunk.contentLength()); // ??
 		}
 		
 		if(objChunk!=null){
 		    if(raostream!=null){
+
 			objectTable.writeTableEntry(raostream,objChunk);
+			
 			objChunk.clear();
 			objChunk = null;
 		    }
@@ -422,7 +425,7 @@ public class IRhino3dmExporter extends IRhino3dm{
     static public Brep getRhinoBrep(IBrep brep){ return new Brep(brep); }
     
     static public Mesh getRhinoMesh(IMeshI mesh){ return new Mesh(mesh); }
-        
+    
     static public TextEntity2 getRhinoText(IText text){ return new TextEntity2(text); }
     
     public Chunk getObjectChunk(IObject e) throws IOException{

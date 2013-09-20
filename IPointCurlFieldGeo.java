@@ -32,14 +32,18 @@ package igeo;
 public class IPointCurlFieldGeo extends IPointFieldGeo{
     public IPointCurlFieldGeo(IVecI pos, IVecI axis){ super(pos,axis); }
     
-    public IVecI get(IVecI v, IVecI orig){ return orig.get().dif(v).icross(dir); }
+    public IVecI getForce(IVecI v, IVecI orig){ return orig.get().dif(v).icross(dir); }
     
     public IPointCurlFieldGeo noDecay(){ super.noDecay(); return this; }
     public IPointCurlFieldGeo linearDecay(double threshold){ super.linearDecay(threshold); return this; }
     public IPointCurlFieldGeo linear(double threshold){ super.linear(threshold); return this; }
     public IPointCurlFieldGeo gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public IPointCurlFieldGeo gaussian(double threshold){ super.gaussian(threshold); return this; }
+    public IPointCurlFieldGeo gauss(double threshold){ super.gauss(threshold); return this; }
     public IPointCurlFieldGeo constantIntensity(boolean b){ super.constantIntensity(b); return this; }
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public IPointCurlFieldGeo bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
     public IPointCurlFieldGeo threshold(double t){ super.threshold(t); return this; }
     public IPointCurlFieldGeo intensity(double i){ super.intensity(i); return this; }
 }

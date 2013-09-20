@@ -36,6 +36,7 @@ public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
     /** tension is a coefficient to convert distance of two points to amount of force. */
     public double tension = defaultTension;
     public boolean constantTension=false;
+    public double maxTension = -1; // default negative, meaning no maximum limit
     
     public ISpacingEqualizer(IParticleI p1, IParticleI p2, IParticleI p3, IObject parent){
 	super(parent);
@@ -84,6 +85,12 @@ public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
     
     public boolean constant(){ return constantTension; }
     public ISpacingEqualizer constant(boolean cnst){ constantTension = cnst; return this; }
+    
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension. if constant is set, maxTension is ignored. */
+    public double maxTension(){ return maxTension; }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public ISpacingEqualizer maxTension(double maxTension){ this.maxTension = maxTension; return this; }
+    
 
     /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i){
@@ -127,7 +134,12 @@ public class ISpacingEqualizer extends IDynamicsBase implements ITensionI{
 
 	
 	dif.div(2).add(p1).sub(p2);
-	if(!constantTension){ dif.mul(tension); }
+	if(!constantTension){
+	    dif.mul(tension);
+	    if(maxTension >= 0 && dif.len() > maxTension){
+		dif.len(maxTension);
+	    }
+	}
 	else if(dif.len2()>0){ dif.len(tension); }
 	// adding force to the middle point
 	pt2.addForce(dif);

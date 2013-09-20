@@ -41,15 +41,21 @@ public class I2DSurfaceFieldGeo extends IFieldGeo implements I2DFieldI{
     
     
     /** get original field value out of curve parameter u */
-    public IVec2I get(IVecI v, IVec2I uv){ return fieldSurface.pt(uv).to2d(); }
+    public IVec2I get(IVecI pos, IVec2I uv){ return fieldSurface.pt(uv).to2d(); }
+    
+    /** get original field value out of curve parameter u */
+    public IVec2I get(IVecI pos, IVecI vel, IVec2I uv){ return fieldSurface.pt(uv).to2d(); }
     
     /** get 3D vector field value */
-    public IVec2I get(IVecI v){
-	//IVec2I uv = surface.uv(v.to2d());
-	IVec2 uv = surface.uv(v.to2d()).get();
+    public IVec2I get(IVecI v){ return get(v,(IVecI)null); }
+    
+    /** get 3D vector field value */
+    public IVec2I get(IVecI pos, IVecI vel){
+	//IVec2I uv = surface.uv(pos.to2d());
+	IVec2 uv = surface.uv(pos.to2d()).get();
 	double r = intensity;
 	if(decay == Decay.Linear){
-	    double dist = surface.pt(uv).to2d().dist(v.to2d());
+	    double dist = surface.pt(uv).to2d().dist(pos.to2d());
 	    if(dist >= threshold &&
 	       (uv.x<=0||uv.y<=0||uv.x>=1.0||uv.y>=1.0)) return new IVec2(); // zero
 	       //(uv.x<IConfig.parameterTolerance || uv.y<IConfig.parameterTolerance ||
@@ -58,18 +64,21 @@ public class I2DSurfaceFieldGeo extends IFieldGeo implements I2DFieldI{
 	    if(threshold>0) r *= (threshold-dist)/threshold;
 	}
 	else if(decay == Decay.Gaussian){
-	    double dist = surface.pt(uv).to2d().dist(v.to2d());
+	    double dist = surface.pt(uv).to2d().dist(pos.to2d());
 	    if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	}
 	
-	IVec2I vec = get(v,uv);
+	IVec2I vec = get(pos, vel, uv);
+	
+	if(bidirectional && vec.get().dot(vel.to2d()) < 0){ r=-r; }
+	
 	if(constantIntensity){
 	    double len = vec.len();
 	    if(len<IConfig.tolerance){ return vec.zero(); }
 	    return vec.len(r);
 	}
-	return vec.mul(r);
 	
+	return vec.mul(r);
 	
 	/*
 	switch(decay){
@@ -118,6 +127,10 @@ public class I2DSurfaceFieldGeo extends IFieldGeo implements I2DFieldI{
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
     public I2DSurfaceFieldGeo constantIntensity(boolean b){ super.constantIntensity(b); return this; }
     
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public I2DSurfaceFieldGeo bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
+    
     /** set no decay */
     public I2DSurfaceFieldGeo noDecay(){ super.noDecay(); return this; }
     /** set linear decay; When distance is equal to threshold, output is zero.*/
@@ -135,6 +148,8 @@ public class I2DSurfaceFieldGeo extends IFieldGeo implements I2DFieldI{
     public I2DSurfaceFieldGeo gaussian(double threshold){
 	super.gaussian(threshold); return this;
     }
+    public I2DSurfaceFieldGeo gauss(double threshold){ super.gauss(threshold); return this; }
+    
     public I2DSurfaceFieldGeo threshold(double t){ super.threshold(t); return this; }
     public I2DSurfaceFieldGeo intensity(double i){ super.intensity(i); return this; }
     

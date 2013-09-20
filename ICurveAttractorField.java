@@ -42,7 +42,11 @@ public class ICurveAttractorField extends I3DField{
     public ICurveAttractorField linear(double threshold){ super.linear(threshold); return this; }
     public ICurveAttractorField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public ICurveAttractorField gaussian(double threshold){ super.gaussian(threshold); return this; }
+    public ICurveAttractorField gauss(double threshold){ super.gauss(threshold); return this; }
     public ICurveAttractorField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public ICurveAttractorField bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
     public ICurveAttractorField threshold(double t){ super.threshold(t); return this; }
     public ICurveAttractorField intensity(double i){ super.intensity(i); return this; }
 }

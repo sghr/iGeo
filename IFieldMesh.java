@@ -68,7 +68,7 @@ public class IFieldMesh{
 	dif.x /= xnum;
 	dif.y /= ynum;
 	dif.z /= znum;
-
+	
 	grid.setGridPosition(minPos.get(), dif.x, dif.y, dif.z);
 	
 	
@@ -112,6 +112,10 @@ public class IFieldMesh{
 		    
 		    
 		    //new IPoint(pos).clr(0,0,1.).size(2); //
+		    
+		    if((i*ynum*znum+j*znum+k)%200==0){ // not all
+			IOut.debug(10, "intensity("+i+","+j+","+k+") = "+intensities[i][j][k]); //
+		    }
 		    
 		    grid.index(i,j,k);
 		    
@@ -483,6 +487,8 @@ public class IFieldMesh{
 	    //meshGeo.removeDuplicatedEdge(); // no effect
 	    return new IMesh(meshGeo);
 	}
+	
+	IOut.err("no face is sampled"); //
 	return null;
     }
 

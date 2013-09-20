@@ -256,7 +256,9 @@ public class IMesh extends IGeometry implements IMeshI{
     
     /** returns naked edges of the mesh */
     public IEdge[] nakedEdges(){ return mesh.nakedEdges(); }
+
     
+    public IMesh subdivide(){ return new IMesh(mesh.subdivide()); }
     
     
     synchronized public IMesh name(String nm){ super.name(nm); return this; }
@@ -373,6 +375,41 @@ public class IMesh extends IGeometry implements IMeshI{
 	mesh.attr(meshes[0].attr()); // copy attributes
 	return mesh;
     }
+
+    public static IMesh polyhedron(IVertex[] vtx){
+	return new IMesh(IMeshGeo.createPolyhedron(vtx));
+    }
+    public static IMesh createPolyhedron(IVertex[] vtx){ return polyhedron(vtx); }
+    
+    public static IMesh polyhedron(IVecI[] pts){
+	IVertex[] vtx = new IVertex[pts.length];
+	for(int i=0; i<pts.length; i++){ vtx[i] = new IVertex(pts[i].get()); }
+	return new IMesh(IMeshGeo.createPolyhedron(vtx));
+    }
+    public static IMesh createPolyhedron(IVecI[] pts){ return polyhedron(pts); }
+
+    
+    /** connect closest vertex */
+    public static IMesh connectVertex(IMesh mesh1, IMesh mesh2){
+	int n1 = mesh1.vertexNum();
+	int n2 = mesh2.vertexNum();
+	double mindist=-1;
+	int minIdx1=0, minIdx2=0;
+	for(int i=0; i<n1; i++){
+	    for(int j=0; j<n2; j++){
+		double dist = mesh1.vertex(i).dist(mesh2.vertex(j));
+		if(mindist<0 || dist<mindist){ mindist = dist; minIdx1=i; minIdx2=j; }
+	    }
+	}
+	return connectVertex(mesh1, mesh1.vertex(minIdx1), mesh2, mesh2.vertex(minIdx2));
+    }
+    
+    /** connect faces over a vertex */
+    public static IMesh connectVertex(IMesh mesh1, IVertex v1, IMesh mesh2, IVertex v2){
+	IMeshGeo m = IMeshGeo.connectVertex(mesh1.mesh, v1, mesh2.mesh, v2);
+	return new IMesh(m);
+    }
+    
     
     /** only setting value to closed. checking no connection of mesh */
     synchronized public IMesh close(){ mesh.close(); return this; }

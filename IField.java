@@ -78,6 +78,9 @@ abstract public class IField extends IAgent implements IFieldI{
     
     abstract public void applyField(IParticleI particle);
     
+
+    /** default field vector ignoreing velocity */
+    public IVal get(IVecI pos, IVecI vel){ return get(pos); }
     
     /**************************************
      * methods of IObject

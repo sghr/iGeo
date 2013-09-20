@@ -47,11 +47,16 @@ abstract public class IScalarField extends IField implements IScalarFieldI{
     */
     public IScalarField gaussianDecay(double threshold){ field.gaussianDecay(threshold); return this; }
     public IScalarField gaussian(double threshold){ field.gaussian(threshold); return this; }
+    public IScalarField gauss(double threshold){ field.gauss(threshold); return this; }
     /** this returns current decay type */
     //public Decay decay();
     
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
     public IScalarField constantIntensity(boolean b){ field.constantIntensity(b); return this; }
+    
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public IScalarField bidirectional(boolean b){ field.bidirectional(b); return this; }
+    
     
     
     /** set decay threshold */

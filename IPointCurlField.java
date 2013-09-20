@@ -51,7 +51,11 @@ public class IPointCurlField extends I3DField{
     public IPointCurlField linear(double threshold){ super.linear(threshold); return this; }
     public IPointCurlField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public IPointCurlField gaussian(double threshold){ super.gaussian(threshold); return this; }
+    public IPointCurlField gauss(double threshold){ super.gauss(threshold); return this; }
     public IPointCurlField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public IPointCurlField bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
     public IPointCurlField threshold(double t){ super.threshold(t); return this; }
     public IPointCurlField intensity(double i){ super.intensity(i); return this; }
     

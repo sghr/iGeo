@@ -6049,6 +6049,7 @@ public class IRhino3dm{
 	    
 	    for(int i=0; i<mesh.vertexNum(); i++){
 		IVertex v = mesh.vertex(i);
+		v.index = i;
 		vtx.add(v);
 		vertices.add(v.get());
 		if(v.normal!=null){ normals.add(v.normal.get()); }// not calc a new normal
@@ -6056,37 +6057,48 @@ public class IRhino3dm{
 		if(v.texture!=null) texture.add(v.texture.get());
 		else{ texture.add(new IVec2(0,0)); } //default value; added 20120725
 	    }
-	    
+
 	    faces = new ArrayList<MeshFace>();
 	    for(int i=0; i<mesh.faceNum(); i++){
 		IFace f = mesh.face(i);
 		if(f.vertexNum()==3){
-		    int vi1 = vtx.indexOf(f.vertex(0));
-		    int vi2 = vtx.indexOf(f.vertex(1));
-		    int vi3 = vtx.indexOf(f.vertex(2));
+		    //int vi1 = vtx.indexOf(f.vertex(0));
+		    //int vi2 = vtx.indexOf(f.vertex(1));
+		    //int vi3 = vtx.indexOf(f.vertex(2));
+		    int vi1 = f.vertex(0).index;
+		    int vi2 = f.vertex(1).index;
+		    int vi3 = f.vertex(2).index;
 		    if(vi1>=0 && vi2>=0 && vi3>=0) faces.add(new MeshFace(vi1,vi2,vi3));
 		    else{
 			IOut.err("vertex of the face is missing int the vertices array");
 		    }
 		}
 		else if(f.vertexNum()==4){
-		    int vi1 = vtx.indexOf(f.vertex(0));
-		    int vi2 = vtx.indexOf(f.vertex(1));
-		    int vi3 = vtx.indexOf(f.vertex(2));
-		    int vi4 = vtx.indexOf(f.vertex(3));
+		    //int vi1 = vtx.indexOf(f.vertex(0));
+		    //int vi2 = vtx.indexOf(f.vertex(1));
+		    //int vi3 = vtx.indexOf(f.vertex(2));
+		    //int vi4 = vtx.indexOf(f.vertex(3));
+		    int vi1 = f.vertex(0).index;
+		    int vi2 = f.vertex(1).index;
+		    int vi3 = f.vertex(2).index;
+		    int vi4 = f.vertex(3).index;
 		    if(vi1>=0 && vi2>=0 && vi3>=0 && vi4>=0) faces.add(new MeshFace(vi1,vi2,vi3,vi4));
 		    else{
 			IOut.err("vertex of the face is missing int the vertices array");
 		    }
 		}
 		else if(f.vertexNum()>4){ // divide
-		    int vi1 = vtx.indexOf(f.vertex(0));
-		    int vi2 = vtx.indexOf(f.vertex(1));
+		    //int vi1 = vtx.indexOf(f.vertex(0));
+		    //int vi2 = vtx.indexOf(f.vertex(1));
+		    int vi1 = f.vertex(0).index;
+		    int vi2 = f.vertex(1).index;
 		    if(vi1>=0&&vi2>=0){
 			for(int j=2; j<f.vertexNum(); j+=2){
 			    if(j<f.vertexNum()-1){
-				int vi3 = vtx.indexOf(f.vertex(j));
-				int vi4 = vtx.indexOf(f.vertex(j+1));
+				//int vi3 = vtx.indexOf(f.vertex(j));
+				//int vi4 = vtx.indexOf(f.vertex(j+1));
+				int vi3 = f.vertex(j).index;
+				int vi4 = f.vertex(j+1).index;
 				if(vi3>=0&&vi4>=0) faces.add(new MeshFace(vi1,vi2,vi3,vi4));
 				else{
 				    IOut.err("vertex of the face is missing int the vertices array");
@@ -6094,7 +6106,8 @@ public class IRhino3dm{
 				vi2 = vi4;
 			    }
 			    else{
-				int vi3 = vtx.indexOf(f.vertex(j));
+				//int vi3 = vtx.indexOf(f.vertex(j));
+				int vi3 = f.vertex(j).index;
 				if(vi3>=0) faces.add(new MeshFace(vi1,vi2,vi3));
 				else{
 				    IOut.err("vertex of the face is missing int the vertices array");
@@ -6187,7 +6200,6 @@ public class IRhino3dm{
 		}
 	    }
 	}
-	
 	
 	
 	public void read(Rhino3dmFile context, InputStream is)throws IOException{

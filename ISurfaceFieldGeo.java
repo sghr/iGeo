@@ -39,26 +39,36 @@ public class ISurfaceFieldGeo extends IFieldGeo implements I3DFieldI{ //extends 
     /** get original field value out of curve parameter u */
     public IVecI get(IVecI v, IVec2I uv){ return fieldSurface.pt(uv); }
     
+    /** get original field value out of curve parameter u */
+    public IVecI get(IVecI pos, IVecI vel, IVec2I uv){ return get(pos,uv); }
+    
     /** get 3D vector field value */
-    public IVecI get(IVecI v){
-	IVec2I uv = surface.uv(v);
+    public IVecI get(IVecI v){ return get(v,(IVecI)null); }
+    
+    /** get 3D vector field value */
+    public IVecI get(IVecI pos, IVecI vel){
+	IVec2I uv = surface.uv(pos);
 	double r = intensity;
 	if(decay == Decay.Linear){
-	    double dist = surface.pt(uv).dist(v);
+	    double dist = surface.pt(uv).dist(pos);
 	    if(dist >= threshold) return new IVec(); // zero
 	    if(threshold>0) r *= (threshold-dist)/threshold;
 	}
 	else if(decay == Decay.Gaussian){
-	    double dist = surface.pt(uv).dist(v);
+	    double dist = surface.pt(uv).dist(pos);
 	    if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	}
 	
-	IVecI vec = get(v,uv);
+	IVecI vec = get(pos,vel,uv);
+	
+	if(bidirectional && vec.get().dot(vel) < 0){ r=-r; }
+	
 	if(constantIntensity){
 	    double len = vec.len();
 	    if(len<IConfig.tolerance){ return vec.zero(); }
 	    return vec.len(r);
 	}
+	
 	return vec.mul(r);
 	
 	/*
@@ -102,6 +112,10 @@ public class ISurfaceFieldGeo extends IFieldGeo implements I3DFieldI{ //extends 
     
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
     public ISurfaceFieldGeo constantIntensity(boolean b){ super.constantIntensity(b); return this; }
+
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public ISurfaceFieldGeo bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
     
     /** set no decay */
     public ISurfaceFieldGeo noDecay(){ super.noDecay(); return this; }
@@ -120,6 +134,8 @@ public class ISurfaceFieldGeo extends IFieldGeo implements I3DFieldI{ //extends 
     public ISurfaceFieldGeo gaussian(double threshold){
 	super.gaussian(threshold); return this;
     }
+    public ISurfaceFieldGeo gauss(double threshold){ super.gauss(threshold); return this; }
+    
     public ISurfaceFieldGeo threshold(double t){ super.threshold(t); return this; }
     public ISurfaceFieldGeo intensity(double i){ super.intensity(i); return this; }
     

@@ -36,6 +36,7 @@ public class IStraightener extends IDynamicsBase implements IStraightenerI{
     /** tension is a coefficient to convert distance of two points to amount of force. */
     public double tension = defaultTension;
     public boolean constantTension=false;
+    public double maxTension = -1; // default negative, meaning no maximum limit
     
     public IStraightener(IParticleI p1, IParticleI p2, IParticleI p3, IObject parent){
 	super(parent);
@@ -82,7 +83,12 @@ public class IStraightener extends IDynamicsBase implements IStraightenerI{
     
     public boolean constant(){ return constantTension; }
     public IStraightener constant(boolean cnst){ constantTension = cnst; return this; }
-
+    
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension. if constant is set, maxTension is ignored. */
+    public double maxTension(){ return maxTension; }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public IStraightener maxTension(double maxTension){ this.maxTension = maxTension; return this; }
+    
     /** getting end point. i==0 , i==1 or i==2 */
     public IParticleI pt(int i){
 	if(i==2) return pt3; if(i==1) return pt2; return pt1;
@@ -125,7 +131,12 @@ public class IStraightener extends IDynamicsBase implements IStraightenerI{
 	
 	
 	dif.mul(p2.diff(p1).dot(dif)/dif.len2()).add(p1).sub(p2);
-	if(!constantTension){ dif.mul(tension); }
+	if(!constantTension){
+	    dif.mul(tension);
+	    if(maxTension>=0 && dif.len()>maxTension){
+		dif.len(maxTension);
+	    }
+	}
 	else if(dif.len2()>0){ dif.len(tension); }
 	
 	// adding force to the middle point

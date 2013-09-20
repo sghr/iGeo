@@ -39,6 +39,9 @@ public class IVertex implements IVecI{
     public IVecI normal;
     public IVec2I texture; // texture coordinates
     
+    /** index number in IMeshGeo vertices array list */
+    public int index=-1;
+    
     //public int index; // index number in parent mesh
     
     public IVertex(){ pos = new IVec(); init(); }
@@ -622,6 +625,61 @@ public class IVertex implements IVecI{
 	return "IVertex: "+pos+ " (normal="+normal+", texture="+texture+")";
     }
     
+    
+    /** list of vertices are sorted by tracing edge connection. ideally vertices are connected as a circle by edges
+	this works only when all triangulated. quad mesh might not work.
+    */
+    public static ArrayList<IVertex> sortByEdge(ArrayList<IVertex> vtx, int startIdx){
+	if(startIdx<0 || startIdx>=vtx.size()){
+	    IOut.err("start index is out of range.");
+	    return null;
+	}
+	int num = vtx.size();
+	ArrayList<IVertex> ret = new ArrayList<IVertex>();
+	boolean[] taken = new boolean[num];
+	for(int i=0; i<num; i++){ taken[i] = false; }
+	
+	ret.add(vtx.get(startIdx));
+	taken[startIdx] = true;
+	
+	for(int i=0; ret.size()<vtx.size() && i<vtx.size()*2 /*?*/; i++){
+	    int idx = findLinkedVertexInArray(ret.get(ret.size()-1), vtx, taken);
+	    if(idx<0){
+		IOut.err("given vertices are not connected");
+		return ret; // return null; // ?
+	    }
+	    ret.add(vtx.get(idx));
+	    taken[idx] = true;
+	}
+	
+	if(ret.size()==vtx.size()) return ret; // sccessful
+	
+	IOut.err("sort failed");
+	return ret; // return null; // ?
+    }
+    
+    /** list of vertices are sorted by tracing edge connection. ideally vertices are connected as a circle by edges
+	this works only when all triangulated. quad mesh might not work.
+    */
+    public static ArrayList<IVertex> sortByEdge(ArrayList<IVertex> vtx, IVertex v){
+	return sortByEdge(vtx,vtx.indexOf(v));
+    }
+    
+    /** list of vertices are sorted by tracing edge connection. ideally vertices are connected as a circle by edges
+	this works only when all triangulated. quad mesh might not work.
+    */
+    public static ArrayList<IVertex> sortByEdge(ArrayList<IVertex> vtx){
+	return sortByEdge(vtx,0);
+    }
+    
+    /** returns vertex index in arraylist */
+    public static int findLinkedVertexInArray(IVertex v, ArrayList<IVertex> vlist, boolean[] skiplist){
+	for(int i=0; i<vlist.size(); i++){
+	    if(!skiplist[i] && v.linkedVertices.contains(vlist.get(i))){ return i; }
+	}
+	return -1;
+    }
+    
     public static class ZComparator implements IComparator<IVertex>{
 	public int compare(IVertex v1, IVertex v2){
 	    double z1=v1.pos.z();
@@ -650,5 +708,7 @@ public class IVertex implements IVecI{
 	    return 0;
 	}
     }
+    
+    
     
 }

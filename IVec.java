@@ -939,6 +939,12 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return to2d(projectionDir).isInside(pts);
     }
     
+    public boolean isInsideTriangle(IVecI pt1, IVecI pt2, IVecI pt3){
+	double[] coef = this.dif(pt1).projectTo2Vec(pt2.get().dif(pt1), pt3.get().dif(pt1));
+	//orig = coef[0] * v1 + coef[1] * v2 + coef[2] * v1.cross(v2); (this is already projected)
+	if(coef[0]<0 || coef[0]>1 || coef[1] < 0 || coef[1]>1) return false;
+	return true;
+    }
     
     
     /** alias of cross. (not unitized) */
@@ -1440,7 +1446,16 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return cnt.div(v.length);
     }
     
-
+    /** calculate circumcenter; center of circumcircle */
+    public static IVec circumcenter(IVecI pt1, IVecI pt2, IVecI pt3){
+	IVec d1 = pt2.get().dif(pt1);
+	IVec d2 = pt3.get().dif(pt1);
+	IVec[] itxn = intersectPlane(d1, pt1.get().mid(pt2), d2, pt1.get().mid(pt3));
+	if(itxn==null) return null; // 2 dirs are pararell
+	return intersectPlaneAndLine(d1.cross(d2), pt1.get(), itxn[0], itxn[1]);
+    }
+        
+    
     public static IVec[] toIVecArray(IVecI[] array){
 	if(array==null) return null;
 	IVec[] ret = new IVec[array.length];
@@ -2686,7 +2701,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	if(ldir.len2()<IConfig.tolerance*IConfig.tolerance) return null; // plane is parallel
 	IVec t = plane1Dir.cross(ldir);
 	t.mul( plane2Dir.dot(plane2Pt.dif(plane1Pt))/plane2Dir.dot(t) );
-	t.add(plane1Dir);
+	t.add(plane1Pt); //t.add(plane1Dir); // bug!!!
 	return new IVec[]{ ldir, t };
     }
     

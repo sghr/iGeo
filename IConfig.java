@@ -191,6 +191,9 @@ public /*interface*/ class IConfig{
     
     /** update normal vector of mesh when its graphics is updated by agents. */
     public static boolean updateMeshNormal=false;
+
+    /** remove duplicated vertices and edges under the tolerance = IConfig.tolerance automatically when a mesh is created in new IMesh(IFace[] faces) */
+    public static boolean removeDuplicatesAtMeshCreation=true; 
     
     
     /*****************************

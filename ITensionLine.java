@@ -110,6 +110,12 @@ public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! a
 	tensionDynamics.constant(cnst); return this;
     }
     
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension. if constant is set, maxTension is ignored. */
+    public double maxTension(){ return tensionDynamics.maxTension(); }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public ITensionLine maxTension(double maxTension){ tensionDynamics.maxTension(maxTension); return this; }
+    
+    
     /** getting end point. i==0 or i==1. if i is other value, returns first point. */
     public IParticleI pt(int i){ return tensionDynamics.pt(i); }
     /** alias of pt(int) */

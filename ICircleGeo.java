@@ -161,6 +161,14 @@ public class ICircleGeo extends ICurveGeo{
     }
     
     
+    public static ICircleGeo circumcircle(IVecI pt1, IVecI pt2, IVecI pt3){
+	IVec center = IVec.circumcenter(pt1.get(),pt2.get(),pt3.get());
+	double rad = center.dist(pt1);
+	IVec nml = pt1.get().nml(pt2,pt3);
+	return new ICircleGeo(center,nml,rad);
+    }
+    
+    
     
     public IVecI center;
     public IVecI normal;

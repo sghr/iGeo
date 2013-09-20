@@ -33,7 +33,8 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public ArrayList<IVertex> vertices;
     public ArrayList<IEdge> edges;
     public ArrayList<IFace> faces;
-    
+
+    /** just setting boolean value to closed. checking no connection of mesh. used to set closed flag in saving */
     public boolean closed=false;
     
     //public IMeshGeo(ArrayList<ICurveI> lines){ initWithLines(lines, new IMeshType()); }
@@ -94,7 +95,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
         vertices = new ArrayList<IVertex>();
         edges = new ArrayList<IEdge>();
         faces = new ArrayList<IFace>();
-	for(int i=0; i<vtx.length; i++) vertices.add(vtx[i]);
+	for(int i=0; i<vtx.length; i++) addVertex(vtx[i]); //vertices.add(vtx[i]);
 	for(int i=0; i<edg.length; i++) edges.add(edg[i]);
 	for(int i=0; i<fcs.length; i++) faces.add(fcs[i]);
     }
@@ -104,7 +105,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	vertices = new ArrayList<IVertex>();
         edges = new ArrayList<IEdge>();
         faces = new ArrayList<IFace>();
-	for(int i=0; i<vert.length; i++) vertices.add(new IVertex(vert[i]));
+	for(int i=0; i<vert.length; i++) addVertex(new IVertex(vert[i])); //vertices.add(new IVertex(vert[i]));
 	for(int i=0; i<vert.length; i++)
 	    edges.add(new IEdge(vertices.get(i), vertices.get((i+1)%vertices.size())));
 	IEdge[] e = new IEdge[edges.size()];
@@ -116,7 +117,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	vertices = new ArrayList<IVertex>();
         edges = new ArrayList<IEdge>();
         faces = new ArrayList<IFace>();
-	for(int i=0; i<vert.length; i++) vertices.add(vert[i]);
+	for(int i=0; i<vert.length; i++) addVertex(vert[i]); //vertices.add(vert[i]);
 	for(int i=0; i<vert.length; i++)
 	    edges.add(new IEdge(vertices.get(i), vertices.get((i+1)%vertices.size())));
 	IEdge[] e = new IEdge[edges.size()];
@@ -159,8 +160,12 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
         faces = new ArrayList<IFace>();
 	for(IFace f : fcs){
 	    faces.add(f);
-	    for(IVertex v : f.vertices) if(!vertices.contains(v)) vertices.add(v);
+	    for(IVertex v : f.vertices) if(!vertices.contains(v)) addVertex(v); //vertices.add(v);
 	    for(IEdge e : f.edges) if(!edges.contains(e)) edges.add(e);
+	}
+	
+	if(IConfig.removeDuplicatesAtMeshCreation){
+	    this.removeDuplicates();
 	}
     }
     
@@ -170,7 +175,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
         edges = new ArrayList<IEdge>();
         faces = new ArrayList<IFace>();
 	
-	for(int i=0; i<m.vertices.size(); i++) vertices.add(m.vertices.get(i).dup());
+	for(int i=0; i<m.vertices.size(); i++)  addVertex(m.vertices.get(i).dup()); //vertices.add(m.vertices.get(i).dup());
 	for(int i=0; i<m.edges.size(); i++) edges.add(m.edges.get(i).dup());
 	for(int i=0; i<m.faces.size(); i++) faces.add(m.faces.get(i).dup());
 	
@@ -180,7 +185,8 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	for(int i=0; i<m.vertices.size(); i++) replaceVertex(m.vertices.get(i), vertices.get(i));
 	
     }
-
+    
+    
     /*
     public void initWithLines(ArrayList<ICurveI> lines, IMeshType creator){
 	initWithLines(lines.toArray(new ICurveI[lines.size()]),creator);
@@ -214,8 +220,8 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	    IVertex p2 = creator.createVertex(link.end().get());
 	    IEdge e = creator.createEdge(p1,p2);
 	    edges.add(e);
-	    vertices.add(p1);
-	    vertices.add(p2);
+	    vertices.add(p1); // addVertex(p1); //would it mess up because some of them replaced later?
+	    vertices.add(p2); // addVertex(p2); //would it mess up because some of them replaced later?
 	    //}
         }
 	
@@ -349,7 +355,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 		}
 		if(unique){
 		    vtx[j] = creator.createVertex(cp);
-		    vertices.add(vtx[j]);
+		    addVertex(vtx[j]); // vertices.add(vtx[j]); 
 		}
 	    }
 	    IEdge[] e = new IEdge[num];
@@ -387,11 +393,11 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	}
 	initWithClosedLines(cpts.toArray(new IVecI[cpts.size()][]),creator);
     }
-    
+
     public IMeshGeo get(){ return this; }
     
     public IMeshGeo dup(){ return new IMeshGeo(this); }
-
+    
     public boolean isValid(){
 	if(vertices==null) return false;
 	for(int i=0; i<vertices.size(); i++){
@@ -401,6 +407,14 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	    }
 	}
 	return true;
+    }
+
+    /** add a vertex to a mesh and set index number to the vertex */
+    // this makes a vartex impossble to be shared between different mesh
+    public void addVertex(IVertex v){
+	//if(vertices==null){ vertices = new ArrayList<IVertex>(); }
+	//v.index = vertices.size(); // this will be done at saving
+	vertices.add(v);
     }
     
     /** For use in copy constructor */
@@ -445,35 +459,241 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
-    static IMeshGeo createMeshWithEdges(ArrayList<IEdge> edges, IMeshType creator){
+    public static IMeshGeo createMeshWithEdges(ArrayList<IEdge> edges, IMeshType creator){
 	IMeshGeo mesh = new IMeshGeo();
 	mesh.initWithEdges(edges,creator);
 	return mesh;
     }
+
+    /** create polyhedron mesh by delaunay triangulation around a center */
+    public static IMeshGeo createPolyhedron(IVertex[] vtx){
+	int n = vtx.length;
+	IVec c = new IVec();
+	IVec[] p = new IVec[n];
+	for(int i=0; i<n; i++){ p[i] = vtx[i].get().dup(); c.add(p[i]); }
+	c.div(n);
+	for(int i=0; i<n; i++){ p[i].sub(c).unit(); } // unitize around center
+	
+	ArrayList<IFace> fcs = new ArrayList<IFace>();
+	for(int i=0; i<n; i++){
+	    for(int j=i+1; j<n; j++){
+		for(int k=j+1; k<n; k++){
+		    boolean in=false;
+		    IVec cc = IVec.circumcenter(p[i],p[j],p[k]);
+		    if(cc==null) in=true;
+		    else{
+			double r = cc.dist(p[i]);
+			for(int l=0; l<n&&!in; l++){
+			    if(i!=l&&j!=l&&k!=l){
+				IVec ix = IVec.intersectPlaneAndLine(p[i],p[j],p[k],p[l],IG.origin);
+				if(ix!=null && ix.dot(p[l])>0 && r>cc.dist(ix)){
+				    in=true;
+				}
+			    }
+			}
+		    }
+		    if(!in){
+			if(p[i].nml(p[j],p[k]).dot(p[i])>0){
+			    fcs.add(new IFace(vtx[i],vtx[j],vtx[k]));
+			}
+			else{
+			    fcs.add(new IFace(vtx[i],vtx[k],vtx[j]));
+			}
+		    }
+		}
+	    }
+	}
+	
+	return new IMeshGeo(fcs.toArray(new IFace[fcs.size()]));
+    }
+    
+    /** alias of createPolyhedron */
+    public static IMeshGeo polyhedron(IVertex[] vtx){
+	return createPolyhedron(vtx);
+    }
+    
+    /** connect closest vertex */
+    public static IMeshGeo connectVertex(IMeshGeo mesh1, IMeshGeo mesh2){
+	int n1 = mesh1.vertexNum();
+	int n2 = mesh2.vertexNum();
+	double mindist=-1;
+	int minIdx1=0, minIdx2=0;
+	for(int i=0; i<n1; i++){
+	    for(int j=0; j<n2; j++){
+		double dist = mesh1.vertex(i).dist(mesh2.vertex(j));
+		if(mindist<0 || dist<mindist){ mindist = dist; minIdx1=i; minIdx2=j; }
+	    }
+	}
+	return connectVertex(mesh1, mesh1.vertex(minIdx1), mesh2, mesh2.vertex(minIdx2));
+    }
+    
+    
+    public static IMeshGeo connectVertex(IMeshGeo mesh1, IVertex v1, IMeshGeo mesh2, IVertex v2){
+	
+	// remove duplicated vertices (multiple edge to a same vertex)
+	ArrayList<IVertex> vtx1 = new ArrayList<IVertex>();
+	ArrayList<IVertex> vtx2 = new ArrayList<IVertex>();
+	
+	for(int i=0; i<v1.linkedVertices.size(); i++){
+	    if(!vtx1.contains(v1.linkedVertices.get(i))){
+		vtx1.add(v1.linkedVertices.get(i));
+	    }
+	}
+	
+	for(int i=0; i<v2.linkedVertices.size(); i++){
+	    if(!vtx2.contains(v2.linkedVertices.get(i))){
+		vtx2.add(v2.linkedVertices.get(i));
+	    }
+	}
+		
+	ArrayList<IVertex> allVtx = new ArrayList<IVertex>();
+	for(int i=0; i<vtx1.size(); i++){ allVtx.add(vtx1.get(i)); }
+	for(int i=0; i<vtx2.size(); i++){ allVtx.add(vtx2.get(i)); }
+	IMeshGeo mesh = IMeshGeo.polyhedron(allVtx.toArray(new IVertex[allVtx.size()])); //
+	
+	ArrayList<IFace> fcs = new ArrayList<IFace>();
+	
+	for(int i=0; i<mesh.faceNum(); i++){
+	    boolean mixed=false;
+	    if(vtx1.contains(mesh.face(i).vertex(0))){
+		for(int j=1; j<mesh.face(i).vertexNum() && !mixed; j++){
+		    if(!vtx1.contains(mesh.face(i).vertex(j))){ mixed=true; }
+		}
+	    }
+	    else{ // vertex is in vtx2
+		for(int j=1; j<mesh.face(i).vertexNum() && !mixed; j++){
+		    if(vtx1.contains(mesh.face(i).vertex(j))){ mixed=true; }
+		}
+	    }
+	    
+	    if(mixed){ // connecting vtx1 and vtx2
+		fcs.add(mesh.face(i));
+	    }
+	}
+	
+	for(int i=0; i<mesh1.faceNum(); i++){
+	    boolean contain=false;
+	    for(int j=0; j<mesh1.face(i).vertexNum() && !contain; j++){
+		if(mesh1.face(i).vertex(j)==v1) contain=true;
+	    }
+	    if(!contain){ fcs.add(mesh1.face(i)); }
+	}
+	
+	for(int i=0; i<mesh2.faceNum(); i++){
+	    boolean contain=false;
+	    for(int j=0; j<mesh2.face(i).vertexNum() && !contain; j++){
+		if(mesh2.face(i).vertex(j)==v2) contain=true;
+	    }
+	    if(!contain){ fcs.add(mesh2.face(i)); }
+	}
+	
+	return new IMeshGeo(fcs.toArray(new IFace[fcs.size()]));
+	
+	/*    
+	int ln1 = vtx1.size();
+	int ln2 = vtx2.size();
+	
+	double mindist=-1;
+	int minIdx1=0, minIdx2=0;
+	for(int i=0; i<ln1; i++){
+	    if(vtx1.get(i).dist(v1)>IConfig.tolerance ){
+		for(int j=0; j<ln2; j++){
+		    if(vtx2.get(j).dist(v2)>IConfig.tolerance ){
+			double dist = vtx1.get(i).dist(vtx2.get(j));
+			if(mindist<0 || dist<mindist){ mindist = dist; minIdx1=i; minIdx2=j; }
+		    }
+		}
+	    }
+	}
+	
+	vtx1 = IVertex.sortByEdge(vtx1, minIdx1);
+	vtx2 = IVertex.sortByEdge(vtx2, minIdx2);
+	
+	if(vtx1==null || vtx2==null){ // how about partial error where sorted.size()<vertices.size()
+	    IOut.err("connection error");
+	    return null;
+	}
+	ln1 = vtx1.size();
+	ln2 = vtx2.size();
+	
+	// check direction of ring
+	IVec cnt1 = IVec.center(vtx1.toArray(new IVertex[vtx1.size()]));
+	IVec cnt2 = IVec.center(vtx2.toArray(new IVertex[vtx2.size()]));
+	IVec dir = cnt2.dif(cnt1);
+	
+	IVec nml1 = IVec.averageNormal(vtx1.toArray(new IVertex[vtx1.size()]));
+	IVec nml2 = IVec.averageNormal(vtx2.toArray(new IVertex[vtx2.size()]));
+
+	if(dir.dot(nml1) * dir.dot(nml2) < 0){
+	//if(nml1.dot(nml2)<0){
+	    // flip order
+	    ArrayList<IVertex> tmp = new ArrayList<IVertex>();
+	    for(int i=ln2-1; i>=0; i--){ tmp.add(vtx2.get(i)); }
+	    vtx2.clear();
+	    vtx2 = tmp;
+	    nml2.flip();
+	}
+	ArrayList<IFace> fcs = new ArrayList<IFace>();
+	for(int i=0,j=0; i<ln1&&j<ln2; ){
+	    IVertex u1 = vtx1.get(i%ln1);
+	    IVertex u2 = vtx2.get(j%ln2);
+	    IVertex u3 = null;
+	    if(i==ln1){
+		u3 = vtx2.get((j+1)%ln2);
+		j++;
+	    }
+	    else if(j==ln2){
+		u3 = vtx1.get((i+1)%ln1);
+		i++;
+	    }
+	    else{
+		if( u1.dist(vtx2.get((j+1)%ln2)) < u2.dist(vtx1.get((i+1)%ln1)) ){
+		    u3 = vtx2.get((j+1)%ln2);
+		    j++;
+		}
+		else{
+		    u3 = vtx1.get((i+1)%ln1);
+		    i++;
+		}
+	    }
+	    fcs.add(new IFace(u1,u2,u3));
+	    if(i>=ln1-1 && j>=ln2-1){
+		i++; j++; // end
+	    }
+	    else{
+		if(ln1<ln2){ if(i==ln1){ i--; } }
+		else{ if(j==ln2){ j--; } }
+	    }
+	}
+	return new IMeshGeo(fcs.toArray(new IFace[fcs.size()])); //
+	*/
+    }
+    
     
     public void initWithEdges(ArrayList<IEdge> edges, IMeshType creator){
 	
 	for(int i=0; i<edges.size(); i++){
 	    if(!vertices.contains(edges.get(i).vertices[0]))
-		vertices.add(edges.get(i).vertices[0]);
+		addVertex(edges.get(i).vertices[0]);
+		//vertices.add(edges.get(i).vertices[0]);
+		
 	    if(!vertices.contains(edges.get(i).vertices[1]))
-		vertices.add(edges.get(i).vertices[1]);
+		addVertex(edges.get(i).vertices[1]);
+		//vertices.add(edges.get(i).vertices[1]);
 	}
         
         // pick all points
-        ArrayList<IVertex> vertices = new ArrayList<IVertex>();
-	
-	for(int i=0; i<edges.size(); i++){
-	    if(!vertices.contains(edges.get(i).vertices[0]))
-		vertices.add(edges.get(i).vertices[0]);
-	    if(!vertices.contains(edges.get(i).vertices[1]))
-		vertices.add(edges.get(i).vertices[1]);
-	}
-		
+        //ArrayList<IVertex> vertices = new ArrayList<IVertex>();
+	//
+	//for(int i=0; i<edges.size(); i++){
+	//    if(!vertices.contains(edges.get(i).vertices[0]))
+	//	vertices.add(edges.get(i).vertices[0]);
+	//    if(!vertices.contains(edges.get(i).vertices[1]))
+	//	vertices.add(edges.get(i).vertices[1]);
+	//}
 	// putting index of arrya to local index (unexpected use)
         //for(int i=0; i<vertices.size(); i++) vertices.get(i).setIndex(i);
-	
-	
+		
 	faces = new ArrayList<IFace>();
         for(int i=0; i<edges.size(); i++){
             IEdge e = edges.get(i);
@@ -508,7 +728,8 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	for(int i=0; i<unum; i++){
 	    for(int j=0; j<vnum; j++){
 		vmatrix[i][j] = creator.createVertex(matrix[i][j]);
-		vertices.add(vmatrix[i][j]);
+		//vertices.add(vmatrix[i][j]);
+		addVertex(vmatrix[i][j]);
 	    }
 	}
 	
@@ -720,13 +941,19 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
         }
         
         for(int i=0; i<f.vertices.length; i++){
-            if(!vertices.contains(f.vertices[i])){ vertices.add(f.vertices[i]); }
+            if(!vertices.contains(f.vertices[i])){
+		//vertices.add(f.vertices[i]);
+		addVertex(f.vertices[i]);
+	    }
         }
     }
     
     public void addFace(IFace f, boolean checkVertexExisting, boolean checkEdgeExisting, boolean checkFaceExisting){
 	for(int i=0; i<f.vertices.length; i++){
-	    if(!checkVertexExisting || !vertices.contains(f.vertices[i])) vertices.add(f.vertices[i]);
+	    if(!checkVertexExisting || !vertices.contains(f.vertices[i])){
+		//vertices.add(f.vertices[i]);
+		addVertex(f.vertices[i]);
+	    }
 	}
 	for(int i=0; i<f.edges.length; i++){
 	    if(!checkEdgeExisting || !edges.contains(f.edges[i])) edges.add(f.edges[i]);
@@ -775,7 +1002,12 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public void addTriangleStrip(IVertex[] v){
 	if(v.length<3) return;
 	
-	for(int i=0; i<v.length; i++) if(!vertices.contains(v[i])) vertices.add(v[i]);
+	for(int i=0; i<v.length; i++){
+	    if(!vertices.contains(v[i])){
+		//vertices.add(v[i]);
+		addVertex(v[i]);
+	    }
+	}
 	
 	IEdge[] edges1 = new IEdge[v.length-1];
 	IEdge[] edges2 = new IEdge[v.length-2];
@@ -794,7 +1026,11 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public void addTriangleStrip(IVec[] v){
 	if(v.length<3) return;
 	IVertex[] vtx = new IVertex[v.length];
-	for(int i=0; i<v.length; i++){ vtx[i] = new IVertex(v[i]); vertices.add(vtx[i]); }
+	for(int i=0; i<v.length; i++){
+	    vtx[i] = new IVertex(v[i]);
+	    //vertices.add(vtx[i]);
+	    addVertex(vtx[i]);
+	}
 	
 	IEdge[] edges1 = new IEdge[v.length-1];
 	IEdge[] edges2 = new IEdge[v.length-2];
@@ -812,7 +1048,12 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public void addQuadStrip(IVertex[] v){
 	if(v.length<4) return;
 	int num = v.length/2;
-	for(int i=0; i<num*2; i++) if(!vertices.contains(v[i])) vertices.add(v[i]);
+	for(int i=0; i<num*2; i++){
+	    if(!vertices.contains(v[i])){
+		//vertices.add(v[i]);
+		addVertex(v[i]);
+	    }
+	}
 	
 	IEdge[] edges1 = new IEdge[num];
 	IEdge[] edges2 = new IEdge[num-1];
@@ -831,7 +1072,11 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	if(v.length<4) return;
 	int num = v.length/2;
 	IVertex[] vtx = new IVertex[num*2];
-	for(int i=0; i<num*2; i++){ vtx[i] = new IVertex(v[i]); vertices.add(vtx[i]); }
+	for(int i=0; i<num*2; i++){
+	    vtx[i] = new IVertex(v[i]);
+	    //vertices.add(vtx[i]);
+	    addVertex(vtx[i]);
+	}
 	
 	IEdge[] edges1 = new IEdge[num];
 	IEdge[] edges2 = new IEdge[num-1];
@@ -849,7 +1094,12 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public void addTriangleFan(IVertex[] v){
 	if(v.length<3) return;
 	
-	for(int i=0; i<v.length; i++) if(!vertices.contains(v[i])) vertices.add(v[i]);
+	for(int i=0; i<v.length; i++){
+	    if(!vertices.contains(v[i])){
+		//vertices.add(v[i]);
+		addVertex(v[i]);
+	    }
+	}
 	
 	IEdge[] edges1 = new IEdge[v.length-1];
 	IEdge[] edges2 = new IEdge[v.length-2];
@@ -864,7 +1114,11 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public void addTriangleFan(IVec[] v){
 	if(v.length<3) return;
 	IVertex[] vtx = new IVertex[v.length];
-	for(int i=0; i<v.length; i++){ vtx[i] = new IVertex(v[i]); vertices.add(vtx[i]); }
+	for(int i=0; i<v.length; i++){
+	    vtx[i] = new IVertex(v[i]);
+	    //vertices.add(vtx[i]);
+	    addVertex(vtx[i]);
+	}
 	
 	IEdge[] edges1 = new IEdge[v.length-1];
 	IEdge[] edges2 = new IEdge[v.length-2];
@@ -916,7 +1170,10 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	    }
 	}
 	
-	if(!vertices.contains(v)) vertices.add(v);
+	if(!vertices.contains(v)){
+	    //vertices.add(v);
+	    addVertex(v);
+	}
 	
 	for(int i=0; i<num; i++){
 	    edges.add(newEdges[i]);
@@ -975,7 +1232,10 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	}
 	
 	// usually already added in insertVertex
-	if(!vertices.contains(vertexOnEdge)) vertices.add(vertexOnEdge);
+	if(!vertices.contains(vertexOnEdge)){
+	    //vertices.add(vertexOnEdge);
+	    addVertex(vertexOnEdge);
+	}
 	
 	for(int i=0; i<num; i++){
 	    if(newEdges[i]!=newEdge1 && newEdges[i]!=newEdge2) edges.add(newEdges[i]);
@@ -998,7 +1258,8 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	IEdge ne1 = creator.createEdge(v1, v);
 	IEdge ne2 = creator.createEdge(v, v2);
 	
-	vertices.add(v);
+	//vertices.add(v);
+	addVertex(v);
 	edges.add(ne1);
 	edges.add(ne2);
 	
@@ -1117,7 +1378,8 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	for(int i=0; i<ratios.length; i++){
 	    vtx[i] = creator.createVertex(v2.pos.dup().get().sum(v1.pos,1.-ratios[i]));
 	    vtx[i].setNormal(n1.sum(n2,ratios[i]));
-	    vertices.add(vtx[i]);
+	    //vertices.add(vtx[i]);
+	    addVertex(vtx[i]);
 	}
 	
 	IEdge[] ne = new IEdge[vtx.length+1];
@@ -1437,7 +1699,10 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	    }
 	}
 
-	for(int i=0; i<newVertices.size();i++)vertices.add(newVertices.get(i));
+	for(int i=0; i<newVertices.size();i++){
+	    //vertices.add(newVertices.get(i));
+	    addVertex(newVertices.get(i));
+	}
 	for(int i=0; i<newEdges.size(); i++) edges.add(newEdges.get(i));
 	for(int i=0; i<newFaces.size(); i++) faces.add(newFaces.get(i));
 	
@@ -1518,6 +1783,56 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	    if(naked[i]){ nakedEdges.add(edges.get(i)); }
 	}
 	return nakedEdges;
+    }
+    
+    /** subdivide all triangle faces into 4 triangles each divided at each mid point of edges. */
+    public IMeshGeo subdivide(){
+	
+	IVertex[] midVtx = new IVertex[edges.size()];
+	
+	for(int i=0; i<edges.size(); i++){
+	    midVtx[i] = new IVertex(edges.get(i).vertex(0).get().mid(edges.get(i).vertex(1)));
+	}
+	
+	ArrayList<IFace> fcs = new ArrayList<IFace>();
+	
+	for(int i=0; i<faces.size(); i++){
+	    IFace f = faces.get(i);
+	    if(f.vertexNum()==3){
+		IVertex v1 = f.vertex(0);
+		IVertex v2 = f.vertex(1);
+		IVertex v3 = f.vertex(2);
+		
+		IEdge e1 = f.getEdge(v1, v2);
+		IEdge e2 = f.getEdge(v2, v3);
+		IEdge e3 = f.getEdge(v3, v1);
+		
+		int ei1 = edges.indexOf(e1);
+		int ei2 = edges.indexOf(e2);
+		int ei3 = edges.indexOf(e3);
+		
+		if(ei1>=0 && ei2>=0 && ei3>=0){
+		    IVertex m1 = midVtx[ei1];
+		    IVertex m2 = midVtx[ei2];
+		    IVertex m3 = midVtx[ei3];
+		    
+		    IFace f1 = new IFace(v1, m1, m3);
+		    IFace f2 = new IFace(v2, m2, m1);
+		    IFace f3 = new IFace(v3, m3, m2);
+		    IFace f4 = new IFace(m1, m2, m3);
+		    
+		    fcs.add(f1);
+		    fcs.add(f2);
+		    fcs.add(f3);
+		    fcs.add(f4);
+		}
+	    }
+	    else{
+		
+	    }
+	}
+	
+	return new IMeshGeo(fcs.toArray(new IFace[fcs.size()]));
     }
     
     
@@ -1657,8 +1972,9 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     
-    /** only setting value to closed. checking no connection of mesh */
-    public IMeshGeo close(){ closed=true; return this; } 
+    /** just setting boolean value to closed. checking no connection of mesh. used to set closed flag in saving */
+    public IMeshGeo close(){ closed=true; return this; }
+    /** just setting boolean value to closed. checking no connection of mesh. used to set closed flag in saving */
     public boolean isClosed(){ return closed; }
     
     
@@ -1672,7 +1988,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	mesh.removeDuplicates();
 	return mesh;
     }
-
+    
     /** join other meshes into the current one and remove duplicated edges and vertices */
     public IMeshGeo join(IMeshGeo[] meshes){ return join(meshes, IConfig.tolerance); }
     
@@ -1681,7 +1997,10 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	synchronized(IG.lock){ // IG.lock or IG.dynamicServer() ?
 	    for(int i=0; i<meshes.length; i++){
 		for(int j=0; j<meshes[i].vertexNum(); j++){
-		    if(!vertices.contains(meshes[i].vertex(j))) vertices.add(meshes[i].vertex(j));
+		    if(!vertices.contains(meshes[i].vertex(j))){
+			//vertices.add(meshes[i].vertex(j));
+			addVertex(meshes[i].vertex(j));
+		    }
 		}
 		for(int j=0; j<meshes[i].edgeNum(); j++){
 		    if(!edges.contains(meshes[i].edge(j))) edges.add(meshes[i].edge(j));
@@ -1781,7 +2100,10 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	    for(int i=0; i<faces2.size(); i++){
 		IFace f = faces2.get(i);
 		for(int j=0; j<f.vertices.length; j++){
-		    if(!vertices.contains(f.vertices[j])) vertices.add(f.vertices[j]);
+		    if(!vertices.contains(f.vertices[j])){
+			//vertices.add(f.vertices[j]);
+			addVertex(f.vertices[j]);
+		    }
 		}
 		for(int j=0; j<f.edges.length; j++){
 		    if(!edges.contains(f.edges[j])) edges.add(f.edges[j]);

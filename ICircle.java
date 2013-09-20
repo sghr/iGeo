@@ -64,6 +64,15 @@ public class ICircle extends ICurve{
 	return ICircleGeo.ovalCPApprox(center,xaxis,yaxis);
     }
     
+    public static ICircle circumcircle(IVecI pt1, IVecI pt2, IVecI pt3){
+	return new ICircle(ICircleGeo.circumcircle(pt1,pt2,pt3));
+    }
+    
+    public static ICircle circumcircle(IServer s, IVecI pt1, IVecI pt2, IVecI pt3){
+	return new ICircle(s,ICircleGeo.circumcircle(pt1,pt2,pt3));
+    }
+    
+    
     //ICircleGeo circle;
     
     public ICircle(IVecI center, IVecI normal, IDoubleI radius){
@@ -170,6 +179,8 @@ public class ICircle extends ICurve{
 	this((IServerI)null,center,xradiusVec,yradiusVec,approx);
     }
     
+    public ICircle(ICircleGeo cir){ super(cir); }
+    
     
     public ICircle(IServerI s, IVecI center, IVecI normal, IDoubleI radius){
 	super(s, new ICircleGeo(center,normal,radius,radius,false));
@@ -273,6 +284,9 @@ public class ICircle extends ICurve{
     public ICircle(IServerI s, IVecI center, IVecI xradiusVec, IVecI yradiusVec, boolean approx){
 	super(s,new ICircleGeo(center,xradiusVec,yradiusVec,approx));
     }
+    
+    public ICircle(IServerI s, ICircleGeo cir){ super(s,cir); }
+    
     
     
     // name(), layer(), clr() etc.

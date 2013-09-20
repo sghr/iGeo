@@ -40,7 +40,12 @@ public class ISurfaceNormalField extends I3DField{
     public ISurfaceNormalField linear(double threshold){ super.linear(threshold); return this; }
     public ISurfaceNormalField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public ISurfaceNormalField gaussian(double threshold){ super.gaussian(threshold); return this; }
+    public ISurfaceNormalField gauss(double threshold){ super.gauss(threshold); return this; }
     public ISurfaceNormalField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
+
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public ISurfaceNormalField bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
     public ISurfaceNormalField threshold(double t){ super.threshold(t); return this; }
     public ISurfaceNormalField intensity(double i){ super.intensity(i); return this; }
     

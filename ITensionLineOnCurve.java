@@ -60,6 +60,12 @@ public class ITensionLineOnCurve extends ICurve implements ITensionI{
 	tension.constant(cnst); return this;
     }
     
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension. if constant is set, maxTension is ignored. */
+    public double maxTension(){ return tension.maxTension(); }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public ITensionLineOnCurve maxTension(double maxTension){ tension.maxTension(maxTension); return this; }
+    
+    
     /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i){ return tension.pt(i); }
     /** alias of pt(int) */

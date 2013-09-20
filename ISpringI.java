@@ -25,13 +25,24 @@ package igeo;
 import java.util.ArrayList;
 
 /**
-   abstract field function
+   Interface API of straightener (straightening force) classes
    
    @author Satoru Sugihara
 */
+public interface ISpringI extends ITensionI{
+    
+    /** get length */
+    public double len();
+    /** set length */
+    public ISpringI len(double length);
+    /** set length by two points */
+    public ISpringI len(IVecI p1, IVecI p2);
 
-public interface I2DFieldI extends IFieldI{
-    /** get field value at 3D location */
-    public IVec2I get(IVecI pos);
-    public IVec2I get(IVecI pos, IVecI vel);
+    /** alias of len */
+    public double length();
+    /** alias of len */
+    public ISpringI length(double length);
+    /** alias of len */
+    public ISpringI length(IVecI p1, IVecI p2);
+    
 }

@@ -38,6 +38,7 @@ public class ITension extends IDynamicsBase implements ITensionI{
     /** if constantTension is true, amount of force is always constant and it's equals to tension.
 	Only direction of force changes. But if the distance is zero, force is also zero. */
     public boolean constantTension = false;
+    public double maxTension = -1; // default negative, meaning no limit
     
     public ITension(IParticleI p1, IParticleI p2, double tension, IObject parent){
 	super(parent);
@@ -143,6 +144,12 @@ public class ITension extends IDynamicsBase implements ITensionI{
     
     public boolean constant(){ return constantTension; }
     public ITension constant(boolean cnst){ constantTension = cnst; return this; }
+
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension. if constant is set, maxTension is ignored. */
+    public double maxTension(){ return maxTension; }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public ITension maxTension(double maxTension){ this.maxTension = maxTension; return this; }
+    
     
     /** getting end point. i==0 or i==1. if i is other value, returns first point. */
     public IParticleI pt(int i){ if(i==1){ return pt2; } return pt1; }
@@ -181,6 +188,9 @@ public class ITension extends IDynamicsBase implements ITensionI{
 	}
 	else{
 	    dif.mul(tension);
+	    if(maxTension>=0 && dif.len()>maxTension){
+		dif.len(maxTension);
+	    }
 	    pt1.push(dif);
 	    pt2.pull(dif); // opposite dir
 	}

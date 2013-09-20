@@ -32,7 +32,12 @@ abstract public class I3DField extends IField implements I3DFieldI{
     public I3DFieldI field;
     public I3DField(I3DFieldI f){ field=f; }
     public IVecI get(IVecI pt){ if(field==null){ return null; } return field.get(pt); }
-    public void applyField(IParticleI p){ p.push(get(p.pos())); }
+    
+    public IVecI get(IVecI pt, IVecI vel){ if(field==null){ return null; } return field.get(pt,vel); }
+    
+    //public void applyField(IParticleI p){ p.push(get(p.pos())); }
+    public void applyField(IParticleI p){ p.push(get(p.pos(),p.vel())); }
+    
     public I3DFieldI field(){ return field; }
     /** set no decay */
     public I3DField noDecay(){ if(field!=null){ field.noDecay(); } return this; }
@@ -46,12 +51,16 @@ abstract public class I3DField extends IField implements I3DFieldI{
     public I3DField gaussianDecay(double threshold){ if(field!=null){ field.gaussianDecay(threshold); } return this; }
     /** alias of gaussianDecay */
     public I3DField gaussian(double threshold){ return gaussianDecay(threshold); }
+    /** alias of gaussianDecay */
+    public I3DField gauss(double threshold){ return gaussianDecay(threshold); }
     /** this returns current decay type */
     //public Decay decay();
     
     
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
     public I3DField constantIntensity(boolean b){ if(field!=null){ field.constantIntensity(b); } return this; }
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public I3DField bidirectional(boolean b){ if(field!=null){ field.bidirectional(b); } return this; }
     
     
     /** set decay threshold */

@@ -51,6 +51,14 @@ public class IBounds{
 	compare(p.add(xwidth,yheight,zdepth));
     }
     
+    public IBounds(IObject[] objects){
+	for(int i=0; i<objects.length; i++){ compare(objects[i]); }
+    }
+    
+    public IBounds(ArrayList<IObject> objects){
+	for(int i=0; i<objects.size(); i++){ compare(objects.get(i)); }
+    }
+    
     
     public IVec min(){ return min; }
     public IVec getMin(){ return min(); }
@@ -100,6 +108,7 @@ public class IBounds{
     
     public void compare(IObject e){
 	synchronized(e){
+	    
 	    if(!e.visible()) return; // if e is in the middle of constructor, this should be false.
 	    
 	    if(e instanceof IPoint){

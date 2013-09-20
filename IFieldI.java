@@ -30,7 +30,10 @@ package igeo;
 
 public interface IFieldI{// extends ITransformable{
     /** get field value at 3D location */
-    public IVal get(IVecI v);
+    public IVal get(IVecI pos);
+    
+    /** get field value at 3D location with velocity */
+    public IVal get(IVecI pos, IVecI vel);
     
     
     /** set no decay */
@@ -45,12 +48,17 @@ public interface IFieldI{// extends ITransformable{
     public IFieldI gaussianDecay(double threshold);
     /** alias of gaussianDecay */
     public IFieldI gaussian(double threshold);
+    /** alias of gaussianDecay */
+    public IFieldI gauss(double threshold);
     
     /** this returns current decay type */
     //public Decay decay();
     
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
     public IFieldI constantIntensity(boolean b);
+    
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public IFieldI bidirectional(boolean b);
     
     /** set decay threshold */
     public IFieldI threshold(double t);

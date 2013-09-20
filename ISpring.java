@@ -29,7 +29,7 @@ import java.util.ArrayList;
    
    @author Satoru Sugihara
 */
-public class ISpring extends IDynamicsBase implements ITensionI{
+public class ISpring extends IDynamicsBase implements ISpringI{
     //public static double defaultTension=1.0;
     
     public IParticleI pt1, pt2;
@@ -38,47 +38,48 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     /** if constantTension is true, amount of force is always constant and it's equals to tension.
 	Only direction of force changes. But if the distance is zero, force is also zero. */
     public boolean constantTension = false;
-    
+    public double maxTension = -1; // default negative, maxTension is ignored
     public double length;
+    
     
     public ISpring(IParticleI p1, IParticleI p2, double tension, double length, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
 	this.tension = tension;
-	this.length = length;
+	len(length);
     }
     
     public ISpring(IVecI p1, IVecI p2, double tension, double length, IObject parent){
 	super(parent);
 	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
-	this.length = length;
+	len(length);
     }
     
     public ISpring(IParticleI p1, IParticleI p2, double tension, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
 	this.tension = tension;
-	length(p1,p2);
+	len(p1,p2);
     }
     
     public ISpring(IVecI p1, IVecI p2, double tension, IObject parent){
 	super(parent);
 	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
-	length(p1,p2);
+	len(p1,p2);
     }
     
     public ISpring(IParticleI p1, IParticleI p2, IObject parent){
 	super(parent);
 	pt1=p1; pt2=p2;
-	length(p1,p2);
+	len(p1,p2);
     }
     
     public ISpring(IVecI p1, IVecI p2, IObject parent){
 	super(parent);
 	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
-	length(p1,p2);
+	len(p1,p2);
     }
         
     public ISpring(IParticleI p1, IParticleI p2, double tension, double length){
@@ -99,20 +100,20 @@ public class ISpring extends IDynamicsBase implements ITensionI{
 	super();
 	pt1=p1; pt2=p2;
 	this.tension = tension;
-	length(p1,p2);
+	len(p1,p2);
     }
     
     public ISpring(IVecI p1, IVecI p2, double tension){
 	super();
 	pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get());
 	this.tension = tension;
-	length(p1,p2);
+	len(p1,p2);
     }
     
-    public ISpring(IParticleI p1, IParticleI p2){ super(); pt1=p1; pt2=p2; length(p1,p2); }
+    public ISpring(IParticleI p1, IParticleI p2){ super(); pt1=p1; pt2=p2; len(p1,p2); }
     
     public ISpring(IVecI p1, IVecI p2){
-	super(); pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get()); length(p1,p2);
+	super(); pt1 = new IParticleGeo(p1.get()); pt2=new IParticleGeo(p2.get()); len(p1,p2);
     }
     
     
@@ -122,9 +123,18 @@ public class ISpring extends IDynamicsBase implements ITensionI{
     public boolean constant(){ return constantTension; }
     public ISpring constant(boolean cnst){ constantTension = cnst; return this; }
     
-    public double length(){ return length; }
-    public ISpring length(double length){ this.length = length; return this; }
-    public ISpring length(IVecI p1, IVecI p2){ length = p1.dist(p2); return this; }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension. if constant is set, maxTension is ignored. */
+    public double maxTension(){ return maxTension; }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public ISpring maxTension(double maxTension){ this.maxTension = maxTension; return this; }
+    
+    public double len(){ return length; }
+    public ISpring len(double length){ this.length = length; return this; }
+    public ISpring len(IVecI p1, IVecI p2){ length = p1.dist(p2); return this; }
+    
+    public double length(){ return len(); }
+    public ISpring length(double length){ return len(length); }
+    public ISpring length(IVecI p1, IVecI p2){ return len(p1,p2); }
     
     
     /** getting end point. i==0 or i==1. if i is other value, returns first point. */
@@ -166,6 +176,9 @@ public class ISpring extends IDynamicsBase implements ITensionI{
 	}
 	else if(dist>0){
 	    dif.mul(tension*(dist-length)/dist);
+	    if(maxTension>=0 && dif.len()>maxTension){
+		dif.len(maxTension);
+	    }
 	    pt1.push(dif);
 	    pt2.pull(dif); // opposite dir
 	}

@@ -45,6 +45,9 @@ abstract public class IFieldGeo implements IFieldI{
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
     public boolean constantIntensity = IConfig.defaultConstantFieldIntensity; // default
     
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public boolean bidirectional = false; // default
+    
     //public IFieldGeo(){}
     
     
@@ -65,12 +68,19 @@ abstract public class IFieldGeo implements IFieldI{
     }
     /** alias of gaussianDecay */
     public IFieldGeo gaussian(double threshold){ return gaussianDecay(threshold); }
+    /** alias of gaussianDecay */
+    public IFieldGeo gauss(double threshold){ return gaussianDecay(threshold); }
     
     public Decay decay(){ return decay; }
     
     
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
     public IFieldGeo constantIntensity(boolean b){ constantIntensity=b; return this; }
+
+    
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public IFieldGeo bidirectional(boolean b){ bidirectional=b; return this; }
+    
     
     
     /** set decay threshold */

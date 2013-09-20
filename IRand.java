@@ -214,10 +214,14 @@ public class IRand{
     */
     static public IVec dir(){ return dir(1.0); }
     static public IVec dir(double length){
-	IVec vec = pt(-1,1);
-	double l = vec.len();
-	while(l < IConfig.tolerance){ vec = pt(-1,1); l = vec.len(); }
-	return vec.mul(length/l);
+	IVec v = new IVec(length,0,0);
+	v.rot(IG.yaxis, get(-Math.PI,Math.PI));
+	v.rot(IG.zaxis, get(0, 2*Math.PI));
+	return v;
+	//IVec vec = pt(-1,1);
+	//double l = vec.len();
+	//while(l < IConfig.tolerance){ vec = pt(-1,1); l = vec.len(); }
+	//return vec.mul(length/l);
     }
     static public IVec dir(IVecI perpendicularAxis){
 	return dir(perpendicularAxis, 1.0);
@@ -229,6 +233,14 @@ public class IRand{
 	else vec = IVec.xaxis.cross(perpendicularAxis);
 	return vec.rot(perpendicularAxis, get(Math.PI*2)).len(length);
     }
+    static public IVec dir(IVecI axis, double length, double angleRange){
+	IVec ax2 = null;
+	if(!IVec.zaxis.isParallel(axis))
+	    ax2 = IVec.zaxis.cross(axis);
+	else ax2 = IVec.xaxis.cross(axis);
+	IVec v = axis.get().cp().len(length).rot(ax2, get(angleRange));
+	return v.rot(axis, get(Math.PI*2));
+    }
     
     static public IVec direction(){ return dir(); }
     static public IVec direction(double length){ return dir(length); }
@@ -237,6 +249,9 @@ public class IRand{
     }
     static public IVec direction(IVecI perpendicularAxis, double length){
 	return dir(perpendicularAxis,length);
+    }
+    static public IVec direction(IVecI axis, double length, double angleRange){
+	return dir(axis,length,angleRange);
     }
     
     static public IVec getDirection(){ return dir(); }
@@ -247,6 +262,9 @@ public class IRand{
     static public IVec getDirection(IVecI perpendicularAxis, double length){
 	return dir(perpendicularAxis,length);
     }
+    static public IVec getDirection(IVecI axis, double length, double angleRange){
+	return dir(axis,length,angleRange);
+    }
     
     
     /**
@@ -256,11 +274,21 @@ public class IRand{
     static public IVec dir2(double length){
 	double a = get(Math.PI*2);
 	return new IVec(length*Math.cos(a), length*Math.sin(a), 0);
-    }    
+    }
+    static public IVec dir2(IVecI axis, double length, double angleRange){
+	return axis.get().cp().len(length).rot(IG.zaxis, get(-angleRange, angleRange));
+    }
+    
     static public IVec direction2(){ return dir2(); }
     static public IVec direction2(double length){ return dir2(length); }
+    static public IVec direction2(IVecI axis, double length, double angleRange){
+	return dir2(axis,length,angleRange);
+    }
     static public IVec getDirection2(){ return dir2(); }
     static public IVec getDirection2(double length){ return dir2(length); }
+    static public IVec getDirection2(IVecI axis, double length, double angleRange){
+	return dir2(axis,length,angleRange);
+    }
     
     
     static public boolean getPercent(double percent){

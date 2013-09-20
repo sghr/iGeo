@@ -31,14 +31,18 @@ package igeo;
 
 public class IAttractorGeo extends IPointFieldGeo{
     public IAttractorGeo(IVecI p){ super(p,null); }
-    public IVecI get(IVecI v, IVecI orig){ return orig.dif(v); }
+    public IVecI getForce(IVecI v, IVecI orig){ return orig.dif(v); }
     
     public IAttractorGeo noDecay(){ super.noDecay(); return this; }
     public IAttractorGeo linearDecay(double threshold){ super.linearDecay(threshold); return this; }
     public IAttractorGeo linear(double threshold){ super.linear(threshold); return this; }
     public IAttractorGeo gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public IAttractorGeo gaussian(double threshold){ super.gaussian(threshold); return this; }
+    public IAttractorGeo gauss(double threshold){ super.gauss(threshold); return this; }
     public IAttractorGeo constantIntensity(boolean b){ super.constantIntensity(b); return this; }
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public IAttractorGeo bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
     public IAttractorGeo threshold(double t){ super.threshold(t); return this; }
     public IAttractorGeo intensity(double i){ super.intensity(i); return this; }
 }

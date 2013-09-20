@@ -39,7 +39,11 @@ public class ICurvePositionField extends I3DField{
     public ICurvePositionField linear(double threshold){ super.linear(threshold); return this; }
     public ICurvePositionField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public ICurvePositionField gaussian(double threshold){ super.gaussian(threshold); return this; }
+    public ICurvePositionField gauss(double threshold){ super.gauss(threshold); return this; }
     public ICurvePositionField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
+    /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
+    public ICurvePositionField bidirectional(boolean b){ super.bidirectional(b); return this; }
+    
     public ICurvePositionField threshold(double t){ super.threshold(t); return this; }
     public ICurvePositionField intensity(double i){ super.intensity(i); return this; }
     

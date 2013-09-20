@@ -38,7 +38,7 @@ public class ITensionOnCurve extends IDynamicsBase implements ITensionI{
     /** if constantTension is true, amount of force is always constant and it's equals to tension.
         Only direction of force changes. But if the distance is zero, force is also zero. */
     public boolean constantTension = false;    
-    
+    public double maxTension = -1; // default negative, meaning no maximum limit
     public boolean isCurveClosed;
     
     public ITensionOnCurve(IParticleOnCurveI p1, IParticleOnCurveI p2, double tension, IObject parent){
@@ -79,6 +79,12 @@ public class ITensionOnCurve extends IDynamicsBase implements ITensionI{
     public boolean constant(){ return constantTension; }
     public ITensionOnCurve constant(boolean cnst){ constantTension = cnst; return this; }
     
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension. if constant is set, maxTension is ignored. */
+    public double maxTension(){ return maxTension; }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public ITensionOnCurve maxTension(double maxTension){ this.maxTension = maxTension; return this; }
+    
+    
     /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i){ if(i==1) return pt2; return pt1; }
     /** alias of pt(int) */
@@ -118,11 +124,15 @@ public class ITensionOnCurve extends IDynamicsBase implements ITensionI{
 	    if(udiff>0) udiff=tension;
 	    else if(udiff<0) udiff=-tension;
 	}
-	else{ udiff*=tension; }
+	else{
+	    udiff*=tension;
+	    if(maxTension>=0 && udiff>maxTension){
+		udiff = maxTension;
+	    }
+	}
 	
 	pt1.addUForce(udiff);
 	pt2.addUForce(-udiff); // opposite
-	
     }
     
     synchronized public void update(){

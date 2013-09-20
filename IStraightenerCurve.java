@@ -63,6 +63,12 @@ public class IStraightenerCurve extends ICurve implements IStraightenerI{
 
     public boolean constant(){ return straightener.constant(); }
     public IStraightenerCurve constant(boolean cnst){ straightener.constant(cnst); return this; }
+    
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension. if constant is set, maxTension is ignored. */
+    public double maxTension(){ return straightener.maxTension(); }
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public IStraightenerCurve maxTension(double maxTension){ straightener.maxTension(maxTension); return this; }
+    
 
     /** getting end point. i==0 or i==1 or i==2*/
     public IParticleI pt(int i){ return straightener.pt(i); }

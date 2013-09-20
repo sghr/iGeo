@@ -30,5 +30,8 @@ package igeo;
 
 public interface I3DFieldI extends IFieldI{
     /** get field value at 3D location */
-    public IVecI get(IVecI v);
+    public IVecI get(IVecI pos);
+    /** get field value at 3D location with velocity */
+    public IVecI get(IVecI pos, IVecI vel);
+
 }

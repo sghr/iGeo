@@ -34,12 +34,21 @@ public interface ITensionI{
     
     /** tension is a coefficient to convert distance of two points to amount of force. */
     public double tension();
+    /** tension is a coefficient to convert distance of two points to amount of force. */
     public ITensionI tension(double tension);
     
     /** if constantTension is true, amount of force is always constant and it's equals to tension.
         Only direction of force changes. But if the distance is zero, force is also zero. */
     public boolean constant();
+    /** if constantTension is true, amount of force is always constant and it's equals to tension.
+        Only direction of force changes. But if the distance is zero, force is also zero. */
     public ITensionI constant(boolean cnst);
+    
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public double maxTension();
+    /** if maxTension is set to be positive number, it limits the force (distance * tension) is cut off at maxTension if constant is set, maxTension is ignored. */
+    public ITensionI maxTension(double maxTension);
+    
     
     /** getting end point. i==0 or i==1 */
     public IParticleI pt(int i);

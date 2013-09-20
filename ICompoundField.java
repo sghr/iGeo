@@ -79,9 +79,9 @@ public class ICompoundField extends I3DField{
 	return this;
     }
     
+    @Override public IVecI get(IVecI pt){ return get(pt,null); }
     
-    
-    @Override public IVecI get(IVecI pt){
+    @Override public IVecI get(IVecI pt, IVecI vel){
 	// find closest field
 	I3DFieldI closestField=null;
 	double minDist=0;
@@ -121,7 +121,8 @@ public class ICompoundField extends I3DField{
 	// debug
 	//debugLine = new ICurve(pt.dup(), closestPt).clr(1.0,0.5); //
 	
-	return closestField.get(pt);
+	//return closestField.get(pt);
+	return closestField.get(pt,vel);
     }
     
     /* // child fields are aready deleted when added
