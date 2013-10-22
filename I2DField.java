@@ -28,7 +28,7 @@ package igeo;
    @author Satoru Sugihara
 */
 
-abstract public class I2DField extends IField implements I2DFieldI{
+public class I2DField extends IField implements I2DFieldI{
     public I2DFieldI field;
     public I2DField(I2DFieldI f){ field=f; }
     public IVec2I get(IVecI pt){ return field.get(pt); }

@@ -45,7 +45,7 @@ import igeo.gui.*;
    
    @author Satoru Sugihara
 */
-public class PIGraphicsGL extends PGraphics3D /*PGraphicsOpenGL*/ 
+public class PIGraphicsGL2 extends PGraphics3D /*PGraphicsOpenGL*/ 
 				   //implements IGraphics3D
     /*implements IPanelAdapter*/ /*MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener,*/ /*ComponentListener*/
 {
@@ -68,7 +68,7 @@ public class PIGraphicsGL extends PGraphics3D /*PGraphicsOpenGL*/
     public boolean looping=true;
     
     
-    public PIGraphicsGL(){ super(); }
+    public PIGraphicsGL2(){ super(); }
     
     
     /**

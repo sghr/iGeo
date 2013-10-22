@@ -44,20 +44,20 @@ public class IPointFieldGeo extends IFieldGeo implements I3DFieldI{
     public IVecI get(IVecI v){ return get(v, null); }
     
     /** get 3D vector field value */
-    public IVecI get(IVecI pos, IVecI vel){
+    public IVecI get(IVecI pt, IVecI vel){
 	double r = intensity;
-	if(pos!=null){
+	if(this.pos!=null){
 	    if(decay == Decay.Linear){
-		double dist = pos.dist(pos);
+		double dist = this.pos.dist(pt);
 		if(dist >= threshold) return new IVec(); // zero
 		if(threshold>0) r *= (threshold-dist)/threshold;
 	    }
 	    else if(decay == Decay.Gaussian){
-		double dist = pos.dist(pos);
+		double dist = this.pos.dist(pt);
 		if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	    }
 	}
-	IVecI vec = getForce(pos,vel,pos);
+	IVecI vec = getForce(pt,vel,this.pos);
 	
 	if(bidirectional && vec.get().dot(vel) < 0){ r=-r; }
 	

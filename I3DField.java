@@ -28,7 +28,7 @@ package igeo;
    @author Satoru Sugihara
 */
 
-abstract public class I3DField extends IField implements I3DFieldI{
+public class I3DField extends IField implements I3DFieldI{
     public I3DFieldI field;
     public I3DField(I3DFieldI f){ field=f; }
     public IVecI get(IVecI pt){ if(field==null){ return null; } return field.get(pt); }

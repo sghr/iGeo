@@ -28,8 +28,9 @@ import java.util.ArrayList;
 
 import igeo.*;
 
+
 import javax.media.opengl.*;
-//import com.sun.opengl.util.j2d.TextRenderer;
+//import com.sun.opengl.util.j2d.TextRenderer; // processing 1.5
 import com.jogamp.opengl.util.awt.TextRenderer; // processing 2.0
 
 /**
@@ -102,7 +103,7 @@ public class ITextGraphicGL extends IGraphicObject{
 	if(text.text()==null) return;
 	
 	if(g.type()==IGraphicMode.GraphicType.GL){
-	    IGraphicsGL2 ggl = (IGraphicsGL2)g;
+	    IGraphicsGL ggl = (IGraphicsGL)g;
 	    if(ggl.firstDraw() || renderer==null){ update(); } // when resized, it's firstDraw too.
 	    
 	    float halign=0, valign=0;
@@ -117,8 +118,11 @@ public class ITextGraphicGL extends IGraphicObject{
 						 text.vvec(),
 						 text.uvec().cross(text.vvec()),
 						 text.pos());
-	    ggl.getGL2().glPushMatrix();
-	    ggl.getGL2().glMultMatrixd(mat.toArray(),0);
+	    //GL gl = ggl.getGL(); // for processing 1.5
+	    GL2 gl = ((IGraphicsGL2)ggl).getGL2(); // for processing 2.0
+	    
+	    gl.glPushMatrix();
+	    gl.glMultMatrixd(mat.toArray(),0);
 	    renderer.begin3DRendering();
 	    renderer.setColor((float)text.red(),(float)text.green(),(float)text.blue(),(float)text.alpha());
 	    for(int i=0; i<lines.length; i++){
@@ -126,7 +130,7 @@ public class ITextGraphicGL extends IGraphicObject{
 		//renderer.flush(); // necessary?
 	    }
 	    renderer.end3DRendering();
-	    ggl.getGL2().glPopMatrix();
+	    gl.glPopMatrix();
 	}
     }
     

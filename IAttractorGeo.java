@@ -32,7 +32,7 @@ package igeo;
 public class IAttractorGeo extends IPointFieldGeo{
     public IAttractorGeo(IVecI p){ super(p,null); }
     public IVecI getForce(IVecI v, IVecI orig){ return orig.dif(v); }
-    
+        
     public IAttractorGeo noDecay(){ super.noDecay(); return this; }
     public IAttractorGeo linearDecay(double threshold){ super.linearDecay(threshold); return this; }
     public IAttractorGeo linear(double threshold){ super.linear(threshold); return this; }

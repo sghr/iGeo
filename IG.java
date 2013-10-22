@@ -50,8 +50,8 @@ public class IG implements IServerI{
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 9; }
     public static int buildVersion(){ return 0; }
-    public static int revisionVersion(){ return 2; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 9, 19); }
+    public static int revisionVersion(){ return 4; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2013, 10, 22); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -63,8 +63,10 @@ public class IG implements IServerI{
     public static final Object lock = new Object();
     
     /** Processing Graphics using OpenGL to be put in size() method in Processing */
-    //public static final String GL = "igeo.p.PIGraphicsGL";
-    public static final String GL = "igeo.p.PIGraphicsGL"; 
+    public static final String GL1 = "igeo.p.PIGraphicsGL1";
+    public static final String GL2 = "igeo.p.PIGraphicsGL2";
+    //public static final String GL = GL1; // switch before compile for target // for processing 1.5
+    public static final String GL = GL2; // switch before compile for target // for processing 2.0
     
     /** Processing Graphics using P3D to be put in size() method in Processing; under development. do not use yet. */
     //public static final String P3D = "igeo.p.PIGraphics3D";
@@ -547,6 +549,27 @@ public class IG implements IServerI{
     /** number of objects in the current server; alias */
     public static int objNum(){ return objectNum(); }
     
+    
+    public static void del(IObject o){ o.del(); }
+    public static void del(IObject[] o){
+	for(int i=0; i<o.length; i++){ if(o[i]!=null) o[i].del(); }
+    }
+    public static void del(ArrayList<IObject> o){
+	for(int i=0; i<o.size(); i++){ if(o.get(i)!=null) o.get(i).del(); }
+    }
+    /* delete all objects of specified class */
+    public static void del(Class cls){
+	IObject[] o = objects(cls);
+	del(o);
+    }
+    /* alias of clear(): clear all not just objects but all dynamics, graphics and layers */
+    public static void delAll(){ clear(); }
+    
+    /* clear all not just objects but all dynamics, graphics and layers */
+    public static void clear(){
+	IG ig = cur();
+	if(ig!=null){ ig.clearServer(); }
+    }
     
     
     public static ILayer layer(String layerName){
@@ -1331,7 +1354,9 @@ public class IG implements IServerI{
     //public IPanelI panel(){ return panel; }
     
     //public void delete(){
-    public void clear(){ server.clear(); }
+    /* name is changed from clear() to clearServer(). delete objects, graphic objects, dynamics and layers */
+    public void clearServer(){ server.clear(); }
+    
     
     
     

@@ -30,7 +30,7 @@ import javax.media.opengl.awt.*; // processing 2.0
 
 import igeo.gui.*;
 
-public class IApplicationGL implements GLEventListener /*, IPanelAdapter*/{
+public class IApplicationGL2 implements GLEventListener /*, IPanelAdapter*/{
     
     public static void main(String[] args){
 	
@@ -38,7 +38,7 @@ public class IApplicationGL implements GLEventListener /*, IPanelAdapter*/{
 	frame.setSize(1024,768);
 	
 	GLCanvas canvas = new GLCanvas();
-	IApplicationGL application = new IApplicationGL();
+	IApplicationGL2 application = new IApplicationGL2();
 	application.setFrame(frame);
 	canvas.addGLEventListener(application);
 	frame.add(canvas);
@@ -76,7 +76,7 @@ public class IApplicationGL implements GLEventListener /*, IPanelAdapter*/{
 	ig = IG.init(panel);
 	ig.server().graphicServer().enableGL();
 	
-	igg = new IGraphicsGL();
+	igg = new IGraphicsGL2();
 	
 	((Component)drawable).addMouseListener((MouseListener)panel);
 	((Component)drawable).addMouseMotionListener((MouseMotionListener)panel);

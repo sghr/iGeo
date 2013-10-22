@@ -44,7 +44,7 @@ import igeo.gui.*;
    
    @author Satoru Sugihara
 */
-public class IGraphicsGL2 implements IGraphics3D{
+public class IGraphicsGL2 implements IGraphicsGL{
     
     // constants
     public static float[] defaultGLLightPosition = {0f, 0f, 1f, 0f};

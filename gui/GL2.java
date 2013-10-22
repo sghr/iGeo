@@ -22,16 +22,10 @@
 
 package igeo.gui;
 
-
-import igeo.*;
 import javax.media.opengl.*;
 
-
 /**
-   Interface of Graphics to draw 3D geometry with OpenGL
+   Fake GL2 interface for compiling old GL code
    @author Satoru Sugihara
 */
-public interface IGraphicsGL extends IGraphics3D{
-    public GL getGL();
-    public void setGL(GL g);
-}
+public interface GL2 extends GL{}

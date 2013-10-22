@@ -476,7 +476,7 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     public IVec4 sum(IVec v2, double w1, double w2){ return dup().mul(w1).add(v2,w2); }
     public IVec4 sum(IVec v2, double w2){ return dup().mul(1.0-w2).add(v2,w2); }
     public IVec4 sum(IVecI v2, double w1, double w2){ return sum(v2.get(),w1,w2); }
-    public IVec4 sum(IVecI v2, double w2){ return sum(v2,w2); }
+    public IVec4 sum(IVecI v2, double w2){ return sum(v2.get(),w2); }
     public IVec4 sum(IVecI v2, IDoubleI w1, IDoubleI w2){ return sum(v2.get(),w1.x(),w2.x()); }
     public IVec4 sum(IVecI v2, IDoubleI w2){ return sum(v2.get(),w2.x()); }
     
@@ -489,17 +489,17 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     
     /** create normal vector from 3 points of self, pt1 and pt2, not unitized */
     public IVec4 nml(IVec pt1, IVec pt2){
-	//return this.diff(pt1).cross(this.diff(pt2)).unit();
-	return this.diff(pt1).icross(this.diff(pt2));
+	//return this.dif(pt1).cross(this.dif(pt2)).unit();
+	return this.dif(pt1).icross(this.dif(pt2));
     }
     /** create normal vector from 3 points of self, pt1 and pt2, not unitized */
     public IVec4 nml(double vx1, double vy1, double vz1, double vx2, double vy2, double vz2){
-	return this.diff(vx1,vy1,vz1).cross(this.diff(vx2,vy2,vz2));
+	return this.dif(vx1,vy1,vz1).cross(this.dif(vx2,vy2,vz2));
     }
     /** create normal vector from 3 points of self, pt1 and pt2, not unitized */
     public IVec4 nml(IVecI pt1, IVecI pt2){
-	//return this.diff(pt1).cross(this.diff(pt2)).unit();
-	return this.diff(pt1).icross(this.diff(pt2));
+	//return this.dif(pt1).cross(this.dif(pt2)).unit();
+	return this.dif(pt1).icross(this.dif(pt2));
     }
     
     /** checking x, y, and z is valid number (not Infinite, nor NaN). */
