@@ -32,6 +32,8 @@ import java.awt.geom.*;
 import java.awt.*;
 import java.util.*;
 
+import java.lang.reflect.*;
+
 //import com.sun.opengl.util.j2d.Overlay;
 import com.jogamp.opengl.util.awt.Overlay; // processing 2.0
 
@@ -52,6 +54,8 @@ public class PIGraphicsGL2 extends PGraphics3D /*PGraphicsOpenGL*/
     
     public IPanel panel;
     public IGraphics3D igg;
+
+    public PGL localPGL;
     
     /** To draw Java2D graphic over OpenGL graphic. */
     public Overlay overlay;
@@ -140,25 +144,124 @@ public class PIGraphicsGL2 extends PGraphics3D /*PGraphicsOpenGL*/
 	
 	//super.hints[DISABLE_OPENGL_2X_SMOOTH]=true;  //
 	//super.hints[ENABLE_OPENGL_4X_SMOOTH]=true;  //
-
-
-
+	
 	// shader test
 	//String vertexShader = "#version 110\n attribute vec2 position;\n varying vec2 texcoord;\n void main(){\n gl_Position = vec4(position, 0.0, 1.0);\n texcoord = position * vec2(0.5) + vec2(0.5);\n }";
 	//String fragmentShader = "#version 110\n uniform float fade_factor;\n uniform sampler2D textures[2];\n varying vec2 texcoord;\n void main(){\n gl_FragColor = mix( texture2D(textures[0], texcoord), texture2D(textures[1], texcoord), fade_factor); }";
 	
     }
+
+    public PGL getPGL(){
+	try{
+	    Class<?> cls = Class.forName("processing.opengl.PGraphicsOpenGL");
+	    Field pglField = cls.getField("pgl");
+	    if(pglField!=null){
+		Object obj = pglField.get(this);
+		if(obj!=null && obj instanceof PGL){
+		    return (PGL)obj;
+		}
+	    }
+	}
+	catch(ClassNotFoundException e){}
+	catch(NoSuchFieldException e){}
+	catch(Exception e){ e.printStackTrace(); }
+	
+	IG.err("no PGL found"); //
+	return null;
+    }
+    
+    public GL getGL(){
+	
+	if(localPGL==null){ localPGL = getPGL(); }
+	if(localPGL==null){ return null; }
+	
+	if(localPGL.getClass().getSimpleName().equals("PJOGL")){ // Processing v 2.1
+	    try{
+		Field glField = localPGL.getClass().getField("gl");
+		if(glField!=null){
+		    Object obj = glField.get(localPGL);
+		    if(obj!=null && obj instanceof GL){
+			return (GL)obj;
+		    }
+		}
+	    }
+	    catch(NoSuchFieldException e){}
+	    catch(Exception e){ e.printStackTrace(); }
+	}
+	
+	try{
+	    Field glField = localPGL.getClass().getField("gl");
+	    if(glField!=null){
+		Object obj = glField.get(localPGL);
+		if(obj!=null && obj instanceof GL){ return (GL)obj; }
+	    }
+	}
+	catch(NoSuchFieldException e){}
+	catch(Exception e){ e.printStackTrace(); }
+	
+	IG.err("no GL found"); //
+	return null;
+    }
+    
+    public GL2 getGL2(){
+	GL gl = getGL();
+	if(gl!=null){ return gl.getGL2(); }
+	return null;
+    }
+    
+    protected Canvas getCanvas(){
+	
+	if(localPGL==null){ localPGL = getPGL(); }
+	if(localPGL==null){ return null; }
+	
+	try{
+	    Class<?> cls = localPGL.getClass();
+	    Method canvasMethod = cls.getMethod("getCanvas");
+	    if(canvasMethod != null){ // Processing 2.1
+		Object obj = canvasMethod.invoke(localPGL);
+		if(obj!=null && obj instanceof Canvas){ return (Canvas)obj; }
+	    }
+	}
+	catch(NoSuchMethodException e){}
+	catch(Exception e){ e.printStackTrace(); }
+	
+	try{
+	    Field canvasField = localPGL.getClass().getField("canvas");
+	    if(canvasField != null){ // Processing 2.0.3
+		Object fieldObj = canvasField.get(localPGL);
+		if(fieldObj!=null && fieldObj instanceof Canvas){ return (Canvas)fieldObj; }
+	    }
+	}
+	catch(NoSuchFieldException e){}
+	catch(Exception e){ e.printStackTrace(); }
+	
+	return null;
+    }
+    
     
     @Override
     public void initPrimary(){
 	super.initPrimary();
+
+	Canvas canvas = getCanvas();
+
+	if(canvas!=null){
+	    canvas.addMouseListener(panel);
+	    canvas.addMouseMotionListener(panel);
+	    canvas.addMouseWheelListener(panel);
+	    canvas.addKeyListener(panel);
+	    canvas.addFocusListener(panel);
+	    canvas.addComponentListener(panel);
+	}
 	
+	/*
 	pgl.canvas.addMouseListener(panel);
 	pgl.canvas.addMouseMotionListener(panel);
 	pgl.canvas.addMouseWheelListener(panel);
 	pgl.canvas.addKeyListener(panel);
 	pgl.canvas.addFocusListener(panel);
 	pgl.canvas.addComponentListener(panel);
+	*/
     }
     
     
@@ -206,15 +309,15 @@ public class PIGraphicsGL2 extends PGraphics3D /*PGraphicsOpenGL*/
        Overlay is also used to draw 2D graphics on top of OpenGL 3D graphics.
     */
     public synchronized void drawIG(){
-
-	((IGraphicsGL2)igg).setGL(pgl.gl);
-	
-	super.beginPGL();
-	
-	panel.draw(igg);
-	
-	super.endPGL();
-
+	GL gl= getGL();
+	if(gl!=null){
+	    if(igg instanceof IGraphicsGL){
+		((IGraphicsGL)igg).setGL(gl);
+	    }
+	    super.beginPGL();
+	    panel.draw(igg);
+	    super.endPGL();
+	}
     }
     
     public void setOverlay(){ // doing nothing for now

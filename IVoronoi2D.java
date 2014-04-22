@@ -177,6 +177,30 @@ public class IVoronoi2D {
 	return cellPts;
     }
 
+
+    public static IVec2[][] getEdges(IVec2[] pts){
+	IVec2[][] poly = getPolygons(pts);
+	ArrayList<IVec2[]> pairs = new ArrayList<IVec2[]>();
+	for(int i=0; i<poly.length; i++){
+	    for(int j=0; j<poly[i].length; j++){
+		boolean exists=false;
+		for(int k=0; k<pairs.size()&&!exists; k++){
+		    if(pairs.get(k)[0] == poly[i][j] &&
+		       pairs.get(k)[1] == poly[i][(j+1)%poly[i].length] ||
+		       pairs.get(k)[1] == poly[i][j] &&
+		       pairs.get(k)[0] == poly[i][(j+1)%poly[i].length]){
+			exists=true;
+		    }
+		}
+		if(!exists){
+		    pairs.add(new IVec2[]{ poly[i][j], poly[i][(j+1)%poly[i].length] });
+		}
+	    }
+	}
+	return pairs.toArray(new IVec2[pairs.size()][]);
+    }
+    
+
     
     public static IVec2[] removeDuplicatedPoint(IVec2[] pts, double tolerance){
 	if(pts==null) return null;

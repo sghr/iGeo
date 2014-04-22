@@ -84,6 +84,16 @@ public class IPointR extends IObject implements IVecI{
     public IPointR x(IDoubleI vx){ pos.x(vx); return this; }
     public IPointR y(IDoubleI vy){ pos.y(vy); return this; }
     public IPointR z(IDoubleI vz){ pos.z(vz); return this; }
+
+    public IPointR x(IVecI vx){ pos.x(vx); return this; }
+    public IPointR y(IVecI vy){ pos.y(vy); return this; }
+    public IPointR z(IVecI vz){ pos.z(vz); return this; }
+    
+    public IPointR x(IVec2I vx){ pos.x(vx); return this; }
+    public IPointR y(IVec2I vy){ pos.y(vy); return this; }
+    
+
+
     
     public double x(ISwitchE e){ return pos.x(e); }
     public double y(ISwitchE e){ return pos.y(e); }

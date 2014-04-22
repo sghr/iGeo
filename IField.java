@@ -67,7 +67,6 @@ abstract public class IField extends IAgent implements IFieldI{
     
     public void interact(ArrayList<IDynamics> agents){
 	super.interact(agents); // in case of interact(IDynamics) in child class
-
 	for(int i=0; i<agents.size(); i++){
 	    if(targetClasses==null && agents.get(i) instanceof IParticleI ||
 	       targetClasses!=null && isTargetClass(agents.get(i))){

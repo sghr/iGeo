@@ -105,6 +105,22 @@ public class IVec4 extends IVec implements IVec4I, IEntityParameter{
     /** setting z component */
     public IVec4 w(IDoubleI vw){ w=vw.x(); return this; }
     
+    
+    /** setting x component by x component of input vector*/
+    public IVec4 x(IVecI v){ x(v.x()); return this; }
+    /** setting y component by y component of input vector*/
+    public IVec4 y(IVecI v){ y(v.y()); return this; }
+    /** setting z component by z component of input vector*/
+    public IVec4 z(IVecI v){ z(v.z()); return this; }
+    /** setting w component by z component of input vector*/
+    public IVec4 w(IVec4I v){ w(v.w()); return this; }
+    
+    /** setting x component by x component of input vector*/
+    public IVec4 x(IVec2I v){ x(v.x()); return this; }
+    /** setting y component by y component of input vector*/
+    public IVec4 y(IVec2I v){ y(v.y()); return this; }
+    
+    
     /** getting z component */
     public double w(ISwitchE e){ return w(); }
     

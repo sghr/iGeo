@@ -35,7 +35,9 @@ public class I2DField extends IField implements I2DFieldI{
     public IVec2I get(IVecI pt, IVecI vel){ return field.get(pt,vel); }
     
     //public void applyField(IParticleI p){ p.push(get(p.pos()).to3d()); }
-    public void applyField(IParticleI p){ p.push(get(p.pos(),p.vel()).to3d()); }
+    public void applyField(IParticleI p){
+	p.push(get(p.pos(),p.vel()).to3d());
+    }
     
     public I2DFieldI field(){ return field; }
     /** set no decay */

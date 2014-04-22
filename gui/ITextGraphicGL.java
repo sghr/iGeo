@@ -25,6 +25,7 @@ package igeo.gui;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.lang.reflect.*;
 
 import igeo.*;
 
@@ -118,8 +119,11 @@ public class ITextGraphicGL extends IGraphicObject{
 						 text.vvec(),
 						 text.uvec().cross(text.vvec()),
 						 text.pos());
+	    
+	    
+	    
 	    //GL gl = ggl.getGL(); // for processing 1.5
-	    GL2 gl = ((IGraphicsGL2)ggl).getGL2(); // for processing 2.0
+	    GL2 gl = (GL2) ((IGraphicsGL2)ggl).getGL(); // for processing 2.0
 	    
 	    gl.glPushMatrix();
 	    gl.glMultMatrixd(mat.toArray(),0);
@@ -131,6 +135,37 @@ public class ITextGraphicGL extends IGraphicObject{
 	    }
 	    renderer.end3DRendering();
 	    gl.glPopMatrix();
+	    
+	    /*
+	    GL gl = ggl.getGL();
+	    try{
+		Method glPushMatrixMethod = gl.getClass().getMethod("glPushMatrix");
+		if(glPushMatrixMethod != null){
+		    glPushMatrixMethod.invoke(gl);
+		}
+		Method glMultMatrixMethod = gl.getClass().getMethod("glMultMatrixd");
+		if(glPushMatrixMethod != null){
+		    glPushMatrixMethod.invoke(gl,new Object[]{ mat.toArray(),
+							       new Integer(0)});
+		}
+	    }catch(Exception e){
+	    e.printStackTrace();
+	    }
+	    
+	    renderer.begin3DRendering();
+	    renderer.setColor((float)text.red(),(float)text.green(),(float)text.blue(),(float)text.alpha());
+	    for(int i=0; i<lines.length; i++){
+		renderer.draw3D(lines[i], -halign, -valign-i, 0, 1f/renderer.getFont().getSize());
+		//renderer.flush(); // necessary?
+	    }
+	    renderer.end3DRendering();
+	    try{
+		Method glPopMatrixMethod = gl.getClass().getMethod("glPopMatrix");
+		if(glPopMatrixMethod != null){
+		    glPopMatrixMethod.invoke(gl);
+		}
+	    }catch(Exception e){ e.printStackTrace(); }
+	    */
 	}
     }
     

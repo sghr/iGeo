@@ -105,6 +105,8 @@ public class IGraphicsGL1 implements IGraphicsGL{
 	}
     }
     
+    public void setBGImage(String imageFilename){} // do nothing for the moment
+    
     public void drawView(IView view){
 	
 	gl.glViewport(view.screenX, view.screenY, view.screenWidth, view.screenHeight);

@@ -40,11 +40,16 @@ public class I2DSurfaceFieldGeo extends IFieldGeo implements I2DFieldI{
     }
     
     
-    /** get original field value out of curve parameter u */
-    public IVec2I get(IVecI pos, IVec2I uv){ return fieldSurface.pt(uv).to2d(); }
+    /** get original field value out of surface parameter uv */
+    public IVec2I get(IVecI pos, IVec2I uv){
+	return fieldSurface.pt(uv).to2d();
+    }
     
-    /** get original field value out of curve parameter u */
-    public IVec2I get(IVecI pos, IVecI vel, IVec2I uv){ return fieldSurface.pt(uv).to2d(); }
+    /** get original field value out of surface parameter uv */
+    public IVec2I get(IVecI pos, IVecI vel, IVec2I uv){
+	//return fieldSurface.pt(uv).to2d();
+	return get(pos,uv); // 20140323
+    }
     
     /** get 3D vector field value */
     public IVec2I get(IVecI v){ return get(v,(IVecI)null); }

@@ -152,6 +152,7 @@ public class ISurfaceCache{
 	    dist[0][0] = pt.distToTriangle(p0,pv1,pu1);
 	    minDist = dist[0][0]; minIdx[0]=uidx-1; minIdx[1]=vidx-1;
 	}
+	
 	if(pu2!=null && pv1!=null){
 	    dist[1][0] = pt.distToTriangle(p0,pu2,pv1);
 	    if(minDist<0 || dist[1][0] < minDist){ minDist = dist[1][0]; minIdx[0]=uidx; minIdx[1]=vidx-1; }
@@ -160,6 +161,7 @@ public class ISurfaceCache{
 	    dist[0][1] = pt.distToTriangle(p0,pv2,pu1);
 	    if(minDist<0 || dist[0][1] < minDist){ minDist = dist[0][1]; minIdx[0]=uidx-1; minIdx[1]=vidx; }
 	}
+	
 	if(pu2!=null && pv2!=null){
 	    dist[1][1] = pt.distToTriangle(p0,pu2,pv2);
 	    if(minDist<0 || dist[1][1] < minDist){ minDist = dist[1][1]; minIdx[0]=uidx; minIdx[1]=vidx; }
@@ -203,10 +205,8 @@ public class ISurfaceCache{
     /** approximate invert projection from 3D location to interanl parameter U (closest point on curve) */
     public IVec2 uv(IVec pt){
 	if(pts==null) init();
-	
 	int[] idx = closest(pt);
 	int[] cellIdx = getCloserTriangle(pt, idx[0], idx[1]);
-	
 	double minU = u(cellIdx[0]);
 	double minV = v(cellIdx[1]);
 	double maxU = u(cellIdx[0]+1);

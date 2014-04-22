@@ -24,7 +24,8 @@ package igeo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.awt.Color;
+import java.awt.*;
+import java.nio.*;
 
 import igeo.gui.*;
 
@@ -76,6 +77,10 @@ public class IGraphicServer{
     
     public boolean useGL;
     
+    public String bgImageFilename;
+    //public int bgTextureID;
+    //public boolean bgTextureGenerated=false;
+    
     
     public IGraphicServer(IServer s, IPanelI p){
 	server=s;
@@ -104,6 +109,38 @@ public class IGraphicServer{
 	if(views!=null) for(IView v:views) v.bgColor(c1,c2,c3,c4);
     }
     public void background(IColor c1, IColor c2, IColor c3, IColor c4){ bg(c1,c2,c3,c4); }
+
+    public void bg(String imageFilename){
+	bgImageFilename = imageFilename;
+	/*
+	int w = IImageLoader.getWidth(img);
+	int h = IImageLoader.getHeight(img);
+	byte[] buf = IImageLoader.getRGBBytes(img);
+	
+	IG.err("w = "+w+", h = "+h+", w*h*3="+(w*h*3));
+	IG.err("buf.length = "+buf.length);
+	
+	// upside down for GL
+	byte[] buf2 = new byte[buf.length];
+	for(int j=0; j<h; j++){
+	    for(int i=0; i<w; i++){
+		buf2[((h-1-j)*w+i)*3] = buf[(j*w+i)*3];
+		buf2[((h-1-j)*w+i)*3+1] = buf[(j*w+i)*3+1];
+		buf2[((h-1-j)*w+i)*3+2] = buf[(j*w+i)*3+2];
+	    }
+	}
+	ByteBuffer bbuf = ByteBuffer.wrap(buf2);
+	if(views!=null){
+	    for(IView v:views){
+		v.bgImage(bbuf,w,h);
+	    }
+	}
+	*/
+    }
+    public void background(String imageFilename){
+	bg(imageFilename);
+    }
+    
     
     
     public void add(IObject e){

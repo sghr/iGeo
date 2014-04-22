@@ -97,6 +97,14 @@ public class IPoint extends IGeometry implements IVecI{
     synchronized public IPoint x(IDoubleI vx){ pos.x(vx); return this; }
     synchronized public IPoint y(IDoubleI vy){ pos.y(vy); return this; }
     synchronized public IPoint z(IDoubleI vz){ pos.z(vz); return this; }
+
+    synchronized public IPoint x(IVecI vx){ pos.x(vx); return this; }
+    synchronized public IPoint y(IVecI vy){ pos.y(vy); return this; }
+    synchronized public IPoint z(IVecI vz){ pos.z(vz); return this; }
+    
+    synchronized public IPoint x(IVec2I vx){ pos.x(vx); return this; }
+    synchronized public IPoint y(IVec2I vy){ pos.y(vy); return this; }
+    
     
     synchronized public double x(ISwitchE e){ return pos.x(e); }
     synchronized public double y(ISwitchE e){ return pos.y(e); }

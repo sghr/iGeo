@@ -25,7 +25,7 @@ package igeo;
 import java.util.ArrayList;
 
 /**
-   Class of an implementation of IDynamics to have physical attributes of point on a cureve.
+   Class of an implementation of IDynamics to have physical attributes of point on a curve.
    
    @author Satoru Sugihara
 */
@@ -179,8 +179,11 @@ public class IParticleOnCurveGeo extends IParticleGeo implements IParticleOnCurv
 	uvel *= 1.0-friction;
 	
 	// reset
-	frc.zero();
-	ufrc=0; // also reset ufrc
+        if( !(IConfig.enablePostupdate && IConfig.clearParticleForceInPostupdate)){
+            // this is done here again because force in update cannot be reflected (updated 2014/03/10)
+	    frc.zero();
+	    ufrc=0; // also reset ufrc
+        }
     }
     
     /** update of velocity is done in preupdate and update of position is done in update() (updated 2012/08/26) */
@@ -238,8 +241,17 @@ public class IParticleOnCurveGeo extends IParticleGeo implements IParticleOnCurv
 	*/
 	
 	//if(parent!=null) parent.updateGraphic();
-	//updateTarget(); //moved to IDynamics.postUpdate()
+	//updateTarget(); //moved to IDynamics.postupdate()
     }
+    
+    synchronized public void postupdate(){
+        if(IConfig.enablePostupdate && IConfig.clearParticleForceInPostupdate){
+            frc.zero();
+	    ufrc=0; // also reset ufrc
+        }
+    }
+    
+
     
     
     /****************************************************************************
@@ -253,6 +265,13 @@ public class IParticleOnCurveGeo extends IParticleGeo implements IParticleOnCurv
     public IParticleOnCurveGeo x(IDoubleI vx){ pos.x(vx); return this; }
     public IParticleOnCurveGeo y(IDoubleI vy){ pos.y(vy); return this; }
     public IParticleOnCurveGeo z(IDoubleI vz){ pos.z(vz); return this; }
+    
+    public IParticleOnCurveGeo x(IVecI vx){ pos.x(vx); return this; }
+    public IParticleOnCurveGeo y(IVecI vy){ pos.y(vy); return this; }
+    public IParticleOnCurveGeo z(IVecI vz){ pos.z(vz); return this; }
+    
+    public IParticleOnCurveGeo x(IVec2I vx){ pos.x(vx); return this; }
+    public IParticleOnCurveGeo y(IVec2I vy){ pos.y(vy); return this; }
     
     public IParticleOnCurveGeo set(IVecI v){ pos.set(v); return this; }
     public IParticleOnCurveGeo set(double x, double y, double z){ pos.set(x,y,z); return this;}

@@ -116,6 +116,13 @@ public class IPaneLight extends IComponent implements IPane{
 	    // retrieved every time
 	    //ArrayList<IGraphicObject> objects = parent.ig.server().graphicServer().getObjects(view);
 	    ArrayList<IGraphicI> objects = parent.ig.server().graphicServer().getObjects(view);
+
+	    if(parent.ig.server().graphicServer().bgImageFilename!=null){
+		if(g instanceof IGraphicsGL){
+		    ((IGraphicsGL)g).setBGImage(parent.ig.server().graphicServer().bgImageFilename);
+		    parent.ig.server().graphicServer().bgImageFilename=null;
+		}
+	    }
 	    
 	    g.draw(objects, view); // new algorithm 20120531
 	    

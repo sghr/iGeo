@@ -36,8 +36,13 @@ public class I3DField extends IField implements I3DFieldI{
     public IVecI get(IVecI pt, IVecI vel){ if(field==null){ return null; } return field.get(pt,vel); }
     
     //public void applyField(IParticleI p){ p.push(get(p.pos())); }
-    public void applyField(IParticleI p){ p.push(get(p.pos(),p.vel())); }
-    
+    public void applyField(IParticleI p){
+	p.push(get(p.pos(),p.vel()));
+	//IVecI force = get(p.pos(),p.vel());
+	//IG.p("force = "+force); 
+	//p.push(force);
+    }
+        
     public I3DFieldI field(){ return field; }
     /** set no decay */
     public I3DField noDecay(){ if(field!=null){ field.noDecay(); } return this; }

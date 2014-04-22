@@ -29,10 +29,15 @@ package igeo;
 */
 
 public class I2DSurfaceSlopeField extends I2DField{
-    public I2DSurfaceSlopeField(ISurfaceI srf){ super(new I2DSurfaceSlopeFieldGeo(srf)); }
+    public I2DSurfaceSlopeField(ISurfaceI srf){
+	super(new I2DSurfaceSlopeFieldGeo(srf));
+    }
     static public class I2DSurfaceSlopeFieldGeo extends I2DSurfaceFieldGeo{
 	public static IVec axis = new IVec(0,0,-1);
 	public I2DSurfaceSlopeFieldGeo(ISurfaceI srf){ super(srf,srf); constantIntensity=false; }
+	
+	//public IVec2I get(IVecI v, IVecI vel, IVec2I uv){ return get(v,uv); }
+		
 	public IVec2I get(IVecI v, IVec2I uv){
 	    IVec n = fieldSurface.nml(uv).get().unit();
 	    return n.cross(axis).icross(n).to2d();

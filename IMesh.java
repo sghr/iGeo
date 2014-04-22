@@ -375,19 +375,40 @@ public class IMesh extends IGeometry implements IMeshI{
 	mesh.attr(meshes[0].attr()); // copy attributes
 	return mesh;
     }
-
+    
+    /** create polyhedron mesh by delaunay triangulation around a center */
     public static IMesh polyhedron(IVertex[] vtx){
 	return new IMesh(IMeshGeo.createPolyhedron(vtx));
     }
+    /** create polyhedron mesh by delaunay triangulation around a center */
     public static IMesh createPolyhedron(IVertex[] vtx){ return polyhedron(vtx); }
-    
+
+    /** create polyhedron mesh by delaunay triangulation around a center */
     public static IMesh polyhedron(IVecI[] pts){
 	IVertex[] vtx = new IVertex[pts.length];
 	for(int i=0; i<pts.length; i++){ vtx[i] = new IVertex(pts[i].get()); }
 	return new IMesh(IMeshGeo.createPolyhedron(vtx));
     }
+    /** create polyhedron mesh by delaunay triangulation around a center */
     public static IMesh createPolyhedron(IVecI[] pts){ return polyhedron(pts); }
-
+    
+    
+    /** create polyhedron mesh by delaunay triangulation around a center with maximum threshold of edge length */
+    public static IMesh polyhedron(IVertex[] vtx, double threshold){
+	return new IMesh(IMeshGeo.createPolyhedron(vtx,threshold));
+    }
+    /** create polyhedron mesh by delaunay triangulation around a center with maximum threshold of edge length */
+    public static IMesh createPolyhedron(IVertex[] vtx, double threshold){ return polyhedron(vtx,threshold); }
+    
+    /** create polyhedron mesh by delaunay triangulation around a center with maximum threshold of edge length */
+    public static IMesh polyhedron(IVecI[] pts, double threshold){
+	IVertex[] vtx = new IVertex[pts.length];
+	for(int i=0; i<pts.length; i++){ vtx[i] = new IVertex(pts[i].get()); }
+	return new IMesh(IMeshGeo.createPolyhedron(vtx,threshold));
+    }
+    /** create polyhedron mesh by delaunay triangulation around a center with maximum threshold of edge length */
+    public static IMesh createPolyhedron(IVecI[] pts, double threshold){ return polyhedron(pts,threshold); }
+    
     
     /** connect closest vertex */
     public static IMesh connectVertex(IMesh mesh1, IMesh mesh2){

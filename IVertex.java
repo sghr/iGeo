@@ -110,6 +110,13 @@ public class IVertex implements IVecI{
     public IVertex x(IDoubleI vx){ pos.x(vx); return this; }
     public IVertex y(IDoubleI vy){ pos.y(vy); return this; }
     public IVertex z(IDoubleI vz){ pos.z(vz); return this; }
+
+    public IVertex x(IVecI vx){ pos.x(vx); return this; }
+    public IVertex y(IVecI vy){ pos.y(vy); return this; }
+    public IVertex z(IVecI vz){ pos.z(vz); return this; }
+    
+    public IVertex x(IVec2I vx){ pos.x(vx); return this; }
+    public IVertex y(IVec2I vy){ pos.y(vy); return this; }
     
     public double x(ISwitchE e){ return pos.x(e); }
     public double y(ISwitchE e){ return pos.y(e); }

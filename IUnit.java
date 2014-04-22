@@ -29,6 +29,118 @@ package igeo;
 */
 
 public class IUnit{
+    static public final Type NoUnits = Type.NoUnits;
+    static public final Type Angstroms = Type.Angstroms;
+    static public final Type Nanometers = Type.Nanometers;
+    static public final Type Microns = Type.Microns;
+    static public final Type Millimeters = Type.Millimeters;
+    static public final Type Centimeters = Type.Centimeters;
+    static public final Type Decimeters = Type.Decimeters;
+    static public final Type Meters = Type.Meters;
+    static public final Type Dekameters = Type.Dekameters;
+    static public final Type Hectometers = Type.Hectometers;
+    static public final Type Kilometers = Type.Kilometers;
+    static public final Type Megameters = Type.Megameters;
+    static public final Type Gigameters = Type.Gigameters;
+    static public final Type Microinches = Type.Microinches;
+    static public final Type Mils = Type.Mils;
+    static public final Type Inches = Type.Inches;
+    static public final Type Feet = Type.Feet;
+    static public final Type Yards = Type.Yards;
+    static public final Type Miles = Type.Miles;
+    static public final Type Points = Type.Points;
+    static public final Type Picas = Type.Picas;
+    static public final Type NauticalMiles = Type.NauticalMiles;
+    static public final Type AstronomicalUnits = Type.AstronomicalUnits;
+    static public final Type Lightyears = Type.Lightyears;
+    static public final Type Parsecs = Type.Parsecs;
+    static public final Type CustomUnits = Type.CustomUnits;
+    
+
+    static public final Type NoUnit = Type.NoUnits;
+    static public final Type Angstrom = Type.Angstroms;
+    static public final Type Nanometer = Type.Nanometers;
+    static public final Type Micron = Type.Microns;
+    static public final Type Millimeter = Type.Millimeters;
+    static public final Type Centimeter = Type.Centimeters;
+    static public final Type Decimeter = Type.Decimeters;
+    static public final Type Meter = Type.Meters;
+    static public final Type Dekameter = Type.Dekameters;
+    static public final Type Hectometer = Type.Hectometers;
+    static public final Type Kilometer = Type.Kilometers;
+    static public final Type Megameter = Type.Megameters;
+    static public final Type Gigameter = Type.Gigameters;
+    static public final Type Microinche = Type.Microinches;
+    static public final Type Mil = Type.Mils;
+    static public final Type Inche = Type.Inches;
+    static public final Type Foot = Type.Feet;
+    static public final Type Yard = Type.Yards;
+    static public final Type Mile = Type.Miles;
+    static public final Type Point = Type.Points;
+    static public final Type Pica = Type.Picas;
+    static public final Type NauticalMile = Type.NauticalMiles;
+    static public final Type AstronomicalUnit = Type.AstronomicalUnits;
+    static public final Type Lightyear = Type.Lightyears;
+    static public final Type Parsec = Type.Parsecs;
+    static public final Type CustomUnit = Type.CustomUnits;
+
+    static public final Type nounits = Type.NoUnits;
+    static public final Type angstroms = Type.Angstroms;
+    static public final Type nanometers = Type.Nanometers;
+    static public final Type microns = Type.Microns;
+    static public final Type millimeters = Type.Millimeters;
+    static public final Type centimeters = Type.Centimeters;
+    static public final Type decimeters = Type.Decimeters;
+    static public final Type meters = Type.Meters;
+    static public final Type dekameters = Type.Dekameters;
+    static public final Type hectometers = Type.Hectometers;
+    static public final Type kilometers = Type.Kilometers;
+    static public final Type megameters = Type.Megameters;
+    static public final Type gigameters = Type.Gigameters;
+    static public final Type microinches = Type.Microinches;
+    static public final Type mils = Type.Mils;
+    static public final Type inches = Type.Inches;
+    static public final Type feet = Type.Feet;
+    static public final Type yards = Type.Yards;
+    static public final Type miles = Type.Miles;
+    static public final Type points = Type.Points;
+    static public final Type picas = Type.Picas;
+    static public final Type nauticalmiles = Type.NauticalMiles;
+    static public final Type astronomicalunits = Type.AstronomicalUnits;
+    static public final Type lightyears = Type.Lightyears;
+    static public final Type parsecs = Type.Parsecs;
+    static public final Type customunits = Type.CustomUnits;
+    
+    static public final Type nounit = Type.NoUnits;
+    static public final Type angstrom = Type.Angstroms;
+    static public final Type nanometer = Type.Nanometers;
+    static public final Type micron = Type.Microns;
+    static public final Type millimeter = Type.Millimeters;
+    static public final Type centimeter = Type.Centimeters;
+    static public final Type decimeter = Type.Decimeters;
+    static public final Type meter = Type.Meters;
+    static public final Type dekameter = Type.Dekameters;
+    static public final Type hectometer = Type.Hectometers;
+    static public final Type kilometer = Type.Kilometers;
+    static public final Type megameter = Type.Megameters;
+    static public final Type gigameter = Type.Gigameters;
+    static public final Type microinche = Type.Microinches;
+    static public final Type mil = Type.Mils;
+    static public final Type inch = Type.Inches;
+    static public final Type foot = Type.Feet;
+    static public final Type yard = Type.Yards;
+    static public final Type mile = Type.Miles;
+    static public final Type point = Type.Points;
+    static public final Type pica = Type.Picas;
+    static public final Type nauticalmile = Type.NauticalMiles;
+    static public final Type astronomicalunit = Type.AstronomicalUnits;
+    static public final Type lightyear = Type.Lightyears;
+    static public final Type parsec = Type.Parsecs;
+    static public final Type customunit = Type.CustomUnits;
+        
+    
+    
+    
     public enum Type{ NoUnits,
 	    Angstroms,
 	    Nanometers,

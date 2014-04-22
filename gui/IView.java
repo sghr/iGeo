@@ -23,7 +23,7 @@
 package igeo.gui;
 
 import java.awt.*;
-
+import java.nio.ByteBuffer;
 //import javax.media.opengl.*;
 
 import igeo.*;
@@ -50,17 +50,6 @@ public class IView{
     
     public static boolean defaultGLTwoSidedLighting = false; //true; // when this is true, it seems to cause weird behavior looking like some of normals are flipped or messed up
 
-    /*
-    public static double[][][] defaultGLBGColor =
-	new double[][][]{ { {1.0,1.0,1.0},{0.3,0.5,0.7} },
-			  { {0.9,0.9,0.9},{0.3,0.5,0.7} } };
-    */
-    /*
-    public static IColor defaultBGColor1 = new IColor(255,255,255);
-    public static IColor defaultBGColor2 = new IColor(230,230,230);
-    public static IColor defaultBGColor3 = new IColor(77,128,179);
-    public static IColor defaultBGColor4 = new IColor(77,128,179); 
-    */
     /** eye location */
     public IVec pos;
     
@@ -125,6 +114,14 @@ public class IView{
 	new IColor[]{ IConfig.bgColor2, IConfig.bgColor3 }
     };
     
+    public ByteBuffer bgImageBuf;
+    public int bgImageWidth;
+    public int bgImageHeight;
+    
+    public boolean useBGTexture=false;
+    public boolean bgTextureGenerated=false;
+    public int bgTextureID;
+    
     
     public IView(double x, double y, double z,
 		 double yaw, double pitch, double roll,
@@ -175,48 +172,18 @@ public class IView{
     public void show(){ hide=false; }
     
     public void bgColor(IColor c){
-	// test
 	bgColor[0][0]=bgColor[0][1]=bgColor[1][0]=bgColor[1][1]=c;
-	/*
-	if(useGL){
-	    for(int i=0; i<2; i++){
-		for(int j=0; j<2; j++){
-		    glBGColor[i][j][0] = (double)c.getRed()/255;
-		    glBGColor[i][j][1] = (double)c.getGreen()/255;
-		    glBGColor[i][j][2] = (double)c.getBlue()/255;
-		}
-	    }    
-	}
-	else{ javaBGColor1 = c; javaBGColor2 = c; }
-	*/
     }
     public void bgColor(IColor c1, IColor c2){
-	// test
 	bgColor[0][0]=bgColor[1][0]=c1;
 	bgColor[0][1]=bgColor[1][1]=c2;
-	
-	/*
-	if(useGL){
-	    for(int i=0; i<2; i++){
-		glBGColor[i][0][0] = (double)c1.getRed()/255;
-		glBGColor[i][0][1] = (double)c1.getGreen()/255;
-		glBGColor[i][0][2] = (double)c1.getBlue()/255;
-		glBGColor[i][1][0] = (double)c2.getRed()/255;
-		glBGColor[i][1][1] = (double)c2.getGreen()/255;
-		glBGColor[i][1][2] = (double)c2.getBlue()/255;
-	    }
-	}
-	else{ javaBGColor1 = c1; javaBGColor2 = c2; }
-	*/
     }
     
     public void bgColor(IColor c1, IColor c2, IColor c3, IColor c4){
-	// test
 	bgColor[0][0] = c1;
 	bgColor[1][0] = c2;
 	bgColor[1][1] = c3;
 	bgColor[0][1] = c4;
-	
 	//bgColor(new Color[][]{ new Color[]{ c1, c4 }, new Color[]{ c2, c3 } }); // necessary?
     }
     
@@ -224,22 +191,22 @@ public class IView{
 	// test
 	for(int i=0; i<2 && i<c.length; i++)
 	    for(int j=0; j<2 && j<c[i].length; j++) bgColor[i][j]=c[i][j];
-	/*
-	if(useGL){
-	    for(int i=0; i<2; i++){
-		for(int j=0; j<2; j++){
-		    glBGColor[i][j][0] = (double)c[i][j].getRed()/255;
-		    glBGColor[i][j][1] = (double)c[i][j].getGreen()/255;
-		    glBGColor[i][j][2] = (double)c[i][j].getBlue()/255;
-		}
-	    }
-	}
-	else{ javaBGColor1 = c[0][0]; javaBGColor2 = c[0][1]; }
-	*/
+    }
+    
+    public IColor[][] bgColor(){ return bgColor; }
+    
+    
+    public void bgImage(ByteBuffer imgBuf, int imgWidth, int imgHeight){
+	bgImageBuf = imgBuf;
+	bgImageWidth = imgWidth;
+	bgImageHeight = imgHeight;
     }
     
     
-    public IColor[][] bgColor(){ return bgColor; }
+    public void bgTexture(int texID){
+	bgTextureID = texID;
+	useBGTexture=true;
+    }
     
     
     public void setPane(IPane p){
@@ -672,115 +639,6 @@ public class IView{
 	}
     }
     
-    
-    //public void drawBG(IGraphics g){}
-    /*
-    public void drawBG(GL gl){
-	//if(glBGColor!=null){
-	if(bgColor!=null){
-	    double[][][] glBGColor = new double[2][2][3];
-	    for(int i=0; i<2; i++){
-		for(int j=0; j<2; j++){
-		    glBGColor[i][j][0] = (double)bgColor[i][j].getRed()/255;
-		    glBGColor[i][j][1] = (double)bgColor[i][j].getGreen()/255;
-		    glBGColor[i][j][2] = (double)bgColor[i][j].getBlue()/255;
-		}
-	    }
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
-	    gl.glPushMatrix();
-	    gl.glLoadIdentity();
-	    gl.glMatrixMode(GL.GL_PROJECTION);
-	    gl.glPushMatrix();
-	    gl.glLoadIdentity();
-	    gl.glDisable(GL.GL_DEPTH_TEST);
-	    //if(mode.isLight()) gl.glDisable(GL.GL_LIGHTING);
-	    gl.glBegin(GL.GL_QUADS);
-	    //gl.glColor3d(0.3,0.5,0.7);
-	    gl.glColor3dv(glBGColor[0][1],0);
-	    gl.glVertex3d(-1.,-1.,0);
-	    gl.glColor3dv(glBGColor[1][1],0);
-	    gl.glVertex3d(1.,-1.,0);
-	    //gl.glColor3d(1.,1.,1.);
-	    gl.glColor3dv(glBGColor[1][0],0);
-	    gl.glVertex3d(1.,1.,0);
-	    //gl.glColor3d(0.9,0.9,0.9);
-	    gl.glColor3dv(glBGColor[0][0],0);
-	    gl.glVertex3d(-1.,1.,0);
-	    gl.glEnd();
-	    gl.glEnable(GL.GL_DEPTH_TEST);
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
-	    gl.glPopMatrix();
-	    gl.glMatrixMode(GL.GL_PROJECTION);
-	    gl.glPopMatrix();
-	}
-    }
-    */
-
-    /* now this is moved to IGraphicsGL.drawView(IView)
-    //public void beginGLView(GL gl, IGraphics g){
-    public void draw(GL gl){
-	if(hide) return;
-	
-	gl.glViewport(screenX, screenY, screenWidth, screenHeight);
-	
-	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT); //
-	
-	// background
-	
-	drawBG(gl);
-	
-	//gl.glDisable(GL.GL_DEPTH_TEST); // !! for transparency
-	//gl.glEnable(GL.GL_DEPTH_TEST);
-	
-	// default light
-	if(mode.isLight()){
-	    //
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
-	    gl.glPushMatrix();
-	    gl.glLoadIdentity();
-	    
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, defaultGLLightPosition, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, defaultGLAmbientLight, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, defaultGLDiffuseLight, 0);
-	    gl.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, defaultGLSpecularLight, 0);
-	    
-	    //gl.glLightModeli(GL.GL_LIGHT_MODEL_LOCAL_VIEWER, 1); //
-	    if(defaultGLTwoSidedLighting)
-		gl.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, 1); // this seems to cause weird behavior looking like some of normals are flipped or messed up
-	    
-	    //gl.glEnable(GL.GL_NORMALIZE); //
-	    //gl.glEnable(GL.GL_AUTO_NORMAL); //
-	    
-	    gl.glEnable(GL.GL_LIGHT1);
-	    gl.glEnable(GL.GL_LIGHTING);
-	    	    	    
-	    gl.glPopMatrix();
-	}
-	
-	gl.glMatrixMode(GL.GL_PROJECTION);
-	gl.glLoadIdentity();
-	//gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-	
-	if(axonometric){
-	    double glWidth = screenWidth*axonRatio;
-	    double glHeight = screenHeight*axonRatio;
-	    gl.glOrtho(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,near,far);
-	}
-	else{
-	    double glHeight = near*persRatio*2;
-	    double glWidth = glHeight*screenWidth/screenHeight;
-	    gl.glFrustum(-glWidth/2,glWidth/2,-glHeight/2,glHeight/2,near,far);
-	}
-	
-	gl.glMatrixMode(GL.GL_MODELVIEW);
-	//gl.glLoadIdentity();
-	//gl.glTranslated(-x,-y,-z);
-	
-	gl.glLoadMatrixd(transformArray,0);
-    }
-    */
-    
-    
     public void update(){
 	
 	synchronized(this){
@@ -924,6 +782,7 @@ public class IView{
     }
     public void setPerspective(double x, double y, double z, double perspectiveAngle){
 	setPerspective(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
+	setPerspectiveAngle(perspectiveAngle); // added 20140315
     }
     public void setPerspective(double x, double y, double z,
 			       double yaw, double pitch,

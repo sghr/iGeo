@@ -99,6 +99,15 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject x(IDoubleI vx){ vec.x(vx); return this; }
     public IVectorObject y(IDoubleI vy){ vec.y(vy); return this; }
     public IVectorObject z(IDoubleI vz){ vec.z(vz); return this; }
+
+    public IVectorObject x(IVecI vx){ vec.x(vx); return this; }
+    public IVectorObject y(IVecI vy){ vec.y(vy); return this; }
+    public IVectorObject z(IVecI vz){ vec.z(vz); return this; }
+
+    public IVectorObject x(IVec2I vx){ vec.x(vx); return this; }
+    public IVectorObject y(IVec2I vy){ vec.y(vy); return this; }
+    
+
     
     public double x(ISwitchE e){ return vec.x(e); }
     public double y(ISwitchE e){ return vec.y(e); }

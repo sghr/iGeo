@@ -96,6 +96,7 @@ public class IAttractor extends I3DField{
     
     public IAttractor clr(IColor c){ super.clr(c); point.clr(c); return this; }
     public IAttractor clr(IColor c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
+    public IAttractor clr(IColor c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     //public IAttractor clr(Color c){ super.clr(c); point.clr(c); return this; }
     //public IAttractor clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     public IAttractor clr(int gray){ super.clr(gray); point.clr(gray); return this; }

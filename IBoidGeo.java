@@ -305,6 +305,20 @@ public class IBoidGeo extends IParticleGeo implements IBoidI{
     public IBoidGeo y(IDoubleI vy){ pos.y(vy); return this; }
     public IBoidGeo z(IDoubleI vz){ pos.z(vz); return this; }
     
+    /** setting x component by x component of input vector*/
+    public IBoidGeo x(IVecI v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IBoidGeo y(IVecI v){ pos.y(v); return this; }
+    /** setting z component by z component of input vector*/
+    public IBoidGeo z(IVecI v){ pos.z(v); return this; }
+    
+    /** setting x component by x component of input vector*/
+    public IBoidGeo x(IVec2I v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IBoidGeo y(IVec2I v){ pos.y(v); return this; }
+    
+    
+    
     public IBoidGeo dup(){ return new IBoidGeo(this); }
     
     public IBoidGeo set(IVecI v){ pos.set(v); return this; }

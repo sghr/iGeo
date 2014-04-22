@@ -62,16 +62,15 @@ public class IIO{
     
     
     public static boolean open(String filename, IServerI server){
-	IOut.debug(0,"opening "+filename);
-	FileType type = getFileType(filename);
-	if(type == FileType.OBJ) return openOBJ(new File(filename),server);
-	if(type == FileType.RHINO) return openRhino(new File(filename),server);
-	if(type == FileType._3DXML) return open3DXML(new File(filename),server);
-	IOut.err("file extension ."+getExtension(filename)+" is not supported");
-	return false;
+	return open(new File(filename), server);
     }
     
     public static boolean open(File file, IServerI server){
+	IOut.debug(0,"opening "+file.getPath());
+	if(!file.exists()){
+	    IOut.err("the input file doesn't exist : "+file.getPath());
+	    return false;
+	}
 	FileType type = getFileType(file.getName());
 	if(type == FileType.OBJ) return openOBJ(file,server);
 	if(type == FileType.RHINO) return openRhino(file,server);
@@ -79,26 +78,40 @@ public class IIO{
 	IOut.err("file extension ."+getExtension(file.getName())+" is not supported");
 	return false;
     }
+
     
     public static boolean open(String filename, IServerI server, IInputWrapper wrapper){
-	if(wrapper==null) return open(filename,server);
-	IOut.debug(0,"opening "+filename);
-	FileType type = getFileType(filename);
+	return open(new File(filename), server, wrapper);
+    }
+    
+    public static boolean open(File file, IServerI server, IInputWrapper wrapper){
+	if(wrapper==null) return open(file,server);
+	IOut.debug(0,"opening "+file.getPath()); 
+	
+	InputStream is = wrapper.getStream(file);
+	if(is == null){
+	    if(!file.exists()){
+		IOut.err("the input file doesn't exist : "+file.getPath());
+		return false;
+	    }
+	    else{
+		return open(file,server);
+	    }
+	}
+	
+	FileType type = getFileType(file.getName());
 	if(type == FileType.OBJ){
-	    InputStream is = wrapper.getStream(filename);
 	    boolean retval = openOBJ(is,server);
 	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
 	    return retval;
 	}
 	if(type == FileType.RHINO){
-	    InputStream is = wrapper.getStream(filename);
 	    boolean retval = openRhino(is,server);
 	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
 	    return retval;
 	}
 	if(type == FileType._3DXML){
-	    InputStream is = wrapper.getStream(filename);
-	    boolean retval = open3DXML(is,filename,server);
+	    boolean retval = open3DXML(is,file.getName(),server);
 	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
 	    return retval;
 	    
@@ -107,7 +120,7 @@ public class IIO{
 	    //return true; // ?
 	}
 	
-	IOut.err("file extension ."+getExtension(filename)+" is not supported");
+	IOut.err("file extension ."+getExtension(file.getName())+" is not supported");
 	return false;
     }
     

@@ -22,7 +22,7 @@
 
 package igeo;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.awt.Color;
 
 import igeo.gui.*;
@@ -57,7 +57,7 @@ public class IObject{
     
     
     /** for user's custom data */
-    public Object userData;
+    public Object[] userData;
     
     
     
@@ -329,14 +329,83 @@ public class IObject{
     }
     
     /** get user's custom data */
-    public Object userData(){ return userData; }
+    public Object[] userData(){ return userData; }
+    /** get user's custom data */
+    public Object userData(int index){
+	if(userData==null || index>=userData.length) return null;
+	return userData[index];
+    }
+    /** get user's custom data */
+    public int userDataNum(){ return userData==null?0:userData.length; }
     /** set user's custom data */
-    public IObject userData(Object data){ userData=data; return this; }
+    public IObject userData(Object[] data){ userData=data; return this; }
     
+    /** set user's custom data */
+    public IObject addUserData(Object data){
+	if(userData==null){
+	    userData=new Object[1];
+	    userData[0] = data;
+	}
+	else{
+	    Object[] newUserData = new Object[userData.length+1];
+	    for(int i=0; i<userData.length; i++){
+		newUserData[i] = userData[i];
+	    }
+	    newUserData[userData.length] = data;
+	    userData = newUserData;
+	}
+	return this;
+    }
     
+    /** set user's custom data */
+    public IObject addUserData(String key, String value){
+	HashMap<String,String> map=null;
+	if(userData==null){
+	    userData=new Object[1];
+	    map = new HashMap<String,String>();
+	    userData[0] = map;
+	}
+	else{
+	    for(int i=0; i<userData.length && map==null; i++){ // find existing HashMap<String,String>
+		if(userData[i] instanceof HashMap){
+		    HashMap generalMap = (HashMap)userData[i];
+		    Set keys = generalMap.keySet();
+		    if(keys!=null){
+			Iterator iter = keys.iterator();
+			if(iter!=null){
+			    Object k =iter.next();
+			    if(k instanceof String){
+				Object v = generalMap.get(k);
+				if(v instanceof String){
+				    map = castStringHashMap(generalMap);
+				}
+			    }
+			}
+		    }
+		    
+		}
+	    }
+	    if(map==null){
+		Object[] newUserData = new Object[userData.length+1];
+		for(int i=0; i<userData.length; i++){
+		    newUserData[i] = userData[i];
+		}
+		map = new HashMap<String,String>();
+		newUserData[userData.length] = map;
+		userData = newUserData;
+	    }
+	}
+	map.put(key,value);
+	return this;
+    }
+    
+    //
+    @SuppressWarnings("unchecked")  //
+    public static HashMap<String,String> castStringHashMap(HashMap m){
+	return (HashMap<String,String>)m;
+    }
     
     // shouldn't these methods be in other graphic class?
-    
     
     public boolean visible(){
 	//if(attribute==null) attribute=defaultAttribute(); // default true?

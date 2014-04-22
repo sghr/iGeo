@@ -52,10 +52,8 @@ public class IBrep extends IGeometry implements ITransformable{
     
     //public IBrep(ISurfaceGeo[] srfs, ICurveGeo[] seams, IVec[] seamPts){ this(null, srfs, seams, seamPts); }
     
-    public IBrep(ISurfaceGeo[] srfs){ this(null, srfs); }
-    
     //public IBrep(IServerI s){ super(s); surfaces = new ArrayList<ISurfaceGeo>(); }
-
+    
     /*
     public IBrep(IServerI s, ISurfaceGeo[] srfs, ICurveGeo[] seams, IVec[] seamPts){
 	super(s);
@@ -66,22 +64,26 @@ public class IBrep extends IGeometry implements ITransformable{
     }
     */
     
-    public IBrep(IServerI s, ISurfaceGeo[] srfs){ super(s); surfaces = srfs; initBrep(s); }
+    public IBrep(IServerI s, ISurfaceGeo[] srfs){ super(s); initBrepWithSurfaceGeo(s, srfs); }
     
-    public IBrep(IBrep brep){ this(brep.server,brep); }
+    public IBrep(IServerI s, ISurface[] srfs){ super(s); initBrepWithSurface(s,srfs); }
+    
+    public IBrep(IServerI s, ICurveI[] outlines){ super(s); initBrepWithCurve(s, outlines, null); }
+    
+    public IBrep(IServerI s, ICurveI[] outlines, ICurveI[][] holes){ super(s); initBrepWithCurve(s, outlines, holes); }
+    
+    public IBrep(IServerI s, IVecI[][] outlinePoints){ super(s); initBrepWithPoint(s, outlinePoints); }
+    
     
     public IBrep(IServerI s, IBrep brep){
 	super(s,brep);
-	
 	//surfaces = new ArrayList<ISurfaceGeo>(brep.surfaces.size());
 	//for(int i=0; i<brep.surfaces.length; i++)surfaces.add(brep.surfaces.get(i).dup()); // deep copy
 	if(brep.surfaces!=null){
 	    surfaces = new ISurfaceGeo[brep.surfaces.length];
 	    for(int i=0; i<surfaces.length; i++) surfaces[i] = brep.surfaces[i].dup(); // deep copy
 	}
-	
 	solid = brep.solid;
-	
 	/*
 	if(brep.seams!=null){
 	    seams = new ICurveGeo[brep.seams.length];
@@ -95,6 +97,15 @@ public class IBrep extends IGeometry implements ITransformable{
 	initBrep(s);
     }
     
+    public IBrep(ISurfaceGeo[] srfs){ this(null, srfs); }
+    
+    public IBrep(IBrep brep){ this(brep.server,brep); }
+    
+    public IBrep(ISurface[] srfs){ this(null,srfs); }
+    public IBrep(ICurveI[] outlines){ this(null,outlines); }
+    public IBrep(ICurveI[] outlines, ICurveI[][] holes){ this(null,outlines,holes); }
+    public IBrep(IVecI[][] outlinePoints){ this(null,outlinePoints); }
+    
     
     public void initBrep(IServerI s){
 	parameter = null; // !!! what should this be? IBrepGeo?
@@ -102,7 +113,64 @@ public class IBrep extends IGeometry implements ITransformable{
 	
 	if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedPoints(); }
     }
-
+    
+    public void initBrepWithSurfaceGeo(IServerI s, ISurfaceGeo[] srfs){
+	if(srfs==null){
+	    IOut.err("input surface is null");
+	    return;
+	}
+	surfaces = srfs;
+	initBrep(s);
+    }
+    
+    public void initBrepWithSurface(IServerI s, ISurface[] srfs){
+	if(srfs==null){
+	    IOut.err("input surface is null");
+	    return;
+	}
+	surfaces = new ISurfaceGeo[srfs.length];
+	for(int i=0; i<srfs.length; i++){
+	    surfaces[i] = srfs[i].surface;
+	}
+	initBrep(s);
+    }
+    
+    public void initBrepWithCurve(IServerI s, ICurveI[] outlines, ICurveI[][] holes){
+	if(outlines==null){
+	    IOut.err("input curve is null");
+	    return;
+	}
+	
+	surfaces = new ISurfaceGeo[outlines.length];
+	
+	if(holes!=null && holes.length!=outlines.length){
+	    IOut.err("number of holes does not match with outlines");
+	}
+	
+	for(int i=0; i<outlines.length; i++){
+	    if(holes!=null && i < holes.length && holes[i]!=null){
+		surfaces[i] = new ISurfaceGeo(outlines[i], holes[i]);
+	    }
+	    else{
+		surfaces[i] = new ISurfaceGeo(outlines[i]);
+	    }
+	}
+	initBrep(s);
+    }
+    
+    public void initBrepWithPoint(IServerI s, IVecI[][] points){
+	if(points==null){
+	    IOut.err("input points are null");
+	    return;
+	}
+	surfaces = new ISurfaceGeo[points.length];
+	for(int i=0; i<points.length; i++){
+	    surfaces[i] = new ISurfaceGeo(points[i]);
+	}
+	initBrep(s);
+    }
+    
+    
     public void checkDuplicatedPoints(){
 	boolean changed=false;
 	for(int i=0; i<surfaces.length; i++){

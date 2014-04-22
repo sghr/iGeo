@@ -58,6 +58,20 @@ public class IVecR extends IParameterObject implements IVecI, IReferenceParamete
     public IVecR y(IDoubleI vy){ op = new FromY(op,vy); return this; }
     /** setting z component */
     public IVecR z(IDoubleI vz){ op = new FromZ(op,vz); return this; }
+
+    /** setting x component by x component of input vector*/
+    public IVecR x(IVecI v){ op = new FromX(op, v.x((ISwitchR)null)); return this; }
+    /** setting y component by y component of input vector*/
+    public IVecR y(IVecI v){ op = new FromY(op, v.y((ISwitchR)null)); return this; }
+    /** setting z component by z component of input vector*/
+    public IVecR z(IVecI v){ op = new FromZ(op, v.z((ISwitchR)null)); return this; }
+    
+    /** setting x component by x component of input vector*/
+    public IVecR x(IVec2I v){ op = new FromX(op, v.x((ISwitchR)null)); return this; }
+    /** setting y component by y component of input vector*/
+    public IVecR y(IVec2I v){ op = new FromY(op, v.y((ISwitchR)null)); return this; }
+    
+
     
     /** getting x component */
     public double x(ISwitchE e){ return x(); }

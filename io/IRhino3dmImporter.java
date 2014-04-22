@@ -730,8 +730,9 @@ public class IRhino3dmImporter extends IRhino3dm{
 			}
 		    }
 		}
-		//else if(chunks[i].header == tcodeOpenNurbsClassUserData){ // user data
-		//} // skipped
+		else if(chunks[i].header == tcodeOpenNurbsClassUserData){ // user data
+		    IOut.debug(20, "user data = \n"+chunks[i]);
+		} // skipped
 	    }
 	}
 	catch(EOFException e){
@@ -2065,7 +2066,7 @@ public class IRhino3dmImporter extends IRhino3dm{
 		    object.setAttributes(attributes);
 		}
 		else if(chunks[i].header == tcodeObjectRecordAttributesUserData){
-		    // skip ?
+		    readObjectUserData(chunks[i]);
 		}
 	    }
 	}
@@ -2078,6 +2079,60 @@ public class IRhino3dmImporter extends IRhino3dm{
 	}
 	
 	return object;
+    }
+
+    public void readObjectUserData(Chunk chunk){
+	
+	try{
+	    ByteArrayInputStream bais = new ByteArrayInputStream(chunk.content);
+	    
+	    Chunk chunk2 = readChunk(bais);
+	    
+	    ByteArrayInputStream bais2 = new ByteArrayInputStream(chunk2.content);
+	    
+	    int[] version = readChunkVersion(bais2);
+	    int majorVersion = version[0];
+	    int minorVersion = version[1];
+	    
+	    ByteArrayInputStream headerBais = bais2;
+	    if(majorVersion==2){
+		Chunk headerChunk = readChunk(bais2);
+		headerBais = new ByteArrayInputStream(headerChunk.content);
+	    }
+	    
+	    UUID classID = readUUID(headerBais);
+	    UUID itemID = readUUID(headerBais);
+	    int copyCount = readInt(headerBais);
+	    Xform xform = readXform(headerBais);
+	    
+	    IOut.err("classID = "+classID);
+	    IOut.err("itemID = "+itemID);
+	    IOut.err("copyCount = "+copyCount);
+	    IOut.err("xform = "+xform);
+	    
+	    if(majorVersion==2){
+		if(minorVersion>=1){
+		    UUID appUUID = readUUID(headerBais);
+		    IOut.err("appID = "+appUUID);
+		    if(minorVersion>=2){
+			boolean isUnknownData = readBool(headerBais);
+			int version3dm = readInt(headerBais);
+			int versionOpenNurbs = readInt(headerBais);
+			
+			IOut.err("unknown data = "+isUnknownData);
+			IOut.err("3dm version = "+version3dm);
+			IOut.err("ON version = "+versionOpenNurbs);
+		    }
+		}
+	    }
+	    
+	    Chunk anonymousDataChunk = readChunk(bais2);
+	    
+	    IOut.err("anonymousDataChunk : "+anonymousDataChunk);
+	    
+	}
+	catch(IOException e){ e.printStackTrace(); }
+	
     }
     
     
@@ -2121,6 +2176,8 @@ public class IRhino3dmImporter extends IRhino3dm{
 	Chunk[] chunks = readChunkTable(chunk);
 	if(chunks==null) return; // no user data
 	
+	IOut.debug(10,chunks.length+" chunks"); //
+	
 	ArrayList<UserData> userData = new ArrayList<UserData>();
 	
 	for(Chunk c:chunks){
@@ -2145,6 +2202,9 @@ public class IRhino3dmImporter extends IRhino3dm{
     }
     
     public UserData readUserData(Chunk chunk){
+	
+	IOut.debug(20, chunk.toString()); //
+	
 	return null;
     }
     

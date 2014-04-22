@@ -23,6 +23,7 @@
 package igeo.io;
 
 import java.io.*;
+import igeo.*;
 
 /**
    Input wrapper class. Mostly for wrapping Processing's input stream method.
@@ -34,6 +35,12 @@ public class IInputWrapper{
     public InputStream getStream(String filename){
 	InputStream is = null;
 	try{ is = new FileInputStream(filename); }catch(IOException e){ e.printStackTrace(); }
+	return is;
+    }
+    
+    public InputStream getStream(File file){
+	InputStream is = null;
+	try{ is = new FileInputStream(file); }catch(IOException e){ e.printStackTrace(); }
 	return is;
     }
     

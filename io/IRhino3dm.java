@@ -513,7 +513,10 @@ public class IRhino3dm{
     public static String asciiOrHex(byte[] c){
 	String str = new String();
 	for(int i=0; i<c.length; i++){
-	    if( c[i]>32&&c[i]<127 || c[i]==9 || c[i]==10 || c[i]==13)str+=String.valueOf(c[i]);
+	    if( c[i]>32&&c[i]<127 || c[i]==9 || c[i]==10 || c[i]==13){
+		//str+=String.valueOf(c[i]);
+		str += (char)c[i];
+	    }
 	    else str+=hex(c[i]);
 	}
 	return str;
@@ -740,8 +743,9 @@ public class IRhino3dm{
 	    if(content!=null){
 		str +=
 		    "length: " + content.length +"\n"+
-		    //"content: "+ asciiOrHex(content) + "\n";
-		    "content: "+ hex(content) + "\n";
+		    "content: "+ hex(content) + "\n" + 
+		    "content: "+ asciiOrHex(content) + "\n";
+		    
 	    }
 	    return str;
 	}
@@ -1065,8 +1069,20 @@ public class IRhino3dm{
 		    if(i==j) xform[i][j]=1.0;
 		    else xform[i][j] = 0.0;
 	}
-    }
 
+	public String toString(){
+	    String str = "[";
+	    for(int i=0; i<4; i++){
+		for(int j=0; j<4; j++){
+		    str += String.valueOf(xform[i][j]);
+		    if(i<3 || j<3){ str += ","; }
+		}
+	    }
+	    str += "]";
+	    return str;
+	}
+    }
+    
     public static class Rect{
 	int left;
 	int top;
@@ -1285,6 +1301,8 @@ public class IRhino3dm{
 	
 	
 	public ObjectAttributes attributes=null;
+	
+	public UserData[] userDataList;
 	
 	public UUID getClassUUID(){ return new UUID(uuid); }
 	
@@ -1520,7 +1538,8 @@ public class IRhino3dm{
 	
 	public void readV3(Rhino3dmFile context, InputStream is, int minorVersion) throws IOException{
 	    
-	    IOut.err(); //
+	    //IOut.err(); //
+	    IOut.debug(0, "reading Rhino V3 file");
 	    
 	    ambient = readColor(is);
 	    diffuse = readColor(is);
@@ -3293,6 +3312,51 @@ public class IRhino3dm{
 	
 	public UUID getClassUUID(){ return new UUID(uuid); }
 	//public int getType(){ return objectTypeUnknown; }
+	
+	public void writeBody(Rhino3dmFile context, OutputStream os, CRC32 crc) throws IOException{
+	}
+	
+	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc) throws IOException{
+	    // write only V4 file format. V2, V3 is ignored.
+	    
+	    writeChunkVersion(os, 2, 2, crc);
+	    
+	    ChunkOutputStream cosHeader = new ChunkOutputStream(tcodeOpenNurbsClassUserDataHeader);
+	    
+	    writeUUID(cosHeader, getClassUUID(), cosHeader.getCRC());
+	    
+	    //UUID userDataUUID = UUID.randomUUID();
+	    UUID userDataUUID = getClassUUID();
+	    writeUUID(cosHeader, userDataUUID, cosHeader.getCRC());
+	    
+	    int copycount=1;
+	    writeInt(cosHeader, copycount, cosHeader.getCRC());
+	    
+	    Xform userDataXform = new Xform();
+	    userDataXform.identity();
+	    writeXform(cosHeader, userDataXform, cosHeader.getCRC());
+	    
+	    UUID applicationUUID = UUID.randomUUID();
+	    writeUUID(cosHeader, applicationUUID, cosHeader.getCRC());
+	    
+	    boolean unknownUserData=false;
+	    writeBool(cosHeader, unknownUserData, cosHeader.getCRC());
+	    
+	    int version = context.version;
+	    writeInt(cosHeader, version, cosHeader.getCRC());
+	    
+	    int onVersion = context.openNurbsVersion;
+	    writeInt(cosHeader, onVersion, cosHeader.getCRC());
+	    
+	    writeChunk(os, cosHeader.getChunk());
+	    
+	    
+	    ChunkOutputStream cos = new ChunkOutputStream(tcodeAnonymousChunk);
+	    
+	    this.writeBody(context,cos,cos.getCRC());
+	    
+	    writeChunk(os, cos.getChunk());
+	}
     }
     
     public static class Annotation extends Geometry{
@@ -4810,7 +4874,7 @@ public class IRhino3dm{
 		IOut.err("maximum range of boundary box is null");
 		bbox.max=new IVec();
 	    }
-
+	    
 	    
 	    /*
 	    NurbsSurface nsrf = new NurbsSurface(srf);
@@ -5037,7 +5101,7 @@ public class IRhino3dm{
 	public void getTrimLoops(ISurfaceGeo srf,
 				 ArrayList<ArrayList<ITrimCurve>> trimLoops,
 				 ArrayList<BrepLoop.Type> loopType){
-
+	    
 	    //if(!srf.hasOuterTrim() && srf.hasInnerTrim()){
 	    if(!srf.hasOuterTrim()){ // in brep, every surface needs trim curve
 		// adding default outer trim
@@ -5078,14 +5142,34 @@ public class IRhino3dm{
 	    
 	    for(int i=0; i<srf.outerTrimLoopNum(); i++){
 		ArrayList<ITrimCurve> outLoop = new ArrayList<ITrimCurve>();
-		for(int j=0; j<srf.outerTrimNum(i); j++) outLoop.add(srf.outerTrim(i,j).get());
+		for(int j=0; j<srf.outerTrimNum(i); j++){
+		    if(srf.outerTrim(i,j).deg()==1){ // split into lines
+			ITrimCurve tcrv = srf.outerTrim(i,j).get();
+			for(int k=0; k<tcrv.num()-1; k++){
+			    outLoop.add(new ITrimCurve(tcrv.cp(k), tcrv.cp(k+1)).surface(srf));
+			}
+		    }
+		    else{
+			outLoop.add(srf.outerTrim(i,j).get());
+		    }
+		}
 		trimLoops.add(outLoop);
 		loopType.add(BrepLoop.Type.Outer);
 	    }
 	    
 	    for(int i=0; i<srf.innerTrimLoopNum(); i++){
 		ArrayList<ITrimCurve> inLoop = new ArrayList<ITrimCurve>();
-		for(int j=0; j<srf.innerTrimNum(i); j++) inLoop.add(srf.innerTrim(i,j).get());
+		for(int j=0; j<srf.innerTrimNum(i); j++){
+		    if(srf.outerTrim(i,j).deg()==1){ // split into lines
+			ITrimCurve tcrv = srf.innerTrim(i,j).get();
+			for(int k=0; k<tcrv.num()-1; k++){
+			    inLoop.add(new ITrimCurve(tcrv.cp(k), tcrv.cp(k+1)).surface(srf));
+			}
+		    }
+		    else{
+			inLoop.add(srf.innerTrim(i,j).get());
+		    }
+		}
 		trimLoops.add(inLoop);
 		loopType.add(BrepLoop.Type.Inner);
 	    }
@@ -7648,6 +7732,9 @@ public class IRhino3dm{
 	public void read(Rhino3dmFile context, InputStream is)throws IOException{
 	    int[] version = readChunkVersion(is);
 	    if(version[0]!=1) throw new IOException("invalid major version : "+String.valueOf(version[0]));
+	    
+	    //IG.err("chunkVersion = "+version[0]+", "+version[1]); //
+	    
 	    point = new IVec();
 	    point.x = readDouble(is);
 	    point.y = readDouble(is);
@@ -8267,11 +8354,62 @@ public class IRhino3dm{
 	public UUID getClassUUID(){ return new UUID(uuid); }
 	//public int getType(){ return objectTypeUnknown; }
     }
+    
     public static class UserStringList extends UserData{
+	public ArrayList<UserString> userStrings;
+	
+	public UserStringList(){
+	    userStrings = new ArrayList<UserString>();
+	}
+
+	public void add(UserString str){
+	    userStrings.add(str);
+	}
+
+	public int size(){
+	    return userStrings.size();
+	}
+	
 	public static final String uuid = "CE28DE29-F4C5-4faa-A50A-C3A6849B6329";
 	public UUID getClassUUID(){ return new UUID(uuid); }
 	//public int getType(){ return objectTypeUnknown; }
+	
+	
+	public void writeBody(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
+	    ChunkOutputStream cos = new ChunkOutputStream(tcodeAnonymousChunk, 1, 0);
+	    
+	    int count = 0;
+	    if(userStrings!=null){
+		count = userStrings.size();
+	    }
+	    
+	    writeInt(cos, count, cos.getCRC());
+	    	    
+	    for(int i=0; i<count; i++){
+		userStrings.get(i).write(context, cos, cos.getCRC());
+	    }
+	    
+	    writeChunk(os, cos.getChunk());
+	}
     }
+    
+    public static class UserString{
+	String key, value;
+	public UserString(String k, String v){
+	    key=k; value=v;
+	}
+	
+	public void write(Rhino3dmFile context, OutputStream os, CRC32 crc)throws IOException{
+	    ChunkOutputStream cos = new ChunkOutputStream(tcodeAnonymousChunk, 1, 0);
+	    
+	    writeString(cos, key, cos.getCRC());
+	    	    
+	    writeString(cos, value, cos.getCRC());
+	    
+	    writeChunk(os, cos.getChunk());
+	}
+    }
+    
     public static class Viewport extends Geometry{
 	public static final String uuid = "D66E5CCF-EA39-11d3-BFE5-0010830122F0";
 	public UUID getClassUUID(){ return new UUID(uuid); }

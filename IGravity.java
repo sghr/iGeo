@@ -72,53 +72,53 @@ public class IGravity extends I3DField{
     public IGravity intensity(double i){ super.intensity(i); return this; }
     
     
-    public IGravity name(String nm){ super.name(nm); point.name(nm); return this; }
-    public IGravity layer(ILayer l){ super.layer(l); point.layer(l); return this; }
-    public IGravity show(){ point.show(); return this; }
-    public IGravity hide(){ point.hide(); return this; }
+    public IGravity name(String nm){ super.name(nm); if(point!=null){ point.name(nm); } return this; }
+    public IGravity layer(ILayer l){ super.layer(l); if(point!=null){ point.layer(l); } return this; }
+    public IGravity show(){ if(point!=null){ point.show(); } return this; }
+    public IGravity hide(){ if(point!=null){ point.hide(); } return this; }
 
-    public void del(){ point.del(); super.del(); }
+    public void del(){ if(point!=null){ point.del(); } super.del(); }
     
     /**************************************
      * methods of IPoint
      *************************************/
     public IGravity setSize(double sz){ return size(sz); }
-    public IGravity size(double sz){ point.size(sz); return this; }
-    public double getSize(){ return point.size(); }
-    public double size(){ return point.size(); }
+    public IGravity size(double sz){ if(point!=null){ point.size(sz); } return this; }
+    public double getSize(){ if(point!=null){ return point.size(); } return 0; }
+    public double size(){ if(point!=null){ return point.size(); } return 0; }
     
     
-    public IGravity clr(Color c){ super.clr(c); point.clr(c); return this; }
-    public IGravity clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
-    public IGravity clr(int gray){ super.clr(gray); point.clr(gray); return this; }
-    public IGravity clr(float fgray){ super.clr(fgray); point.clr(fgray); return this; }
-    public IGravity clr(double dgray){ super.clr(dgray); point.clr(dgray); return this; }
-    public IGravity clr(int gray, int alpha){ super.clr(gray,alpha); point.clr(gray,alpha); return this; }
-    public IGravity clr(float fgray, float falpha){ super.clr(fgray,falpha); point.clr(fgray,falpha); return this; }
-    public IGravity clr(double dgray, double dalpha){ super.clr(dgray,dalpha); point.clr(dgray,dalpha); return this; }
-    public IGravity clr(int r, int g, int b){ super.clr(r,g,b); point.clr(r,g,b); return this; }
-    public IGravity clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); point.clr(fr,fg,fb); return this; }
-    public IGravity clr(double dr, double dg, double db){ super.clr(dr,dg,db); point.clr(dr,dg,db); return this; }
+    public IGravity clr(Color c){ super.clr(c); if(point!=null){ point.clr(c); } return this; }
+    public IGravity clr(Color c, int alpha){ super.clr(c,alpha); if(point!=null){ point.clr(c,alpha); } return this; }
+    public IGravity clr(int gray){ super.clr(gray); if(point!=null){ point.clr(gray); } return this; }
+    public IGravity clr(float fgray){ super.clr(fgray); if(point!=null){ point.clr(fgray); } return this; }
+    public IGravity clr(double dgray){ super.clr(dgray); if(point!=null){ point.clr(dgray); } return this; }
+    public IGravity clr(int gray, int alpha){ super.clr(gray,alpha); if(point!=null){ point.clr(gray,alpha); } return this; }
+    public IGravity clr(float fgray, float falpha){ super.clr(fgray,falpha); if(point!=null){ point.clr(fgray,falpha); } return this; }
+    public IGravity clr(double dgray, double dalpha){ super.clr(dgray,dalpha); if(point!=null){ point.clr(dgray,dalpha); } return this; }
+    public IGravity clr(int r, int g, int b){ super.clr(r,g,b); if(point!=null){ point.clr(r,g,b); } return this; }
+    public IGravity clr(float fr, float fg, float fb){ super.clr(fr,fg,fb); if(point!=null){ point.clr(fr,fg,fb); } return this; }
+    public IGravity clr(double dr, double dg, double db){ super.clr(dr,dg,db); if(point!=null){ point.clr(dr,dg,db); } return this; }
     public IGravity clr(int r, int g, int b, int a){
-        super.clr(r,g,b,a); point.clr(r,g,b,a); return this;
+        super.clr(r,g,b,a); if(point!=null){ point.clr(r,g,b,a); } return this;
     }
     public IGravity clr(float fr, float fg, float fb, float fa){
-        super.clr(fr,fg,fb,fa); point.clr(fr,fg,fb,fa); return this;
+        super.clr(fr,fg,fb,fa); if(point!=null){ point.clr(fr,fg,fb,fa); } return this;
     }
     public IGravity clr(double dr, double dg, double db, double da){
-        super.clr(dr,dg,db,da); point.clr(dr,dg,db,da); return this;
+        super.clr(dr,dg,db,da); if(point!=null){ point.clr(dr,dg,db,da); } return this;
     }
     public IGravity hsb(float h, float s, float b, float a){
-        super.hsb(h,s,b,a); point.hsb(h,s,b,a); return this;
+        super.hsb(h,s,b,a); if(point!=null){ point.hsb(h,s,b,a); } return this;
     }
     public IGravity hsb(double h, double s, double b, double a){
-        super.hsb(h,s,b,a); point.hsb(h,s,b,a); return this;
+        super.hsb(h,s,b,a); if(point!=null){ point.hsb(h,s,b,a); } return this;
     }
     public IGravity hsb(float h, float s, float b){
-        super.hsb(h,s,b); point.hsb(h,s,b); return this;
+        super.hsb(h,s,b); if(point!=null){ point.hsb(h,s,b); } return this;
     }
     public IGravity hsb(double h, double s, double b){
-        super.hsb(h,s,b); point.hsb(h,s,b); return this;
+        super.hsb(h,s,b); if(point!=null){ point.hsb(h,s,b); } return this;
     }
     public IGravity setColor(Color c){ return clr(c); }
     public IGravity setColor(Color c, int alpha){ return clr(c,alpha); }
@@ -139,8 +139,8 @@ public class IGravity extends I3DField{
     public IGravity setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
     public IGravity setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
 
-    public IGravity weight(double w){ super.weight(w); point.weight(w); return this; }
-    public IGravity weight(float w){ super.weight(w); point.weight(w); return this; }
+    public IGravity weight(double w){ super.weight(w); if(point!=null){ point.weight(w); } return this; }
+    public IGravity weight(float w){ super.weight(w); if(point!=null){ point.weight(w); } return this; }
     
     
 }

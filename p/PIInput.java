@@ -26,6 +26,8 @@ import processing.core.*;
 import java.io.*;
 import igeo.io.IInputWrapper;
 
+import igeo.*;
+
 /**
    Input wrapper class. Mostly for wrapping Processing's input stream method.
    
@@ -34,5 +36,10 @@ import igeo.io.IInputWrapper;
 public class PIInput extends IInputWrapper{
     public PApplet papplet;
     public PIInput(PApplet p){ papplet = p; }
-    public InputStream getStream(String filename){ return papplet.createInput(filename); }
+    public InputStream getStream(String filename){
+	return papplet.createInput(filename);
+    }
+    public InputStream getStream(File file){
+	return papplet.createInput(file.getName());
+    }
 }

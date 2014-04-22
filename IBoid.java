@@ -213,6 +213,19 @@ public class IBoid extends IParticle implements IBoidI{
     public IBoid y(IDoubleI vy){ pos.y(vy); return this; }
     public IBoid z(IDoubleI vz){ pos.z(vz); return this; }
     
+    /** setting x component by x component of input vector*/
+    public IBoid x(IVecI v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IBoid y(IVecI v){ pos.y(v); return this; }
+    /** setting z component by z component of input vector*/
+    public IBoid z(IVecI v){ pos.z(v); return this; }
+    
+    /** setting x component by x component of input vector*/
+    public IBoid x(IVec2I v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IBoid y(IVec2I v){ pos.y(v); return this; }
+    
+    
     public IBoid dup(){ return new IBoid(this); }
     
     public IBoid set(IVecI v){ pos.set(v); return this; }

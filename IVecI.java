@@ -53,6 +53,18 @@ public interface IVecI extends IVecOp, ITransformable{
     /** setting z component */
     public IVecI z(IDoubleI vz);
     
+    /** setting x component by x component of input vector*/
+    public IVecI x(IVecI v);
+    /** setting y component by y component of input vector*/
+    public IVecI y(IVecI v);
+    /** setting z component by z component of input vector*/
+    public IVecI z(IVecI v);
+    
+    /** setting x component by x component of input vector*/
+    public IVecI x(IVec2I v);
+    /** setting y component by y component of input vector*/
+    public IVecI y(IVec2I v);
+    
     
     /** getting x component */
     public double x(ISwitchE e);

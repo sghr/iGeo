@@ -254,6 +254,12 @@ public /*interface*/ class IConfig{
     /** synchronize draw loop and dynamics updating loop instead of using another thread. default is false to use multi-thread. */
     public static boolean syncDrawAndDynamics=false;
     
+    /*****************************
+     * properties of IParticleGeo
+     *****************************/
+    /** frc.zero called in IParticleGeo if this is true and also IConfig.enablePostupdate is true */
+    public static boolean clearParticleForceInPostupdate=false; 
+    
     
     /*****************************
      * properties of IWall

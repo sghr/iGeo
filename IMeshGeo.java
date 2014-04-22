@@ -476,6 +476,9 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	
 	ArrayList<IFace> fcs = new ArrayList<IFace>();
 	for(int i=0; i<n; i++){
+	    if(i%10==0){
+		IOut.debug(20, "checking vertex "+i+"/"+n); //
+	    }
 	    for(int j=i+1; j<n; j++){
 		for(int k=j+1; k<n; k++){
 		    boolean in=false;
@@ -507,9 +510,70 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	return new IMeshGeo(fcs.toArray(new IFace[fcs.size()]));
     }
     
+    
+    /** create polyhedron mesh by delaunay triangulation around a center with maximum length of triangle edge by threshold */
+    public static IMeshGeo createPolyhedron(IVertex[] vtx, double threshold){
+	int n = vtx.length;
+	IVec c = new IVec();
+	IVec[] p = new IVec[n];
+	for(int i=0; i<n; i++){ p[i] = vtx[i].get().dup(); c.add(p[i]); }
+	c.div(n);
+	for(int i=0; i<n; i++){ p[i].sub(c).unit(); } // unitize around center
+	
+	ArrayList<IFace> fcs = new ArrayList<IFace>();
+	for(int i=0; i<n; i++){
+	    if(i%10==0){
+		IOut.debug(20, "checking vertex "+i+"/"+n); //
+	    }
+	    for(int j=i+1; j<n; j++){
+		if(vtx[j].pos.dist(vtx[i].pos)<threshold){
+		    for(int k=j+1; k<n; k++){
+			if(vtx[k].pos.dist(vtx[i].pos)<threshold && vtx[k].pos.dist(vtx[j].pos)<threshold){
+			    boolean in=false;
+			    IVec cc = IVec.circumcenter(p[i],p[j],p[k]);
+			    if(cc==null) in=true;
+			    else{
+				double r = cc.dist(p[i]);
+				for(int l=0; l<n&&!in; l++){
+				    if(vtx[l].dist(vtx[i])<threshold &&
+				       vtx[l].dist(vtx[j])<threshold &&
+				       vtx[l].dist(vtx[k])<threshold ){
+					if(i!=l&&j!=l&&k!=l){
+					    IVec ix = IVec.intersectPlaneAndLine(p[i],p[j],p[k],p[l],IG.origin);
+					    if(ix!=null && ix.dot(p[l])>0 && r>cc.dist(ix)){
+						in=true;
+					    }
+					}
+				    }
+				}
+			    }
+			    if(!in){
+				if(p[i].nml(p[j],p[k]).dot(p[i])>0){
+				    fcs.add(new IFace(vtx[i],vtx[j],vtx[k]));
+				}
+				else{
+				    fcs.add(new IFace(vtx[i],vtx[k],vtx[j]));
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	
+	return new IMeshGeo(fcs.toArray(new IFace[fcs.size()]));
+    }
+    
+
+
     /** alias of createPolyhedron */
     public static IMeshGeo polyhedron(IVertex[] vtx){
 	return createPolyhedron(vtx);
+    }
+    
+    /** alias of createPolyhedron with maximum threshold for edge length */
+    public static IMeshGeo polyhedron(IVertex[] vtx, double threshold){
+	return createPolyhedron(vtx,threshold);
     }
     
     /** connect closest vertex */

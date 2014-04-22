@@ -34,4 +34,5 @@ import javax.media.opengl.*;
 public interface IGraphicsGL extends IGraphics3D{
     public GL getGL();
     public void setGL(GL g);
+    public void setBGImage(String imageFilename);
 }

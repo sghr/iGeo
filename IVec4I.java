@@ -59,6 +59,20 @@ public interface IVec4I extends IVec4Op, IVecI{
     /** setting w component */
     public IVec4I w(IDoubleI vz);
     
+    /** setting x component by x component of input vector*/
+    public IVec4I x(IVecI v);
+    /** setting y component by y component of input vector*/
+    public IVec4I y(IVecI v);
+    /** setting z component by z component of input vector*/
+    public IVec4I z(IVecI v);
+    /** setting w component by w component of input vector*/
+    public IVec4I w(IVec4I v);
+    
+    /** setting x component by x component of input vector*/
+    public IVec4I x(IVec2I v);
+    /** setting y component by y component of input vector*/
+    public IVec4I y(IVec2I v);
+    
     
     /** getting x component */
     public double x(ISwitchE e);

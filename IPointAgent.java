@@ -195,6 +195,20 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent x(IDoubleI vx){ pos.x(vx); return this; }
     public IPointAgent y(IDoubleI vy){ pos.y(vy); return this; }
     public IPointAgent z(IDoubleI vz){ pos.z(vz); return this; }
+
+    /** setting x component by x component of input vector*/
+    public IPointAgent x(IVecI v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IPointAgent y(IVecI v){ pos.y(v); return this; }
+    /** setting z component by z component of input vector*/
+    public IPointAgent z(IVecI v){ pos.z(v); return this; }
+    
+    /** setting x component by x component of input vector*/
+    public IPointAgent x(IVec2I v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IPointAgent y(IVec2I v){ pos.y(v); return this; }
+
+
     
     public double x(ISwitchE e){ return pos.x(e); }
     public double y(ISwitchE e){ return pos.y(e); }

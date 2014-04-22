@@ -222,6 +222,19 @@ public class IParticle extends IPointAgent implements IParticleI{
     public IParticle x(IDoubleI vx){ pos.x(vx); return this; }
     public IParticle y(IDoubleI vy){ pos.y(vy); return this; }
     public IParticle z(IDoubleI vz){ pos.z(vz); return this; }
+
+    /** setting x component by x component of input vector*/
+    public IParticle x(IVecI v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IParticle y(IVecI v){ pos.y(v); return this; }
+    /** setting z component by z component of input vector*/
+    public IParticle z(IVecI v){ pos.z(v); return this; }
+    
+    /** setting x component by x component of input vector*/
+    public IParticle x(IVec2I v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IParticle y(IVec2I v){ pos.y(v); return this; }
+
     
 
     public IParticle dup(){ return new IParticle(this); }

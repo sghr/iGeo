@@ -221,6 +221,13 @@ public class IParticleOnCurve extends IPointAgent implements IParticleOnCurveI{
     public IParticleOnCurve y(IDoubleI vy){ pos.y(vy); return this; }
     public IParticleOnCurve z(IDoubleI vz){ pos.z(vz); return this; }
     
+    public IParticleOnCurve x(IVecI vx){ pos.x(vx); return this; }
+    public IParticleOnCurve y(IVecI vy){ pos.y(vy); return this; }
+    public IParticleOnCurve z(IVecI vz){ pos.z(vz); return this; }
+
+    public IParticleOnCurve x(IVec2I vx){ pos.x(vx); return this; }
+    public IParticleOnCurve y(IVec2I vy){ pos.y(vy); return this; }
+    
 
     public IParticleOnCurve dup(){ return new IParticleOnCurve(this); }
     

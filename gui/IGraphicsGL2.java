@@ -29,11 +29,18 @@ import javax.media.opengl.*;
 
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.image.*;
 import java.awt.*;
 import java.util.*;
+//import java.nio.*;
+import java.io.*;
 
 //import com.sun.opengl.util.j2d.Overlay;
 import com.jogamp.opengl.util.awt.Overlay; // processing 2.0
+
+import com.jogamp.opengl.util.texture.*;
+
+
 
 import igeo.*;
 import igeo.gui.*;
@@ -53,7 +60,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public static float[] defaultGLSpecularLight = {.0f,.0f,.0f,1f};
 
     public static boolean defaultGLTwoSidedLighting = false; //true; // when this is true, it seems to cause weird behavior looking like some of normals are flipped or messed up
-        
+    
     public GL gl;
     public GL2 gl2;
     public Graphics2D g;
@@ -61,47 +68,156 @@ public class IGraphicsGL2 implements IGraphicsGL{
     //public PGL pgl;
     
     public double[][][] bgColor = new double[2][2][3];
-
+    
+    public Texture bgTexture;
+    public int bgTextureID;
+    
     public boolean firstDraw=true;
-
-
+    
+    
     public IGraphicsGL2(){}
     
     public IView view(){ return view; }
-
+    
     //public void setPGL(PGL pgl){ this.pgl=pgl; setGL(pgl.gl); }
     public void setGL(GL gl){ this.gl=gl; gl2 = gl.getGL2(); }
     public void setGraphics(Graphics2D g){ this.g=g; }
-
-    public GL getGL(){ return gl; }
-    public GL2 getGL2(){ return gl2; }
+    
+    //public GL getGL(){ return gl; }
+    public GL getGL(){ return gl2; }
+    //public GL2 getGL2(){ return gl2; }
     public Graphics2D getGraphics(){ return g; }
-
+    
     public IGraphicMode.GraphicType type(){ return IGraphicMode.GraphicType.GL; }
+    /*
+    public void setBGImage(Image img){
+	BufferedImage bimg;
+	if(img instanceof BufferedImage){
+	    bimg = (BufferedImage)img;
+	}
+	else{
+	    bimg = new BufferedImage(img.getWidth(null),img.getHeight(null),BufferedImage.TYPE_INT_ARGB);
+	    Graphics2D g = bimg.createGraphics();
+	    g.drawImage(img, 0, 0, null);
+	    g.dispose();
+	}
+	try{
+	    //bgTexture = TextureIO.newTexture(new FileInputStream(new File("")),true, "");
+	    //bgTexture = TextureIO.newTexture(new File(""),true);
+	    //bgTexture = TextureIO.newTexture(bimg, true);
+	    bgTextureID = bgTexture.getTextureObject();
+	}catch(Exception e){}
+    }
+    */
 
+    String imageFile; // debug
+    
+    public void setBGImage(String imageFilename){
+	
+	imageFile = imageFilename; // debug
+	
+	IG ig = IG.cur();
+	if(ig!=null){
+	    String suffix = null;
+	    int sidx = imageFilename.lastIndexOf(".");
+	    if(sidx>=0){
+		suffix = imageFilename.substring(sidx+1);
+	    }
+	    InputStream is=null;
+	    try{
+		if(ig.inputWrapper!=null){
+		    is = ig.inputWrapper.getStream(imageFilename);
+		}
+		else{
+		    is = new FileInputStream(imageFilename);
+		}
+		if(is!=null){
+		    bgTexture = TextureIO.newTexture(is, true, suffix);
+		    bgTextureID = bgTexture.getTextureObject();
+		}
+		else{
+		    IOut.err("input stream could not be instantiated");
+		}
+	    }
+	    catch(IOException e){ e.printStackTrace(); }
+	    
+	}
+	else{
+	    IOut.err("no IG instance found");
+	}
+    }
+    
+    
     public void drawBG(GL gl, IView v){
-
+	
         GL2 gl2 = gl.getGL2(); // jogl 2.0
-
-        if(view.bgColor!=null){
+	
+	//  jogl2?
+	gl2.glMatrixMode(GL2.GL_MODELVIEW); // not in processing 2.0
+	gl2.glPushMatrix(); // not in processing 2.0
+	gl2.glLoadIdentity(); // not in processing 2.0
+	gl2.glMatrixMode(GL2.GL_PROJECTION); // not in processing 2.0
+	gl2.glPushMatrix(); // not in processing 2.0
+	gl2.glLoadIdentity(); // not in processing 2.0
+	
+	//if(IConfig.depthSort) gl2.glDisable(GL2.GL_DEPTH_TEST);
+	//if(mode.isLight()) gl2.glDisable(GL2.GL_LIGHTING);
+	
+	/*
+	if(view.bgImageBuf!=null){
+	    //gl2.glDisable(GL2.GL_DEPTH_TEST);
+	    //gl2.glRasterPos2i(-1,-1);
+	    gl2.glPixelZoom((float)view.screenWidth/view.bgImageWidth,
+			    (float)view.screenHeight/view.bgImageHeight);
+	    //gl2.glDrawPixels(100,100,gl2.GL_RGB,gl2.GL_UNSIGNED_BYTE,view.bgImageBuf);
+	    //gl2.glDrawPixels(view.bgImageWidth,view.bgImageHeight,gl2.GL_RGB,gl2.GL_UNSIGNED_BYTE,view.bgImageBuf);
+	    gl2.glDrawPixels(view.screenWidth,view.screenHeight,gl2.GL_RGB,gl2.GL_UNSIGNED_BYTE,view.bgImageBuf);
+	    //gl2.glEnable(GL2.GL_DEPTH_TEST);
+	}
+        */
+	
+	if(bgTexture!=null){
+	    //gl2.glClear(GL2.GL_COLOR_BUFFER_BIT); // 
+	    //gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT); // 
+	    //gl2.glClear(GL2.GL_ACCUM_BUFFER_BIT); // 
+	    //gl2.glClear(GL2.GL_STENCIL_BUFFER_BIT); // 
+	    //gl2.glDisable(GL2.GL_DEPTH_TEST);
+	    
+	    gl2.glDisable(GL2.GL_BLEND); // important
+	    gl2.glEnable(GL2.GL_TEXTURE_2D);
+	    gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE); // GL_DECAL
+	    
+	    gl2.glBindTexture(GL2.GL_TEXTURE_2D, bgTextureID);
+	    
+	    gl2.glBegin(GL2.GL_QUADS);
+	    gl2.glTexCoord2f(0f,0f);
+	    gl2.glVertex3d(-1,-1,0);
+	    gl2.glTexCoord2f(1f,0f);
+	    gl2.glVertex3d(1,-1,0);
+            gl2.glTexCoord2f(1f,1f);
+	    gl2.glVertex3d(1,1,0);
+	    gl2.glTexCoord2f(0f,1f);
+	    gl2.glVertex3d(-1,1,0);
+	    
+            gl2.glEnd();
+	    
+	    //gl2.glFlush();
+	    
+	    gl2.glBindTexture(GL2.GL_TEXTURE_2D, 0); // bind no texture
+	    //gl2.glDisable(GL2.GL_TEXTURE_2D);
+	    
+	    gl2.glEnable(GL2.GL_BLEND);
+	    //gl2.glEnable(GL2.GL_DEPTH_TEST);
+	}
+	else if(view.bgColor!=null){
 	    for(int i=0; i<bgColor.length; i++){
 		for(int j=0; j<bgColor[i].length; j++){
                     bgColor[i][j][0] = (double)(view.bgColor[i][j].getRed())/255.0;
                     bgColor[i][j][1] = (double)(view.bgColor[i][j].getGreen())/255.0;
                     bgColor[i][j][2] = (double)(view.bgColor[i][j].getBlue())/255.0;
                 }
-            }
+	    }
 	    
-            //  jogl2?
-            gl2.glMatrixMode(GL2.GL_MODELVIEW); // not in processing 2.0
-            gl2.glPushMatrix(); // not in processing 2.0
-            gl2.glLoadIdentity(); // not in processing 2.0
-            gl2.glMatrixMode(GL2.GL_PROJECTION); // not in processing 2.0
-            gl2.glPushMatrix(); // not in processing 2.0
-            gl2.glLoadIdentity(); // not in processing 2.0
-
-            //if(IConfig.depthSort) gl2.glDisable(GL2.GL_DEPTH_TEST);
-            //if(mode.isLight()) gl2.glDisable(GL2.GL_LIGHTING);
             gl2.glBegin(GL2.GL_QUADS);
             gl2.glColor3dv(bgColor[0][1],0);
             gl2.glVertex3d(-1.,-1.,0);
@@ -112,12 +228,13 @@ public class IGraphicsGL2 implements IGraphicsGL{
             gl2.glColor3dv(bgColor[0][0],0);
             gl2.glVertex3d(-1.,1.,0);
             gl2.glEnd();
-            //if(IConfig.depthSort) gl2.glEnable(GL2.GL_DEPTH_TEST);
-            gl2.glMatrixMode(GL2.GL_MODELVIEW);
-            gl2.glPopMatrix();
-            gl2.glMatrixMode(GL2.GL_PROJECTION);
-            gl2.glPopMatrix();
         }
+	
+	//if(IConfig.depthSort) gl2.glEnable(GL2.GL_DEPTH_TEST);
+	gl2.glMatrixMode(GL2.GL_MODELVIEW);
+	gl2.glPopMatrix();
+	gl2.glMatrixMode(GL2.GL_PROJECTION);
+	gl2.glPopMatrix();
     }
     
     public void drawView(IView view){
@@ -328,6 +445,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public void drawLineLoop(IVec[] p){
         gl2.glBegin(GL2.GL_LINE_LOOP);
         for(int i=0; i<p.length; i++){ gl2.glVertex3d(p[i].x,p[i].y,p[i].z); }
+	//for(int i=0; i<=p.length; i++){ gl2.glVertex3d(p[i%p.length].x,p[i%p.length].y,p[i%p.length].z); }
         gl2.glEnd();
     }
     public void drawPolygon(IVec[] pts, IVec[] nml){

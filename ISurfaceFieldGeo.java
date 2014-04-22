@@ -49,6 +49,7 @@ public class ISurfaceFieldGeo extends IFieldGeo implements I3DFieldI{ //extends 
     public IVecI get(IVecI pos, IVecI vel){
 	IVec2I uv = surface.uv(pos);
 	double r = intensity;
+	
 	if(decay == Decay.Linear){
 	    double dist = surface.pt(uv).dist(pos);
 	    if(dist >= threshold) return new IVec(); // zero
@@ -68,7 +69,7 @@ public class ISurfaceFieldGeo extends IFieldGeo implements I3DFieldI{ //extends 
 	    if(len<IConfig.tolerance){ return vec.zero(); }
 	    return vec.len(r);
 	}
-	
+		
 	return vec.mul(r);
 	
 	/*

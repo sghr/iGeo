@@ -50,8 +50,8 @@ public class IG implements IServerI{
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 9; }
     public static int buildVersion(){ return 0; }
-    public static int revisionVersion(){ return 4; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2013, 10, 22); }
+    public static int revisionVersion(){ return 9; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2014, 4, 22); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -319,6 +319,12 @@ public class IG implements IServerI{
     public static void unit(IUnit u){
 	IG ig=cur(); if(ig!=null) ig.server().unit(u); 
     }
+
+    /** setting unit of current IG server */
+    public static void unit(IUnit.Type u){
+	IG ig=cur(); if(ig!=null) ig.server().unit(u); 
+    }
+
     /** setting unit of current IG server */
     public static void unit(String unitName){
 	IG ig=cur(); if(ig!=null) ig.server().unit(unitName); 
@@ -1045,6 +1051,25 @@ public class IG implements IServerI{
     public static void bg(Color c){ bg(c,c,c,c); }
     public static void background(Color c){ bg(c); }
     
+
+    /*
+    public static void bg(Image img){
+	IG ig = cur(); if(ig==null) return;
+	ig.server().bg(img);
+    }
+    public static void background(Image img){ bg(img); }
+    public static void bg(String filename){
+	IG ig = cur(); if(ig==null) return;
+	ig.server().bg(IImageLoader.getImage(filename));
+    }
+    public static void background(String filename){ bg(filename); }
+    */
+    public static void bg(String imageFilename){
+	IG ig = cur(); if(ig==null) return;
+	ig.server().bg(imageFilename);
+    }
+    public static void background(String imageFilename){ bg(imageFilename); }
+    
     public static void defaultBG(){ blueBG(); }
     public static void blueBG(){ bg(IConfig.bgColor1,IConfig.bgColor2,IConfig.bgColor3,IConfig.bgColor4); } // added 2012/09/02
     public static void lightBG(){ bg(1.0, 1.0, 0.9, 0.8); } // added 2012/09/02
@@ -1219,7 +1244,7 @@ public class IG implements IServerI{
 	if(inputWrapper!=null){ retval = IIO.open(file,this,inputWrapper); }
 	else{
 	    File f = new File(file);
-	    if(!f.isAbsolute() && basePath!=null) file = basePath + File.separator + file;
+	    if(!f.isAbsolute() && basePath!=null){ file = basePath + File.separator + file; }
 	    retval = IIO.open(file,this);
 	}
 	server.updateState(); // update server status
@@ -3088,11 +3113,16 @@ public class IG implements IServerI{
     public static IVec2I[] vec2(IVec2I ... v){ return v2(v); }
     public static IVec2[] vec2(IDoubleI x, IDoubleI y, IDoubleI... xyvals){ return v2(x,y,xyvals); }
     
-    /** IVec4 2d array */
+    /** IVec2 2d array from IVecI*/
+    public static IVec2I[] vec2(IVecI ... v){ return v2(v); }
+    /** IVec2 2d array from IVecI*/
+    public static IVec2[] vec2(IVec ... v){ return v2(v); }
+    
+    /** IVec2 2d array */
     public static IVec2[][] vec2(IVec2[] ... v){ return v2(v); }
     public static IVec2I[][] vec2(IVec2I[] ... v){ return v2(v); }
     
-    /** IVec4 3d array */
+    /** IVec2 3d array */
     public static IVec2[][][] vec2(IVec2[][] ... v){ return v2(v); }
     public static IVec2I[][][] vec2(IVec2I[][] ... v){ return v2(v); }
     
@@ -3120,6 +3150,21 @@ public class IG implements IServerI{
 	}
 	return array;
     }
+    /** IVec2 array from IVec (projection) */
+    public static IVec2[] v2(IVec ... v){
+	IVec2[] array = new IVec2[v.length];
+	for(int i=0; i<v.length; i++){ array[i] = v[i].to2d(); }
+	return array;
+    }
+    
+    /** IVec2I array from IVecI (projection) */
+    public static IVec2I[] v2(IVecI ... v){
+	IVec2I[] array = new IVec2I[v.length];
+	for(int i=0; i<v.length; i++){ array[i] = v[i].to2d(); }
+	return array;
+    }
+    
+    
     
     /** IVec4 2d array */
     public static IVec2[][] v2(IVec2[] ... v){ return v; }

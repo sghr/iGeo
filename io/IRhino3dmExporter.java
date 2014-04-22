@@ -39,7 +39,7 @@ import igeo.gui.*;
 
 import java.io.*;
 //import java.awt.Color;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.zip.*;
 
 /**
@@ -337,12 +337,13 @@ public class IRhino3dmExporter extends IRhino3dm{
 	    if(obj.isValid()){
 		//Chunk objChunk = getObjectChunk(server.server().getObject(i));
 		Chunk objChunk = getObjectChunk(obj);
-
 		
+		/*
 		if(obj instanceof IMesh){ // somehow this prevent saving meshes from crashing. why!? timing of GC?
 		    //IOut.debug(100,i+": chunk ="+objChunk); // ??
 		    //if(objChunk!=null) IOut.debug(100,i+": chunk size="+objChunk.contentLength()); // ??
 		}
+		*/
 		
 		if(objChunk!=null){
 		    if(raostream!=null){
@@ -404,8 +405,40 @@ public class IRhino3dmExporter extends IRhino3dm{
 	    obj = getRhinoText( (IText)e );
 	}
 	
-	if(obj!=null) obj.setAttributes(new ObjectAttributes(e,context));
-	
+	if(obj!=null){
+	    obj.setAttributes(new ObjectAttributes(e,context));
+	    
+	    if(e.userData!=null){
+		// currently only one string list is stored; if multiple hashmaps exist, all merged.
+		
+		UserStringList stringList = new UserStringList();
+		
+		for(int i=0; i<e.userData.length; i++){
+		    if(e.userData[i] instanceof HashMap){
+			HashMap map = (HashMap)e.userData[i];
+			Set keys = map.keySet();
+			if(keys!=null){
+			    Iterator it = keys.iterator();
+			    if(it!=null){
+				while(it.hasNext()){
+				    Object k = it.next();
+				    if(k instanceof String){
+					Object v = map.get(k);
+					if(v instanceof String){
+					    stringList.add(new UserString((String)k,(String)v));
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		}
+		if(stringList.size()>0){
+		    obj.userDataList = new UserData[1];
+		    obj.userDataList[0] = stringList;
+		}
+	    }
+	}
 	return obj;
     }
     
@@ -454,8 +487,31 @@ public class IRhino3dmExporter extends IRhino3dm{
 	    obj.attributes.write(file, cosAttr, cosAttr.getCRC());
 	    Chunk attrChunk = cosAttr.getChunk();
 	    if(attrChunk!=null) ctable.add(attrChunk);
-	}
+	    
+	    if(obj.userDataList!=null){
+		ChunkOutputStream cosAttrUserData = new ChunkOutputStream(tcodeObjectRecordAttributesUserData);
+		//writeobjectusredata
+		
+		for(int i=0; i<obj.userDataList.length; i++){
+		    if(obj.userDataList[i]!=null){
+			ChunkOutputStream cosUserData = new ChunkOutputStream(tcodeOpenNurbsClassUserData);
+			obj.userDataList[i].write(file, cosUserData, cosUserData.getCRC());
+			Chunk userDataChunk = cosUserData.getChunk();
+			if(userDataChunk.content!=null && userDataChunk.content.length>0){
+			    //IG.err("writing userDataChunk"); //
+			    writeChunk(cosAttrUserData, userDataChunk);
+			}
+		    }
+		}
+		
+		
+		ChunkOutputStream cosEnd = new ChunkOutputStream(tcodeOpenNurbsClassEnd);
+		writeChunk(cosAttrUserData, cosEnd.getChunk());
+		ctable.add(cosAttrUserData.getChunk());
+	    }
 	
+	}
+
 	ctable.serialize();
 	
 	return ctable;
@@ -470,6 +526,9 @@ public class IRhino3dmExporter extends IRhino3dm{
     
     public void writeUserDataTable() throws IOException{
 	writeChunkTable(tcodeUserTable);
+
+	//ChunkOutputStream cos = new ChunkOutputStream(tcodeUserTableUUID);
+	
     }
     
     public void writeEndMark() throws IOException{
@@ -507,8 +566,31 @@ public class IRhino3dmExporter extends IRhino3dm{
 	Chunk dataChunk = cosData.getChunk();
 	if(dataChunk.content==null || dataChunk.content.length==0) return null; // no data 
 	objChunkTable.add(dataChunk);
-	
+
+	/*
 	// user data
+	//...
+	if(obj.userDataList!=null){
+	    for(int i=0; i<obj.userDataList.length; i++){
+		if(obj.userDataList[i]!=null){
+		    ChunkOutputStream cosUserData = new ChunkOutputStream(tcodeOpenNurbsClassUserData);
+		    obj.userDataList[i].write(file, cosUserData, cosUserData.getCRC());
+		    Chunk userDataChunk = cosUserData.getChunk();
+		    if(userDataChunk.content!=null && userDataChunk.content.length>0){
+			objChunkTable.add(userDataChunk);
+
+			IG.err("writing userDataChunk"); //
+		    }
+		}
+	    }
+	}
+	*/
+	
+	//obj.write(file,cosData,cosData.getCRC());
+	//Chunk dataChunk = cosData.getChunk();
+	//if(dataChunk.content==null || dataChunk.content.length==0) return null; // no data 
+	//objChunkTable.add(dataChunk);
+	
 	// skipped
 	
 	Chunk endChunk = new Chunk(tcodeOpenNurbsClassEnd,0);
@@ -627,6 +709,12 @@ public class IRhino3dmExporter extends IRhino3dm{
 	writeDouble(os,plane.planeEquation.y,crc);
 	writeDouble(os,plane.planeEquation.z,crc);
 	writeDouble(os,plane.planeEquation.d,crc);
+    }
+    
+    public static void writeXform(OutputStream os, Xform xform, CRC32 crc) throws IOException{
+	for(int i=0; i<4; i++)
+	    for(int j=0; j<4; j++)
+		writeDouble(os,xform.xform[i][j],crc);
     }
     
     public static void writeInterval(OutputStream os, Interval interval, CRC32 crc) throws IOException{
@@ -909,7 +997,7 @@ public class IRhino3dmExporter extends IRhino3dm{
 	}
 	
     }
-    
+
     public static void writeDeflate(OutputStream os, byte[] buf, int len, CRC32 crc) throws IOException{
 	
 	Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);

@@ -121,6 +121,14 @@ public class IImageLoader implements ImageObserver{
     }
     */
     
+    public static int getWidth(Image image){
+	return image.getWidth(observer);
+    }
+    
+    public static int getHeight(Image image){
+	return image.getHeight(observer);
+    }
+    
     public static int[] getPixelBuffer(Image image){
 	int w = image.getWidth(observer);
 	int h = image.getHeight(observer);
@@ -144,6 +152,30 @@ public class IImageLoader implements ImageObserver{
 	    for(int x=0; x<w; x++)
 		mat[x][y] = pix[w*y+x];
 	return mat;
+    }
+    
+    public static byte[] getRGBBytes(Image image){
+	int[] pix = getPixelBuffer(image);
+	// pix is ARGB format
+	byte[] buf = new byte[pix.length*3];
+	for(int i=0; i<pix.length; i++){
+	    buf[i*3] = (byte)((pix[i]>>16)&0xff);
+	    buf[i*3+1] = (byte)((pix[i]>>8)&0xff);
+	    buf[i*3+2] = (byte)(pix[i]&0xff);
+	}
+	return buf;
+    }
+    
+    public static byte[] getARGBBytes(Image image){
+	int[] pix = getPixelBuffer(image);
+	byte[] buf = new byte[pix.length*4];
+	for(int i=0; i<pix.length; i++){
+	    buf[i*4] = (byte)((pix[i]>>24)&0xff);
+	    buf[i*4+1] = (byte)((pix[i]>>16)&0xff);
+	    buf[i*4+2] = (byte)((pix[i]>>8)&0xff);
+	    buf[i*4+3] = (byte)(pix[i]&0xff);
+	}
+	return buf;
     }
     
     public static Color[][] getPixels(Image image){

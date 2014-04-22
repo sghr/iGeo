@@ -119,7 +119,6 @@ public class IDelaunay2D {
 	}
 	
 	
-	
 	for(int i=0; i<pts.length-2; i++){
 
 	    //IOut.p((i+1)+"/"+(pts.length-2)); //
@@ -207,6 +206,68 @@ public class IDelaunay2D {
 	return triangles.toArray(new IVec2[triangles.size()][]);
     }
     
+    /**
+       Getting delaunay triangles out of array of 3D points interpreted as 2D points on XY plane.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVecI[][] getTriangles(IVecI[] pts){
+	return getTriangles(pts, null);
+    }
+    
+    /**
+       Getting delaunay triangles out of array of 3D points interpreted as 2D points on a projected plane.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVecI[][] getTriangles(IVecI[] pts, IVecI projectionDir){
+	IVec2[] pts2 = new IVec2[pts.length];
+	for(int i=0; i<pts2.length; i++){
+	    if(projectionDir!=null){ pts2[i] = pts[i].get().to2d(projectionDir); }
+	    else{ pts2[i] = pts[i].get().to2d(); }
+	}
+	IVec2[][] ret2 = getTriangles(pts2);
+	IVecI[][] ret = new IVecI[ret2.length][];
+	List<IVec2> pts2list = Arrays.asList(pts2);
+	for(int i=0; i<ret2.length; i++){
+	    ret[i] = new IVecI[ret2[i].length];
+	    for(int j=0; j<ret2[i].length; j++){
+		int idx = pts2list.indexOf(ret2[i][j]);
+		if(idx>=0){ ret[i][j] = pts[idx]; }
+	    }
+	}
+	return ret;
+    }
+    
+    /**
+       Getting delaunay triangles out of array of 3D points interpreted as 2D points on XY plane.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVec[][] getTriangles(IVec[] pts){
+	return getTriangles(pts, null);
+    }
+    
+    /**
+       Getting delaunay triangles out of array of 3D points interpreted as 2D points on a projected plane.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVec[][] getTriangles(IVec[] pts, IVecI projectionDir){
+	IVec2[] pts2 = new IVec2[pts.length];
+	for(int i=0; i<pts2.length; i++){
+	    if(projectionDir!=null){ pts2[i] = pts[i].to2d(projectionDir); }
+	    else{ pts2[i] = pts[i].to2d(); }
+	}
+	IVec2[][] ret2 = getTriangles(pts2);
+	IVec[][] ret = new IVec[ret2.length][];
+	List<IVec2> pts2list = Arrays.asList(pts2);
+	for(int i=0; i<ret2.length; i++){
+	    ret[i] = new IVec[ret2[i].length];
+	    for(int j=0; j<ret2[i].length; j++){
+		int idx = pts2list.indexOf(ret2[i][j]);
+		if(idx>=0){ ret[i][j] = pts[idx]; }
+	    }
+	}
+	return ret;
+    }
+    
     
     /**
        Getting delaunay triangles out of array of 2D points
@@ -275,6 +336,92 @@ public class IDelaunay2D {
 	//IOut.p("trinangles.size()="+triangles.size()); //
 	return triangles.toArray(new IVec2[triangles.size()][]);
     }
+
+    /**
+       Getting edges of delaunay triangles out of array of 2D points
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVec2[][] getEdges(IVec2[] pts){
+	IVec2[][] tri = getTriangles(pts);
+	ArrayList<IVec2[]> pairs = new ArrayList<IVec2[]>();
+	for(int i=0; i<tri.length; i++){
+	    for(int j=0; j<tri[i].length; j++){
+		boolean exists=false;
+		for(int k=0; k<pairs.size()&&!exists; k++){
+		    if(pairs.get(k)[0] == tri[i][j] &&
+		       pairs.get(k)[1] == tri[i][(j+1)%tri[i].length] ||
+		       pairs.get(k)[1] == tri[i][j] &&
+		       pairs.get(k)[0] == tri[i][(j+1)%tri[i].length]){
+			exists=true;
+		    }
+		}
+		if(!exists){
+		    pairs.add(new IVec2[]{ tri[i][j], tri[i][(j+1)%tri[i].length] });
+		}
+	    }
+	}
+	return pairs.toArray(new IVec2[pairs.size()][]);
+    }
+    
+    /**
+       Getting edges of 2D delaunay triangles out of array of 3D points and projection vector.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVecI[][] getEdges(IVecI[] pts){ return getEdges(pts,null); }
+    
+    
+    /**
+       Getting edges of 2D delaunay triangles out of array of 3D points and projection vector.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVecI[][] getEdges(IVecI[] pts, IVecI projectionDir){
+	IVec2[] pts2 = new IVec2[pts.length];
+	for(int i=0; i<pts2.length; i++){
+	    if(projectionDir!=null){ pts2[i] = pts[i].get().to2d(projectionDir); }
+	    else{ pts2[i] = pts[i].get().to2d(); }
+	}
+	IVec2[][] ret2 = getEdges(pts2);
+	IVecI[][] ret = new IVecI[ret2.length][];
+	List<IVec2> pts2list = Arrays.asList(pts2);
+	for(int i=0; i<ret2.length; i++){
+	    ret[i] = new IVecI[ret2[i].length];
+	    for(int j=0; j<ret2[i].length; j++){
+		int idx = pts2list.indexOf(ret2[i][j]);
+		if(idx>=0){ ret[i][j] = pts[idx]; }
+	    }
+	}
+	return ret;
+    }
+
+    /**
+       Getting edges of 2D delaunay triangles out of array of 3D points and projection vector.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVec[][] getEdges(IVec[] pts){ return getEdges(pts,null); }
+    
+    /**
+       Getting edges of 2D delaunay triangles out of array of 3D points and projection vector.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVec[][] getEdges(IVec[] pts, IVecI projectionDir){
+	IVec2[] pts2 = new IVec2[pts.length];
+	for(int i=0; i<pts2.length; i++){
+	    if(projectionDir!=null){ pts2[i] = pts[i].to2d(projectionDir); }
+	    else{ pts2[i] = pts[i].to2d(); }
+	}
+	IVec2[][] ret2 = getEdges(pts2);
+	IVec[][] ret = new IVec[ret2.length][];
+	List<IVec2> pts2list = Arrays.asList(pts2);
+	for(int i=0; i<ret2.length; i++){
+	    ret[i] = new IVec[ret2[i].length];
+	    for(int j=0; j<ret2[i].length; j++){
+		int idx = pts2list.indexOf(ret2[i][j]);
+		if(idx>=0){ ret[i][j] = pts[idx]; }
+	    }
+	}
+	return ret;
+    }
+    
     
     
     public static boolean isInsideCircumcircle(IVec2 pt, IVec2 trianglePt1,

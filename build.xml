@@ -9,7 +9,8 @@
 -->
 
 <property name="processing1_path" value="C:\Program Files (x86)\processing-1.5.1" />
-<property name="processing2_path" value="C:\Program Files\processing-2.0.3" />
+<!--<property name="processing2_path" value="C:\Program Files\processing-2.0.3" /> -->
+<property name="processing2_path" value="C:\Program Files\processing-2.1.1" /> 
 <property name="processing_home" value="C:\Users\Satoru\Documents\processing" />
 <property name="processing_zip_path" value="processing_zip\igeo\" />
 <property name="javadoc_path" value="${processing_zip_path}\reference\" />
@@ -199,7 +200,7 @@
 </project>
 
 <!-- To swich compilation target to either Processing1.5 or Processing 2.0,
-     you need to change some code manually at IG.java (IG.GL) and 
+     you need to change some code manually at IG.java (IG.GL = GL1 or GL2) and 
      gui/ITextGraphicsGL.java (import TextRenderer and ggl.getGL2() )
      in addition to using all1 or all2 target.
    -->

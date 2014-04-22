@@ -23,7 +23,7 @@
 package igeo;
 
 import java.util.ArrayList;
-import java.awt.Color;
+import java.awt.*;
 import igeo.gui.*;
 
 /**
@@ -90,8 +90,8 @@ public class IServer implements IServerI{
     
     public IUnit unit(){ return unit; }
     public void unit(IUnit u){ unit = u; }
+    public void unit(IUnit.Type u){ unit = new IUnit(u); }
     public void unit(String unitName){ unit = new IUnit(unitName); }
-    
     
     public void add(IObject e){
 	//synchronized(IG.lock){
@@ -136,6 +136,19 @@ public class IServer implements IServerI{
 	else{ IOut.err("graphicServer is null"); }
     }
     public void background(IColor c1, IColor c2, IColor c3, IColor c4){ bg(c1,c2,c3,c4); }
+
+    /*
+    public void bg(Image img){
+	if(graphicServer!=null) graphicServer.background(img);
+	else{ IOut.err("graphicServer is null"); }
+    }
+    public void background(Image img){ bg(img); }
+    */
+    public void bg(String imageFilename){
+	if(graphicServer!=null) graphicServer.background(imageFilename);
+	else{ IOut.err("graphicServer is null"); }
+    }
+    public void background(String imageFilename){ bg(imageFilename); }
     
     
     public ArrayList<IObject> getAllObjects(){ return allObjects(); }

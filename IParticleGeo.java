@@ -44,7 +44,7 @@ public class IParticleGeo extends IDynamicsBase implements IParticleI, IVecI{
     public IVec frc;
     public boolean fixed=false;
     public double friction = defaultFriction;
-
+    
     /** when other agent set locatin, this skips to update the position by the velocity */
     public boolean skipUpdateOnce;
     
@@ -196,13 +196,30 @@ public class IParticleGeo extends IDynamicsBase implements IParticleI, IVecI{
     public IParticleGeo decay(double d){ return fric(d); }
     
     /** adding force */
-    synchronized public IParticleGeo push(IVecI f){ frc.add(f); return this; }
+    synchronized public IParticleGeo push(IVecI f){
+	//IG.p(IOut.currentStack(5)); //
+	//IG.p(parent.name()+": f = "+f.z()); //
+	if(!fixed){ frc.add(f); }
+	//IG.p(parent.name()+": frc = "+frc.z); //
+	return this;
+    }
     /** adding force */
-    synchronized public IParticleGeo push(double fx, double fy, double fz){ frc.add(fx,fy,fz); return this; }
+    synchronized public IParticleGeo push(double fx, double fy, double fz){
+	if(!fixed){ frc.add(fx,fy,fz); } return this;
+    }
     /** adding negative force */
-    synchronized public IParticleGeo pull(IVecI f){ frc.sub(f); return this; }
+    synchronized public IParticleGeo pull(IVecI f){
+	//IG.p(IOut.currentStack(5)); //
+	//IG.p(parent.name()+": f = "+f.z()); //
+	if(!fixed){ frc.sub(f); }
+	//IG.p(parent.name()+": frc = "+frc.z); //
+	return this;
+	
+    }
     /** adding negative force */
-    synchronized public IParticleGeo pull(double fx, double fy, double fz){ frc.sub(fx,fy,fz); return this; }
+    synchronized public IParticleGeo pull(double fx, double fy, double fz){
+	if(!fixed){ frc.sub(fx,fy,fz); } return this;
+    }
     /** adding force (alias of push) */
     synchronized public IParticleGeo addForce(IVecI f){ return push(f); }
     /** adding force (alias of push) */
@@ -220,7 +237,10 @@ public class IParticleGeo extends IDynamicsBase implements IParticleI, IVecI{
 	if(fixed) return;
 	//vel.add(frc.mul(IConfig.updateRate/mass)).mul(1.0-friction);
 	vel.add(frc, IConfig.updateRate/mass).mul(1.0-friction);
-	frc.zero();
+	//frc.zero(); // now this is done in postupdate
+	if( !(IConfig.enablePostupdate && IConfig.clearParticleForceInPostupdate)){
+	    frc.zero(); // this is done here again because force in update cannot be reflected (updated 2014/03/10)
+	}
     }
     
     /** update of velocity is done in preupdate and update of position is done in update() (updated 2012/08/26) */
@@ -230,12 +250,22 @@ public class IParticleGeo extends IDynamicsBase implements IParticleI, IVecI{
 	if(fixed) return;
 	//vel.add(frc.mul(IConfig.updateRate/mass)).mul(1.0-friction);
 	//pos.add(vel.dup().mul(IConfig.updateRate));
+	
 	pos.add(vel, IConfig.updateRate);
 	//frc.zero();
 	
 	//if(parent!=null) parent.updateGraphic(); // graphic update
 	//super.update();
 	//updateTarget(); //moved to IDynamics.postUpdate()
+    }
+    
+    /** clearing frc is done in postupdate (updated 2013/12/08) */
+    /** this is changed again because force in update cannot be reflected (updated 2014/03/10) */
+    
+    synchronized public void postupdate(){
+	if(IConfig.enablePostupdate && IConfig.clearParticleForceInPostupdate){
+	    frc.zero();
+	}
     }
     
     
@@ -254,6 +284,20 @@ public class IParticleGeo extends IDynamicsBase implements IParticleI, IVecI{
     public IParticleGeo x(IDoubleI vx){ pos.x(vx); return this; }
     public IParticleGeo y(IDoubleI vy){ pos.y(vy); return this; }
     public IParticleGeo z(IDoubleI vz){ pos.z(vz); return this; }
+    
+    /** setting x component by x component of input vector*/
+    public IParticleGeo x(IVecI v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IParticleGeo y(IVecI v){ pos.y(v); return this; }
+    /** setting z component by z component of input vector*/
+    public IParticleGeo z(IVecI v){ pos.z(v); return this; }
+    
+    /** setting x component by x component of input vector*/
+    public IParticleGeo x(IVec2I v){ pos.x(v); return this; }
+    /** setting y component by y component of input vector*/
+    public IParticleGeo y(IVec2I v){ pos.y(v); return this; }
+
+
     
     public double x(ISwitchE e){ return pos.x(e); }
     public double y(ISwitchE e){ return pos.y(e); }

@@ -48,7 +48,9 @@ public class ICurveFieldGeo extends IFieldGeo implements I3DFieldI{
     
     /** get 3D vector field value */
     public IVecI get(IVecI pos, IVecI vel){
+	
 	double u = curve.u(pos);
+	
 	double r = intensity;
 	if(decay == Decay.Linear){
 	    double dist = curve.pt(u).dist(pos);
