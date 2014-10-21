@@ -30,7 +30,7 @@ import javax.swing.*;
 import java.awt.*;
 
 import igeo.*;
-import igeo.io.IIO;
+import igeo.io.*;
 
 /**
    A root GUI object of iGeo managing all IPane instance.
@@ -487,7 +487,8 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 					       new String[]{ "ai", "Ai", "AI" } },
 			       new String[]{ "Rhinoceros 3D file v4 (.3dm)",
 					     "Wavefront OBJ file (.obj)",
-					     "Adobe Illustrator file (.ai) (line&polyline only)" },
+					     //"Adobe Illustrator file (.ai) (line&polyline only)" },
+					     "Adobe Illustrator file (.ai)" },
 			       "Save",
 			       true,
 			       ig.basePath,
@@ -520,24 +521,27 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	
 	public JTextField scalefield;
 	//double scale=1.0;
+	public JCheckBox fillClosedCurveBox;
 	public File file;
 	
 	public AIScaleDialog(File f){
 	    super();
 	    file = f;
 	    
-	    getContentPane().setLayout(new GridLayout(2,3));
+	    getContentPane().setLayout(new GridLayout(3,3));
+	    
 	    boolean axon = currentPane().getView().isAxonometric();
 	    if(axon){
 		String unitStr = server().unit().toString().toLowerCase();
 		getContentPane().add(new JLabel(" scale: 1 "+unitStr+" = " ));
+		String defaultScaleText = String.valueOf(IConfig.defaultAIExportScale); //"0.1"; //"0.01"; //"1";
+		scalefield = new JTextField(defaultScaleText, 12);
 	    }
 	    else{
 		getContentPane().add(new JLabel(" scale: 1 pixel = " ));
+		String defaultScaleText = String.valueOf(IConfig.defaultAIExportPixelScale); //"0.1"; //"0.01"; //"1";
+		scalefield = new JTextField(defaultScaleText, 12);
 	    }
-	    
-	    String defaultScaleText = String.valueOf(IConfig.defaultAIExportScale); //"0.1"; //"0.01"; //"1";
-	    scalefield = new JTextField(defaultScaleText, 12);
 	    getContentPane().add(scalefield);
 	    
 	    if(axon){
@@ -546,6 +550,15 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	    else{
 		getContentPane().add(new JLabel("pt"));
 	    }
+
+	    
+	    fillClosedCurveBox = new JCheckBox("");
+	    fillClosedCurveBox.setSelected(IAIExporter.fillClosedCurve);
+	    
+	    getContentPane().add(new JLabel("fill closed curves"));
+	    getContentPane().add(fillClosedCurveBox);
+	    getContentPane().add(new JLabel(""));
+	    
 	    
 	    JButton btn1 = new JButton("OK");
 	    btn1.addActionListener(this);
@@ -557,13 +570,16 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	    
 	    setTitle("Set Scale");
 	    
-	    setSize(400, 90);
+	    setSize(400, 135);
 	    
 	    setVisible(true);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
 	    if(e.getActionCommand().equals("OK")){
+
+
+		IAIExporter.fillClosedCurve = fillClosedCurveBox.isSelected();
 		
 		String scalestr = scalefield.getText();
 		

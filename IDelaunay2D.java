@@ -238,6 +238,36 @@ public class IDelaunay2D {
     }
     
     /**
+       Getting delaunay triangles out of array of 3D points interpreted as 2D points on a specified plane.
+       @return array of triangles, which consist of array of 3 points of IVec2
+    */
+    public static IVecI[][] getTriangles(IVecI[] pts, IVecI planeDir, IVecI planePt){
+	IVec2[] pts2 = new IVec2[pts.length];
+	IVec planeZ = planeDir.get().cp();
+	IVec planeY = IG.zaxis.cross(planeZ);
+	if(planeY.len2()==0){
+	    planeY = planeZ.cross(IG.xaxis);
+	}
+	IVec planeX = planeY.cross(planeZ);
+	
+	for(int i=0; i<pts2.length; i++){
+	    IMatrix4 conv = IMatrix4.convertCoordinates(planeX, planeY, planeZ, planePt.get(), IG.xaxis, IG.yaxis, IG.zaxis, IG.origin);
+	    pts2[i] = pts[i].get().cp().transform(conv).to2d();
+	}
+	IVec2[][] ret2 = getTriangles(pts2);
+	IVecI[][] ret = new IVecI[ret2.length][];
+	List<IVec2> pts2list = Arrays.asList(pts2);
+	for(int i=0; i<ret2.length; i++){
+	    ret[i] = new IVecI[ret2[i].length];
+	    for(int j=0; j<ret2[i].length; j++){
+		int idx = pts2list.indexOf(ret2[i][j]);
+		if(idx>=0){ ret[i][j] = pts[idx]; }
+	    }
+	}
+	return ret;
+    }
+    
+    /**
        Getting delaunay triangles out of array of 3D points interpreted as 2D points on XY plane.
        @return array of triangles, which consist of array of 3 points of IVec2
     */

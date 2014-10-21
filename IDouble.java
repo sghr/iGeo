@@ -66,6 +66,8 @@ public class IDouble extends IParameterObject implements IDoubleI, IEntityParame
     //public IDouble set(IDouble v){ x=v.x; return this; }
     public IDouble set(IDoubleI v){ x=v.x(); return this; }
     public IDouble set(IIntegerI v){ x=v.x(); return this; }
+
+    public IDouble zero(){ x=0; return this; }
     
     public IDouble add(double x){ this.x+=x; return this; }
     //public IDouble add(IDouble v){ x+=v.x; return this; }

@@ -754,7 +754,10 @@ public class PIGraphics3D extends PGraphics3D
 	else{ super.fill(r,g,b,a); }
     }
     public void clr(float[] rgba){ clr(rgba[0],rgba[1],rgba[2],rgba[3]); }
-    
+    /** alpha : 0-1 */
+    public void clr(IColor c, float alpha){
+	clr(c.getRed(),c.getGreen(),c.getBlue(),alpha*255);
+    }
     
     public void stroke(IColor c){ stroke(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha()); }
     public void stroke(float r, float g, float b, float a){
@@ -773,6 +776,7 @@ public class PIGraphics3D extends PGraphics3D
     public void diffuse(float r, float g, float b, float a){ clr(r,g,b,a); }
     public void diffuse(float r, float g, float b){ clr(r,g,b,255); }
     public void diffuse(IColor c){ clr(c); }
+    public void diffuse(IColor c,float alpha){ clr(c,alpha); }
     public void diffuse(float[] rgba){ clr(rgba); }
     
     
@@ -787,6 +791,7 @@ public class PIGraphics3D extends PGraphics3D
     public void ambient(float r, float g, float b){ this.ambient(r,g,b,255); }
     public void ambient(float[] rgba){ ambient(rgba[0],rgba[1],rgba[2],rgba[3]); }
     public void ambient(IColor c){ ambient(c.getRed(),c.getGreen(),c.getBlue()); }
+    public void ambient(IColor c, float alpha){ ambient(c.getRed(),c.getGreen(),alpha*255); }
     
     public void specular(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
@@ -799,6 +804,7 @@ public class PIGraphics3D extends PGraphics3D
     public void specular(float r, float g, float b){ this.specular(r,g,b,255); }
     public void specular(float[] rgba){ this.specular(rgba[0],rgba[1],rgba[2],rgba[3]); }
     public void specular(IColor c){ specular(c.getRed(),c.getGreen(),c.getBlue()); }
+    public void specular(IColor c, float alpha){ specular(c.getRed(),c.getGreen(),c.getBlue(),alpha*255); }
     
     public void emissive(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
@@ -812,6 +818,9 @@ public class PIGraphics3D extends PGraphics3D
     public void emissive(float[] rgba){ this.emissive(rgba[0],rgba[1],rgba[2],rgba[3]); }
     public void emissive(IColor c){
 	emissive(c.getRed(),c.getGreen(),c.getBlue());
+    }
+    public void emissive(IColor c, float alpha){
+	emissive(c.getRed(),c.getGreen(),c.getBlue(),alpha*255);
     }
     
     public void shininess(float s){ super.shininess(s); }
@@ -1037,6 +1046,102 @@ public class PIGraphics3D extends PGraphics3D
 	//vertex(p,n);
 	super.endShape(CLOSE);
     }
+    public void drawPolygon(IVec[] p, IColor clr[], float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(POLYGON);
+	if(light){
+	    if(alpha<0){
+		for(int i=0; i<p.length; i++){
+		    ambient(clr[i]);
+		    diffuse(clr[i]);
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i])){ vertex(p[i]); }
+		    }
+		    else{ vertex(p[i]); }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length; i++){
+		    ambient(clr[i], alpha);
+		    diffuse(clr[i], alpha);
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i])){ vertex(p[i]); }
+		    }
+		    else{ vertex(p[i]); }
+		}
+	    }
+	}
+	else{
+	    if(alpha<0){
+		for(int i=0; i<p.length; i++){
+		    clr(clr[i]);
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i])){ vertex(p[i]); }
+		    }
+		    else{ vertex(p[i]); }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length; i++){
+		    clr(clr[i], alpha);
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i])){ vertex(p[i]); }
+		    }
+		    else{ vertex(p[i]); }
+		}
+	    }
+	}
+	super.endShape(CLOSE);
+    }
+    public void drawPolygon(IVec[] p, IVec[] n, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(POLYGON);
+	if(light){
+	    if(alpha<0){
+		for(int i=0; i<p.length; i++){
+		    ambient(clr[i]);
+		    diffuse(clr[i]);
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i])){ normal(n[i]); vertex(p[i]); }
+		    }
+		    else{ normal(n[i]); vertex(p[i]); }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length; i++){
+		    ambient(clr[i], alpha);
+		    diffuse(clr[i], alpha);
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i])){ normal(n[i]); vertex(p[i]); }
+		    }
+		    else{ normal(n[i]); vertex(p[i]); }
+		}
+	    }
+	}
+	else{
+	    if(alpha<0){
+		for(int i=0; i<p.length; i++){
+		    clr(clr[i]);
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i])){ normal(n[i]); vertex(p[i]); }
+		    }
+		    else{ normal(n[i]); vertex(p[i]); }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length; i++){
+		    clr(clr[i], alpha);
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i])){ normal(n[i]); vertex(p[i]); }
+		    }
+		    else{ normal(n[i]); vertex(p[i]); }
+		}
+	    }
+	}
+	super.endShape(CLOSE);
+    }
     public void drawQuads(IVec[] p){
 	super.stroke= false;
 	super.fill = true;
@@ -1082,6 +1187,226 @@ public class PIGraphics3D extends PGraphics3D
 	    }
 	}
 	//vertex(p,n);
+	super.endShape();
+    }
+    public void drawQuads(IVec[] p, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(QUADS);
+	if(light){
+	    if(alpha<0){
+		for(int i=0; i<p.length-3; i+=4){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) &&
+			   isInFront(p[i+2]) && isInFront(p[i+3])){
+			    ambient(clr[i]);
+			    diffuse(clr[i]);
+			    vertex(p[i]);
+			    ambient(clr[i+1]);
+			    diffuse(clr[i+1]);
+			    vertex(p[i+1]);
+			    ambient(clr[i+2]);
+			    diffuse(clr[i+2]);
+			    vertex(p[i+2]);
+			    ambient(clr[i+3]);
+			    diffuse(clr[i+3]);
+			    vertex(p[i+3]);
+			}
+		    }
+		    else{
+			ambient(clr[i]);
+			diffuse(clr[i]);
+			vertex(p[i]);
+			ambient(clr[i+1]);
+			diffuse(clr[i+1]);
+			vertex(p[i+1]);
+			ambient(clr[i+2]);
+			diffuse(clr[i+2]);
+			vertex(p[i+2]);
+			ambient(clr[i+3]);
+			diffuse(clr[i+3]);
+			vertex(p[i+3]);
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length-3; i+=4){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) &&
+			   isInFront(p[i+2]) && isInFront(p[i+3])){
+			    ambient(clr[i], alpha);
+			    diffuse(clr[i], alpha);
+			    vertex(p[i]);
+			    ambient(clr[i+1], alpha);
+			    diffuse(clr[i+1], alpha);
+			    vertex(p[i+1]);
+			    ambient(clr[i+2], alpha);
+			    diffuse(clr[i+2], alpha);
+			    vertex(p[i+2]);
+			    ambient(clr[i+3], alpha);
+			    diffuse(clr[i+3], alpha);
+			    vertex(p[i+3]);
+			}
+		    }
+		    else{
+			ambient(clr[i], alpha);
+			diffuse(clr[i], alpha);
+			vertex(p[i]);
+			ambient(clr[i+1], alpha);
+			diffuse(clr[i+1], alpha);
+			vertex(p[i+1]);
+			ambient(clr[i+2], alpha);
+			diffuse(clr[i+2], alpha);
+			vertex(p[i+2]);
+			ambient(clr[i+3], alpha);
+			diffuse(clr[i+3], alpha);
+			vertex(p[i+3]);
+		    }
+		}
+	    }
+	}
+	else{
+	    if(alpha<0){
+		for(int i=0; i<p.length-3; i+=4){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) &&
+			   isInFront(p[i+2]) && isInFront(p[i+3])){
+			    clr(clr[i]);
+			    vertex(p[i]);
+			    clr(clr[i+1]);
+			    vertex(p[i+1]);
+			    clr(clr[i+2]);
+			    vertex(p[i+2]);
+			    clr(clr[i+3]);
+			    vertex(p[i+3]);
+			}
+		    }
+		    else{
+			clr(clr[i]);
+			vertex(p[i]);
+			clr(clr[i+1]);
+			vertex(p[i+1]);
+			clr(clr[i+2]);
+			vertex(p[i+2]);
+			clr(clr[i+3]);
+			vertex(p[i+3]);
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length-3; i+=4){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) &&
+			   isInFront(p[i+2]) && isInFront(p[i+3])){
+			    clr(clr[i], alpha);
+			    vertex(p[i]);
+			    clr(clr[i+1], alpha);
+			    vertex(p[i+1]);
+			    clr(clr[i+2], alpha);
+			    vertex(p[i+2]);
+			    clr(clr[i+3], alpha);
+			    vertex(p[i+3]);
+			}
+		    }
+		    else{
+			clr(clr[i], alpha);
+			vertex(p[i]);
+			clr(clr[i+1], alpha);
+			vertex(p[i+1]);
+			clr(clr[i+2], alpha);
+			vertex(p[i+2]);
+			clr(clr[i+3], alpha);
+			vertex(p[i+3]);
+		    }
+		}
+	    }
+	}
+	super.endShape();
+    }
+    public void drawQuads(IVec[] p, IVec[] n, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(QUADS);
+	if(light){
+	    if(alpha<0){
+		for(int i=0; i<p.length-3; i+=4){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) &&
+			   isInFront(p[i+2]) && isInFront(p[i+3])){
+			    ambient(clr[i]); diffuse(clr[i]); normal(n[i]); vertex(p[i]);
+			    ambient(clr[i+1]); diffuse(clr[i+1]); normal(n[i+1]); vertex(p[i+1]);
+			    ambient(clr[i+2]); diffuse(clr[i+2]); normal(n[i+2]); vertex(p[i+2]);
+			    ambient(clr[i+3]); diffuse(clr[i+3]); normal(n[i+3]); vertex(p[i+3]);
+			}
+		    }
+		    else{
+			ambient(clr[i]); diffuse(clr[i]); normal(n[i]); vertex(p[i]);
+			ambient(clr[i+1]); diffuse(clr[i+1]); normal(n[i+1]); vertex(p[i+1]);
+			ambient(clr[i+2]); diffuse(clr[i+2]); normal(n[i+2]); vertex(p[i+2]);
+			ambient(clr[i+3]); diffuse(clr[i+3]); normal(n[i+3]); vertex(p[i+3]);
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length-3; i+=4){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) &&
+			   isInFront(p[i+2]) && isInFront(p[i+3])){
+			    ambient(clr[i],alpha); diffuse(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			    ambient(clr[i+1],alpha); diffuse(clr[i+1],alpha); normal(n[i+1]); vertex(p[i+1]);
+			    ambient(clr[i+2],alpha); diffuse(clr[i+2],alpha); normal(n[i+2]); vertex(p[i+2]);
+			    ambient(clr[i+3],alpha); diffuse(clr[i+3],alpha); normal(n[i+3]); vertex(p[i+3]);
+			}
+		    }
+		    else{
+			ambient(clr[i],alpha); diffuse(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			ambient(clr[i+1],alpha); diffuse(clr[i+1],alpha); normal(n[i+1]); vertex(p[i+1]);
+			ambient(clr[i+2],alpha); diffuse(clr[i+2],alpha); normal(n[i+2]); vertex(p[i+2]);
+			ambient(clr[i+3],alpha); diffuse(clr[i+3],alpha); normal(n[i+3]); vertex(p[i+3]);
+		    }
+		}
+	    }
+	}
+	else{
+	    if(alpha<0){
+		for(int i=0; i<p.length-3; i+=4){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) &&
+			   isInFront(p[i+2]) && isInFront(p[i+3])){
+			    clr(clr[i]); normal(n[i]); vertex(p[i]);
+			    clr(clr[i+1]); normal(n[i+1]); vertex(p[i+1]);
+			    clr(clr[i+2]); normal(n[i+2]); vertex(p[i+2]);
+			    clr(clr[i+3]); normal(n[i+3]); vertex(p[i+3]);
+			}
+		    }
+		    else{
+			clr(clr[i]); normal(n[i]); vertex(p[i]);
+			clr(clr[i+1]); normal(n[i+1]); vertex(p[i+1]);
+			clr(clr[i+2]); normal(n[i+2]); vertex(p[i+2]);
+			clr(clr[i+3]); normal(n[i+3]); vertex(p[i+3]);
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length-3; i+=4){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) &&
+			   isInFront(p[i+2]) && isInFront(p[i+3])){
+			    clr(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			    clr(clr[i+1],alpha); normal(n[i+1]); vertex(p[i+1]);
+			    clr(clr[i+2],alpha); normal(n[i+2]); vertex(p[i+2]);
+			    clr(clr[i+3],alpha); normal(n[i+3]); vertex(p[i+3]);
+			}
+		    }
+		    else{
+			clr(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			clr(clr[i+1],alpha); normal(n[i+1]); vertex(p[i+1]);
+			clr(clr[i+2],alpha); normal(n[i+2]); vertex(p[i+2]);
+			clr(clr[i+3],alpha); normal(n[i+3]); vertex(p[i+3]);
+		    }
+		}
+	    }
+	}
 	super.endShape();
     }
     public void drawQuadStrip(IVec[] p){
@@ -1147,6 +1472,282 @@ public class PIGraphics3D extends PGraphics3D
 	else{
 	    super.beginShape(QUAD_STRIP);
 	    for(int i=0; i<p.length; i++){ normal(n[i]); vertex(p[i]); }
+	    super.endShape();
+	}
+    }
+    public void drawQuadStrip(IVec[] p, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    boolean previousFront=false;
+	    boolean isDrawing=false;
+	    if(light){
+		if(alpha<0){
+		    for(int i=0; i<p.length-1; i+=2){
+			boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+			if(currentFront){
+			    if(isDrawing){
+				ambient(clr[i]);
+				diffuse(clr[i]);
+				vertex(p[i]);
+				ambient(clr[i+1]);
+				diffuse(clr[i+1]);
+				vertex(p[i+1]);
+			    }
+			    else{
+				super.beginShape(QUAD_STRIP);
+				ambient(clr[i]);
+				diffuse(clr[i]);
+				vertex(p[i]);
+				ambient(clr[i+1]);
+				diffuse(clr[i+1]);
+				vertex(p[i+1]);
+				isDrawing=true;
+			    }
+			}
+			else if(isDrawing){ super.endShape(); isDrawing=false; }
+			previousFront = currentFront;
+		    }
+		}
+		else{
+		    for(int i=0; i<p.length-1; i+=2){
+			boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+			if(currentFront){
+			    if(isDrawing){
+				ambient(clr[i], alpha);
+				diffuse(clr[i], alpha);
+				vertex(p[i]);
+				ambient(clr[i+1], alpha);
+				diffuse(clr[i+1], alpha);
+				vertex(p[i+1]);
+			    }
+			    else{
+				super.beginShape(QUAD_STRIP);
+				ambient(clr[i], alpha);
+				diffuse(clr[i], alpha);
+				vertex(p[i]);
+				ambient(clr[i+1], alpha);
+				diffuse(clr[i+1], alpha);
+				vertex(p[i+1]);
+				isDrawing=true;
+			    }
+			}
+			else if(isDrawing){ super.endShape(); isDrawing=false; }
+			previousFront = currentFront;
+		    }
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    for(int i=0; i<p.length-1; i+=2){
+			boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+			if(currentFront){
+			    if(isDrawing){
+				clr(clr[i]);
+				vertex(p[i]);
+				clr(clr[i+1]);
+				vertex(p[i+1]);
+			    }
+			    else{
+				super.beginShape(QUAD_STRIP);
+				clr(clr[i]);
+				vertex(p[i]);
+				clr(clr[i+1]);
+				vertex(p[i+1]);
+				isDrawing=true;
+			    }
+			}
+			else if(isDrawing){ super.endShape(); isDrawing=false; }
+			previousFront = currentFront;
+		    }
+		}
+		else{
+		    for(int i=0; i<p.length-1; i+=2){
+			boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+			if(currentFront){
+			    if(isDrawing){
+				clr(clr[i], alpha);
+				vertex(p[i]);
+				clr(clr[i+1], alpha);
+				vertex(p[i+1]);
+			    }
+			    else{
+				super.beginShape(QUAD_STRIP);
+				clr(clr[i], alpha);
+				vertex(p[i]);
+				clr(clr[i+1], alpha);
+				vertex(p[i+1]);
+				isDrawing=true;
+			    }
+			}
+			else if(isDrawing){ super.endShape(); isDrawing=false; }
+			previousFront = currentFront;
+		    }
+		}
+	    }
+	    if(isDrawing){ super.endShape(); }
+	}
+	else{
+	    super.beginShape(QUAD_STRIP);
+	    if(light){
+		if(alpha<0){
+		    for(int i=0; i<p.length; i++){
+			ambient(clr[i]); diffuse(clr[i]); vertex(p[i]);
+		    }
+		}
+		else{
+		    for(int i=0; i<p.length; i++){
+			ambient(clr[i], alpha); diffuse(clr[i], alpha); vertex(p[i]);
+		    }
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    for(int i=0; i<p.length; i++){ clr(clr[i]); vertex(p[i]); }
+		}
+		else{
+		    for(int i=0; i<p.length; i++){ clr(clr[i], alpha); vertex(p[i]); }
+		}
+	    }
+	    super.endShape();
+	}
+    }
+    public void drawQuadStrip(IVec[] p, IVec[] n, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    boolean previousFront=false;
+	    boolean isDrawing=false;
+	    if(light){
+		if(alpha<0){
+		    for(int i=0; i<p.length-1; i+=2){
+			boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+			if(currentFront){
+			    if(isDrawing){
+				ambient(clr[i]);
+				diffuse(clr[i]);
+				normal(n[i]);
+				vertex(p[i]);
+				ambient(clr[i+1]);
+				diffuse(clr[i+1]);
+				normal(n[i+1]);
+				vertex(p[i+1]);
+			    }
+			    else{
+				super.beginShape(QUAD_STRIP);
+				ambient(clr[i]);
+				diffuse(clr[i]);
+				normal(n[i]);
+				vertex(p[i]);
+				ambient(clr[i+1]);
+				diffuse(clr[i+1]);
+				normal(n[i+1]);
+				vertex(p[i+1]);
+				isDrawing=true;
+			    }
+			}
+			else if(isDrawing){ super.endShape(); isDrawing=false; }
+			previousFront = currentFront;
+		}
+		}
+		else{
+		    for(int i=0; i<p.length-1; i+=2){
+			boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+			if(currentFront){
+			    if(isDrawing){
+				ambient(clr[i], alpha);
+				diffuse(clr[i], alpha);
+				normal(n[i]);
+				vertex(p[i]);
+				ambient(clr[i+1], alpha);
+				diffuse(clr[i+1], alpha);
+				normal(n[i+1]);
+				vertex(p[i+1]);
+			    }
+			    else{
+				super.beginShape(QUAD_STRIP);
+				ambient(clr[i], alpha);
+				diffuse(clr[i], alpha);
+				normal(n[i]);
+				vertex(p[i]);
+				ambient(clr[i+1], alpha);
+				diffuse(clr[i+1], alpha);
+				normal(n[i+1]);
+				vertex(p[i+1]);
+				isDrawing=true;
+			    }
+			}
+			else if(isDrawing){ super.endShape(); isDrawing=false; }
+			previousFront = currentFront;
+		    }
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    for(int i=0; i<p.length-1; i+=2){
+			boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+			if(currentFront){
+			    if(isDrawing){
+				clr(clr[i]);
+				normal(n[i]);
+				vertex(p[i]);
+				clr(clr[i+1]);
+				normal(n[i+1]);
+				vertex(p[i+1]);
+			    }
+			    else{
+				super.beginShape(QUAD_STRIP);
+				clr(clr[i]);
+				normal(n[i]);
+				vertex(p[i]);
+				clr(clr[i+1]);
+				normal(n[i+1]);
+				vertex(p[i+1]);
+				isDrawing=true;
+			    }
+			}
+			else if(isDrawing){ super.endShape(); isDrawing=false; }
+			previousFront = currentFront;
+		    }
+		}
+		else{
+		    for(int i=0; i<p.length-1; i+=2){
+			boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+			if(currentFront){
+			    if(isDrawing){
+				clr(clr[i], alpha);
+				normal(n[i]);
+				vertex(p[i]);
+				clr(clr[i+1], alpha);
+				normal(n[i+1]);
+				vertex(p[i+1]);
+			    }
+			    else{
+				super.beginShape(QUAD_STRIP);
+				clr(clr[i], alpha);
+				normal(n[i]);
+				vertex(p[i]);
+				clr(clr[i+1], alpha);
+				normal(n[i+1]);
+				vertex(p[i+1]);
+				isDrawing=true;
+			    }
+			}
+			else if(isDrawing){ super.endShape(); isDrawing=false; }
+			previousFront = currentFront;
+		    }
+		}
+	    }
+	    if(isDrawing){ super.endShape(); }
+	}
+	else{
+	    super.beginShape(QUAD_STRIP);
+	    if(alpha<0){
+		for(int i=0; i<p.length; i++){ clr(clr[i]); normal(n[i]); vertex(p[i]); }
+	    }
+	    else{
+		for(int i=0; i<p.length; i++){ clr(clr[i],alpha); normal(n[i]); vertex(p[i]); }
+	    }
 	    super.endShape();
 	}
     }
@@ -1230,6 +1831,390 @@ public class PIGraphics3D extends PGraphics3D
 	    }
         }
     }
+    public void drawQuadMatrix(IVec[][] pts, IColor[][] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	if(light){
+	    if(alpha<0){
+		for(int i=0; i<pts.length-1; i++){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			boolean previousFront=false;
+			boolean isDrawing=false;
+			for(int j=0; j<pts[i].length; j++){
+			    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+			    if(currentFront){
+				if(isDrawing){
+				    ambient(clr[i][j]);
+				    diffuse(clr[i][j]);
+				    vertex(pts[i][j]);
+				    ambient(clr[i+1][j]);
+				    diffuse(clr[i+1][j]);
+				    vertex(pts[i+1][j]);
+				}
+				else{
+				    super.beginShape(QUAD_STRIP);
+				    ambient(clr[i][j]);
+				    diffuse(clr[i][j]);
+				    vertex(pts[i][j]);
+				    ambient(clr[i+1][j]);
+				    diffuse(clr[i+1][j]);
+				    vertex(pts[i+1][j]);
+				    isDrawing=true;
+				}
+			    }
+			    else if(isDrawing){ super.endShape(); isDrawing=false; }
+			    previousFront = currentFront;
+			}
+			if(isDrawing){ super.endShape(); }
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			for(int j=0; j<pts[i].length; j++){
+			    ambient(clr[i][j]);
+			    diffuse(clr[i][j]);
+			    vertex(pts[i][j]);
+			    ambient(clr[i+1][j]);
+			    diffuse(clr[i+1][j]);
+			    vertex(pts[i+1][j]);
+			}
+			super.endShape();
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<pts.length-1; i++){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			boolean previousFront=false;
+			boolean isDrawing=false;
+			for(int j=0; j<pts[i].length; j++){
+			    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+			    if(currentFront){
+				if(isDrawing){
+				    ambient(clr[i][j], alpha);
+				    diffuse(clr[i][j], alpha);
+				    vertex(pts[i][j]);
+				    ambient(clr[i+1][j], alpha);
+				    diffuse(clr[i+1][j], alpha);
+				    vertex(pts[i+1][j]);
+				}
+				else{
+				    super.beginShape(QUAD_STRIP);
+				    ambient(clr[i][j], alpha);
+				    diffuse(clr[i][j], alpha);
+				    vertex(pts[i][j]);
+				    ambient(clr[i+1][j], alpha);
+				    diffuse(clr[i+1][j], alpha);
+				    vertex(pts[i+1][j]);
+				    isDrawing=true;
+				}
+			    }
+			    else if(isDrawing){ super.endShape(); isDrawing=false; }
+			    previousFront = currentFront;
+			}
+			if(isDrawing){ super.endShape(); }
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			for(int j=0; j<pts[i].length; j++){
+			    ambient(clr[i][j], alpha);
+			    diffuse(clr[i][j], alpha);
+			    vertex(pts[i][j]);
+			    ambient(clr[i+1][j], alpha);
+			    diffuse(clr[i+1][j], alpha);
+			    vertex(pts[i+1][j]);
+			}
+			super.endShape();
+		    }
+		}
+	    }
+	}
+	else{
+	    if(alpha<0){
+		for(int i=0; i<pts.length-1; i++){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			boolean previousFront=false;
+			boolean isDrawing=false;
+			for(int j=0; j<pts[i].length; j++){
+			    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+			    if(currentFront){
+				if(isDrawing){
+				    clr(clr[i][j]);
+				    vertex(pts[i][j]);
+				    clr(clr[i+1][j]);
+				    vertex(pts[i+1][j]);
+				}
+				else{
+				    super.beginShape(QUAD_STRIP);
+				    clr(clr[i][j]);
+				    vertex(pts[i][j]);
+				    clr(clr[i+1][j]);
+				    vertex(pts[i+1][j]);
+				    isDrawing=true;
+				}
+			    }
+			    else if(isDrawing){ super.endShape(); isDrawing=false; }
+			    previousFront = currentFront;
+			}
+			if(isDrawing){ super.endShape(); }
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			for(int j=0; j<pts[i].length; j++){
+			    clr(clr[i][j]);
+			    vertex(pts[i][j]);
+			    clr(clr[i+1][j]);
+			    vertex(pts[i+1][j]);
+			}
+			super.endShape();
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<pts.length-1; i++){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			boolean previousFront=false;
+			boolean isDrawing=false;
+			for(int j=0; j<pts[i].length; j++){
+			    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+			    if(currentFront){
+				if(isDrawing){
+				    clr(clr[i][j], alpha);
+				    vertex(pts[i][j]);
+				    clr(clr[i+1][j], alpha);
+				    vertex(pts[i+1][j]);
+				}
+				else{
+				    super.beginShape(QUAD_STRIP);
+				    clr(clr[i][j], alpha);
+				    vertex(pts[i][j]);
+				    clr(clr[i+1][j], alpha);
+				    vertex(pts[i+1][j]);
+				    isDrawing=true;
+				}
+			    }
+			    else if(isDrawing){ super.endShape(); isDrawing=false; }
+			    previousFront = currentFront;
+			}
+			if(isDrawing){ super.endShape(); }
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			for(int j=0; j<pts[i].length; j++){
+			    clr(clr[i][j], alpha);
+			    vertex(pts[i][j]);
+			    clr(clr[i+1][j], alpha);
+			    vertex(pts[i+1][j]);
+			}
+			super.endShape();
+		    }
+		}
+	    }
+	}
+    }
+    public void drawQuadMatrix(IVec[][] pts, IVec[][] nml, IColor[][] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	if(light){
+	    if(alpha<0){
+		for(int i=0; i<pts.length-1; i++){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			boolean previousFront=false;
+			boolean isDrawing=false;
+			for(int j=0; j<pts[i].length; j++){
+			    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+			    if(currentFront){
+				if(isDrawing){
+				    ambient(clr[i][j]);
+				    diffuse(clr[i][j]);
+				    normal(nml[i][j]);
+				    vertex(pts[i][j]);
+				    ambient(clr[i+1][j]);
+				    diffuse(clr[i+1][j]);
+				    normal(nml[i+1][j]);
+				    vertex(pts[i+1][j]);
+				}
+				else{
+				    super.beginShape(QUAD_STRIP);
+				    ambient(clr[i][j]);
+				    diffuse(clr[i][j]);
+				    normal(nml[i][j]);
+				    vertex(pts[i][j]);
+				    ambient(clr[i+1][j]);
+				    diffuse(clr[i+1][j]);
+				    normal(nml[i+1][j]);
+				    vertex(pts[i+1][j]);
+				    isDrawing=true;
+				}
+			    }
+			    else if(isDrawing){ super.endShape(); isDrawing=false; }
+			    previousFront = currentFront;
+			}
+			if(isDrawing){ super.endShape(); }
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			for(int j=0; j<pts[i].length; j++){
+			    ambient(clr[i][j]);
+			    diffuse(clr[i][j]);
+			    normal(nml[i][j]);
+			    vertex(pts[i][j]);
+			    ambient(clr[i+1][j]);
+			    diffuse(clr[i+1][j]);
+			    normal(nml[i+1][j]);
+			    vertex(pts[i+1][j]);
+			}
+			super.endShape();
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<pts.length-1; i++){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			boolean previousFront=false;
+			boolean isDrawing=false;
+			for(int j=0; j<pts[i].length; j++){
+			    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+			    if(currentFront){
+				if(isDrawing){
+				    ambient(clr[i][j], alpha);
+				    diffuse(clr[i][j], alpha);
+				    normal(nml[i][j]);
+				    vertex(pts[i][j]);
+				    ambient(clr[i+1][j], alpha);
+				    diffuse(clr[i+1][j], alpha);
+				    normal(nml[i+1][j]);
+				    vertex(pts[i+1][j]);
+				}
+				else{
+				    super.beginShape(QUAD_STRIP);
+				    ambient(clr[i][j], alpha);
+				    diffuse(clr[i][j], alpha);
+				    normal(nml[i][j]);
+				    vertex(pts[i][j]);
+				    ambient(clr[i+1][j], alpha);
+				    diffuse(clr[i+1][j], alpha);
+				    normal(nml[i+1][j]);
+				    vertex(pts[i+1][j]);
+				    isDrawing=true;
+				}
+			    }
+			    else if(isDrawing){ super.endShape(); isDrawing=false; }
+			    previousFront = currentFront;
+			}
+			if(isDrawing){ super.endShape(); }
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			for(int j=0; j<pts[i].length; j++){
+			    ambient(clr[i][j], alpha);
+			    diffuse(clr[i][j], alpha);
+			    normal(nml[i][j]);
+			    vertex(pts[i][j]);
+			    ambient(clr[i+1][j], alpha);
+			    diffuse(clr[i+1][j], alpha);
+			    normal(nml[i+1][j]);
+			    vertex(pts[i+1][j]);
+			}
+			super.endShape();
+		    }
+		}
+	    }
+	}
+	else{
+	    if(alpha<0){
+		for(int i=0; i<pts.length-1; i++){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			boolean previousFront=false;
+			boolean isDrawing=false;
+			for(int j=0; j<pts[i].length; j++){
+			    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+			    if(currentFront){
+				if(isDrawing){
+				    clr(clr[i][j]);
+				    normal(nml[i][j]);
+				    vertex(pts[i][j]);
+				    clr(clr[i+1][j]);
+				    normal(nml[i+1][j]);
+				    vertex(pts[i+1][j]);
+				}
+				else{
+				    super.beginShape(QUAD_STRIP);
+				    clr(clr[i][j]);
+				    normal(nml[i][j]);
+				    vertex(pts[i][j]);
+				    clr(clr[i+1][j]);
+				    normal(nml[i+1][j]);
+				    vertex(pts[i+1][j]);
+				    isDrawing=true;
+				}
+			    }
+			    else if(isDrawing){ super.endShape(); isDrawing=false; }
+			    previousFront = currentFront;
+			}
+			if(isDrawing){ super.endShape(); }
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			for(int j=0; j<pts[i].length; j++){
+			    clr(clr[i][j]);
+			    normal(nml[i][j]);
+			    vertex(pts[i][j]);
+			    clr(clr[i+1][j]);
+			    normal(nml[i+1][j]);
+			    vertex(pts[i+1][j]);
+			}
+			super.endShape();
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<pts.length-1; i++){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			boolean previousFront=false;
+			boolean isDrawing=false;
+			for(int j=0; j<pts[i].length; j++){
+			    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+			    if(currentFront){
+				if(isDrawing){
+				    clr(clr[i][j], alpha);
+				    normal(nml[i][j]);
+				    vertex(pts[i][j]);
+				    clr(clr[i+1][j], alpha);
+				    normal(nml[i+1][j]);
+				    vertex(pts[i+1][j]);
+				}
+				else{
+				    super.beginShape(QUAD_STRIP);
+				    clr(clr[i][j], alpha);
+				    normal(nml[i][j]);
+				    vertex(pts[i][j]);
+				    clr(clr[i+1][j], alpha);
+				    normal(nml[i+1][j]);
+				    vertex(pts[i+1][j]);
+				    isDrawing=true;
+				}
+			    }
+			    else if(isDrawing){ super.endShape(); isDrawing=false; }
+			    previousFront = currentFront;
+			}
+			if(isDrawing){ super.endShape(); }
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			for(int j=0; j<pts[i].length; j++){
+			    clr(clr[i][j], alpha);
+			    normal(nml[i][j]);
+			    vertex(pts[i][j]);
+			    clr(clr[i+1][j], alpha);
+			    normal(nml[i+1][j]);
+			    vertex(pts[i+1][j]);
+			}
+			super.endShape();
+		    }
+		}
+	    }
+	}
+    }
     public void drawTriangles(IVec[] p){
 	super.stroke= false;
 	super.fill = true;
@@ -1267,6 +2252,191 @@ public class PIGraphics3D extends PGraphics3D
 		normal(n[i]); vertex(p[i]);
 		normal(n[i+1]); vertex(p[i+1]);
 		normal(n[i+2]); vertex(p[i+2]);
+	    }
+	}
+	//vertex(p,n);
+	super.endShape();
+    }
+    public void drawTriangles(IVec[] p, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(TRIANGLES);
+	if(light){
+	    if(alpha<0){
+		for(int i=0; i<p.length-2; i+=3){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+			    ambient(clr[i]);
+			    diffuse(clr[i]);
+			    vertex(p[i]);
+			    ambient(clr[i+1]);
+			    diffuse(clr[i+1]);
+			    vertex(p[i+1]);
+			    ambient(clr[i+2]);
+			    diffuse(clr[i+2]);
+			    vertex(p[i+2]);
+			}
+		    }
+		    else{
+			ambient(clr[i]);
+			diffuse(clr[i]);
+			vertex(p[i]);
+			ambient(clr[i+1]);
+			diffuse(clr[i+1]);
+			vertex(p[i+1]);
+			ambient(clr[i+2]);
+			diffuse(clr[i+2]);
+			vertex(p[i+2]);
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length-2; i+=3){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+			    ambient(clr[i], alpha);
+			    diffuse(clr[i], alpha);
+			    vertex(p[i]);
+			    ambient(clr[i+1], alpha);
+			    diffuse(clr[i+1], alpha);
+			    vertex(p[i+1]);
+			    ambient(clr[i+2], alpha);
+			    diffuse(clr[i+2], alpha);
+			    vertex(p[i+2]);
+			}
+		    }
+		    else{
+			ambient(clr[i], alpha);
+			diffuse(clr[i], alpha);
+			vertex(p[i]);
+			ambient(clr[i+1], alpha);
+			diffuse(clr[i+1], alpha);
+			vertex(p[i+1]);
+			ambient(clr[i+2], alpha);
+			diffuse(clr[i+2], alpha);
+			vertex(p[i+2]);
+		    }
+		}
+	    }
+	}
+	else{
+	    if(alpha<0){
+		for(int i=0; i<p.length-2; i+=3){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+			    clr(clr[i]);
+			    vertex(p[i]);
+			    clr(clr[i+1]);
+			    vertex(p[i+1]);
+			    clr(clr[i+2]);
+			    vertex(p[i+2]);
+			}
+		    }
+		    else{
+			clr(clr[i]);
+			vertex(p[i]);
+			clr(clr[i+1]);
+			vertex(p[i+1]);
+			clr(clr[i+2]);
+			vertex(p[i+2]);
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length-2; i+=3){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+			    clr(clr[i], alpha);
+			    vertex(p[i]);
+			    clr(clr[i+1], alpha);
+			    vertex(p[i+1]);
+			    clr(clr[i+2], alpha);
+			    vertex(p[i+2]);
+			}
+		    }
+		    else{
+			clr(clr[i], alpha);
+			vertex(p[i]);
+			clr(clr[i+1], alpha);
+			vertex(p[i+1]);
+			clr(clr[i+2], alpha);
+			vertex(p[i+2]);
+		    }
+		}
+	    }
+	}
+	super.endShape();
+    }
+    public void drawTriangles(IVec[] p, IVec[] n, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(TRIANGLES);
+	if(light){
+	    if(alpha<0){
+		for(int i=0; i<p.length-2; i+=3){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+			    ambient(clr[i]); diffuse(clr[i]); normal(n[i]); vertex(p[i]);
+			    ambient(clr[i+1]); diffuse(clr[i+1]); normal(n[i+1]); vertex(p[i+1]);
+			    ambient(clr[i+2]); diffuse(clr[i+2]); normal(n[i+2]); vertex(p[i+2]);
+			}
+		    }
+		    else{
+			ambient(clr[i]); diffuse(clr[i]); normal(n[i]); vertex(p[i]);
+			ambient(clr[i+1]); diffuse(clr[i+1]); normal(n[i+1]); vertex(p[i+1]);
+			ambient(clr[i+2]); diffuse(clr[i+2]); normal(n[i+2]); vertex(p[i+2]);
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length-2; i+=3){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+			    ambient(clr[i],alpha); diffuse(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			    ambient(clr[i+1],alpha); diffuse(clr[i+1],alpha); normal(n[i+1]); vertex(p[i+1]);
+			    ambient(clr[i+2],alpha); diffuse(clr[i+2],alpha); normal(n[i+2]); vertex(p[i+2]);
+			}
+		    }
+		    else{
+			ambient(clr[i],alpha); diffuse(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			ambient(clr[i+1],alpha); diffuse(clr[i+1],alpha); normal(n[i+1]); vertex(p[i+1]);
+			ambient(clr[i+2],alpha); diffuse(clr[i+2],alpha); normal(n[i+2]); vertex(p[i+2]);
+		    }
+		}
+	    }
+	}
+	else{
+	    if(alpha<0){
+		for(int i=0; i<p.length-2; i+=3){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+			    clr(clr[i]); normal(n[i]); vertex(p[i]);
+			    clr(clr[i+1]); normal(n[i+1]); vertex(p[i+1]);
+			    clr(clr[i+2]); normal(n[i+2]); vertex(p[i+2]);
+			}
+		    }
+		    else{
+			clr(clr[i]); normal(n[i]); vertex(p[i]);
+			clr(clr[i+1]); normal(n[i+1]); vertex(p[i+1]);
+			clr(clr[i+2]); normal(n[i+2]); vertex(p[i+2]);
+		    }
+		}
+	    }
+	    else{
+		for(int i=0; i<p.length-2; i+=3){
+		    if(IConfig.cullVertexBehindViewInP3D){
+			if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+			    clr(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			    clr(clr[i+1],alpha); normal(n[i+1]); vertex(p[i+1]);
+			    clr(clr[i+2],alpha); normal(n[i+2]); vertex(p[i+2]);
+			}
+		    }
+		    else{
+			clr(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			clr(clr[i+1],alpha); normal(n[i+1]); vertex(p[i+1]);
+			clr(clr[i+2],alpha); normal(n[i+2]); vertex(p[i+2]);
+		    }
+		}
 	    }
 	}
 	//vertex(p,n);
@@ -1388,6 +2558,296 @@ public class PIGraphics3D extends PGraphics3D
 	    super.endShape();
 	}
     }
+    public void drawTriangleStrip(IVec[] p, IColor[] clr, float alpha, boolean light){
+	if(p.length<3) return;
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    boolean isDrawing = false;
+	    boolean previous1Front = false;
+	    boolean previous2Front = false;
+	    if(light){
+		if(alpha<0){
+		    for(int i=0; i<p.length; i++){
+			boolean isFront = isInFront(p[i]);
+			if(isFront){
+			    if(isDrawing){
+				ambient(clr[i]);
+				diffuse(clr[i]);
+				vertex(p[i]);
+			    }
+			    else{
+				super.beginShape(TRIANGLE_STRIP);
+				ambient(clr[i]);
+				diffuse(clr[i]);
+				vertex(p[i]);
+				isDrawing=true;
+			}
+			}
+			else{
+			    if(isDrawing){
+				super.endShape();
+				isDrawing=false;
+			    }
+			}
+			previous2Front = previous1Front;
+			previous1Front = isFront;
+		    }
+		}
+		else{
+		    for(int i=0; i<p.length; i++){
+			boolean isFront = isInFront(p[i]);
+			if(isFront){
+			    if(isDrawing){
+				ambient(clr[i],alpha);
+				diffuse(clr[i],alpha);
+				vertex(p[i]);
+			    }
+			    else{
+				super.beginShape(TRIANGLE_STRIP);
+				ambient(clr[i], alpha);
+				diffuse(clr[i], alpha);
+				vertex(p[i]);
+				isDrawing=true;
+			    }
+			}
+			else{
+			    if(isDrawing){
+				super.endShape();
+				isDrawing=false;
+			    }
+			}
+			previous2Front = previous1Front;
+			previous1Front = isFront;
+		    }
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    for(int i=0; i<p.length; i++){
+			boolean isFront = isInFront(p[i]);
+			if(isFront){
+			    if(isDrawing){
+				clr(clr[i]);
+				vertex(p[i]);
+			    }
+			    else{
+				super.beginShape(TRIANGLE_STRIP);
+				clr(clr[i]);
+				vertex(p[i]);
+				isDrawing=true;
+			    }
+			}
+			else{
+			    if(isDrawing){
+				super.endShape();
+				isDrawing=false;
+			    }
+			}
+			previous2Front = previous1Front;
+			previous1Front = isFront;
+		    }
+		}
+		else{
+		    for(int i=0; i<p.length; i++){
+			boolean isFront = isInFront(p[i]);
+			if(isFront){
+			    if(isDrawing){
+				clr(clr[i],alpha);
+				vertex(p[i]);
+			    }
+			    else{
+				super.beginShape(TRIANGLE_STRIP);
+				clr(clr[i], alpha);
+				vertex(p[i]);
+				isDrawing=true;
+			    }
+			}
+			else{
+			    if(isDrawing){
+				super.endShape();
+				isDrawing=false;
+			    }
+			}
+			previous2Front = previous1Front;
+			previous1Front = isFront;
+		    }
+		}
+	    }
+	    if(isDrawing){ super.endShape(); }
+	}
+	else{
+	    super.beginShape(TRIANGLE_STRIP);
+	    if(light){
+		if(alpha<0){
+		    ambient(clr[0]); // ?
+		    diffuse(clr[0]); // ?
+		}
+		else{
+		    ambient(clr[0], alpha); // ?
+		    diffuse(clr[0], alpha); // ?
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    clr(clr[0]); // ?
+		}
+		else{
+		    clr(clr[0], alpha); // ?
+		}
+		
+	    }
+	    vertex(p);
+	    super.endShape();
+	}
+    }
+    
+    public void drawTriangleStrip(IVec[] p, IVec[] n, IColor[] clr, float alpha, boolean light){
+	if(p.length<3) return;
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    boolean isDrawing = false;
+	    boolean previous1Front = false; 
+	    boolean previous2Front = false;
+	    if(light){
+		if(alpha<0){
+		    for(int i=0; i<p.length; i++){
+			boolean isFront = isInFront(p[i]);
+			if(isFront){
+			    if(isDrawing){
+				ambient(clr[i]);
+				diffuse(clr[i]);
+				normal(n[i]);
+				vertex(p[i]);
+			    }
+			    else{
+				super.beginShape(TRIANGLE_STRIP);
+				ambient(clr[i]);
+				diffuse(clr[i]);
+				normal(n[i]);
+				vertex(p[i]);
+			    }
+			}
+			else{
+			    if(isDrawing){
+				super.endShape();
+				isDrawing=false;
+			    }
+			}
+			previous2Front = previous1Front;
+			previous1Front = isFront;
+		    }
+		}
+		else{
+		    for(int i=0; i<p.length; i++){
+			boolean isFront = isInFront(p[i]);
+			if(isFront){
+			    if(isDrawing){
+				ambient(clr[i],alpha);
+				diffuse(clr[i],alpha);
+				normal(n[i]);
+				vertex(p[i]);
+			    }
+			    else{
+				super.beginShape(TRIANGLE_STRIP);
+				ambient(clr[i],alpha);
+				diffuse(clr[i],alpha);
+				normal(n[i]);
+				vertex(p[i]);
+			    }
+			}
+			else{
+			    if(isDrawing){
+				super.endShape();
+				isDrawing=false;
+			    }
+			}
+			previous2Front = previous1Front;
+			previous1Front = isFront;
+		    }
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    for(int i=0; i<p.length; i++){
+			boolean isFront = isInFront(p[i]);
+			if(isFront){
+			    if(isDrawing){
+				clr(clr[i]);
+				normal(n[i]);
+				vertex(p[i]);
+			    }
+			    else{
+				super.beginShape(TRIANGLE_STRIP);
+				clr(clr[i]);
+				normal(n[i]);
+				vertex(p[i]);
+			    }
+			}
+			else{
+			    if(isDrawing){
+				super.endShape();
+				isDrawing=false;
+			    }
+			}
+			previous2Front = previous1Front;
+			previous1Front = isFront;
+		    }
+		}
+		else{
+		    for(int i=0; i<p.length; i++){
+			boolean isFront = isInFront(p[i]);
+			if(isFront){
+			    if(isDrawing){
+				clr(clr[i],alpha);
+				normal(n[i]);
+				vertex(p[i]);
+			    }
+			    else{
+				super.beginShape(TRIANGLE_STRIP);
+				clr(clr[i],alpha);
+				normal(n[i]);
+				vertex(p[i]);
+			    }
+			}
+			else{
+			    if(isDrawing){
+				super.endShape();
+				isDrawing=false;
+			    }
+			}
+			previous2Front = previous1Front;
+			previous1Front = isFront;
+		    }
+		}
+	    }
+	    if(isDrawing){ super.endShape(); }
+	}
+	else{
+	    super.beginShape(TRIANGLE_STRIP);
+	    if(light){
+		if(alpha<0){
+		    ambient(clr[0]); // ?
+		    diffuse(clr[0]); // ?
+		}
+		else{
+		    ambient(clr[0],alpha); // ?
+		    diffuse(clr[0],alpha); // ?
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    clr(clr[0]); // ?
+		}
+		else{
+		    clr(clr[0],alpha); // ?
+		}
+	    }
+	    vertex(p,n);
+	    super.endShape();
+	}
+    }
     public void drawTriangleFan(IVec[] p){
 	super.stroke= false;
 	super.fill = true;
@@ -1429,6 +2889,173 @@ public class PIGraphics3D extends PGraphics3D
 	}
 	else{
 	    super.beginShape(TRIANGLE_FAN);
+	    vertex(p,n);
+	    super.endShape();
+	}
+    }
+    
+    public void drawTriangleFan(IVec[] p, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    super.beginShape(TRIANGLE_FAN);
+	    if(light){
+		if(alpha<0){
+		    ambient(clr[0]);
+		    diffuse(clr[0]);
+		    vertex(p[0]);
+		    boolean firstFront=isInFront(p[0]);
+		    boolean prevFront= firstFront;
+		    for(int i=1; i<p.length; i++){
+			boolean currentFront = isInFront(p[i]);
+			if(firstFront||prevFront||currentFront){
+			    ambient(clr[i]); diffuse(clr[i]); vertex(p[i]);
+			}
+			prevFront=currentFront;
+		    }
+		}
+		else{
+		    ambient(clr[0],alpha);
+		    diffuse(clr[0],alpha);
+		    vertex(p[0]);
+		    boolean firstFront=isInFront(p[0]);
+		    boolean prevFront= firstFront;
+		    for(int i=1; i<p.length; i++){
+			boolean currentFront = isInFront(p[i]);
+			if(firstFront||prevFront||currentFront){
+			    ambient(clr[i],alpha); diffuse(clr[i],alpha); vertex(p[i]);
+			}
+			prevFront=currentFront;
+		    }
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    clr(clr[0]);
+		    vertex(p[0]);
+		    boolean firstFront=isInFront(p[0]);
+		    boolean prevFront= firstFront;
+		    for(int i=1; i<p.length; i++){
+			boolean currentFront = isInFront(p[i]);
+			if(firstFront||prevFront||currentFront){ clr(clr[i]); vertex(p[i]); }
+			prevFront=currentFront;
+		    }
+		}
+		else{
+		    clr(clr[0],alpha);
+		    vertex(p[0]);
+		    boolean firstFront=isInFront(p[0]);
+		    boolean prevFront= firstFront;
+		    for(int i=1; i<p.length; i++){
+			boolean currentFront = isInFront(p[i]);
+			if(firstFront||prevFront||currentFront){ clr(clr[i],alpha); vertex(p[i]); }
+			prevFront=currentFront;
+		    }
+		}
+	    }
+	    super.endShape();
+	}
+	else{
+	    super.beginShape(TRIANGLE_FAN);
+	    if(alpha<0){
+		clr(clr[0]); // ?
+	    }
+	    else{
+		clr(clr[0],alpha); // ?
+	    }
+	    vertex(p);
+	    super.endShape();
+	}
+    }
+    public void drawTriangleFan(IVec[] p, IVec[] n, IColor[] clr, float alpha, boolean light){
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    super.beginShape(TRIANGLE_FAN);
+	    if(light){
+		if(alpha<0){
+		    ambient(clr[0]);
+		    diffuse(clr[0]);
+		    normal(n[0]);
+		    vertex(p[0]);
+		    boolean firstFront=isInFront(p[0]);
+		    boolean prevFront= firstFront;
+		    for(int i=1; i<p.length; i++){
+			boolean currentFront = isInFront(p[i]);
+			if(firstFront||prevFront||currentFront){
+			    ambient(clr[i]); diffuse(clr[i]); normal(n[i]); vertex(p[i]);
+			}
+		    prevFront=currentFront;
+		    }
+		}
+		else{
+		    ambient(clr[0],alpha);
+		    diffuse(clr[0],alpha);
+		    normal(n[0]);
+		    vertex(p[0]);
+		    boolean firstFront=isInFront(p[0]);
+		    boolean prevFront= firstFront;
+		    for(int i=1; i<p.length; i++){
+			boolean currentFront = isInFront(p[i]);
+			if(firstFront||prevFront||currentFront){
+			    ambient(clr[i],alpha); diffuse(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			}
+			prevFront=currentFront;
+		    }
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    clr(clr[0]);
+		    normal(n[0]);
+		    vertex(p[0]);
+		    boolean firstFront=isInFront(p[0]);
+		    boolean prevFront= firstFront;
+		    for(int i=1; i<p.length; i++){
+			boolean currentFront = isInFront(p[i]);
+			if(firstFront||prevFront||currentFront){
+			    clr(clr[i]); normal(n[i]); vertex(p[i]);
+			}
+		    prevFront=currentFront;
+		    }
+		}
+		else{
+		    clr(clr[0],alpha);
+		    normal(n[0]);
+		    vertex(p[0]);
+		    boolean firstFront=isInFront(p[0]);
+		    boolean prevFront= firstFront;
+		    for(int i=1; i<p.length; i++){
+			boolean currentFront = isInFront(p[i]);
+			if(firstFront||prevFront||currentFront){
+			    clr(clr[i],alpha); normal(n[i]); vertex(p[i]);
+			}
+			prevFront=currentFront;
+		    }
+		}
+	    }
+	    super.endShape();
+	}
+	else{
+	    super.beginShape(TRIANGLE_FAN);
+	    if(light){
+		if(alpha<0){
+		    ambient(clr[0]); //?
+		    diffuse(clr[0]); //?
+		}
+		else{
+		    ambient(clr[0],alpha); //?
+		    diffuse(clr[0],alpha); //?
+		}
+	    }
+	    else{
+		if(alpha<0){
+		    clr(clr[0]); //?
+		}
+		else{
+		    clr(clr[0],alpha); //?
+		}
+	    }
 	    vertex(p,n);
 	    super.endShape();
 	}

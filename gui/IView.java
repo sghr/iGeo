@@ -73,6 +73,8 @@ public class IView{
     public int screenX, screenY;
     /**  screen width & height */
     public int screenWidth, screenHeight;
+    /**  screen width & height for save and record in conversion */
+    //public int screenOffsetX=0, screenOffsetY=0;
     
     /** perspective ratio = tan(angle of view) */
     public double persRatio=IConfig.perspectiveRatio; //defaultPersRatio;
@@ -542,12 +544,13 @@ public class IView{
 	    }
 	    else{
 		trans.z = -trans.z;
-		if(trans.z < near) return false;
+		//if(trans.z < near) return false;
 		//double r = screenHeight*near/trans.z/glHeight;
-		double r = screenHeight/(trans.z*persRatio*2);
+		double r = screenHeight/(Math.abs(trans.z)*persRatio*2);
 		
 		dest.x = screenWidth/2 + trans.x*r;
 		dest.y = screenHeight/2 - trans.y*r;
+		if(trans.z < near) return false;
 	    }
 	    if(dest.x < 0 || dest.x > screenWidth ||
 	       dest.y < 0 || dest.y > screenHeight) return false;
@@ -571,12 +574,15 @@ public class IView{
 	    }
 	    else{
 		trans.z = -trans.z;
-		if(trans.z < near) return false;
+		//if(trans.z < near) return false;
 		//float r = (float)(screenHeight*near/trans.z/glHeight);
-		float r = (float)(screenHeight/(trans.z*persRatio*2));
+		float r = (float)(screenHeight/(Math.abs(trans.z)*persRatio*2));
 		
 		dest.x = (float)screenWidth/2 + ((float)trans.x)*r;
 		dest.y = (float)screenHeight/2 - ((float)trans.y)*r;
+		if(trans.z < near){
+		    return false;
+		}
 	    }
 	    if(dest.x < 0 || dest.x > screenWidth ||
 	       dest.y < 0 || dest.y > screenHeight) return false;
@@ -601,17 +607,209 @@ public class IView{
 	    }
 	    else{
 		//double r = screenHeight*near/trans.z/glHeight;
-		double r = screenHeight/(trans.z*persRatio*2);
+		double r = screenHeight/(Math.abs(trans.z)*persRatio*2);
 		
 		dest.x = screenWidth/2 + trans.x*r;
 		dest.y = screenHeight/2 - trans.y*r;
 		dest.z = trans.z;
-		if(trans.z < near) return false;
+		if(trans.z < near){
+		    return false;
+		}
 	    }
 	    if(dest.x < 0 || dest.x > screenWidth ||
 	       dest.y < 0 || dest.y > screenHeight) return false;
 	    return true;
 	}
+    }
+    
+    public boolean trimWithScreenRect(IVec2 inpt, IVec2 outpt){
+	IVec2 ldir = outpt.dif(inpt);
+	IVec2 itxnX=null, itxnY=null;
+	if(ldir.x>0){
+	    // intersect w right edge
+	    itxnX = IVec2.intersect(inpt, ldir,
+				    new IVec2(screenWidth,0),IVec2.yaxis);
+	}
+	else{
+	    // intersect w left edge
+	    itxnX = IVec2.intersect(inpt, ldir, new IVec2(0,0),IVec2.yaxis);
+	}
+	
+	if(ldir.y>0){
+	    // intersect w top edge
+	    itxnY = IVec2.intersect(inpt, ldir, new IVec2(0,screenHeight), IVec2.xaxis);
+	}
+	else{
+	    // intersect w bottom edge
+	    itxnY = IVec2.intersect(inpt, ldir, new IVec2(0,0),IVec2.xaxis);
+	}
+	
+	if(itxnX==null && itxnY==null) return false;
+	if(itxnX==null){
+	    outpt.set(itxnY); return true;
+	}
+	if(itxnY==null){
+	    outpt.set(itxnX); return true;
+	}
+	if(itxnX.dist(inpt) > itxnY.dist(inpt)){
+	    outpt.set(itxnY); return true;
+	}
+	outpt.set(itxnX); return true;
+    }
+    
+    
+    public boolean trimWithScreenRect(IVec2f inpt, IVec2f outpt){
+	IVec2f ldir = outpt.dif(inpt);
+	IVec2 itxnX=null, itxnY=null;
+	if(ldir.x>0){
+	    // intersect w right edge
+	    itxnX = IVec2.intersect(inpt, ldir,
+				    new IVec2(screenWidth,0),IVec2.yaxis);
+	}
+	else{
+	    // intersect w left edge
+	    itxnX = IVec2.intersect(inpt, ldir, new IVec2(0,0),IVec2.yaxis);
+	}
+	
+	if(ldir.y>0){
+	    // intersect w top edge
+	    itxnY = IVec2.intersect(inpt, ldir, new IVec2(0,screenHeight), IVec2.xaxis);
+	}
+	else{
+	    // intersect w bottom edge
+	    itxnY = IVec2.intersect(inpt, ldir, new IVec2(0,0),IVec2.xaxis);
+	}
+	
+	if(itxnX==null && itxnY==null) return false;
+	if(itxnX==null){
+	    outpt.set(itxnY); return true;
+	}
+	if(itxnY==null){
+	    outpt.set(itxnX); return true;
+	}
+	if(itxnX.dist(inpt) > itxnY.dist(inpt)){
+	    outpt.set(itxnY); return true;
+	}
+	outpt.set(itxnX); return true;
+    }
+    
+    
+    public boolean trimWithScreenRect(IVec inpt, IVec outpt){
+	IVec2 ldir = outpt.to2d().dif(inpt.to2d());
+	IVec2 itxnX=null, itxnY=null;
+	if(ldir.x>0){
+	    // intersect w right edge
+	    itxnX = IVec2.intersect(inpt.to2d(), ldir,
+				    new IVec2(screenWidth,0),IVec2.yaxis);
+	}
+	else{
+	    // intersect w left edge
+	    itxnX = IVec2.intersect(inpt.to2d(), ldir, new IVec2(0,0),IVec2.yaxis);
+	}
+	
+	if(ldir.y>0){
+	    // intersect w top edge
+	    itxnY = IVec2.intersect(inpt.to2d(), ldir, new IVec2(0,screenHeight), IVec2.xaxis);
+	}
+	else{
+	    // intersect w bottom edge
+	    itxnY = IVec2.intersect(inpt.to2d(), ldir, new IVec2(0,0),IVec2.xaxis);
+	}
+	
+	if(itxnX==null && itxnY==null) return false;
+	if(itxnX==null){
+	    IVec itxn = itxnY.to3d();
+	    itxn.z = (outpt.z-inpt.z)*itxnY.dist(inpt.to2d())/ldir.len() + inpt.z;
+	    outpt.set(itxn); return true;
+	}
+	if(itxnY==null){
+	    IVec itxn = itxnX.to3d();
+	    itxn.z = (outpt.z-inpt.z)*itxnX.dist(inpt.to2d())/ldir.len() + inpt.z;
+	    outpt.set(itxn); return true;
+	}
+	if(itxnX.dist(inpt.to2d()) > itxnY.dist(inpt.to2d())){
+	    IVec itxn = itxnY.to3d();
+	    itxn.z = (outpt.z-inpt.z)*itxnY.dist(inpt.to2d())/ldir.len() + inpt.z;
+	    
+	    outpt.set(itxn); return true;
+	}
+	IVec itxn = itxnX.to3d();
+	itxn.z = (outpt.z-inpt.z)*itxnX.dist(inpt.to2d())/ldir.len() + inpt.z;
+	outpt.set(itxn); return true;
+    }
+    
+    
+    /**
+       converts 3d coordinates to 2d coordinates of screen whose unit is
+       pixels and whose origin is top left corner and positive Y is downward
+       @return returns if result is inside screen
+    */
+    public boolean convertLine(IVecI orig1, IVecI orig2, IVec2 dest1, IVec2 dest2){
+	boolean flag1 = convert(orig1,dest1);
+	boolean flag2 = convert(orig2,dest2);
+	IVec2 inpt=null, outpt=null;
+	if(flag1){
+	    if(flag2){ return true; }
+	    else{ // modify pt 2
+		inpt = dest1; outpt = dest2;
+	    }
+	}
+	else{
+	    if(flag2){ // modify pt 1
+		inpt = dest2; outpt = dest1;
+	    }
+	    else{ return false; }
+	}
+	return trimWithScreenRect(inpt, outpt);
+    }
+    
+    
+    /**
+       converts 3d coordinates to 2d coordinates of screen whose unit is
+       pixels and whose origin is top left corner and positive Y is downward
+       @return returns if result is inside screen
+    */
+    public boolean convertLine(IVecI orig1, IVecI orig2, IVec2f dest1, IVec2f dest2){
+	boolean flag1 = convert(orig1,dest1);
+	boolean flag2 = convert(orig2,dest2);
+	IVec2f inpt=null, outpt=null;
+	if(flag1){
+	    if(flag2){ return true; }
+	    else{ // modify pt 2
+		inpt = dest1; outpt = dest2;
+	    }
+	}
+	else{
+	    if(flag2){ // modify pt 1
+		inpt = dest2; outpt = dest1;
+	    }
+	    else{ return false; }
+	}
+	return trimWithScreenRect(inpt, outpt);
+    }
+    
+    
+    /**
+       converts 3d coordinates to 2d. Putting depth in z component of the second argument
+       @return returns if result is inside screen
+    */
+    public boolean convertLine(IVecI orig1, IVecI orig2, IVec dest1, IVec dest2){
+	boolean flag1 = convert(orig1,dest1);
+	boolean flag2 = convert(orig2,dest2);
+	IVec inpt=null, outpt=null;
+	if(flag1){
+	    if(flag2){ return true; }
+	    else{ // modify pt 2
+		inpt = dest1; outpt = dest2;
+	    }
+	}
+	else{
+	    if(flag2){ // modify pt 1
+		inpt = dest2; outpt = dest1;
+	    }
+	    else{ return false; }
+	}
+	return trimWithScreenRect(inpt, outpt);
     }
     
     

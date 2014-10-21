@@ -23,6 +23,7 @@
 package igeo;
 
 import java.util.ArrayList;
+import java.awt.Color;
 
 /**
    Class of a vertex of polygon mesh.
@@ -38,6 +39,8 @@ public class IVertex implements IVecI{
     public IVecI pos;
     public IVecI normal;
     public IVec2I texture; // texture coordinates
+
+    public IColor clr; // vertex color
     
     /** index number in IMeshGeo vertices array list */
     public int index=-1;
@@ -717,5 +720,61 @@ public class IVertex implements IVecI{
     }
     
     
+    // color
+    public IColor clr(){ return clr; }
+    
+    public IVertex clr(IColor c){ clr=c; return this; }
+    
+    /** to set color, with alpha value overwritten */
+    public IVertex clr(IColor c, int alpha){
+	return clr(new IColor(c,alpha));
+    }
+    /** to set color, with alpha value overwritten */
+    public IVertex clr(IColor c, float alpha){
+	return clr(new IColor(c,alpha));
+    }
+    /** to set color, with alpha value overwritten */
+    public IVertex clr(IColor c, double alpha){
+	return clr(new IColor(c,alpha));
+    }
+
+    public IVertex clr(Color c){ return clr(new IColor(c)); }
+    public IVertex clr(Color c, int alpha){ return clr(new IColor(c),alpha); }
+    public IVertex clr(Color c, float alpha){ return clr(new IColor(c),alpha); }
+    public IVertex clr(Color c, double alpha){ return clr(new IColor(c),alpha); }
+    
+    /** @return returns whatever Color of any graphics member. (first found) */
+    public IColor getColor(){ return clr(); }
+    
+    
+    public IVertex clr(int gray){ return clr(new IColor(gray)); }
+    
+    public IVertex clr(double dgray){ return clr(new IColor(dgray)); }
+    public IVertex clr(float fgray){ return clr(new IColor(fgray)); }
+    public IVertex clr(int gray, int alpha){ return clr(new IColor(gray,alpha)); }
+    public IVertex clr(double dgray, double dalpha){ return clr(new IColor(dgray,dalpha)); }
+    public IVertex clr(float fgray, float falpha){ return clr(new IColor(fgray,falpha)); }
+    public IVertex clr(int r, int g, int b){ return clr(new IColor(r,g,b)); }
+    public IVertex clr(double dr, double dg, double db){ return clr(new IColor(dr,dg,db)); }
+    public IVertex clr(float fr, float fg, float fb){ return clr(new IColor(fr,fg,fb)); }
+    public IVertex clr(int r, int g, int b, int a){ return clr(new IColor(r,g,b,a)); }
+    public IVertex clr(double dr, double dg, double db, double da){
+	return clr(new IColor(dr,dg,db,da));
+    }
+    public IVertex clr(float fr, float fg, float fb, float fa){
+	return clr(new IColor(fr,fg,fb,fa));
+    }
+    public IVertex hsb(double dh, double ds, double db, double da){
+	return clr(IColor.hsb(dh,ds,db,da));
+    }
+    public IVertex hsb(float h, float s, float b, float a){
+	return clr(IColor.hsb(h,s,b,a));
+    }
+    public IVertex hsb(double dh, double ds, double db){
+	return clr(IColor.hsb(dh,ds,db));
+    }
+    public IVertex hsb(float h, float s, float b){
+	return clr(IColor.hsb(h,s,b));
+    }
     
 }

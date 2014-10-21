@@ -30,6 +30,10 @@ import java.util.ArrayList;
    @author Satoru Sugihara
 */
 public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
+    public static IVec2 xaxis = new IVec2(1,0);
+    public static IVec2 yaxis = new IVec2(0,1);
+    
+    
     public double x, y;
     
     public IVec2(){}
@@ -750,6 +754,22 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	return diff;
     }
     
+    /** intersection of an infinite line and a circle */
+    public static IVec2[] intersectLineAndCircle(IVec2I linePt, IVec2I lineDir, IVec2I circleCenter, double radius){
+	IVec2 d = circleCenter.get().perpendicularVecToLine(lineDir, linePt);
+	
+	double dist = d.len();
+	if(dist>radius) return null; // no intersection
+	
+	d.add(circleCenter);
+	if(dist==radius) return new IVec2[]{ d };
+	
+	double tlen = Math.sqrt(radius*radius - dist*dist);
+	IVec2 t = lineDir.get().cp().len(tlen);
+	d.sub(t);
+	return new IVec2[]{ d, t.mul(2).add(d) }; // reuse instance of d and t
+    }
+    
     
     /**
        remove points which are on straight line of adjacents
@@ -872,7 +892,9 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	return "("+String.valueOf(x)+","+String.valueOf(y)+")";
     }
     
-    
+    /** distance to an infinite line
+	issue: there is another distToLine(IVecI lineDir,IVecI linePt) method
+     */
     public double distToLine(IVec2 pt1, IVec2 pt2){
 	double xdiff = pt2.x-pt1.x;
 	double ydiff = pt2.y-pt1.y;

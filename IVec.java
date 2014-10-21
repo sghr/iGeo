@@ -413,6 +413,40 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	angle is not measured on the plane of axis. axis just define if it's positive angle or negative angle
     */
     public IDouble angle(ISwitchR r, IVecI v, IVecI axis){ return new IDouble(angle(v,axis)); }
+
+
+    /** angle of two vector on a specified plane */
+    public double angleOnPlane(IVec v, IVec planeDir){
+	return this.cp().projectToPlane(planeDir).angle(v.cp().projectToPlane(planeDir), planeDir);
+    }
+    /** angle of two vector on a specified plane */
+    public double angleOnPlane(IVecI v, IVecI planeDir){ return angleOnPlane(v.get(), planeDir.get()); }
+    /** angle of two vector on a specified plane */
+    public double angleOnPlane(ISwitchE e, IVecI v, IVecI planeDir){ return angleOnPlane(v, planeDir); }
+    /** angle of two vector on a specified plane */
+    public IDouble angleOnPlane(ISwitchR r, IVecI v, IVecI planeDir){
+	return new IDouble(angleOnPlane(v,planeDir));
+    }
+    
+    /** angle of two points on a specified plane around the center */
+    public double angleOnPlane(IVec pt, IVec planeCenter, IVec planeDir){
+	return this.dif(planeCenter).angleOnPlane(pt.dif(planeCenter), planeDir);
+    }
+    /** angle of two points on a specified plane around the center */
+    public double angleOnPlane(IVecI pt, IVecI planeCenter, IVecI planeDir){
+	return angleOnPlane(pt.get(),planeCenter.get(), planeDir.get());
+    }
+    /** angle of two points on a specified plane around the center */
+    public double angleOnPlane(ISwitchE e, IVecI pt, IVecI planeCenter, IVecI planeDir){
+	return angleOnPlane(pt,planeCenter,planeDir);
+    }
+    /** angle of two points on a specified plane around the center */
+    public IDouble angleOnPlane(ISwitchR r, IVecI pt, IVecI planeCenter, IVecI planeDir){
+	return new IDouble(angleOnPlane(pt,planeCenter,planeDir));
+    }
+    
+    
+    
     
     
     /** rotate the vector around the axis */
@@ -1005,11 +1039,12 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     /** alias of nml */
     public IVec getNormal(IVec pt2, IVec pt3){ return nml(pt2,pt3); }
     
-    
+    /** project a vector onto a plane at origin */
     public IVec projectToPlane(IVecI planeNormal){
         return projectToPlane(planeNormal,planeNormal);
     }
-
+    
+    /** project a vector onto a plane at origin towards a specified direction */
     public IVec projectToPlane(IVecI projectDir, IVecI planeNormal){
 	double ipRatio = dot(planeNormal)/projectDir.dot(planeNormal);
 	x -= ipRatio*projectDir.x();
@@ -1018,7 +1053,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return this;
     }
     
-    
+    /** project a point onto a plane at planePoint towards a specified direction */
     public IVec projectToPlane(IVecI projectDir, IVecI planeNormal, IVecI planePoint){
 	if(planePoint==this) return this;
 	return sub(planePoint).projectToPlane(projectDir,planeNormal).add(planePoint);
@@ -2914,5 +2949,41 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public static double angle(IVecI pt1, IVecI pt2, IVecI pt3){
 	return pt1.dif(pt2).angle(pt3.dif(pt2));
     }
-    
+
+    /** find two closest points on two infinete lines in a skew relationship, which makes a segment perpendicular to two lines */
+    public static IVec[] closestPointsOn2Lines(IVecI lineDir1, IVecI linePt1,
+					      IVecI lineDir2, IVecI linePt2){
+	if(lineDir1.get().isParallel(lineDir2)){
+	    // when parallel, whatever points
+	    return new IVec[]{ linePt1.get().cp(), linePt1.get().cp().projectToLine(linePt2,lineDir2)  };
+	}
+	
+	IVec d1 = lineDir1.get().cp().unit();
+	IVec d2 = lineDir2.get().cp().unit();
+	
+	IVec dif = linePt1.get().dif(linePt2);
+	double d12 = d1.dot(d2);
+	
+        double k1 = ( - d1.dot(dif) + d2.dot(dif)*d12 ) / (1.0 - d12*d12);
+        double k2 = ( d2.dot(dif) - d1.dot(dif)*d12 ) / (1.0 - d12*d12);
+	
+        d1.mul(k1);
+        d2.mul(k2);
+        d1.add(linePt1);
+        d2.add(linePt2);
+	return new IVec[]{ d1,d2 };
+    }
+
+    /** alias to closestPointsOn2Lines */
+    public static IVec[] perpendicularTo2Lines(IVecI lineDir1, IVecI linePt1,
+					       IVecI lineDir2, IVecI linePt2){
+	return closestPointsOn2Lines(lineDir1,linePt1,lineDir2,linePt2);
+    }
+
+     public static double distBetween2Lines(IVecI lineDir1, IVecI linePt1,
+				     IVecI lineDir2, IVecI linePt2){
+	 IVec[] pts = closestPointsOn2Lines(lineDir1,linePt1,lineDir2,linePt2);
+	 return pts[0].dist(pts[1]);
+     }
+
 }

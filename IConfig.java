@@ -193,7 +193,13 @@ public /*interface*/ class IConfig{
     public static boolean updateMeshNormal=false;
 
     /** remove duplicated vertices and edges under the tolerance = IConfig.tolerance automatically when a mesh is created in new IMesh(IFace[] faces) */
-    public static boolean removeDuplicatesAtMeshCreation=true; 
+    public static boolean removeDuplicatesAtMeshCreation=true;
+
+    /** Enable vertex colors instead of mesh object color */
+    //public static boolean enableVertexColor=false; //true;
+    
+    /** Enable face colors instead of mesh object color */
+    //public static boolean enableFaceColor=false; //true;
     
     
     /*****************************
@@ -427,8 +433,9 @@ public /*interface*/ class IConfig{
     /*************************************************************************************
      * AI Export
      ************************************************************************************/
-    public static double defaultAIExportScale = 0.01;
-
+    public static double defaultAIExportScale = 0.00001; //0.01;
+    public static double defaultAIExportPixelScale = 0.1; //0.01;
+    
     
     /*************************************************************************************
      * Text Object Property

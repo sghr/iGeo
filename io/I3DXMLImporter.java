@@ -234,10 +234,6 @@ public class I3DXMLImporter{
 	//read3DXML(document, file, documentName);
 	
 	
-	
-	
-
-	
 	IOut.p("number of files in archive : " + document.fileList.size()); //
 	
 	IOut.p("number of Reference3D : " + document.references.size()); //
@@ -246,7 +242,7 @@ public class I3DXMLImporter{
 	IOut.p("number of InstanceRep : " + document.instanceReps.size()); //
 	
 	IOut.p("number of RepresentationDocument : "+document.representationDocuments.size()); //
-
+	
 	/*
 	//debug
 	for(int i=0; i<document.representationDocuments.size(); i++){
@@ -319,8 +315,6 @@ public class I3DXMLImporter{
 	for(int i=0; i<document.instanceReps.size(); i++){
 	    IOut.p("instanceRep "+i+": "+document.instanceReps.get(i).name);
 	}
-	
-	
 	
 	return document;
     }

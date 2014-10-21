@@ -43,6 +43,10 @@ public class ITextGraphicGL extends IGraphicObject{
     public static final int defaultFontResolution = 80; //200;
     public static final Font defaultFont = new Font("SansSerif", Font.PLAIN, defaultFontResolution);
     
+    public static boolean shareRenderer=false;
+
+    public static TextRenderer sharedRenderer;
+    
     public TextRenderer renderer;
     public IText text;
     
@@ -78,7 +82,17 @@ public class ITextGraphicGL extends IGraphicObject{
     }
     
     public double textWidth(String[] lines){
-	if(renderer==null) renderer = new TextRenderer(font, true, true);
+	if(renderer==null){
+	    if(shareRenderer){
+		if(sharedRenderer==null){
+		    sharedRenderer = new TextRenderer(font, true, true);
+		}
+		renderer = sharedRenderer;
+	    }
+	    else{
+		renderer = new TextRenderer(font, true, true);
+	    }
+	}
 	if(lines==null) return 0;
 	double maxWidth=0;
 	for(int i=0; i<lines.length; i++){
@@ -209,7 +223,15 @@ public class ITextGraphicGL extends IGraphicObject{
     public void update(){
 	if(text.font==null && font!=defaultFont){ font = defaultFont; }
 	else if(text.font!=null && font!=text.font){ font = text.font; }
-	renderer = new TextRenderer(font, true, true);
+	if(shareRenderer){
+	    if(sharedRenderer==null){
+		sharedRenderer = new TextRenderer(font, true, true);
+	    }
+	    renderer = sharedRenderer;
+	}
+	else{
+	    renderer = new TextRenderer(font, true, true);
+	}
 	initText();
 	super.update();
     }

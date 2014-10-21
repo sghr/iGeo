@@ -167,6 +167,9 @@ public interface ITransformable{
     public ITransformable transform(IMatrix4I mat);
     public ITransformable transform(IVecI xvec, IVecI yvec, IVecI zvec);
     public ITransformable transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate);
+        
+    /** convert coordinates system */
+    //public ITransformable transform(IVecI origXVec, IVecI origYVec, IVecI origZVec, IVecI origPos,IVecI newXVec, IVecI newYVec, IVecI newZVec, IVecI newPos);
     
     
 }

@@ -27,7 +27,7 @@ package igeo;
    
    @author Satoru Sugihara
 */
-public interface IVec2I extends IVec2Op{
+public interface IVec2I extends IVec2Op, IArithmeticVal<IVec2I,IDoubleI>{
     public double x();
     public double y();
     

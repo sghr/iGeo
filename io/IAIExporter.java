@@ -23,13 +23,8 @@
 package igeo.io;
 
 import java.io.*;
-
-
-
-
 import java.util.ArrayList;
 import java.text.*;
-
 import igeo.*;
 import igeo.gui.IView;
 
@@ -39,7 +34,10 @@ import igeo.gui.IView;
    @author Satoru Sugihara
 */
 
-class IAIExporter {
+public class IAIExporter {
+    
+    static boolean ignoreOutOfView = false; //true; // temporarily
+    static boolean enableScreenBoundaryIntersection = true;
     
     public static double minimumPoint = 0.00001f; //0.001f; //0.01f;
     
@@ -58,6 +56,8 @@ class IAIExporter {
     
     static public enum CapType { Butt, Round, Square };
     static public enum JoinType { Miter, Round, Bevel };
+    
+    static public boolean fillClosedCurve = false;
     
     
     public static NumberFormat f;
@@ -297,7 +297,7 @@ class IAIExporter {
 	for(int i=0; i<controlPoints.length; i++){
 	    pt = new IVec2();
 	    boolean f = view.convert(controlPoints[i],pt);
-	    if(f){ inview = true; }
+	    if(f || ignoreOutOfView){ inview = true; }
 	    convertCoordinates(pt,scale,view);
 	    v_cpts.add(pt);
 	}
@@ -444,7 +444,8 @@ class IAIExporter {
 	}
 	return pts;
     }
-    
+    */
+
     public static void writeBezierCurvePaths(PrintStream ps,
 					     ArrayList<ArrayList<IVec2>> pts,
 					     boolean newline){
@@ -480,7 +481,7 @@ class IAIExporter {
 	    //else ps.println("C");
 	}
     }
-    */
+    
     
     public static void writePolylinePaths(PrintStream ps, ArrayList<ArrayList<IVec2>> pts,
 					  boolean newline){
@@ -505,6 +506,59 @@ class IAIExporter {
 	    else{
 		ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
 		if(j==pts.size()-1) ps.println("L");
+		else ps.println("l");
+	    }
+	}
+    }
+    
+    public static void writePolylinePath(PrintStream ps, IVec2[] pts, boolean newline){
+	for(int j=0; j<pts.length; j++){
+	    IVec2 pt = pts[j];
+	    
+	    if(j==0){
+		if(newline){
+		    ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
+		    ps.println("m");
+		}
+		else{
+		    ps.print("%%");
+		    ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
+		    ps.println("m");
+		}
+	    }
+	    else{
+		ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
+		if(j==pts.length-1) ps.println("L");
+		else ps.println("l");
+	    }
+	}
+    }
+    
+    public static void writeClosedPolylinePath(PrintStream ps, IVec2[] pts, boolean newline){
+	for(int j=0; j<pts.length; j++){
+	    IVec2 pt = pts[j];
+	    
+	    if(j==0){
+		if(newline){
+		    ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
+		    ps.println("m");
+		}
+		else{
+		    ps.print("%%");
+		    ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
+		    ps.println("m");
+		}
+	    }
+	    else{
+		ps.print(f.format(pt.x) + " "+ f.format(pt.y) + " ");
+		//if(j==pts.length-1) ps.println("L");
+		if(j==pts.length-1){
+		    ps.println("l");
+		    ps.print(f.format(pts[0].x) + " "+ f.format(pts[0].y) + " ");
+		    ps.println("l");
+		    //ps.print(f.format(pts[0].x) + " "+ f.format(pts[0].y) + " ");
+		    //ps.println("v");
+		}
 		else ps.println("l");
 	    }
 	}
@@ -541,16 +595,33 @@ class IAIExporter {
     
     // remove null points out of screen
     public static ArrayList<ArrayList<IVec2>> createPolylinePointArrayList(IVec2[] pts){
-	
+
 	ArrayList<ArrayList<IVec2>> pts2 = new ArrayList<ArrayList<IVec2>>();
 	pts2.add(new ArrayList<IVec2>());
 	for(int i=0; i<pts.length; i++){
 	    if(pts[i]!=null) pts2.get(pts2.size()-1).add(pts[i]);
 	    else if(pts2.get(pts2.size()-1).size()>0) pts2.add(new ArrayList<IVec2>());
 	}
+        
+        if(pts2.size()>1 && pts[0]!=null && pts[pts.length-1]!=null){
+	    ArrayList<IVec2> firstGroup = pts2.get(0);
+	    ArrayList<IVec2> lastGroup = pts2.get(pts2.size()-1);
+	    for(int i=0; i<firstGroup.size(); i++){
+		if(i==0){ // skip duplicated point
+		    if(!firstGroup.get(0).eq(lastGroup.get(lastGroup.size()-1),0)){
+			lastGroup.add(firstGroup.get(i));
+		    }
+		}
+		else{
+		    lastGroup.add(firstGroup.get(i));
+		}
+	    }
+	    pts2.remove(0);
+        }
+        
 	return pts2;
     }
-
+    
     
     public static void writePaintStyle(PrintStream ps,
 				       IColor fillColor, IColor strokeColor, double lineWidth,
@@ -621,20 +692,180 @@ class IAIExporter {
 	ps.println("0 J 0 j "+f.format(lineWidth)+" w 4 M []0 d");
     }
 
+    public static IVec[] createBezierPoints(ICurveI curve){
+	int sampleNum = curve.epNum()*IConfig.segmentResolution;
+	IVec[] pts = new IVec[sampleNum*3-2];
+	IVec[] pts3 = new IVec[sampleNum];
+	IVec[] tan3 = new IVec[sampleNum];
+	for(int i=0; i<sampleNum; i++){
+	    pts3[i] = curve.pt((double)i/(sampleNum-1)).get();
+	    tan3[i] = curve.tan((double)i/(sampleNum-1)).get();
+	    tan3[i].div(sampleNum*3);
+	}
+	for(int i=0; i<sampleNum; i++){
+	    pts[3*i] = pts3[i];
+	    if(i>0){
+		pts[3*i-2] = pts3[i-1].sum(tan3[i-1]);
+		pts[3*i-1] = pts3[i].dif(tan3[i]);
+	    }
+	}
+	return pts;
+    }
     
     public static ArrayList<ArrayList<IVec2>> convertTo2DPoints(ICurveI curve,double scale, IView view){
 	IVec2[] pts=null;
 	boolean inscreen=false;
-	
-	if(curve.deg()==1 && (!(curve instanceof ITrimCurveI) ||
-			      (curve instanceof ITrimCurveI) && ((ITrimCurveI)curve).surface().isFlat()) ){
+
+        if(curve.deg()>1 || curve instanceof ITrimCurveI && !((ITrimCurveI)curve).surface().isFlat()){
+	    boolean flag=false;
+	    IVec[] pts3 = createBezierPoints(curve);
+	    int sampleNum = (pts3.length+2)/3;
+	    pts = new IVec2[sampleNum*3-2];
+	    for(int i=0; i<sampleNum; i++){
+		pts[3*i] = new IVec2();
+		flag = view.convert(pts3[3*i], pts[3*i]);
+		if(!ignoreOutOfView &&!flag && !view.isAxonometric()) pts[3*i]=null;
+		if(i>0){
+		    pts[3*i-2] = new IVec2();
+		    pts[3*i-1] = new IVec2();
+		    flag = view.convert(pts3[3*i-2], pts[3*i-2]);
+		    if(!ignoreOutOfView && !flag && !view.isAxonometric()) pts[3*i-2]=null;
+		    flag = view.convert(pts3[3*i-1], pts[3*i-1]);
+		    if(!ignoreOutOfView && !flag && !view.isAxonometric()) pts[3*i-1]=null;
+		    if(ignoreOutOfView ||
+		       pts[3*i-3]!=null && pts[3*i-2]!=null &&
+		       pts[3*i-1]!=null && pts[3*i]!=null){ inscreen=true; }
+		}
+	    }
 	    
+	    // check intersection with screen boundary
+	    if(enableScreenBoundaryIntersection && !ignoreOutOfView && !view.isAxonometric()){
+		int num = pts.length;
+		IVec2[] itxns = new IVec2[num-1];
+		boolean anyItxn=false;
+		for(int i=0; i<num-1; i++){
+		    if( pts[i]==null && pts[(i+1)%num]!=null ){
+			IVec2 pt1 = new IVec2();
+			IVec2 pt2 = new IVec2();
+			flag = view.convertLine(pts3[i], pts3[(i+1)%num], pt1, pt2);
+			if(flag){ pts[i] = pt1; anyItxn=true; }
+		    }
+		    else if( pts[i]!=null && pts[(i+1)%num]==null){
+			IVec2 pt1 = new IVec2();
+			IVec2 pt2 = new IVec2();
+			flag = view.convertLine(pts3[i], pts3[(i+1)%num], pt1, pt2);
+			if(flag){ pts[i] = pt2; anyItxn=true; }
+		    }
+		}
+		if(anyItxn){
+		    ArrayList<IVec2> allpts = new ArrayList<IVec2>();
+		    for(int i=0; i<num; i++){ allpts.add(pts[i]); }
+		    for(int i=num-2; i>=0; i--){
+			if(itxns[i]!=null){ allpts.add(i+1, itxns[i]); }
+		    }
+		    pts = allpts.toArray(new IVec2[allpts.size()]);
+		    inscreen=true;
+		}
+	    }
+	}
+        
+        else if(curve instanceof ITrimCurveI){ // surface flat
 	    pts = new IVec2[curve.cpNum()];
+	    boolean flag=false;
+	    ITrimCurveI tcrv = (ITrimCurveI) curve;
 	    for(int i=0; i<pts.length; i++){
 		pts[i] = new IVec2();
-		boolean flag = view.convert(curve.cp(i), pts[i]);
-		if(!flag){ pts[i] = null; }
-		if(i>0 && pts[i-1]!=null && pts[i]!=null) inscreen=true;
+		flag = view.convert(tcrv.surface().pt(curve.cp(i)), pts[i]);
+		if(!ignoreOutOfView && !flag && !view.isAxonometric()){ pts[i] = null; }
+		if(ignoreOutOfView || i>0 && pts[i-1]!=null && pts[i]!=null) inscreen=true;
+	    }
+	    
+	    // check intersection with screen boundary
+	    if(enableScreenBoundaryIntersection && !ignoreOutOfView && !view.isAxonometric()){
+		int num = pts.length;
+		IVec2[] itxns = new IVec2[num-1];
+		boolean anyItxn=false;
+		for(int i=0; i<num-1; i++){
+		    if( pts[i]==null && pts[(i+1)%num]!=null ){
+			IVec2 pt1 = new IVec2();
+			IVec2 pt2 = new IVec2();
+			flag = view.convertLine(tcrv.surface().pt(curve.cp(i)),
+						tcrv.surface().pt(curve.cp((i+1)%num)),
+						pt1, pt2);
+			if(flag){ itxns[i] = pt1; anyItxn=true; }
+		    }
+		    else if( pts[i]!=null && pts[(i+1)%num]==null){
+			IVec2 pt1 = new IVec2();
+			IVec2 pt2 = new IVec2();
+			flag = view.convertLine(tcrv.surface().pt(curve.cp(i)),
+						tcrv.surface().pt(curve.cp((i+1)%num)),
+						pt1, pt2);
+			if(flag){ itxns[i] = pt2; anyItxn=true; }
+		    }
+		}
+		if(anyItxn){
+		    ArrayList<IVec2> allpts = new ArrayList<IVec2>();
+		    for(int i=0; i<num; i++){ allpts.add(pts[i]); }
+		    for(int i=num-2; i>=0; i--){
+			if(itxns[i]!=null){ allpts.add(i+1, itxns[i]); }
+		    }
+		    pts = allpts.toArray(new IVec2[allpts.size()]);
+		    inscreen=true;
+		}
+		
+	    }
+        }
+        else{
+        /*
+	if(curve.deg()==1 && (!(curve instanceof ITrimCurveI) ||
+			      (curve instanceof ITrimCurveI) && ((ITrimCurveI)curve).surface().isFlat()) ){
+	*/
+	    
+	    pts = new IVec2[curve.cpNum()];
+	    boolean flag=false;
+	    for(int i=0; i<pts.length; i++){
+		pts[i] = new IVec2();
+		flag = view.convert(curve.cp(i), pts[i]);
+		if(!ignoreOutOfView && !flag && !view.isAxonometric()){ pts[i] = null; }
+		if(ignoreOutOfView || i>0 && pts[i-1]!=null && pts[i]!=null) inscreen=true;
+	    }
+	    
+	    // check intersection with screen boundary
+	    if(enableScreenBoundaryIntersection && !ignoreOutOfView && !view.isAxonometric()){
+		int num = pts.length;
+		IVec2[] itxns = new IVec2[num-1];
+		boolean anyItxn=false;
+		for(int i=0; i<num-1; i++){
+		    if( pts[i]==null && pts[ (i+1)%num ]!=null ){
+			IVec2 pt1 = new IVec2();
+			IVec2 pt2 = new IVec2();
+			flag = view.convertLine(curve.cp(i), curve.cp((i+1)%num), pt1, pt2);
+			if(flag){ itxns[i] = pt1; anyItxn=true; }
+		    }
+		    else if( pts[i]!=null && pts[ (i+1)%num ]==null ){
+			IVec2 pt1 = new IVec2();
+			IVec2 pt2 = new IVec2();
+			flag = view.convertLine(curve.cp(i), curve.cp((i+1)%num), pt1, pt2);
+			if(flag){ itxns[i] = pt2; anyItxn=true; }
+		    }
+		}
+		if(anyItxn){
+		    
+		    //for(int i=0; i<num; i++){ IG.p("pts["+i+"] = "+pts[i]); }
+		    //for(int i=0; i<num-1; i++){ IG.p("itxns["+i+"] = "+itxns[i]); }
+		    
+		    
+		    ArrayList<IVec2> allpts = new ArrayList<IVec2>();
+		    for(int i=0; i<num; i++){ allpts.add(pts[i]); }
+		    for(int i=num-2; i>=0; i--){
+			if(itxns[i]!=null){ allpts.add(i+1, itxns[i]); }
+		    }
+		    
+		    //for(int i=0; i<allpts.size(); i++){ IG.p("allpts "+i+": "+allpts.get(i)); }
+		    
+		    pts = allpts.toArray(new IVec2[allpts.size()]);
+		    inscreen=true;
+		}
 	    }
 	}
 	
@@ -645,15 +876,15 @@ class IAIExporter {
 	    for(int i=0; i<curve.samplePts.length; i++){
 		pts[3*i] = new IVec2();
 		flag = view.convert(curve.samplePts[i], pts[3*i]);
-		if(!flag) pts[3*i]=null;
+		if(!ignoreOutOfView &&!flag) pts[3*i]=null;
 		if(i>0){
 		    pts[3*i-2] = new IVec2();
 		    pts[3*i-1] = new IVec2();
 		    flag = view.convert(curve.sampleDir1[i-1], pts[3*i-2]);
-		    if(!flag) pts[3*i-2]=null;
+		    if(!ignoreOutOfView && !flag) pts[3*i-2]=null;
 		    flag = view.convert(curve.sampleDir2[i-1], pts[3*i-1]);
-		    if(!flag) pts[3*i-1]=null;
-		    if(pts[3*i-3]!=null && pts[3*i-2]!=null &&
+		    if(!ignoreOutOfView && !flag) pts[3*i-1]=null;
+		    if(ignoreOutOfView || pts[3*i-3]!=null && pts[3*i-2]!=null &&
 		       pts[3*i-1]!=null && pts[3*i]!=null){ inscreen=true; }
 		}
 	    }
@@ -662,7 +893,7 @@ class IAIExporter {
 	    pts = new IVec2[curve.samplePts.length];
 	    for(int i=0; i<curve.samplePts.length; i++){
 		pts[i] = IGView.view.convert(curve.samplePts[i]);
-		if(i>0 && pts[i-1]!=null && pts[i]!=null) inscreen=true;
+		if(ignoreOutOfView || i>0 && pts[i-1]!=null && pts[i]!=null) inscreen=true;
 	    }
 	}
 	*/
@@ -686,10 +917,24 @@ class IAIExporter {
 	boolean inscreen=false;
 	
 	boolean flag = view.convert(pt, pt2);
-	if(!flag) return null;
+	if(!ignoreOutOfView && !flag && !view.isAxonometric()) return null;
 	
 	convertCoordinates(pt2, scale, view);
 	return pt2;
+    }
+    
+    
+    public static IVec2[] convertTo2DPoints(IVecI[] pts,double scale, IView view){
+	IVec2[] pts2=new IVec2[pts.length];
+	boolean inscreen=false;
+	
+	for(int i=0; i<pts.length; i++){
+	    pts2[i] = new IVec2();
+	    boolean flag = view.convert(pts[i], pts2[i]);
+	    if(!ignoreOutOfView && !flag && !view.isAxonometric()) return null;
+	    convertCoordinates(pts2[i], scale, view);
+	}
+	return pts2;
     }
     
     
@@ -714,12 +959,12 @@ class IAIExporter {
 	ArrayList<ArrayList<IVec2>> pts=convertTo2DPoints(curve,scale,view);
 	if(pts==null) return;
 	
-	final boolean fillClosedCurve=true; // false;
+	//final boolean fillClosedCurve=false; //true; // false;
 	final boolean useCurveColor=true; //false;
 	
 	double lineWeight = defaultLineWeight;
 	
-	IColor color = null;
+	IColor color = new IColor(0.5); // default? // null;
 	if(curve instanceof IObject) color = ((IObject)curve).clr();
 	
 	if(fillClosedCurve && curve.isClosed()){
@@ -742,13 +987,11 @@ class IAIExporter {
 	    writePaintStyle(ps,null,color,lineWeight);
 	}
 	
-	writePolylinePaths(ps,pts,true);
-	
-	/*
 	if(curve.deg()>1||curve instanceof ITrimCurveI && !((ITrimCurveI)curve).surface().isFlat())
 	    writeBezierCurvePaths(ps,pts,true);
 	else writePolylinePaths(ps,pts,true);
-	*/
+	
+	//writePolylinePaths(ps,pts,true);
 	
 	if(fillClosedCurve && curve.isClosed()){
 	    ps.println("f"); // closed curve with filling
@@ -762,19 +1005,19 @@ class IAIExporter {
     public static void startCompoundPath(PrintStream ps){ ps.println("*u"); }
     public static void endCompoundPath(PrintStream ps){ ps.println("*U"); }
 
-    /*
-    public static void writeTrimLoops(PrintStream ps, ISurfaceI surf, double scale){
+    
+    public static void writeTrimLoops(PrintStream ps, ISurfaceI surf, double scale, IView view){
 	
 	ps.println("0 D");
 	ps.println("1 XR"); // 1=even-odd; (0=non-zero is curve-direction-sensitive)
 	
 	startCompoundPath(ps);
 	
-	for(int i=0; surf.outerTrimLoop!=null && i<surf.outerTrimLoop.size(); i++){
+	for(int i=0; surf.hasOuterTrim() && i<surf.outerTrimLoopNum(); i++){
 	    //ps.println("0 0 Xd");
 	    //ps.println("6 () XW");
 	    
-	    writeTrimLoop(ps,surf.outerTrimLoop.get(i),scale);
+	    writeTrimLoop(ps,surf.outerTrimLoop(i),scale, view);
 	    //ps.println("s"); // open curve without filling // ?
 	    ps.println("h");
 	    ps.println("W");
@@ -782,11 +1025,11 @@ class IAIExporter {
 	    ps.println("n"); // ?
 	}
 	
-	for(int i=0; surf.innerTrimLoop!=null && i<surf.innerTrimLoop.size(); i++){
+	for(int i=0; surf.hasInnerTrim() && i<surf.innerTrimLoopNum(); i++){
 	    // need compound path
 	    
 	    //writePaintStyle(ps,null,Color.red,defaultLineWeight);
-	    writeTrimLoop(ps,surf.innerTrimLoop.get(i),scale);
+	    writeTrimLoop(ps,surf.innerTrimLoop(i),scale, view);
 	    //ps.println("s"); // open curve without filling // ?
 	    
 	    ps.println("h");
@@ -799,19 +1042,53 @@ class IAIExporter {
     }
     
     
-    public static void writeTrimLoop(PrintStream ps,ArrayList<ITrimCurveI> loop, double scale, IView view){
-	
-	for(int i=0; i<loop.size(); i++){
-	    ITrimCurveI curve = loop.get(i);
+    //public static void writeTrimLoop(PrintStream ps,ArrayList<ITrimCurveI> loop, double scale, IView view){
+    public static void writeTrimLoop(PrintStream ps, ITrimCurveI[] loop, double scale, IView view){
+	for(int i=0; i<loop.length; i++){
+	    ITrimCurveI curve = loop[i];
 	    ArrayList<ArrayList<IVec2>> pts=convertTo2DPoints(curve,scale,view);
 	    if(pts!=null){
-		if(curve.deg()==1&&curve.straightOnEdge) writePolylinePaths(ps,pts,i==0?true:false);
+		//if(curve.deg()==1&&curve.straightOnEdge) writePolylinePaths(ps,pts,i==0?true:false);
+		if(curve.deg()==1&&curve.surface().isFlat()) writePolylinePaths(ps,pts,i==0?true:false);
 		else writeBezierCurvePaths(ps,pts,i==0?true:false);
 	    }
 	}
 	
     }
     
+
+    public static void writePolygonMesh(PrintStream ps, IMeshI mesh, double scale, IView view){
+	
+	ArrayList<IFace> faces = new ArrayList<IFace>();
+	for(int i=0; i<mesh.faceNum(); i++){
+	    faces.add(mesh.face(i));
+	}
+	
+	sortFacesByView(faces, view);
+	
+	double lineWeight = defaultLineWeight;
+	
+	IColor objClr = new IColor(0.5);
+	if(mesh instanceof IObject) objClr = ((IObject)mesh).clr();
+	
+	for(int i=0; i<faces.size(); i++){
+	    IFace f = faces.get(i);
+	    
+	    IVec2[] pts=convertTo2DPoints(f.vertices,scale,view);
+	    if(pts!=null){
+		IColor faceClr = f.clr();
+		if(faceClr==null){ faceClr = objClr; }
+		writePaintStyle(ps,faceClr,null,lineWeight);
+		//writePaintStyle(ps,null,faceClr,lineWeight); // edges
+		writeClosedPolylinePath(ps,pts,true);
+		ps.println("f"); // closed curve with filling
+	    }
+	}
+	
+    }
+    
+    
+    /*
     public static void writeMesh(PrintStream ps, IVec[][] pts, Color[][] colors,
 				 double opacity, double scale, IView view){
 	
@@ -832,7 +1109,7 @@ class IAIExporter {
 	for(int i=0; i<pts.length; i++){
 	    for(int j=0; j<pts[0].length; j++){
 		pts2[i][j] = new IVec2();
-		if(!view.convert(pts[i][j], pts2[i][j])) return; // don't write
+		if(!ignoreOutOfView && !view.convert(pts[i][j], pts2[i][j]) && !view.isAxonometric()) return; // don't write
 		convertCoordinates(pts2[i][j],scale,view);
 	    }
 	}
@@ -979,70 +1256,144 @@ class IAIExporter {
 	
 	
     }
+    */
     
-    public static void writeNurbsSurface(PrintStream ps,
-					 IGNurbsSurfaceGraphic surface,
-					 double scale){
+    
+    public static IVec[][] makeNurbsSurfaceOutline(ISurfaceI surface){
+	IVec[][] retval = new IVec[4][];
+	retval[0] = makeNurbsSurfaceUPath(surface,0);
+	retval[1] = makeNurbsSurfaceVPath(surface,1);
+	retval[2] = reverseArray(makeNurbsSurfaceUPath(surface,1));
+	retval[3] = reverseArray(makeNurbsSurfaceVPath(surface,0));
+	return retval;
+    }
+    
+    public static IVec[] reverseArray(IVec[] array){
+	IVec[] retval = new IVec[array.length];
+	for(int i=0; i<array.length; i++){ retval[array.length-1-i] = array[i]; }
+	return retval;
+    }
+    
+    public static IVec[] makeNurbsSurfaceUPath(ISurfaceI surface, double v){
+	int sampleNum = surface.uepNum()*IConfig.segmentResolution;
+	IVec[] pts = new IVec[sampleNum*3-2];
+	IVec[] pts3 = new IVec[sampleNum];
+	IVec[] tan3 = new IVec[sampleNum];
+	for(int i=0; i<sampleNum; i++){
+	    pts3[i] = surface.pt((double)i/(sampleNum-1),v).get();
+	    tan3[i] = surface.utan((double)i/(sampleNum-1),v).get(); // if udeg==1, could this make the line weirdly curved?
+	    tan3[i].div(sampleNum*3);
+	}
+	for(int i=0; i<sampleNum; i++){
+	    pts[3*i] = pts3[i];
+	    if(i>0){
+		pts[3*i-2] = pts3[i-1].sum(tan3[i-1]);
+		pts[3*i-1] = pts3[i].dif(tan3[i]);
+	    }
+	}
+	return pts;
+    }
+    
+    public static IVec[] makeNurbsSurfaceVPath(ISurfaceI surface, double u){
+	int sampleNum = surface.vepNum()*IConfig.segmentResolution;
+	IVec[] pts = new IVec[sampleNum*3-2];
+	IVec[] pts3 = new IVec[sampleNum];
+	IVec[] tan3 = new IVec[sampleNum];
+	for(int i=0; i<sampleNum; i++){
+	    pts3[i] = surface.pt(u,(double)i/(sampleNum-1)).get();
+	    tan3[i] = surface.vtan(u,(double)i/(sampleNum-1)).get(); // if vdeg==1, could this make the line weirdly curved?
+	    tan3[i].div(sampleNum*3);
+	}
+	for(int i=0; i<sampleNum; i++){
+	    pts[3*i] = pts3[i];
+	    if(i>0){
+		pts[3*i-2] = pts3[i-1].sum(tan3[i-1]);
+		pts[3*i-1] = pts3[i].dif(tan3[i]);
+	    }
+	}
+	return pts;
+    }
+    
+    public static void writeNurbsSurface(PrintStream ps, ISurfaceI surface, double scale, IView view){
+
+	//IOut.debug(100, ""); //
 	
-	if(IGNurbsElement.saveMemoryMode) surface.updateGeometry();
+	//if(IGNurbsElement.saveMemoryMode) surface.updateGeometry();
 	
 	//ps.println("0 Xw");
 	//ps.println("0 "+0.45+" 0 0 0 Xy");
 	//ps.println("u");
 	
-	//if(surface.hasTrimLoop()) startMask(ps);
-	if(surface.hasTrimLoop()) startLayer(ps,"trimmed surface",0,true);
-	//if(surface.subsurfaces!=null)
-	if(surface.subsurfaces!=null && !surface.hasTrimLoop()) // added 2010/07/13
-	    for(int j=0; j<surface.subsurfaces.size(); j++)
+	//if(surface.hasTrim()) startMask(ps);
+	if(surface.hasTrim()) startLayer(ps,"trimmed surface",0,true);
+	
+	/*
+	if(surface.subsurfaces!=null && !surface.hasTrim()) // added 2010/07/13
+	    for(int j=0; j<surface.subsurfaces.size(); j++){
 		if(writeSubsurfaceAsMesh) writeMesh(ps, surface.subsurfaces.get(j), scale);
 		else writeNurbsSubsurfaceOutline(ps, surface.subsurfaces.get(j), scale);
-	else if(!surface.hasTrimLoop()){ // no trim loop, no subsurface
-	    writeNurbsSurfaceOutline(ps, surface, scale);
+	    }
+	else
+	*/
+	if(!surface.hasTrim()){ // no trim loop, no subsurface
+	    writeNurbsSurfaceOutline(ps, surface, scale, view);
 	}
-	if(surface.hasTrimLoop()){
+	else{
+	    writeNurbsSurfaceOutline(ps, surface, scale, view); // for trim, write outline for the moment
+	}
+	
+	if(surface.hasTrim()){
+	    //IOut.debug(100, "has trim"); //
 	    
-	    writePaintStyle(ps, surface.getColor(), null, 0); //
+	    IColor color = new IColor(0.5); // default? // null;
+	    if(surface instanceof IObject) color = ((IObject)surface).clr();
 	    
-	    writeTrimLoops(ps,surface,scale);
+	    writePaintStyle(ps, color, null, 0); //
+	    writeTrimLoops(ps,surface,scale,view);
 	    //endMask(ps);
 	    endLayer(ps);
 	}
 	//ps.println("U"); //
-	
+
+	/*
 	if(surface.getStrokeColor()!=null){
-	    if(surface.hasTrimLoop()){
+	    if(surface.hasTrim()){
 		
-		for(int i=0;surface.outerTrimLoop!=null&&i<surface.outerTrimLoop.size(); i++){
+		for(int i=0;surface.hasOuterTrim()&&i<surface.outerTrimLoopNum(); i++){
 		    //ps.println("0 0 Xd");
 		    //ps.println("6 () XW");
 		    //writePaintStyle(ps,null,Color.red,defaultLineWeight);
 		    
 		    writePaintStyle(ps,null,surface.getStrokeColor(),defaultLineWeight);
 		    
-		    writeTrimLoop(ps,surface.outerTrimLoop.get(i),scale);
+		    writeTrimLoop(ps,surface.outerTrimLoop(i),scale,view);
 		    ps.println("s"); // open curve without filling // ?
 		}
 		
 	    }
-	    else if(writeSubsurfaceAsMesh&&writeOutlineWhenMesh) writeNurbsSurfaceOutline(ps,surface,scale); 
+	    else if(writeSubsurfaceAsMesh&&writeOutlineWhenMesh) writeNurbsSurfaceOutline(ps,surface,scale,view); 
 	}
+	*/
 	
 	//if(IGNurbsElement.saveMemoryMode) surface.clearGeometry();
     }
     
     public static void writeNurbsSurfaceOutline(PrintStream ps, ISurfaceI surface,
-						double scale){
-
-	writeNurbsSurfaceOutline(ps, surface.getOutline(),
-				 surface.getUDegree(),
-				 surface.getVDegree(),
-				 surface.getColor(),
-				 surface.getStrokeColor(),
+						double scale, IView view){
+	IColor color = new IColor(0.5); // default? // null;
+	if(surface instanceof IObject) color = ((IObject)surface).clr();
+	
+	writeNurbsSurfaceOutline(ps, makeNurbsSurfaceOutline(surface),
+				 surface.udeg(),
+				 surface.vdeg(),
+				 color,
+				 color,
 				 defaultLineWeight,
-				 scale);
+				 scale,
+				 view);
     }
     
+    /*
     public static void writeNurbsSubsurfaceOutline(PrintStream ps,
 						   ISurfaceI.Subsurface subsurface,
 						   double scale){
@@ -1053,19 +1404,20 @@ class IAIExporter {
 				 subsurface.getStrokeColor(),
 				 defaultLineWeight,
 				 scale);
-	
     }
     */
     
-    /*
+    
+    
     public static void writeNurbsSurfaceOutline(PrintStream ps,
 						IVec[][] outlinePts,
 						int udegree,
 						int vdegree, 
-						Color fillColor,
-						Color strokeColor,
+						IColor fillColor,
+						IColor strokeColor,
 						double lineWeight,
-						double scale){
+						double scale,
+						IView view){
 	
 	IVec[][] pts = outlinePts;
 	IVec2[][] pts2 = new IVec2[pts.length][];
@@ -1073,31 +1425,37 @@ class IAIExporter {
 	for(int i=0; i<pts.length; i++){
 	    pts2[i] = new IVec2[pts[i].length];
 	    for(int j=0; j<pts[i].length; j++){
-		pts2[i][j] = IGView.view.convert(pts[i][j]);
-		if(pts2[i][j]==null) return; // don't write
-		convertCoordinates(pts2[i][j],scale);
+		pts2[i][j] = new IVec2();
+		boolean flag = view.convert(pts[i][j], pts2[i][j]);
+		//if(pts2[i][j]==null) return; // don't write
+		if(!ignoreOutOfView && !flag && !view.isAxonometric()) return; // don't write
+		convertCoordinates(pts2[i][j],scale,view);
 	    }
 	}
 	
-	ArrayList<IVec2>[] pts3 = new ArrayList[pts2.length];
+	//ArrayList<IVec2>[] pts3 = new ArrayList<IVec2>[pts2.length];
+	ArrayList<ArrayList<IVec2>> pts3 = new ArrayList<ArrayList<IVec2>>();
 	for(int i=0; i<pts2.length; i++){
-	    pts3[i] = new ArrayList();
-	    for(int j=0; j<pts2[i].length; j++) pts3[i].add(pts2[i][j]);
+	    ArrayList<IVec2> ptarray = new ArrayList<IVec2>();
+	    for(int j=0; j<pts2[i].length; j++) ptarray.add(pts2[i][j]);
+	    pts3.add(ptarray);
+	    //pts3[i] = new ArrayList<IVec2>();
+	    //for(int j=0; j<pts2[i].length; j++) pts3[i].add(pts2[i][j]);
 	}
 	
 	writePaintStyle(ps,fillColor,strokeColor,lineWeight);
 	
-	if(udegree>1){ writeBezierCurvePath(ps,pts3[0],true); }
-	else{ writePolylinePath(ps,pts3[0],true); }
+	if(udegree>1){ writeBezierCurvePath(ps,pts3.get(0),true); }
+	else{ writePolylinePath(ps,pts3.get(0),true); }
 	
-	if(vdegree>1){ writeBezierCurvePath(ps,pts3[1],false); }
-	else{ writePolylinePath(ps,pts3[1],false); }
+	if(vdegree>1){ writeBezierCurvePath(ps,pts3.get(1),false); }
+	else{ writePolylinePath(ps,pts3.get(1),false); }
 	
-	if(udegree>1){ writeBezierCurvePath(ps,pts3[2],false); }
-	else{ writePolylinePath(ps,pts3[2],false); }
+	if(udegree>1){ writeBezierCurvePath(ps,pts3.get(2),false); }
+	else{ writePolylinePath(ps,pts3.get(2),false); }
 	
-	if(vdegree>1){ writeBezierCurvePath(ps,pts3[3],false); }
-	else{ writePolylinePath(ps,pts3[3],false); }
+	if(vdegree>1){ writeBezierCurvePath(ps,pts3.get(3),false); }
+	else{ writePolylinePath(ps,pts3.get(3),false); }
 	
 	if( fillColor!=null && strokeColor!=null ){
 	    ps.println("b"); // closed curve with filling & stroke
@@ -1113,7 +1471,7 @@ class IAIExporter {
 	}
 	
     }
-    */
+    
     
     /*
     public static void writeImagePlane(PrintStream ps,
@@ -1140,7 +1498,7 @@ class IAIExporter {
 	w.div(imagePlane.imageWidth); // width vector per pixel
 	h.div(-imagePlane.imageHeight); // height vector per pixel
 	
-	if(!ignoreTrimLoop&&imagePlane.hasTrimLoop()){
+	if(!ignoreTrimLoop&&imagePlane.hasTrim()){
 	    //startLayer(ps,"trimmed surface0",0,true);
 	    
 	    //startLayer(ps,"trimmed surface",0,true);
@@ -1155,7 +1513,7 @@ class IAIExporter {
 	
 	writeImage(ps, imagePlane.image, imagePlane.imageWidth, imagePlane.imageHeight, pt, w, h);
 	
-	if(!ignoreTrimLoop&&imagePlane.hasTrimLoop()){
+	if(!ignoreTrimLoop&&imagePlane.hasTrim()){
 	    //writePaintStyle(ps, imagePlane.getColor(), null, 0); //
 	    //writeTrimLoops(ps,imagePlane,scale);
 	    
@@ -1453,31 +1811,31 @@ class IAIExporter {
 	
 	ps.println("TO");
     }
+    */
     
-
-
+    
     static public void writeText3D(PrintStream ps, String text,
 				   IVec pos,
 				   IVec horizontalDir,
 				   IVec verticalDir,
-				   Color textColor,
-				   double scale ){
+				   IColor textColor,
+				   double scale,
+				   IView view){
 	
 	IVec2 pos2 = new IVec2();
 	IVec2 hdir2 = new IVec2();
 	IVec2 vdir2 = new IVec2();
 	
-	if(!IGView.view.convert(pos,pos2)) return;
-	if(!IGView.view.convert(IVec.add(pos,horizontalDir),hdir2)) return;
-	if(!IGView.view.convert(IVec.add(pos,verticalDir),vdir2)) return;
+	if(!view.convert(pos,pos2)) return;
+	if(!view.convert(pos.add(horizontalDir),hdir2)) return;
+	if(!view.convert(pos.add(verticalDir),vdir2)) return;
 	
-	convertCoordinates(pos2,scale);
-	convertCoordinates(hdir2,scale);
-	convertCoordinates(vdir2,scale);
+	convertCoordinates(pos2,scale,view);
+	convertCoordinates(hdir2,scale,view);
+	convertCoordinates(vdir2,scale,view);
 	
 	hdir2.sub(pos2);
 	vdir2.sub(pos2);
-	
 	
 	ps.println("0 To");
 	//ps.println("1 0 0 1 "+pt.x+" "+pt.y+" 0 Tp");
@@ -1490,9 +1848,9 @@ class IAIExporter {
 	// RGB Color
 	//ps.println("
 	
-	ps.println( f.format((double)textColor.getRed()/255) + " " +
-		    f.format((double)textColor.getGreen()/255) + " " +
-		    f.format((double)textColor.getBlue()/255) + " " +
+	ps.println( f.format(textColor.red()) + " " +
+		    f.format(textColor.green()) + " " +
+		    f.format(textColor.blue()) + " " +
 		    "Xa");
 	
 	//ps.println("0 O");
@@ -1516,7 +1874,7 @@ class IAIExporter {
 	ps.println("TO");
 	
     }
-    */
+    
     
     static public String getOctaString(char c){
 	int oct1 = c%8;
@@ -1541,8 +1899,7 @@ class IAIExporter {
 	ps.close();
 	return true;
     }
-
-
+    
     static public ArrayList<IObject> sortObjectsByView(ArrayList<IObject> objects, IView view){
 	
 	ArrayList<IGeometry> geoms = new ArrayList<IGeometry>();
@@ -1573,6 +1930,24 @@ class IAIExporter {
 	}
     }
     
+    static public ArrayList<IFace> sortFacesByView(ArrayList<IFace> faces, IView view){
+        ISort.sort(faces, new IFaceViewSort(view));
+	return faces;
+    }
+    
+    static public class IFaceViewSort implements IComparator<IFace>{
+	public IView view;
+	IFaceViewSort(IView v){ view = v; }
+	public int compare(IFace o1, IFace o2){
+	    IVec pos1 =view.convert(o1.center());
+	    IVec pos2 =view.convert(o2.center());
+	    
+	    if(pos1.z < pos2.z){ return 1; }
+	    if(pos1.z > pos2.z){ return -1; }
+	    return 0;
+	}
+    }
+    
     static public void write(PrintStream ps, ArrayList<IObject> objects, double scale, IView view){
 	
 	initFormat(); //
@@ -1588,6 +1963,12 @@ class IAIExporter {
 	final boolean updateGeometry=true; //false; //
 	
 	for(int i=0; objects!=null && i<objects.size(); i++){
+	    //IOut.debug(100, "object "+i+"/"+objects.size()); //
+	    
+	    if(!objects.get(i).visible() || objects.get(i).clr().getAlpha()==0){
+		IOut.debug(100, "object "+i+" not visible or alpha zero"); //
+		continue;
+	    }
 	    
 	    if(i>0 && i%100==0){
 		IOut.debug(0, "exporting "+i+"/"+objects.size());
@@ -1606,6 +1987,21 @@ class IAIExporter {
                 IPointR point = (IPointR)objects.get(i);
                 writePoint(ps, point, scale, view); //
             }
+            else if( objects.get(i) instanceof ISurfaceI){
+                ISurfaceI surf = (ISurfaceI)objects.get(i);
+		//if(updateGeometry) surf.updateGeometry(); //
+                writeNurbsSurface(ps,surf,scale,view);
+            }
+            else if( objects.get(i) instanceof IMeshI){
+                IMeshI mesh = (IMeshI)objects.get(i);
+		writePolygonMesh(ps,mesh,scale,view);
+            }
+	    else if( objects.get(i) instanceof IText){
+                IText tx = (IText)objects.get(i);
+		writeText3D(ps,tx.text(),tx.pos(),
+			    tx.uvec(),tx.vvec(),tx.clr(),scale,view);
+	    }
+	    
 	    
 	    /*
             else if(elements.get(i) instanceof TextLabel){
@@ -1634,11 +2030,6 @@ class IAIExporter {
                 IGImagePlane img = (IGImagePlane)elements.get(i);
 		if(updateGeometry) img.updateGeometry(); //
                 writeImagePlane(ps,img,scale);
-            }
-            else if(elements.get(i) instanceof ISurfaceI){
-                ISurfaceI surf = (ISurfaceI)elements.get(i);
-		if(updateGeometry) surf.updateGeometry(); //
-                writeNurbsSurface(ps,surf,scale);
             }
 	    */
 	}

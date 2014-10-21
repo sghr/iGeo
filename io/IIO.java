@@ -23,8 +23,10 @@
 package igeo.io;
 
 import java.io.*;
-
+import java.util.ArrayList;
 import igeo.*;
+
+
 /**
    A class to provide an interface to all File I/O.
    
@@ -32,12 +34,13 @@ import igeo.*;
 */
 public class IIO{
     
-    public enum FileType{ RHINO, OBJ, _3DXML, AI, OTHER };
+    public enum FileType{ RHINO, OBJ, _3DXML, AI, SHP, OTHER };
     
     public static final String extensionObj = "obj";
     public static final String extensionRhino = "3dm";
     public static final String extension3DXML = "3dxml";
     public static final String extensionAI = "ai";
+    public static final String extensionSHP = "shp";
     
     
     public static boolean isExtension(String filename, String extension){
@@ -57,34 +60,37 @@ public class IIO{
 	if(isExtension(filename, extensionObj)) return FileType.OBJ;
 	if(isExtension(filename, extension3DXML)) return FileType._3DXML;
 	if(isExtension(filename, extensionAI)) return FileType.AI;
+	if(isExtension(filename, extensionSHP)) return FileType.SHP;
 	return FileType.OTHER;
     }
     
     
-    public static boolean open(String filename, IServerI server){
+    public static ArrayList<IObject> open(String filename, IServerI server){
 	return open(new File(filename), server);
     }
     
-    public static boolean open(File file, IServerI server){
+    public static ArrayList<IObject> open(File file, IServerI server){
 	IOut.debug(0,"opening "+file.getPath());
 	if(!file.exists()){
 	    IOut.err("the input file doesn't exist : "+file.getPath());
-	    return false;
+	    return null;
 	}
+	ArrayList<IObject> objects=null;
 	FileType type = getFileType(file.getName());
-	if(type == FileType.OBJ) return openOBJ(file,server);
-	if(type == FileType.RHINO) return openRhino(file,server);
-	if(type == FileType._3DXML) return open3DXML(file,server);
+	if(type == FileType.OBJ) objects =  openOBJ(file,server);
+	if(type == FileType.RHINO) objects = openRhino(file,server);
+	if(type == FileType._3DXML) objects = open3DXML(file,server);
+	if(type == FileType.SHP) objects = openShape(file,server);
 	IOut.err("file extension ."+getExtension(file.getName())+" is not supported");
-	return false;
+	return objects;
     }
 
     
-    public static boolean open(String filename, IServerI server, IInputWrapper wrapper){
+    public static ArrayList<IObject> open(String filename, IServerI server, IInputWrapper wrapper){
 	return open(new File(filename), server, wrapper);
     }
     
-    public static boolean open(File file, IServerI server, IInputWrapper wrapper){
+    public static ArrayList<IObject> open(File file, IServerI server, IInputWrapper wrapper){
 	if(wrapper==null) return open(file,server);
 	IOut.debug(0,"opening "+file.getPath()); 
 	
@@ -92,84 +98,112 @@ public class IIO{
 	if(is == null){
 	    if(!file.exists()){
 		IOut.err("the input file doesn't exist : "+file.getPath());
-		return false;
+		return null;
 	    }
 	    else{
 		return open(file,server);
 	    }
 	}
+
+	ArrayList<IObject> objects=null;
 	
 	FileType type = getFileType(file.getName());
 	if(type == FileType.OBJ){
-	    boolean retval = openOBJ(is,server);
+	    objects = openOBJ(is,server);
 	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
-	    return retval;
+	    return objects;
 	}
 	if(type == FileType.RHINO){
-	    boolean retval = openRhino(is,server);
+	    objects = openRhino(is,server);
 	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
-	    return retval;
+	    return objects;
 	}
 	if(type == FileType._3DXML){
-	    boolean retval = open3DXML(is,file.getName(),server);
+	    objects = open3DXML(is,file.getName(),server);
 	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
-	    return retval;
-	    
+	    return objects;
 	    //filename = IG.current().basePath + "\\"+filename;
 	    //open3DXML(filename,server); // InputStream version to be implemented
 	    //return true; // ?
 	}
+	if(type == FileType.SHP){
+
+	    File dbfFile1 = IShapeFileImporter.getFileWithExtension(file, "dbf");
+	    InputStream dbfis = wrapper.getStream(dbfFile1);
+	    
+	    if(dbfis==null){
+		File dbfFile2 = IShapeFileImporter.getFileWithExtension(file, "DBF");
+		dbfis = wrapper.getStream(dbfFile2);
+	    }
+	    if(dbfis==null){
+		File dbfFile3 = IShapeFileImporter.getFileWithExtension(file, "Dbf");
+		dbfis = wrapper.getStream(dbfFile3);
+	    }
+	    if(dbfis==null){
+		IG.err("DBF file does not exist : "+dbfFile1.getAbsolutePath());
+	    }
+	    
+	    objects = openShape(is, dbfis, server);
+	    try{ is.close(); } catch(IOException e){ e.printStackTrace(); }
+	    return objects;
+	}
 	
 	IOut.err("file extension ."+getExtension(file.getName())+" is not supported");
-	return false;
+	return null;
     }
     
-    public static boolean openOBJ(File file, IServerI server){
+    public static ArrayList<IObject> openOBJ(File file, IServerI server){
 	IOut.debug(0, "opening obj file "+file);
-	if(IObjFileImporter.read(file, server)!=null){
+	ArrayList<IObject> objects = IObjFileImporter.read(file, server);
+	if(objects!=null){
 	    IOut.debug(0,"opening complete");
-	    return true;
+	    return objects;
 	}
 	IOut.err("error occured in opening file "+file.toString());
-	return false;
+	return null;
     }
     
-    public static boolean openOBJ(InputStream istream, IServerI server){
-	if(IObjFileImporter.read(istream, server)!=null){
+    public static ArrayList<IObject> openOBJ(InputStream istream, IServerI server){
+	ArrayList<IObject> objects = IObjFileImporter.read(istream, server);
+        if(objects!=null){
 	    IOut.debug(0,"opening complete");
-	    return true;
+	    return objects;
 	}
 	IOut.err("error occured in opening OBJ file");
-	return false;
+	return null;
     }
     
-    public static boolean openRhino(File file, IServerI server){
+    public static ArrayList<IObject> openRhino(File file, IServerI server){
 	IOut.debug(0, "opening 3dm file "+file);
-	if(IRhino3dmImporter.read(file,server)){
+	ArrayList<IObject> objects = IRhino3dmImporter.read(file,server);
+	if(objects!=null){
 	    IOut.debug(0,"opening complete");
-	    return true;
+	    return objects;
 	}
 	IOut.err("error occured in opening file "+file.toString());
-	return false;
+	return objects;
     }
     
-    public static boolean openRhino(InputStream istream, IServerI server){
-	if(IRhino3dmImporter.read(istream,server)){
+    public static ArrayList<IObject> openRhino(InputStream istream, IServerI server){
+	ArrayList<IObject> objects = IRhino3dmImporter.read(istream,server);
+	if(objects!=null){
 	    IOut.debug(0,"opening complete");
-	    return true;
+	    return objects;
 	}
 	IOut.err("error occured in opening Rhino file"); 
-	return false;
+        return objects;
     }
     
-    public static boolean open3DXML(File file, IServerI server){
+    public static ArrayList<IObject> open3DXML(File file, IServerI server){
 	IOut.debug(0, "opening 3dxmm file "+file);
 	try{
-	    I3DXMLImporter.read(file);
+	    I3DXML doc = I3DXMLImporter.read(file);
 	    IOut.debug(0,"opening complete");
-	    return true;
+	    ArrayList<IObject> objects = new ArrayList<IObject>();
+	    for(int i=0; i<doc.objects.size(); i++){ objects.add(doc.objects.get(i)); }
+	    return objects;
 	}catch(IOException e){ e.printStackTrace(); }
-	return false;
+	return null;
 	/*
 	if(I3DXMLImporter.read(file)){
 	    IOut.debug(0,"opening complete");
@@ -190,15 +224,41 @@ public class IIO{
 	return false;
     }
     */
-    public static boolean open3DXML(InputStream istream, String filename,
-				    IServerI server){
+    public static ArrayList<IObject> open3DXML(InputStream istream, String filename,
+					       IServerI server){
 	try{
-	    I3DXMLImporter.read(istream, filename);
+	    I3DXML doc = I3DXMLImporter.read(istream, filename);
 	    IOut.debug(0,"opening complete");
-	    return true;
+	    ArrayList<IObject> objects = new ArrayList<IObject>();
+	    for(int i=0; i<doc.objects.size(); i++){ objects.add(doc.objects.get(i)); }
+	    return objects;
 	}catch(IOException e){ e.printStackTrace(); }
-	return false;
+	return null;
     }
+
+
+    public static ArrayList<IObject> openShape(File file, IServerI server){
+	IOut.debug(0, "opening obj file "+file);
+	ArrayList<IObject> objects = IShapeFileImporter.read(file, server);
+	if(objects!=null){
+	    IOut.debug(0,"opening complete");
+	    return objects;
+	}
+	IOut.err("error occured in opening file "+file.toString());
+	return null;
+    }
+    
+    public static ArrayList<IObject> openShape(InputStream shpStream, InputStream dbfStream, IServerI server){
+	ArrayList<IObject> objects = IShapeFileImporter.read(shpStream, dbfStream, server);
+        if(objects!=null){
+	    IOut.debug(0,"opening complete");
+	    return objects;
+	}
+	IOut.err("error occured in opening Shape file");
+	return null;
+    }
+    
+    
     
     public static boolean save(String filename, IServerI server){
 	FileType type = getFileType(filename);

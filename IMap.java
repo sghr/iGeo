@@ -46,6 +46,8 @@ public class IMap{
     
     public IDoubleMap uIntegration=null, vIntegration=null;
     
+    //public IDoubleMap uDerivative=null, vDelivative=null;
+    
     
     /**
        A main method to get a value of the map.
@@ -103,6 +105,10 @@ public class IMap{
 	    }
 	}
     }
+    
+    
+    
+    
     
     public void scaleDensityMapU(double factor){ uIntegration.scale(factor); }
     public void scaleDensityMapV(double factor){ vIntegration.scale(factor); }

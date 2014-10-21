@@ -101,6 +101,11 @@ public class IColor{
 
     /** returns array of 4 float in the order of RGBA */
     public float[] rgba(){ return rgba; }
+
+    /** returns array of 4 float in the order of RGBA with alpha overwritten */
+    public float[] rgba(float alpha){ return new float[]{ rgba[0], rgba[1], rgba[2], alpha}; }
+
+
     
     /** returns one 32 bit integer in the order of ARGB */
     public int argb(){

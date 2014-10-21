@@ -64,11 +64,11 @@ public class I3DXML{
     public ArrayList<Instance3D> instances;
     public ArrayList<ReferenceRep> referenceReps;
     public ArrayList<InstanceRep> instanceReps;
+
+    public ArrayList<IGeometry> objects;
     
     /** representation files inside a zip archive */
     public ArrayList<RepresentationDocument> representationDocuments; 
-    
-    
     
     //public ArrayList<IVec> positions;
     //public ArrayList<IVec> normals;
@@ -387,7 +387,8 @@ public class I3DXML{
     
     public ArrayList<IGeometry> instantiate(){
 	if(references!=null){
-	    if(references.size()>0) return references.get(0).instantiate(null);
+	    objects = references.get(0).instantiate(null);
+	    if(references.size()>0) return objects;
 	}
 	return null;
     }

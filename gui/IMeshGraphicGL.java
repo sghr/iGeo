@@ -37,14 +37,22 @@ public class IMeshGraphicGL extends IGraphicObject{
     
     public IMeshI mesh;
     public IVec[][] facePts, faceNormal, edgePts;
+    public IColor[][] vertexColor;
+
+    public IMesh meshObj=null; // if mesh is IMesh
     
     public IMeshGraphicGL(IMesh m){ super(m); }
     public IMeshGraphicGL(IMeshR m){ super(m); }
     
     public void initMesh(){
 	synchronized(parent){
-	if(parent instanceof IMesh){ mesh = ((IMesh)parent).mesh; }
-	else if(parent instanceof IMeshR){ mesh = ((IMeshR)parent).mesh; }
+	    if(parent instanceof IMesh){
+		mesh = ((IMesh)parent).mesh;
+		meshObj = (IMesh)parent;
+	    }
+	    else if(parent instanceof IMeshR){
+		mesh = ((IMeshR)parent).mesh;
+	    }
 	
 	/*
 	boolean allTriangles=true, allQuads=true;
@@ -55,26 +63,47 @@ public class IMeshGraphicGL extends IGraphicObject{
 	    else{ allTriangles=false; allQuads==false; }
 	}
 	*/
-	
-	facePts = new IVec[mesh.faceNum()][];
-	faceNormal = new IVec[mesh.faceNum()][];
-	for(int i=0; i<mesh.faceNum(); i++){
-	    IFace face = mesh.face(i);
-	    facePts[i] = new IVec[face.vertexNum()];
-	    faceNormal[i] = new IVec[face.vertexNum()];
-	    for(int j=0; j<face.vertexNum(); j++){
-		facePts[i][j] = face.getVertex(j).get();
-		faceNormal[i][j] = face.getVertex(j).normal().get();
+	    
+	    facePts = new IVec[mesh.faceNum()][];
+	    faceNormal = new IVec[mesh.faceNum()][];
+	    if(meshObj!=null && meshObj.enableVertexColor){
+		vertexColor = new IColor[mesh.faceNum()][];
 	    }
-	}
-	
-	edgePts = new IVec[mesh.edgeNum()][];
-	for(int i=0; i<mesh.edgeNum(); i++){
-	    IEdge edge = mesh.edge(i);
-	    edgePts[i] = new IVec[2];
-	    edgePts[i][0] = edge.getVertex(0).get();
-	    edgePts[i][1] = edge.getVertex(1).get();
-	}
+	    for(int i=0; i<mesh.faceNum(); i++){
+		IFace face = mesh.face(i);
+		facePts[i] = new IVec[face.vertexNum()];
+		faceNormal[i] = new IVec[face.vertexNum()];
+		
+		if(meshObj!=null && meshObj.enableVertexColor){
+		    vertexColor[i] = new IColor[face.vertexNum()];
+		}
+		for(int j=0; j<face.vertexNum(); j++){
+		    facePts[i][j] = face.getVertex(j).get();
+		    faceNormal[i][j] = face.getVertex(j).normal().get();
+		    
+		    if(meshObj!=null && meshObj.enableVertexColor){
+			vertexColor[i][j] = face.getVertex(j).clr();
+			
+			IG.p(vertexColor[i][j]); //
+			
+			if(vertexColor[i][j]==null){
+			    vertexColor[i][j]=color;
+			    if(vertexColor[i][j]==null){
+				vertexColor[i][j] = IConfig.objectColor;
+			    }
+			}
+		    }
+		    
+		}
+	    }
+	    
+	    edgePts = new IVec[mesh.edgeNum()][];
+	    for(int i=0; i<mesh.edgeNum(); i++){
+		IEdge edge = mesh.edge(i);
+		edgePts[i] = new IVec[2];
+		edgePts[i][0] = edge.getVertex(0).get();
+		edgePts[i][1] = edge.getVertex(1).get();
+	    }
 	}
     }
     
@@ -90,27 +119,20 @@ public class IMeshGraphicGL extends IGraphicObject{
 	// how about update?
 	if(mesh==null) initMesh(); // not initizlized at the constructor // shouldn't it?
 	
-
+	
 	if(g.type() == IGraphicMode.GraphicType.GL||
 	   g.type() == IGraphicMode.GraphicType.P3D){
 	    
 	    IGraphics3D g3d = (IGraphics3D)g;
+
 	    
 	    //float red,green,blue,alpha;
 	    float[] rgba=null;
 	    if(color!=null){
 		rgba = color.rgba();
-		//red = color.getRed();
-		//green = color.getGreen();
-		//blue = color.getBlue();
-		//alpha = color.getAlpha();
 	    }
 	    else{
 		rgba = IConfig.objectColor.rgba();
-		//red = IConfig.objectColor.getRed();
-		//green = IConfig.objectColor.getGreen();
-		//blue = IConfig.objectColor.getBlue();
-		//alpha = IConfig.objectColor.getAlpha();
 	    }
 	    
 	    if(g3d.view().mode().isTransparent()){
@@ -124,15 +146,74 @@ public class IMeshGraphicGL extends IGraphicObject{
 		g3d.shininess(IConfig.shininess);
 		g3d.clr(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f); // ? without this, the color is tinted with the previous object's color
 	    }
-	    //else{ g3d.clr(rgba); }
 	    g3d.clr(rgba);
 	    
 	    if(g3d.view().mode().isFill()){
+		
 		int prevNum=0;
 		for(int i=0; i<facePts.length; i++){
-		    if(facePts[i].length==3){ g3d.drawTriangles(facePts[i],faceNormal[i]); }
-		    else if(facePts[i].length==4){ g3d.drawQuads(facePts[i],faceNormal[i]); }
-		    else{ g3d.drawPolygon(facePts[i],faceNormal[i]); }
+		    if(meshObj!=null && meshObj.enableFaceColor){
+			IColor clr = mesh.face(i).clr();
+			if(clr==null){ clr=color; }
+			if(clr==null){ clr=IConfig.objectColor; }
+			float[] frgba = null; 
+			if(g3d.view().mode().isTransparent()){
+			    frgba = clr.rgba(IConfig.transparentModeAlpha/255f);
+			}
+			else{
+			    frgba = clr.rgba;
+			}
+			g3d.clr(frgba);
+			if(facePts[i].length==3){
+			    g3d.drawTriangles(facePts[i],faceNormal[i]);
+			}
+			else if(facePts[i].length==4){
+			    g3d.drawQuads(facePts[i],faceNormal[i]);
+			}
+			else{
+			    g3d.drawPolygon(facePts[i],faceNormal[i]);
+			}
+		    }
+		    else if(meshObj!=null && meshObj.enableVertexColor){
+			
+			for(int j=0; j<mesh.face(i).vertexNum(); j++){
+			    vertexColor[i][j] = mesh.face(i).getVertex(j).clr();
+			    if(vertexColor[i][j]==null){
+				vertexColor[i][j]=color;
+				if(vertexColor[i][j]==null){
+				    vertexColor[i][j] = IConfig.objectColor;
+				}
+			    }
+			}
+			
+			float alpha = -1;
+			if(g3d.view().mode().isTransparent()){
+			    alpha = IConfig.transparentModeAlpha/255f;
+			}
+			if(facePts[i].length==3){
+			    g3d.drawTriangles(facePts[i],faceNormal[i],vertexColor[i],alpha,g3d.view().mode().isLight());
+			}
+			else if(facePts[i].length==4){
+			    g3d.drawQuads(facePts[i],faceNormal[i],vertexColor[i],alpha,g3d.view().mode().isLight());
+			}
+			else{
+			    g3d.drawPolygon(facePts[i],faceNormal[i],vertexColor[i],alpha,g3d.view().mode().isLight());
+			}
+		    }
+		    else{
+			if(facePts[i].length==3){
+			    g3d.drawTriangles(facePts[i],faceNormal[i]);
+			}
+			else if(facePts[i].length==4){
+			    g3d.drawQuads(facePts[i],faceNormal[i]);
+			}
+			else{
+			    g3d.drawPolygon(facePts[i],faceNormal[i]);
+			}
+		    }
+		    
+		    // test
+		    //g3d.clr(new float[]{ IRand.getFloat(1), IRand.getFloat(1), IRand.getFloat(1), IRand.getFloat(1) });
 		}
 	    }
 	    

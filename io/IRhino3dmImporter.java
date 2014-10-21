@@ -828,20 +828,24 @@ public class IRhino3dmImporter extends IRhino3dm{
        @param server A server interface to put imported objects in. 
        @return True if reading is successful. Otherwise false.
     */
-    public static boolean read(File file, IServerI server){
+    public static ArrayList<IObject> read(File file, IServerI server){
 	try{
 	    FileInputStream fis = new FileInputStream(file);
-	    boolean retval = read(fis, server);
+	    //boolean retval = read(fis, server);
+	    ArrayList<IObject> objects = read(fis, server);
 	    if(fis!=null) fis.close();
-	    return retval;
+	    //return retval;
+	    return objects;
 	}catch(IOException e){ e.printStackTrace(); }
-	return false;
+	//return false;
+	return null;
     }
     
-    public static boolean read(InputStream is, IServerI server){
+    public static ArrayList<IObject> read(InputStream is, IServerI server){
 	IRhino3dmImporter importer = new IRhino3dmImporter(is,server);
 	importer.read();
-	return true;
+	//return true;
+	return importer.objects;
     }
     
     /**
@@ -2060,9 +2064,6 @@ public class IRhino3dmImporter extends IRhino3dm{
 		    try{ attributes.read(file,chunks[i].content); }
 		    catch(IOException e){ e.printStackTrace(); }
 		    
-		    //IOut.p("attributes = "); //
-		    //IOut.p(attributes); //
-		    
 		    object.setAttributes(attributes);
 		}
 		else if(chunks[i].header == tcodeObjectRecordAttributesUserData){
@@ -2077,7 +2078,6 @@ public class IRhino3dmImporter extends IRhino3dm{
 	    object.setAttributesToIObject(file,elem);
 	    objects.add(elem);
 	}
-	
 	return object;
     }
 

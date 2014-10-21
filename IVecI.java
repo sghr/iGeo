@@ -27,7 +27,7 @@ package igeo;
    
    @author Satoru Sugihara
 */
-public interface IVecI extends IVecOp, ITransformable{
+public interface IVecI extends IVecOp, ITransformable, IArithmeticVal<IVecI,IDoubleI>{
     //public static final IVec xaxis = new IVec(1,0,0);
     //public static final IVec yaxis = new IVec(0,1,0);
     //public static final IVec zaxis = new IVec(0,0,1);

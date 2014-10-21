@@ -970,6 +970,10 @@ public class ISurfaceCreator{
 	IVec dir = rail[0].get().dif(rail[1]);
 	IVec center = rail[0].get();
 	//IVec roll = dir.cross(n);
+
+	//if(dir.isParallel(nml)){
+	//    IG.err("dir and nml is parallel!!"); 
+	//}
 	IVec[] profile = ICircleGeo.circleCP(center, dir, nml, radius);
 	int profDeg = ICircleGeo.circleDeg();
 	double[] profKnots = ICircleGeo.circleKnots();
@@ -980,6 +984,11 @@ public class ISurfaceCreator{
     public static ISurface squarePipe(IVecI pt1, IVecI pt2, double size){
 	return rectPipe(new IVecI[]{ pt1, pt2 }, size, size);
     }
+    /** square pipe with width dir specified */
+    public static ISurface squarePipe(IVecI pt1, IVecI pt2, IVecI widthDir, double size){
+	return rectPipe(pt1,pt2,widthDir,size,size);
+    }
+    
     public static ISurface squarePipe(IVecI[] rail, double size){
 	return rectPipe(rail, size, size);
     }
@@ -1018,6 +1027,11 @@ public class ISurfaceCreator{
     public static ISurface rectPipe(IVecI pt1, IVecI pt2, double width, double height){
 	return rectPipe(new IVecI[]{ pt1, pt2 }, 1, false, width, height);
     }
+    /** rect pipe with width dir specified */
+    public static ISurface rectPipe(IVecI pt1, IVecI pt2, IVecI widthDir, double width, double height){
+	return rectPipe(pt1,pt2,widthDir,-width/2,width/2,-height/2,height/2);
+    }
+    
     public static ISurface rectPipe(IVecI pt1, IVecI pt2,
 				    double left, double right, double bottom, double top){
 	return rectPipe(new IVecI[]{ pt1, pt2 }, 1, false, left, right, bottom, top);
@@ -1076,27 +1090,6 @@ public class ISurfaceCreator{
     
     public static ISurface rectPipe(IVecI[] rail, int deg, double[] knots, double width, double height){
 	return rectPipe(rail,deg,knots,-width/2,width/2,-height/2,height/2);
-	/*
-	IVec n = IVec.averageNormal(rail);
-	IVec dir = rail[1].get().dif(rail[0]);
-	IVec center = rail[0].get();
-	IVec wdir = dir.cross(n);
-	if(wdir.eq(new IVec(0,0,0))) wdir=new IVec(1,0,0);
-	wdir.len(width/2);
-	IVec hdir = dir.cross(wdir);
-	if(hdir.eq(new IVec(0,0,0))) wdir=new IVec(0,1,0);
-	hdir.len(height/2);
-	
-	IVec[] profile = new IVec[5];
-	profile[0] = center.dup().sub(wdir).sub(hdir);
-	profile[1] = center.dup().add(wdir).sub(hdir);
-	profile[2] = center.dup().add(wdir).add(hdir);
-	profile[3] = center.dup().sub(wdir).add(hdir);
-	profile[4] = profile[0].dup();
-	double[] profKnots = INurbsGeo.createClosedKnots(1,profile.length);
-	//return sweep(profile, 1, profKnots, center, rail, deg, knots);
-	return sweep(profile, 1, profKnots, center, hdir,rail, deg, knots);
-	*/
     }
     
     
@@ -1129,6 +1122,33 @@ public class ISurfaceCreator{
 	double[] profKnots = INurbsGeo.createClosedKnots(1,profile.length);
 	//return sweep(profile, 1, profKnots, center, rail, deg, knots);
 	return sweep(profile, 1, profKnots, center, hdir, rail, deg, knots);
+    }
+    
+
+    /**
+       rect pipe with width dir specified
+     */
+    public static ISurface rectPipe(IVecI pt1, IVecI pt2, IVecI widthDir, double left, double right, double bottom, double top){
+	IVec dir = pt2.get().dif(pt1.get());
+	IVec hdir = widthDir.get().cross(dir); 
+	IVec wdir = dir.cross(hdir); // re orthogonalized
+
+	if(wdir.eq(IVec.origin)){ // dir and hdir is parallel
+	    if(!hdir.isParallel(IVec.zaxis)){ wdir = dir.cross(IVec.zaxis); }
+	    else{ wdir = dir.cross(IVec.xaxis); }
+	}
+	IVec[][] profile = new IVec[2][5];
+	profile[0][0] = pt1.get().cp().add(wdir.cp().len(left)).add(hdir.cp().len(bottom));
+	profile[0][1] = pt1.get().cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
+	profile[0][2] = pt1.get().cp().add(wdir.cp().len(right)).add(hdir.cp().len(top));
+	profile[0][3] = pt1.get().cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
+	profile[0][4] = profile[0][0].cp();
+	profile[1][0] = pt2.get().cp().add(wdir.cp().len(left)).add(hdir.cp().len(bottom));
+	profile[1][1] = pt2.get().cp().add(wdir.cp().len(right)).add(hdir.cp().len(bottom));
+	profile[1][2] = pt2.get().cp().add(wdir.cp().len(right)).add(hdir.cp().len(top));
+	profile[1][3] = pt2.get().cp().add(wdir.cp().len(left)).add(hdir.cp().len(top));
+	profile[1][4] = profile[1][0].cp();
+	return surface(profile);
     }
     
     

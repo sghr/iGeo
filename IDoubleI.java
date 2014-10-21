@@ -27,7 +27,7 @@ package igeo;
    
    @author Satoru Sugihara
 */
-public interface IDoubleI extends IDoubleOp{
+public interface IDoubleI extends IDoubleOp, IArithmeticVal<IDoubleI,IDoubleI>{
     /**
        @return primitive value
     */
@@ -59,6 +59,8 @@ public interface IDoubleI extends IDoubleOp{
     public IDoubleI set(double v);
     public IDoubleI set(IDoubleI v);
     public IDoubleI set(IIntegerI v);
+
+    public IDoubleI zero();
     
     public IDoubleI add(IDoubleI v);
     public IDoubleI add(double v);

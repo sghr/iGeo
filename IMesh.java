@@ -36,6 +36,9 @@ public class IMesh extends IGeometry implements IMeshI{
     
     public IMeshGeo mesh;
     //public IMeshI mesh;
+
+    public boolean enableFaceColor=false;
+    public boolean enableVertexColor=false;
     
     public IMesh(){ super(); mesh=new IMeshGeo(); initMesh(null); }
     public IMesh(IServerI s){ super(s); mesh=new IMeshGeo(); initMesh(s); }
@@ -223,6 +226,307 @@ public class IMesh extends IGeometry implements IMeshI{
     synchronized public ArrayList<IEdge> edges(){ return mesh.edges(); }
     /** return all faces */
     synchronized public ArrayList<IFace> faces(){ return mesh.faces(); }
+
+    
+    public IMesh enableVertexColor(){
+	enableVertexColor=true;
+	return this;
+    }
+    public IMesh disableVertexColor(){
+	enableVertexColor=false;
+	return this;
+    }
+    public IMesh enableFaceColor(){
+	enableFaceColor=true;
+	return this;
+    }
+    public IMesh disableFaceColor(){
+	enableFaceColor=false;
+	return this;
+    }
+    
+    /** set vertex color */
+    public IColor vertexColor(int i){
+	return mesh.vertex(i).clr();
+    }
+    
+    public IMesh vertexColor(int i, IColor c){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(c);
+	return this;
+    }
+    public IMesh vertexColor(int i, IColor c, int alpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, IColor c, float alpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, IColor c, double alpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, Color c){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(c);
+	return this;
+    }
+    public IMesh vertexColor(int i, Color c, int alpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, Color c, float alpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, Color c, double alpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, int gray){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(gray);
+	return this;
+    }
+    
+    public IMesh vertexColor(int i, double dgray){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(dgray);
+	return this;
+    }
+    
+    public IMesh vertexColor(int i, float fgray){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(fgray);
+	return this;
+    }
+    
+    public IMesh vertexColor(int i, int gray, int alpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(gray,alpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, double dgray, double dalpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(dgray,dalpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, float fgray, float falpha){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(fgray,falpha);
+	return this;
+    }
+    public IMesh vertexColor(int i, int r, int g, int b){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(r,g,b);
+	return this;
+    }
+    public IMesh vertexColor(int i, double dr, double dg, double db){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(dr,dg,db);
+	return this;
+    }
+    public IMesh vertexColor(int i, float fr, float fg, float fb){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(fr,fg,fb);
+	return this;
+    }
+    public IMesh vertexColor(int i, int r, int g, int b, int a){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(r,g,b,a);
+	return this;
+    }
+    public IMesh vertexColor(int i, double dr, double dg, double db, double da){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(dr,dg,db,da);
+	return this;
+    }
+    public IMesh vertexColor(int i, float fr, float fg, float fb, float fa){
+	enableVertexColor=true;
+	mesh.vertex(i).clr(fr,fg,fb,fa);
+	return this;
+    }
+    public IMesh vertexHSB(int i, double dh, double ds, double db, double da){
+	return vertexColorHSB(i,dh,ds,db,da);
+    }
+    public IMesh vertexColorHSB(int i, double dh, double ds, double db, double da){
+	enableVertexColor=true;
+	mesh.vertex(i).hsb(dh,ds,db,da);
+	return this;
+    }
+    public IMesh vertexHSB(int i, float h, float s, float b, float a){
+	return vertexColorHSB(i,h,s,b,a);
+    }
+    public IMesh vertexColorHSB(int i, float h, float s, float b, float a){
+	enableVertexColor=true;
+	mesh.vertex(i).hsb(h,s,b,a);
+	return this;
+    }
+    public IMesh vertexHSB(int i, double dh, double ds, double db){
+	return vertexColorHSB(i,dh,ds,db);
+    }
+    public IMesh vertexColorHSB(int i, double dh, double ds, double db){
+	enableVertexColor=true;
+	mesh.vertex(i).hsb(dh,ds,db);
+	return this;
+    }
+    public IMesh vertexHSB(int i, float h, float s, float b){
+	return vertexColorHSB(i,h,s,b);
+    }
+    public IMesh vertexColorHSB(int i, float h, float s, float b){
+	enableVertexColor=true;
+	mesh.vertex(i).hsb(h,s,b);
+	return this;
+    }
+    
+    
+    /** set face color */
+    public IColor faceColor(int i){
+	return mesh.face(i).clr();
+    }
+    
+    public IMesh faceColor(int i, IColor c){
+	enableFaceColor=true;
+	mesh.face(i).clr(c);
+	return this;
+    }
+    public IMesh faceColor(int i, IColor c, int alpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh faceColor(int i, IColor c, float alpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh faceColor(int i, IColor c, double alpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh faceColor(int i, Color c){
+	enableFaceColor=true;
+	mesh.face(i).clr(c);
+	return this;
+    }
+    public IMesh faceColor(int i, Color c, int alpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh faceColor(int i, Color c, float alpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh faceColor(int i, Color c, double alpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(c,alpha);
+	return this;
+    }
+    public IMesh faceColor(int i, int gray){
+	enableFaceColor=true;
+	mesh.face(i).clr(gray);
+	return this;
+    }
+    
+    public IMesh faceColor(int i, double dgray){
+	enableFaceColor=true;
+	mesh.face(i).clr(dgray);
+	return this;
+    }
+    
+    public IMesh faceColor(int i, float fgray){
+	enableFaceColor=true;
+	mesh.face(i).clr(fgray);
+	return this;
+    }
+    
+    public IMesh faceColor(int i, int gray, int alpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(gray,alpha);
+	return this;
+    }
+    public IMesh faceColor(int i, double dgray, double dalpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(dgray,dalpha);
+	return this;
+    }
+    public IMesh faceColor(int i, float fgray, float falpha){
+	enableFaceColor=true;
+	mesh.face(i).clr(fgray,falpha);
+	return this;
+    }
+    public IMesh faceColor(int i, int r, int g, int b){
+	enableFaceColor=true;
+	mesh.face(i).clr(r,g,b);
+	return this;
+    }
+    public IMesh faceColor(int i, double dr, double dg, double db){
+	enableFaceColor=true;
+	mesh.face(i).clr(dr,dg,db);
+	return this;
+    }
+    public IMesh faceColor(int i, float fr, float fg, float fb){
+	enableFaceColor=true;
+	mesh.face(i).clr(fr,fg,fb);
+	return this;
+    }
+    public IMesh faceColor(int i, int r, int g, int b, int a){
+	enableFaceColor=true;
+	mesh.face(i).clr(r,g,b,a);
+	return this;
+    }
+    public IMesh faceColor(int i, double dr, double dg, double db, double da){
+	enableFaceColor=true;
+	mesh.face(i).clr(dr,dg,db,da);
+	return this;
+    }
+    public IMesh faceColor(int i, float fr, float fg, float fb, float fa){
+	enableFaceColor=true;
+	mesh.face(i).clr(fr,fg,fb,fa);
+	return this;
+    }
+    public IMesh faceHSB(int i, double dh, double ds, double db, double da){
+	return faceColorHSB(i,dh,ds,db,da);
+    }
+    public IMesh faceColorHSB(int i, double dh, double ds, double db, double da){
+	enableFaceColor=true;
+	mesh.face(i).hsb(dh,ds,db,da);
+	return this;
+    }
+    public IMesh faceHSB(int i, float h, float s, float b, float a){
+	return faceColorHSB(i,h,s,b,a);
+    }
+    public IMesh faceColorHSB(int i, float h, float s, float b, float a){
+	enableFaceColor=true;
+	mesh.face(i).hsb(h,s,b,a);
+	return this;
+    }
+    public IMesh faceHSB(int i, double dh, double ds, double db){
+	return faceColorHSB(i,dh,ds,db);
+    }
+    public IMesh faceColorHSB(int i, double dh, double ds, double db){
+	enableFaceColor=true;
+	mesh.face(i).hsb(dh,ds,db);
+	return this;
+    }
+    public IMesh faceHSB(int i, float h, float s, float b){
+	return faceColorHSB(i,h,s,b);
+    }
+    public IMesh faceColorHSB(int i, float h, float s, float b){
+	enableFaceColor=true;
+	mesh.face(i).hsb(h,s,b);
+	return this;
+    }
     
     
     /** center of mesh, calculated by average of all vertices */

@@ -23,6 +23,7 @@
 package igeo;
 
 import java.util.ArrayList;
+import java.awt.Color;
 
 /**
    Class of a face of polygon mesh.
@@ -33,9 +34,11 @@ public class IFace{
     public IVertex[] vertices;
     public IEdge[] edges;
     public IVec normal;
-
+    
     /** used in deleting process */
-    public boolean deleted=false; 
+    public boolean deleted=false;
+
+    public IColor clr; // face color
     
     public IFace(IEdge[] e){ init(e); }
     public IFace(IEdge e1, IEdge e2, IEdge e3){ this(new IEdge[]{e1, e2, e3}); }
@@ -751,5 +754,63 @@ public class IFace{
 	return 0;
     }
     
+
+    // color
+    public IColor clr(){ return clr; }
+    
+    public IFace clr(IColor c){ clr=c; return this; }
+    
+    /** to set color, with alpha value overwritten */
+    public IFace clr(IColor c, int alpha){
+	return clr(new IColor(c,alpha));
+    }
+    /** to set color, with alpha value overwritten */
+    public IFace clr(IColor c, float alpha){
+	return clr(new IColor(c,alpha));
+    }
+    /** to set color, with alpha value overwritten */
+    public IFace clr(IColor c, double alpha){
+	return clr(new IColor(c,alpha));
+    }
+
+    public IFace clr(Color c){ return clr(new IColor(c)); }
+    public IFace clr(Color c, int alpha){ return clr(new IColor(c),alpha); }
+    public IFace clr(Color c, float alpha){ return clr(new IColor(c),alpha); }
+    public IFace clr(Color c, double alpha){ return clr(new IColor(c),alpha); }
+    
+    /** @return returns whatever Color of any graphics member. (first found) */
+    public IColor getColor(){ return clr(); }
+    
+    
+    public IFace clr(int gray){ return clr(new IColor(gray)); }
+    
+    public IFace clr(double dgray){ return clr(new IColor(dgray)); }
+    public IFace clr(float fgray){ return clr(new IColor(fgray)); }
+    public IFace clr(int gray, int alpha){ return clr(new IColor(gray,alpha)); }
+    public IFace clr(double dgray, double dalpha){ return clr(new IColor(dgray,dalpha)); }
+    public IFace clr(float fgray, float falpha){ return clr(new IColor(fgray,falpha)); }
+    public IFace clr(int r, int g, int b){ return clr(new IColor(r,g,b)); }
+    public IFace clr(double dr, double dg, double db){ return clr(new IColor(dr,dg,db)); }
+    public IFace clr(float fr, float fg, float fb){ return clr(new IColor(fr,fg,fb)); }
+    public IFace clr(int r, int g, int b, int a){ return clr(new IColor(r,g,b,a)); }
+    public IFace clr(double dr, double dg, double db, double da){
+	return clr(new IColor(dr,dg,db,da));
+    }
+    public IFace clr(float fr, float fg, float fb, float fa){
+	return clr(new IColor(fr,fg,fb,fa));
+    }
+    public IFace hsb(double dh, double ds, double db, double da){
+	return clr(IColor.hsb(dh,ds,db,da));
+    }
+    public IFace hsb(float h, float s, float b, float a){
+	return clr(IColor.hsb(h,s,b,a));
+    }
+    public IFace hsb(double dh, double ds, double db){
+	return clr(IColor.hsb(dh,ds,db));
+    }
+    public IFace hsb(float h, float s, float b){
+	return clr(IColor.hsb(h,s,b));
+    }
+
     
 }

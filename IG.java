@@ -49,9 +49,9 @@ public class IG implements IServerI{
     
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 9; }
-    public static int buildVersion(){ return 0; }
-    public static int revisionVersion(){ return 9; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2014, 4, 22); }
+    public static int buildVersion(){ return 1; }
+    public static int revisionVersion(){ return 3; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2014, 9, 21); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -254,10 +254,12 @@ public class IG implements IServerI{
 	return null;
     }
     
-    public static boolean open(String file){
+    public static IObject[] open(String file){
 	IG ig = cur();
-	if(ig==null) return false;
-	return ig.openFile(file);
+	if(ig==null) return null;
+	ArrayList<IObject> objects = ig.openFile(file);
+	if(objects==null) return null;
+	return objects.toArray(new IObject[objects.size()]);
     }
     
     public static boolean save(String file){
@@ -1239,18 +1241,19 @@ public class IG implements IServerI{
 	p.setIG(this);
     }
     
-    public boolean openFile(String file){
-	boolean retval = false;
-	if(inputWrapper!=null){ retval = IIO.open(file,this,inputWrapper); }
+    public ArrayList<IObject> openFile(String file){
+	//boolean retval = false;
+	ArrayList<IObject> objects=null;
+	if(inputWrapper!=null){ objects= IIO.open(file,this,inputWrapper); }
 	else{
 	    File f = new File(file);
 	    if(!f.isAbsolute() && basePath!=null){ file = basePath + File.separator + file; }
-	    retval = IIO.open(file,this);
+	    objects = IIO.open(file,this);
 	}
 	server.updateState(); // update server status
 	inputFile = file;
 	//focusView(); // instead of here, focused at the end of setup if IConfig.autoFocusAtStart is true
-	return retval;
+	return objects;
     }
     
     
@@ -2318,9 +2321,13 @@ public class IG implements IServerI{
 	return ISurfaceCreator.pipe(rail,railDeg,railKnots,radius);
     }
     
-    
+    /* make an open-ended square pipe surface */
     public static ISurface squarePipe(IVecI pt1, IVecI pt2, double size){
 	return ISurfaceCreator.squarePipe(pt1,pt2,size);
+    }
+    /* make an open-ended square pipe surface with width dir specified*/
+    public static ISurface squarePipe(IVecI pt1, IVecI pt2, IVecI widthDir, double size){
+	return ISurfaceCreator.squarePipe(pt1,pt2,widthDir,size);
     }
     public static ISurface squarePipe(IVecI[] rail, double size){
 	return ISurfaceCreator.squarePipe(rail,size);
@@ -2346,9 +2353,19 @@ public class IG implements IServerI{
     public static ISurface rectPipe(IVecI pt1, IVecI pt2, double width, double height){
 	return ISurfaceCreator.rectPipe(pt1,pt2,width,height);
     }
+    /* make an open-ended rectangular pipe surface with width dir specified*/
+    public static ISurface rectPipe(IVecI pt1, IVecI pt2, IVecI widthDir, double width, double height){
+	return ISurfaceCreator.rectPipe(pt1,pt2,widthDir,width,height);
+    }
+
     public static ISurface rectPipe(IVecI pt1, IVecI pt2, double left, double right, double bottom, double top){
 	return ISurfaceCreator.rectPipe(pt1,pt2,left,right,bottom,top);
     }
+    /* make an open-ended rectangular pipe surface with width dir specified*/
+    public static ISurface rectPipe(IVecI pt1, IVecI pt2, IVecI widthDir, double left, double right, double bottom, double top){
+	return ISurfaceCreator.rectPipe(pt1,pt2,widthDir,left,right,bottom,top);
+    }
+
     public static ISurface rectPipe(IVecI[] rail, double width, double height){
 	return ISurfaceCreator.rectPipe(rail,width,height);
     }
@@ -4357,5 +4374,157 @@ public class IG implements IServerI{
     public static boolean randPct(double percent){ return pct(percent); }
     public static boolean percent(double percent){ return pct(percent); }
     public static boolean pct(double percent){ return IRand.pct(percent); }
+
+
+    
+    // group attribute setting methods
+    
+    public static IObject clr(IObject obj, IColor c){ obj.clr(c); return obj; }
+    public static IObject[] clr(IObject[] objs, IColor c){
+	for(int i=0; i<objs.length; i++){ objs[i].clr(c); } return objs;
+    }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, IColor c){
+	for(int i=0; i<objs.size(); i++){ objs.get(i).clr(c); } return objs;
+    }
+    
+    public static IObject clr(IObject obj, IColor c, int alpha){ obj.clr(c,alpha); return obj; }
+    public static IObject[] clr(IObject[] objs, IColor c, int alpha){
+	for(int i=0; i<objs.length; i++){ objs[i].clr(c,alpha); } return objs;
+    }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, IColor c, int alpha){
+	for(int i=0; i<objs.size(); i++){ objs.get(i).clr(c,alpha); } return objs;
+    }
+    
+    public static IObject clr(IObject obj, IColor c, float alpha){ obj.clr(c,alpha); return obj; }
+    public static IObject[] clr(IObject[] objs, IColor c, float alpha){
+	for(int i=0; i<objs.length; i++){ objs[i].clr(c,alpha); } return objs;
+    }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, IColor c, float alpha){
+	for(int i=0; i<objs.size(); i++){ objs.get(i).clr(c,alpha); } return objs;
+    }
+    
+    public static IObject clr(IObject obj, IColor c, double alpha){ obj.clr(c,alpha); return obj; }
+    public static IObject[] clr(IObject[] objs, IColor c, double alpha){ 
+	for(int i=0; i<objs.length; i++){ objs[i].clr(c,alpha); } return objs;
+    }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, IColor c, double alpha){
+	for(int i=0; i<objs.size(); i++){ objs.get(i).clr(c,alpha); } return objs;
+    }
+    
+    public static IObject clr(IObject obj, Color c){ obj.clr(c); return obj; }
+    public static IObject[] clr(IObject[] objs, Color c){ return clr(objs, new IColor(c)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, Color c){ return clr(objs, new IColor(c)); }
+    
+    public static IObject clr(IObject obj, Color c, int alpha){ obj.clr(new IColor(c,alpha)); return obj; }
+    public static IObject[] clr(IObject[] objs, Color c, int alpha){ return clr(objs, new IColor(c,alpha)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, Color c, int alpha){ return clr(objs, new IColor(c,alpha)); }
+    
+    public static IObject clr(IObject obj, Color c, float alpha){ obj.clr(new IColor(c,alpha)); return obj; }
+    public static IObject[] clr(IObject[] objs, Color c, float alpha){ return clr(objs, new IColor(c,alpha)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, Color c, float alpha){ return clr(objs, new IColor(c,alpha)); }
+        
+    public static IObject clr(IObject obj, Color c, double alpha){ obj.clr(new IColor(c,alpha)); return obj; }
+    public static IObject[] clr(IObject[] objs, Color c, double alpha){ return clr(objs, new IColor(c,alpha)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, Color c, double alpha){ return clr(objs, new IColor(c,alpha)); }
+
+
+    public static IObject clr(IObject obj, int gray){ obj.clr(new IColor(gray)); return obj; }
+    public static IObject[] clr(IObject[] objs, int gray){ return clr(objs, new IColor(gray)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, int gray){ return clr(objs, new IColor(gray)); }
+    
+    public static IObject clr(IObject obj, float gray){ obj.clr(new IColor(gray)); return obj; }
+    public static IObject[] clr(IObject[] objs, float gray){ return clr(objs, new IColor(gray)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, float gray){ return clr(objs, new IColor(gray)); }
+    
+    public static IObject clr(IObject obj, double gray){ obj.clr(new IColor(gray)); return obj; }
+    public static IObject[] clr(IObject[] objs, double gray){ return clr(objs, new IColor(gray)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, double gray){ return clr(objs, new IColor(gray)); }
+    
+    public static IObject clr(IObject obj, int gray, int alpha){ obj.clr(new IColor(gray,alpha)); return obj; }
+    public static IObject[] clr(IObject[] objs, int gray, int alpha){ return clr(objs, new IColor(gray,alpha)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, int gray, int alpha){ return clr(objs, new IColor(gray,alpha)); }
+    
+    public static IObject clr(IObject obj, float gray, float alpha){ obj.clr(new IColor(gray,alpha)); return obj; }
+    public static IObject[] clr(IObject[] objs, float gray, float alpha){ return clr(objs, new IColor(gray,alpha)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, float gray, float alpha){ return clr(objs, new IColor(gray,alpha)); }
+    
+    public static IObject clr(IObject obj, double gray, double alpha){ obj.clr(new IColor(gray,alpha)); return obj; }
+    public static IObject[] clr(IObject[] objs, double gray, double alpha){ return clr(objs, new IColor(gray,alpha)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, double gray, double alpha){ return clr(objs, new IColor(gray,alpha)); }
+    
+    public static IObject clr(IObject obj, int r, int g, int b){ obj.clr(new IColor(r,g,b)); return obj; }
+    public static IObject[] clr(IObject[] objs, int r, int g, int b){ return clr(objs, new IColor(r,g,b)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, int r, int g, int b){ return clr(objs, new IColor(r,g,b)); }
+    
+    public static IObject clr(IObject obj, double r, double g, double b){ obj.clr(new IColor(r,g,b)); return obj; }
+    public static IObject[] clr(IObject[] objs, double r, double g, double b){ return clr(objs, new IColor(r,g,b)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, double r, double g, double b){ return clr(objs, new IColor(r,g,b)); }
+    
+    public static IObject clr(IObject obj, float r, float g, float b){ obj.clr(new IColor(r,g,b)); return obj; }
+    public static IObject[] clr(IObject[] objs, float r, float g, float b){ return clr(objs, new IColor(r,g,b)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, float r, float g, float b){ return clr(objs, new IColor(r,g,b)); }
+    
+    public static IObject clr(IObject obj, int r, int g, int b, int a){ obj.clr(new IColor(r,g,b,a)); return obj; }
+    public static IObject[] clr(IObject[] objs, int r, int g, int b, int a){ return clr(objs, new IColor(r,g,b,a)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, int r, int g, int b, int a){ return clr(objs, new IColor(r,g,b,a)); }
+    
+    public static IObject clr(IObject obj, double r, double g, double b, double a){ obj.clr(new IColor(r,g,b,a)); return obj; }
+    public static IObject[] clr(IObject[] objs, double r, double g, double b, double a){ return clr(objs, new IColor(r,g,b,a)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, double r, double g, double b, double a){ return clr(objs, new IColor(r,g,b,a)); }
+    
+    public static IObject clr(IObject obj, float r, float g, float b, float a){ obj.clr(new IColor(r,g,b,a)); return obj; }
+    public static IObject[] clr(IObject[] objs, float r, float g, float b, float a){ return clr(objs, new IColor(r,g,b,a)); }
+    public static ArrayList<IObject> clr(ArrayList<IObject> objs, float r, float g, float b, float a){ return clr(objs, new IColor(r,g,b,a)); }
+    
+    public static IObject hsb(IObject obj, float h, float s, float b, float a){ obj.clr(IColor.hsb(h,s,b,a)); return obj; }
+    public static IObject[] hsb(IObject[] objs, float h, float s, float b, float a){ return clr(objs,  IColor.hsb(h,s,b,a)); }
+    public static ArrayList<IObject> hsb(ArrayList<IObject> objs, float h, float s, float b, float a){ return clr(objs, IColor.hsb(h,s,b,a)); }
+    
+    public static IObject hsb(IObject obj, double h, double s, double b, double a){ obj.clr(IColor.hsb(h,s,b,a)); return obj; }
+    public static IObject[] hsb(IObject[] objs, double h, double s, double b, double a){ return clr(objs,  IColor.hsb(h,s,b,a)); }
+    public static ArrayList<IObject> hsb(ArrayList<IObject> objs, double h, double s, double b, double a){ return clr(objs, IColor.hsb(h,s,b,a)); }
+    
+    public static IObject hsb(IObject obj, float h, float s, float b){ obj.clr(IColor.hsb(h,s,b)); return obj; }
+    public static IObject[] hsb(IObject[] objs, float h, float s, float b){ return clr(objs,  IColor.hsb(h,s,b)); }
+    public static ArrayList<IObject> hsb(ArrayList<IObject> objs, float h, float s, float b){ return clr(objs, IColor.hsb(h,s,b)); }
+    
+    public static IObject hsb(IObject obj, double h, double s, double b){ obj.clr(IColor.hsb(h,s,b)); return obj; }
+    public static IObject[] hsb(IObject[] objs, double h, double s, double b){ return clr(objs,  IColor.hsb(h,s,b)); }
+    public static ArrayList<IObject> hsb(ArrayList<IObject> objs, double h, double s, double b){ return clr(objs, IColor.hsb(h,s,b)); }
+    
+    
+    public static IObject weight(IObject obj, double w){ obj.weight(w); return obj; }
+    public static IObject[] weight(IObject[] objs, double w){
+	for(int i=0; i<objs.length; i++){ objs[i].weight(w); } return objs;
+    }
+    public static ArrayList<IObject> weight(ArrayList<IObject> objs, double w){
+	for(int i=0; i<objs.size(); i++){ objs.get(i).weight(w); } return objs;
+    }
+    
+    public static IObject weight(IObject obj, float w){ obj.weight(w); return obj; }
+    public static IObject[] weight(IObject[] objs, float w){
+	for(int i=0; i<objs.length; i++){ objs[i].weight(w); } return objs;
+    }
+    public static ArrayList<IObject> weight(ArrayList<IObject> objs, float w){
+	for(int i=0; i<objs.size(); i++){ objs.get(i).weight(w); } return objs;
+    }
+    
+    public static IObject hide(IObject obj){ obj.hide(); return obj; }
+    public static IObject[] hide(IObject[] objs){
+	for(int i=0; i<objs.length; i++){ objs[i].hide(); } return objs;
+    }
+    public static ArrayList<IObject> hide(ArrayList<IObject> objs){
+	for(int i=0; i<objs.size(); i++){ objs.get(i).hide(); } return objs;
+    }
+    
+    public static IObject show(IObject obj){ obj.show(); return obj; }
+    public static IObject[] show(IObject[] objs){
+	for(int i=0; i<objs.length; i++){ objs[i].show(); } return objs;
+    }
+    public static ArrayList<IObject> show(ArrayList<IObject> objs){
+	for(int i=0; i<objs.size(); i++){ objs.get(i).show(); } return objs;
+    }
+    
+
     
 }

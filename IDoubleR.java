@@ -59,6 +59,8 @@ public class IDoubleR extends IParameterObject implements IDoubleI, IReferencePa
     public IDoubleR set(double u){ op=new IDouble(u); return this; }
     public IDoubleR set(IDoubleI u){ op=u; return this; }
     public IDoubleR set(IIntegerI u){ op=new FromInt(u); return this; }
+
+    public IDoubleR zero(){ op=new IDouble(0); return this; }
     
     public IDoubleR add(IDoubleI u){ op = new Add(op,u); return this; }
     public IDoubleR add(double u){ op = new Add(op, new IDouble(u)); return this; }

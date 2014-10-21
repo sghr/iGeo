@@ -37,15 +37,18 @@ public class ISurfaceFieldGeo extends IFieldGeo implements I3DFieldI{ //extends 
     
     
     /** get original field value out of curve parameter u */
-    public IVecI get(IVecI v, IVec2I uv){ return fieldSurface.pt(uv); }
+    public IVecI get(IVecI pos, IVec2I uv){ return fieldSurface.pt(uv); }
     
     /** get original field value out of curve parameter u */
     public IVecI get(IVecI pos, IVecI vel, IVec2I uv){ return get(pos,uv); }
     
     /** get 3D vector field value */
-    public IVecI get(IVecI v){ return get(v,(IVecI)null); }
+    public IVecI get(IVecI pos){ return get(pos,(IVecI)null); }
     
-    /** get 3D vector field value */
+    /** get 3D vector field value
+     @param pos positio of the input particle
+     @param vel velocity of the input particle
+    */
     public IVecI get(IVecI pos, IVecI vel){
 	IVec2I uv = surface.uv(pos);
 	double r = intensity;
@@ -69,7 +72,7 @@ public class ISurfaceFieldGeo extends IFieldGeo implements I3DFieldI{ //extends 
 	    if(len<IConfig.tolerance){ return vec.zero(); }
 	    return vec.len(r);
 	}
-		
+	
 	return vec.mul(r);
 	
 	/*
