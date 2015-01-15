@@ -367,6 +367,28 @@ public class IDelaunay2D {
 	return triangles.toArray(new IVec2[triangles.size()][]);
     }
 
+
+    /**
+       Getting delaunay triangles out of array of 3D points interpreted as 2D points on XY plane.
+       @return a mesh.
+    */
+    public static IMesh getMesh(IVecI[] pts){
+	IVertex[] vtx = new IVertex[pts.length];
+	for(int i=0; i<pts.length; i++){
+	    vtx[i] = new IVertex(pts[i]);
+	}
+	IVecI[][] tri = getTriangles(vtx);
+	IFace[] faces = new IFace[tri.length];
+	for(int i=0; i<tri.length; i++){
+	    IVertex v1 = (IVertex)tri[i][0];
+	    IVertex v2 = (IVertex)tri[i][1];
+	    IVertex v3 = (IVertex)tri[i][2];
+	    faces[i] = new IFace(v1,v2,v3);
+	}
+	return new IMesh(faces);
+    }
+    
+
     /**
        Getting edges of delaunay triangles out of array of 2D points
        @return array of triangles, which consist of array of 3 points of IVec2

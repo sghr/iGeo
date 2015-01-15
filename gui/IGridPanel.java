@@ -48,7 +48,15 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
     public IGridPanel(int x, int y, int width, int height, int xnum, int ynum, IPane[][] panes){
 	super(x,y,width,height);
 	setupGrid(xnum,ynum,panes);
-	currentMousePane = gridPanes[1][0]; //
+	if(gridPanes.length>1 && gridPanes[1].length>0){
+	    currentMousePane = gridPanes[1][0]; //
+	}
+	else if(gridPanes.length>0 && gridPanes[0].length>0){
+	    currentMousePane = gridPanes[0][0]; //
+	}
+	else{
+	    IOut.err("no panes in IGridPanel.gridPanes[][]"); 
+	}
     }
     
     public void setupGrid(int xnum, int ynum, IPane[][] panes){

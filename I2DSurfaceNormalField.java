@@ -40,6 +40,7 @@ public class I2DSurfaceNormalField extends I2DField{
     public I2DSurfaceNormalField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public I2DSurfaceNormalField gaussian(double threshold){ super.gaussian(threshold); return this; }
     public I2DSurfaceNormalField gauss(double threshold){ super.gauss(threshold); return this; }
+    public I2DSurfaceNormalField decay(IDecay decay, double threshold){ super.decay(decay,threshold); return this; }
     public I2DSurfaceNormalField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
     
     /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */

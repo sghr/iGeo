@@ -48,7 +48,7 @@ public class IAppletGL2 extends Applet implements Runnable /*, IPanelAdapter*/{
     
     public boolean runningAsApplication=false;
     
-    public IPanel panel;
+    public IPanelI panel;
     public IG ig;
     public IGraphicsGL igg;
     

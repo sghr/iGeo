@@ -43,6 +43,7 @@ public class IMeshNormalField extends I3DField{
     public IMeshNormalField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public IMeshNormalField gaussian(double threshold){ super.gaussian(threshold); return this; }
     public IMeshNormalField gauss(double threshold){ super.gauss(threshold); return this; }
+    public IMeshNormalField decay(IDecay decay, double threshold){ super.decay(decay,threshold); return this; }
     public IMeshNormalField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
     /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
     public IMeshNormalField bidirectional(boolean b){ super.bidirectional(b); return this; }

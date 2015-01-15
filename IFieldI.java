@@ -50,6 +50,9 @@ public interface IFieldI{// extends ITransformable{
     public IFieldI gaussian(double threshold);
     /** alias of gaussianDecay */
     public IFieldI gauss(double threshold);
+
+    /** set custom decay */
+    public IFieldI decay(IDecay decay, double threshold); 
     
     /** this returns current decay type */
     //public Decay decay();

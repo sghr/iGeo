@@ -59,6 +59,8 @@ public class IErr {
 	    ps.println();
 	}
     }
+
+    public static void printStack(){ if(enabled) IOut.printStack(ps); }
     
     public static void println(Object str){ if(enabled) ps.println(str); }
     public static void println(boolean str){ if(enabled) ps.println(str); }

@@ -266,6 +266,11 @@ public class ISurface extends IGeometry implements ISurfaceI{
     }
     
     public void initSurface(IServerI s){
+	if(!isValid()){ // added 20141129
+	    IOut.err("Surface is invalid. Deleted");
+	    del();
+	    return;
+	}
 	if(surface instanceof ISurfaceGeo){
 	    parameter = (ISurfaceGeo)surface;
 	}

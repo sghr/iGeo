@@ -61,6 +61,10 @@ public class ICurveFieldGeo extends IFieldGeo implements I3DFieldI{
 	    double dist = curve.pt(u).dist(pos);
 	    if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	}
+	else if(decay == Decay.Custom && customDecay!=null){
+	    double dist = curve.pt(u).dist(pos);
+	    r = customDecay.decay(intensity, dist, threshold);
+	}
 	
 	IVecI vec = get(pos,vel,u);
 	

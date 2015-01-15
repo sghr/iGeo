@@ -35,6 +35,7 @@ public class IColor{
     public float[] rgba;
     
     public IColor(){ rgba = new float[4]; }
+    public IColor(float[] rgba){ this.rgba = rgba; }
     public IColor(float r, float g, float b, float a){
 	this();
 	set(r,g,b,a);
@@ -119,6 +120,61 @@ public class IColor{
 	if(a<0) a=0; else if(a>255) a=255;
 	return ((a << 24) + (r << 16) + (g << 8) + b);
     }
+    
+    public static int argb(IColor c, float fa){
+	int r = (int)(c.r()*255);
+	int g = (int)(c.g()*255);
+	int b = (int)(c.b()*255);
+	int a = (int)(fa*255);
+	if(a<0) a=0; else if(a>255) a=255;
+	return ((a << 24) + (r << 16) + (g << 8) + b);
+    }
+    
+    public static int argb(float[] rgba){
+	int r = (int)(rgba[0]*255);
+	int g = (int)(rgba[1]*255);
+	int b = (int)(rgba[2]*255);
+	int a = (int)(rgba[3]*255);
+	if(r<0) r=0; else if(r>255) r=255;
+	if(g<0) g=0; else if(g>255) g=255;
+	if(b<0) b=0; else if(b>255) b=255;
+	if(a<0) a=0; else if(a>255) a=255;
+	return ((a << 24) + (r << 16) + (g << 8) + b);
+    }
+    
+    public static int argb(float fr, float fg, float fb, float fa){
+	int r = (int)(fr*255);
+	int g = (int)(fg*255);
+	int b = (int)(fb*255);
+	int a = (int)(fa*255);
+	if(r<0) r=0; else if(r>255) r=255;
+	if(g<0) g=0; else if(g>255) g=255;
+	if(b<0) b=0; else if(b>255) b=255;
+	if(a<0) a=0; else if(a>255) a=255;
+	return ((a << 24) + (r << 16) + (g << 8) + b);
+    }
+    
+    public static int argb(double fr, double  fg, double fb, double fa){
+	int r = (int)(fr*255);
+	int g = (int)(fg*255);
+	int b = (int)(fb*255);
+	int a = (int)(fa*255);
+	if(r<0) r=0; else if(r>255) r=255;
+	if(g<0) g=0; else if(g>255) g=255;
+	if(b<0) b=0; else if(b>255) b=255;
+	if(a<0) a=0; else if(a>255) a=255;
+	return ((a << 24) + (r << 16) + (g << 8) + b);
+    }
+    
+    public static int argb(int r, int  g, int b, int a){
+	if(r<0) r=0; else if(r>255) r=255;
+	if(g<0) g=0; else if(g>255) g=255;
+	if(b<0) b=0; else if(b>255) b=255;
+	if(a<0) a=0; else if(a>255) a=255;
+	return ((a << 24) + (r << 16) + (g << 8) + b);
+    }
+    
+    
     /** alias of argb() */
     public int getInt(){ return argb(); }
     /** alias of argb() */

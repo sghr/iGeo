@@ -58,6 +58,10 @@ public class I3DField extends IField implements I3DFieldI{
     public I3DField gaussian(double threshold){ return gaussianDecay(threshold); }
     /** alias of gaussianDecay */
     public I3DField gauss(double threshold){ return gaussianDecay(threshold); }
+    
+    /** custom decay */
+    public I3DField decay(IDecay decay, double threshold){ field.decay(decay, threshold); return this; }
+    
     /** this returns current decay type */
     //public Decay decay();
     

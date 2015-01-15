@@ -54,6 +54,9 @@ public class I2DField extends IField implements I2DFieldI{
     public I2DField gaussian(double threshold){ return gaussianDecay(threshold); }
     public I2DField gauss(double threshold){ return gaussianDecay(threshold); }
     
+    /** custom decay */
+    public I2DField decay(IDecay decay, double threshold){ field.decay(decay, threshold); return this; }
+    
     /** this returns current decay type */
     //public Decay decay();
     

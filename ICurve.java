@@ -189,6 +189,12 @@ public class ICurve extends IGeometry implements ICurveI{
     
     
     public void initCurve(IServerI s){
+	if(!isValid()){ // added 20141129
+	    IOut.err("Curve is invalid. Deleted");
+	    del();
+	    return;
+	}
+	
 	if(curve instanceof ICurveGeo){ parameter = (ICurveGeo)curve; }
 	if(graphics==null) initGraphic(s);
     }

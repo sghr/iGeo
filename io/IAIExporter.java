@@ -717,6 +717,9 @@ public class IAIExporter {
 	boolean inscreen=false;
 
         if(curve.deg()>1 || curve instanceof ITrimCurveI && !((ITrimCurveI)curve).surface().isFlat()){
+	    
+	    //if(curve instanceof ITrimCurveI) IG.err("isFlat = "+((ITrimCurveI)curve).surface().isFlat()); //
+	    
 	    boolean flag=false;
 	    IVec[] pts3 = createBezierPoints(curve);
 	    int sampleNum = (pts3.length+2)/3;
@@ -1007,6 +1010,35 @@ public class IAIExporter {
 
     
     public static void writeTrimLoops(PrintStream ps, ISurfaceI surf, double scale, IView view){
+	writeTrimLoops(ps,surf,scale,null,null,view); //
+    }
+    
+    // temporarily, just write outer loops, ignoring inner loop
+    public static void writeTrimLoops(PrintStream ps, ISurfaceI surf, double scale, IColor fillColor, IColor strokeColor, IView view){
+	
+	for(int i=0; surf.hasOuterTrim() && i<surf.outerTrimLoopNum(); i++){
+	    
+	    writeTrimLoop(ps,surf.outerTrimLoop(i),scale, view);
+	    
+	    if( fillColor!=null && strokeColor!=null ){
+		ps.println("b"); // closed curve with filling & stroke
+	    }
+	    else if( fillColor!=null && strokeColor==null ){
+		ps.println("f"); // closed curve with filling
+	    }
+	    else if( fillColor==null && strokeColor!=null ){
+		ps.println("s"); // closed curve with stroke
+	    }
+	    else{
+		ps.println("n"); // closed curve without filling nor stroke
+	    }
+
+	}
+    }
+    
+    /*
+    // as compound path, clipping?
+    public static void writeTrimLoops(PrintStream ps, ISurfaceI surf, double scale, IView view){
 	
 	ps.println("0 D");
 	ps.println("1 XR"); // 1=even-odd; (0=non-zero is curve-direction-sensitive)
@@ -1040,7 +1072,7 @@ public class IAIExporter {
 	endCompoundPath(ps);
 	//ps.println("f"); // closed curve with filling
     }
-    
+    */
     
     //public static void writeTrimLoop(PrintStream ps,ArrayList<ITrimCurveI> loop, double scale, IView view){
     public static void writeTrimLoop(PrintStream ps, ITrimCurveI[] loop, double scale, IView view){
@@ -1275,6 +1307,15 @@ public class IAIExporter {
     }
     
     public static IVec[] makeNurbsSurfaceUPath(ISurfaceI surface, double v){
+	if(surface.udeg()==1){
+	    int sampleNum = surface.uepNum();
+	    IVec[] pts = new IVec[sampleNum];
+	    for(int i=0; i<sampleNum; i++){
+		pts[i] = surface.pt((double)i/(sampleNum-1),v).get();
+	    }
+	    return pts;
+	}
+	
 	int sampleNum = surface.uepNum()*IConfig.segmentResolution;
 	IVec[] pts = new IVec[sampleNum*3-2];
 	IVec[] pts3 = new IVec[sampleNum];
@@ -1295,6 +1336,15 @@ public class IAIExporter {
     }
     
     public static IVec[] makeNurbsSurfaceVPath(ISurfaceI surface, double u){
+	if(surface.vdeg()==1){
+	    int sampleNum = surface.vepNum();
+	    IVec[] pts = new IVec[sampleNum];
+	    for(int i=0; i<sampleNum; i++){
+		pts[i] = surface.pt(u,(double)i/(sampleNum-1)).get();
+	    }
+	    return pts;
+	}
+	
 	int sampleNum = surface.vepNum()*IConfig.segmentResolution;
 	IVec[] pts = new IVec[sampleNum*3-2];
 	IVec[] pts3 = new IVec[sampleNum];
@@ -1313,9 +1363,18 @@ public class IAIExporter {
 	}
 	return pts;
     }
-    
-    public static void writeNurbsSurface(PrintStream ps, ISurfaceI surface, double scale, IView view){
 
+    public static void writeNurbsSurface(PrintStream ps, ISurfaceI surface, double scale, IView view){
+	IColor color=null;
+	if(surface instanceof IObject) color = ((IObject)surface).clr();
+	else{
+	    color = new IColor(0.5); // default? // null;
+	}
+	writeNurbsSurface(ps,surface,scale,color,view);
+    }
+
+    public static void writeNurbsSurface(PrintStream ps, ISurfaceI surface, double scale, IColor color, IView view){
+	
 	//IOut.debug(100, ""); //
 	
 	//if(IGNurbsElement.saveMemoryMode) surface.updateGeometry();
@@ -1335,21 +1394,39 @@ public class IAIExporter {
 	    }
 	else
 	*/
-	if(!surface.hasTrim()){ // no trim loop, no subsurface
-	    writeNurbsSurfaceOutline(ps, surface, scale, view);
+
+	
+	IColor strokeColor = null;
+	IColor fillColor = null;
+	
+	if(view.mode().isWireframe()){
+	    strokeColor = color;
 	}
+	if(view.mode().isFill()){
+	    if(view.mode().isTransparent()){
+		fillColor = new IColor(color, IConfig.transparentModeAlpha);
+	    }
+	    else{
+		fillColor = color;
+	    }
+	}
+	
+	if(!surface.hasTrim()){ // no trim loop, no subsurface
+	    writeNurbsSurfaceOutline(ps, surface, scale, fillColor, strokeColor, view);
+	}
+	/*
 	else{
 	    writeNurbsSurfaceOutline(ps, surface, scale, view); // for trim, write outline for the moment
 	}
-	
 	if(surface.hasTrim()){
+	*/
+	else{ // surface.hasTrim()
 	    //IOut.debug(100, "has trim"); //
 	    
-	    IColor color = new IColor(0.5); // default? // null;
-	    if(surface instanceof IObject) color = ((IObject)surface).clr();
-	    
-	    writePaintStyle(ps, color, null, 0); //
-	    writeTrimLoops(ps,surface,scale,view);
+	    //IColor color = new IColor(0.5); // default? // null;
+	    //if(surface instanceof IObject) color = ((IObject)surface).clr();
+	    writePaintStyle(ps, fillColor, strokeColor, 0); //
+	    writeTrimLoops(ps,surface,scale,fillColor,strokeColor,view);
 	    //endMask(ps);
 	    endLayer(ps);
 	}
@@ -1380,14 +1457,23 @@ public class IAIExporter {
     
     public static void writeNurbsSurfaceOutline(PrintStream ps, ISurfaceI surface,
 						double scale, IView view){
-	IColor color = new IColor(0.5); // default? // null;
+	
+	IColor color=null;
 	if(surface instanceof IObject) color = ((IObject)surface).clr();
+	else{
+	    color = new IColor(0.5); // default? // null;
+	}
+	writeNurbsSurfaceOutline(ps,surface,scale,color,color,view);
+    }
+    
+    public static void writeNurbsSurfaceOutline(PrintStream ps, ISurfaceI surface,
+						double scale, IColor fillColor, IColor strokeColor, IView view){
 	
 	writeNurbsSurfaceOutline(ps, makeNurbsSurfaceOutline(surface),
 				 surface.udeg(),
 				 surface.vdeg(),
-				 color,
-				 color,
+				 fillColor,
+				 strokeColor,
 				 defaultLineWeight,
 				 scale,
 				 view);
@@ -1821,14 +1907,18 @@ public class IAIExporter {
 				   IColor textColor,
 				   double scale,
 				   IView view){
-	
 	IVec2 pos2 = new IVec2();
 	IVec2 hdir2 = new IVec2();
 	IVec2 vdir2 = new IVec2();
-	
-	if(!view.convert(pos,pos2)) return;
-	if(!view.convert(pos.add(horizontalDir),hdir2)) return;
-	if(!view.convert(pos.add(verticalDir),vdir2)) return;
+	if(!view.convert(pos,pos2)){
+	    return;
+	}
+	if(!view.convert(pos.cp().add(horizontalDir),hdir2)){
+	    return;
+	}
+	if(!view.convert(pos.cp().add(verticalDir),vdir2)){
+	    return;
+	}
 	
 	convertCoordinates(pos2,scale,view);
 	convertCoordinates(hdir2,scale,view);
@@ -1924,8 +2014,20 @@ public class IAIExporter {
 	    IVec pos1 =view.convert(o1.center());
 	    IVec pos2 =view.convert(o2.center());
 	    
+	    final double tolerance = 0.20; //IConfig.tolerance;
+	    
+	    if(pos1.z < pos2.z - tolerance){ return 1; }
+	    if(pos1.z > pos2.z + tolerance){ return -1; }
+	    
+	    // added for fill + line drawing
+	    boolean isCurveOrText1 = o1 instanceof ICurveI || o1 instanceof IText;
+	    boolean isCurveOrText2 = o2 instanceof ICurveI || o2 instanceof IText;
+	    if(isCurveOrText1 && !isCurveOrText2) return 1;
+	    if(!isCurveOrText1 && isCurveOrText2) return -1;
+	    
 	    if(pos1.z < pos2.z){ return 1; }
 	    if(pos1.z > pos2.z){ return -1; }
+	    
 	    return 0;
 	}
     }
@@ -1996,10 +2098,31 @@ public class IAIExporter {
                 IMeshI mesh = (IMeshI)objects.get(i);
 		writePolygonMesh(ps,mesh,scale,view);
             }
+            else if( objects.get(i) instanceof IBrep){
+                IBrep brep = (IBrep)objects.get(i);
+		for(int j=0; j<brep.surfaceNum(); j++){
+		    writeNurbsSurface(ps,brep.surface(j),scale,brep.clr(),view);
+		}
+            }
 	    else if( objects.get(i) instanceof IText){
                 IText tx = (IText)objects.get(i);
-		writeText3D(ps,tx.text(),tx.pos(),
-			    tx.uvec(),tx.vvec(),tx.clr(),scale,view);
+		IVec txPos = tx.pos().cp();
+		
+		if(tx.isAlignCenter()){
+		    txPos.add(tx.uvec(), -0.5); // convert center to left
+		}
+		else if(tx.isAlignRight()){
+		    txPos.sub(tx.uvec()); // convert right to left
+		}
+		
+		if(tx.isAlignMiddle()){
+		    txPos.add(tx.vvec(), -0.5); // convert middle to bottom
+		}
+		else if(tx.isAlignTop()){
+		    txPos.sub(tx.vvec()); // convert top to bottom
+		}
+		
+		writeText3D(ps,tx.text(),txPos,tx.uvec(),tx.vvec(),tx.clr(),scale,view);
 	    }
 	    
 	    

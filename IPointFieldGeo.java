@@ -56,6 +56,11 @@ public class IPointFieldGeo extends IFieldGeo implements I3DFieldI{
 		double dist = this.pos.dist(pt);
 		if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	    }
+	    else if(decay == Decay.Custom && customDecay!=null){
+		double dist = this.pos.dist(pt);
+		r = customDecay.decay(intensity, dist, threshold);
+	    }
+	    
 	}
 	IVecI vec = getForce(pt,vel,this.pos);
 	

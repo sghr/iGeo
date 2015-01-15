@@ -476,6 +476,7 @@ public class IView{
 	    
 	    IVec cnt = transformMatrix.transform(center);
 	    for(int i=0; i<pts.length; i++) pts[i]=transformMatrix.transform(pts[i]);
+	    
 	    if(axonometric){
 		double xmin=0, ymin=0, xmax=0, ymax=0;
 		for(int i=0; i<pts.length; i++){
@@ -494,7 +495,7 @@ public class IView{
 		
 		double r = wid/(screenWidth/2);
 		if(hei/(screenHeight/2) > r) r = hei/(screenHeight/2);
-	    
+		
 		dir.len(-viewDistance);
 		axonRatio = r;
 	    }
@@ -517,7 +518,7 @@ public class IView{
 		    
 		    z = pts[i].z+Math.abs(cnt.y-pts[i].y)/persRatio;
 		    
-		if(z>maxz) maxz=z;
+		    if(z>maxz) maxz=z;
 		}
 		maxz -= cnt.z;
 		dir.len(-maxz);
@@ -843,13 +844,12 @@ public class IView{
 	    //if(hide) return;
 	    
 	    if(useGL){
-		
+
+		IOut.debug(100, "x="+pos.x+", y="+pos.y+", z="+pos.z+", yaw="+yaw+", pitch="+pitch);
 		
 		IMatrix3 rot = IMatrix3.getZRotation(yaw);
 		rot.mul(IMatrix3.getYRotation(pitch));
 		if(roll!=0) rot.mul(IMatrix3.getXRotation(roll));
-		
-		//IOut.p("x="+pos.x+", y="+pos.y+", z="+pos.z+", yaw="+yaw+", pitch="+pitch); //
 		
 		rot.invert();
 		
@@ -959,14 +959,12 @@ public class IView{
     public void setPerspective(double x, double y, double z){
 	setPerspective(x,y,z,Math.PI/4,Math.atan(Math.sqrt(2)/2));
     }
-    public void setPerspective(double x, double y, double z,
-			       double yaw, double pitch){
+    public void setPerspective(double x, double y, double z,double yaw, double pitch){
 	setLocation(x,y,z);
 	setAngle(yaw,pitch,true);
 	perspective();
 	//setPerspectiveRatio(defaultPersRatio); // keep the original perspective ratio
 	update();
-
 	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
     }
     
@@ -983,14 +981,30 @@ public class IView{
 	setPerspectiveAngle(perspectiveAngle); // added 20140315
     }
     public void setPerspective(double x, double y, double z,
-			       double yaw, double pitch,
-			       double perspectiveAngle){
+			       double yaw, double pitch, double perspectiveAngle){
 	setLocation(x,y,z);
 	setAngle(yaw,pitch,true);
 	perspective();
 	setPerspectiveAngle(perspectiveAngle);
-
 	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
+    }
+    
+    public void setPerspective(IVecI pos, IVecI dir){
+	IVec xydir = dir.get().cp().z(0);
+	double theta = dir.angle(xydir);
+	if(dir.z() > 0){ theta = -Math.abs(theta); }
+	else{ theta = Math.abs(theta); }
+	double phi = -xydir.angle(IG.xaxis, IG.zaxis);
+	setPerspective(pos.x(), pos.y(), pos.z(), phi, theta);
+    }
+    
+    public void setPerspective(IVecI pos, IVecI dir, double perspectiveAngle){
+	IVec xydir = dir.get().cp().z(0);
+	double theta = dir.angle(xydir);
+	if(dir.z() > 0){ theta = -Math.abs(theta); }
+	else{ theta = Math.abs(theta); }
+	double phi = -xydir.angle(IG.xaxis, IG.zaxis);
+	setPerspective(pos.x(), pos.y(), pos.z(), phi, theta, perspectiveAngle);
     }
     
     public void setAxonometric(){
@@ -1014,6 +1028,23 @@ public class IView{
 	setAxonometricRatio(axonometricRatio);
 	
 	if( pane.getPanel() != null ){ pane.getPanel().skipAutoFocus(); }
+    }
+    public void setAxonometric(IVecI pos, IVecI dir){
+	IVec xydir = dir.get().cp().z(0);
+	double theta = dir.angle(xydir);
+	if(dir.z() > 0){ theta = -Math.abs(theta); }
+	else{ theta = Math.abs(theta); }
+	double phi = -xydir.angle(IG.xaxis, IG.zaxis);
+	setAxonometric(pos.x(), pos.y(), pos.z(), phi, theta);
+    }
+
+    public void setAxonometric(IVecI pos, IVecI dir, double axonometricRatio){
+	IVec xydir = dir.get().cp().z(0);
+	double theta = dir.angle(xydir);
+	if(dir.z() > 0){ theta = -Math.abs(theta); }
+	else{ theta = Math.abs(theta); }
+	double phi = -xydir.angle(IG.xaxis, IG.zaxis);
+	setAxonometric(pos.x(), pos.y(), pos.z(), phi, theta, axonometricRatio);
     }
     
     

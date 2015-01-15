@@ -66,6 +66,9 @@ public class IMeshFieldGeo extends IFieldGeo implements I3DFieldI{ //extends I3D
         else if(decay == Decay.Gaussian){
             if(threshold>0) r *= Math.exp(-2*minDist*minDist/(threshold*threshold));
         }
+	else if(decay == Decay.Custom && customDecay!=null){
+	    r = customDecay.decay(intensity, minDist, threshold);
+	}
 	
         IVecI vec = get(minIdx);
 	

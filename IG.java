@@ -50,8 +50,8 @@ public class IG implements IServerI{
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 9; }
     public static int buildVersion(){ return 1; }
-    public static int revisionVersion(){ return 3; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2014, 9, 21); }
+    public static int revisionVersion(){ return 4; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2015, 1, 15); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -69,10 +69,13 @@ public class IG implements IServerI{
     public static final String GL = GL2; // switch before compile for target // for processing 2.0
     
     /** Processing Graphics using P3D to be put in size() method in Processing; under development. do not use yet. */
-    //public static final String P3D = "igeo.p.PIGraphics3D";
+    public static final String P3D = "igeo.p.PIGraphics3D";
     
     /** alias of IG.P3D */
-    //public static final String P3 = P3D;
+    public static final String P3 = P3D;
+
+    /** alias of IG.P3D */
+    public static final String P = P3D;
     
     /** Processing Graphics using JAVA to be put in size() method in Processing; to be implemented */
     //public static final String JAVA = "igeo.p.PIGraphicsJava";
@@ -725,6 +728,12 @@ public class IG implements IServerI{
 		gpanel.enableFullScreen(pane);
 		return pane;
 	    }
+	    else if(gpanel.gridPanes.length>0 &&
+		    gpanel.gridPanes[0].length>0 ){
+		IPane pane = gpanel.gridPanes[0][0];
+		gpanel.enableFullScreen(0);
+		return pane;
+	    }
 	}
 	return null;
     }
@@ -825,13 +834,19 @@ public class IG implements IServerI{
 	IPane pane = perspectivePane();
 	if(pane!=null){ pane.getView().setPerspective(x,y,z,yaw,pitch); }
     }
+    public static void perspective(IVecI pos, IVecI dir){
+	IPane pane = perspectivePane();
+	if(pane!=null){ pane.getView().setPerspective(pos,dir); }
+    }
     public static void perspectiveView(){ perspective(); }
     public static void perspectiveView(double x, double y, double z){ perspective(x,y,z); }
     public static void perspectiveView(double x, double y, double z,
 				       double yaw, double pitch){ perspective(x,y,z,yaw,pitch); }
+    public static void perspectiveView(IVecI pos, IVecI dir){ perspective(pos,dir); }
     public static void pers(){ perspective(); }
     public static void pers(double x, double y, double z){ perspective(x,y,z); }
     public static void pers(double x, double y, double z, double yaw, double pitch){ perspective(x,y,z,yaw,pitch); }
+    public static void pers(IVecI pos, IVecI dir){ perspective(pos,dir); }
     
     
     /** put perspective view on the full screen inside the window */
@@ -856,6 +871,12 @@ public class IG implements IServerI{
 	    pane.getView().setPerspective(x,y,z,yaw,pitch,perspectiveAngle);
 	}
     }
+    public static void perspective(IVecI pos, IVecI dir, double perspectiveAngle){
+	IPane pane = perspectivePane();
+	if(pane!=null){
+	    pane.getView().setPerspective(pos,dir,perspectiveAngle);
+	}
+    }
     public static void perspectiveView(double perspectiveAngle){ perspective(perspectiveAngle); }
     public static void perspectiveView(double x, double y, double z,
 				       double perspectiveAngle){
@@ -866,12 +887,18 @@ public class IG implements IServerI{
 				       double perspectiveAngle){
 	perspective(x,y,z,yaw,pitch,perspectiveAngle);
     }
+    public static void perspectiveView(IVecI pos, IVecI dir, double perspectiveAngle){
+	perspective(pos,dir,perspectiveAngle);
+    }
     public static void pers(double perspectiveAngle){ perspective(perspectiveAngle); }
     public static void pers(double x, double y, double z, double perspectiveAngle){
 	perspective(x,y,z,perspectiveAngle);
     }
     public static void pers(double x, double y, double z, double yaw, double pitch, double perspectiveAngle){
 	perspective(x,y,z,yaw,pitch,perspectiveAngle);
+    }
+    public static void pers(IVecI pos, IVecI dir, double perspectiveAngle){
+	perspective(pos,dir,perspectiveAngle);
     }
     
     /** put axonometric view on the full screen inside the window */
@@ -898,6 +925,14 @@ public class IG implements IServerI{
 	IPane pane = axonometricPane();
 	if(pane!=null){ pane.getView().setAxonometric(x,y,z,yaw,pitch,axonRatio); }
     }
+    public static void axonometric(IVecI pos, IVecI dir){
+	IPane pane = axonometricPane();
+	if(pane!=null){ pane.getView().setAxonometric(pos,dir); }
+    }
+    public static void axonometric(IVecI pos, IVecI dir, double axonRatio){
+	IPane pane = axonometricPane();
+	if(pane!=null){ pane.getView().setAxonometric(pos,dir,axonRatio); }
+    }
     public static void axonometricView(){ axonometric(); }
     public static void axonometricView(double x, double y, double z){
 	axonometric(x,y,z);
@@ -913,6 +948,12 @@ public class IG implements IServerI{
 				       double yaw, double pitch, double axonRatio){
 	axonometric(x,y,z,yaw,pitch,axonRatio);
     }
+    public static void axonometricView(IVecI pos, IVecI dir){
+	axonometric(pos,dir);
+    }
+    public static void axonometricView(IVecI pos, IVecI dir, double axonRatio){
+	axonometric(pos,dir,axonRatio);
+    }
     public static void axon(){ axonometric(); }
     public static void axon(double x, double y, double z){
 	axonometric(x,y,z);
@@ -925,6 +966,12 @@ public class IG implements IServerI{
     }
     public static void axon(double x, double y, double z, double yaw, double pitch, double axonRatio){
 	axonometric(x,y,z,yaw,pitch,axonRatio);
+    }
+    public static void axon(IVecI pos, IVecI dir){
+	axonometric(pos,dir);
+    }
+    public static void axon(IVecI pos, IVecI dir, double axonRatio){
+	axonometric(pos,dir,axonRatio);
     }
     
     
@@ -3348,6 +3395,55 @@ public class IG implements IServerI{
     }
     
     
+    /*********************************************************
+     * generic vector array copy
+     ********************************************************/
+    public static IVecI[] cp(IVecI ... vecarray){
+	if(vecarray==null) return null;
+	IVecI[] retval = new IVecI[vecarray.length];
+	for(int i=0; i<vecarray.length; i++){
+	    retval[i] = vecarray[i].cp();
+	}
+	return retval;
+    }
+    public static IVec[] cp(IVec ... vecarray){
+	if(vecarray==null) return null;
+	IVec[] retval = new IVec[vecarray.length];
+	for(int i=0; i<vecarray.length; i++){
+	    retval[i] = vecarray[i].cp();
+	}
+	return retval;
+    }
+    public static IVec2I[] cp(IVec2I ... vecarray){
+	if(vecarray==null) return null;
+	IVec2I[] retval = new IVec2I[vecarray.length];
+	for(int i=0; i<vecarray.length; i++){
+	    retval[i] = vecarray[i].cp();
+	}
+	return retval;
+    }
+    public static IVec2[] cp(IVec2 ... vecarray){
+	if(vecarray==null) return null;
+	IVec2[] retval = new IVec2[vecarray.length];
+	for(int i=0; i<vecarray.length; i++){
+	    retval[i] = vecarray[i].cp();
+	}
+	return retval;
+    }
+    public static IVec4[] cp(IVec4 ... vecarray){
+	if(vecarray==null) return null;
+	IVec4[] retval = new IVec4[vecarray.length];
+	for(int i=0; i<vecarray.length; i++){
+	    retval[i] = vecarray[i].cp();
+	}
+	return retval;
+    }
+
+    public static IVecI[] copy(IVecI ... vecarray){ return cp(vecarray); }
+    public static IVec[] copy(IVec ... vecarray){ return cp(vecarray); }
+    public static IVec2I[] copy(IVec2I ... vecarray){ return cp(vecarray); }
+    public static IVec2[] copy(IVec2 ... vecarray){ return cp(vecarray); }
+    public static IVec4[] copy(IVec4 ... vecarray){ return cp(vecarray); }
     
     
     /*********************************************************

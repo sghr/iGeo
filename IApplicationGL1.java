@@ -59,7 +59,7 @@ public class IApplicationGL1 implements GLEventListener /*, IPanelAdapter*/{
     }
     
     
-    public IPanel panel;
+    public IPanelI panel;
     public IG ig;
     public IGraphicsGL igg;
     public Frame frame;

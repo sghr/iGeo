@@ -47,7 +47,7 @@ public class PIGraphics3D extends PGraphics3D
     /** preserve Procesing's color mode or not */
     static boolean keepColorMode=false;
     
-    public IPanel panel;
+    public IPanelI panel;
     
     public IView view; // for IGrahpics3D
     /** cache of view.frontDirection() */
@@ -58,16 +58,11 @@ public class PIGraphics3D extends PGraphics3D
     public int origColorMode;
     public float origColorModeX, origColorModeY, origColorModeZ, origColorModeA;
     
-    
-    //public float pointSize=1f;
-    //public float weight=1f;
-    
     /**
        To show iGeo correctly in Processing's basic mode, this needs to be true.
     */
     public boolean overridePAppletFinish=true;
     public boolean finished=false;
-    
     
     /**
        To show iGeo correctly in Processing's basic mode, this needs to be true.
@@ -93,12 +88,44 @@ public class PIGraphics3D extends PGraphics3D
     
     public PImage bgImage=null;
     public IColor[][] bgColorCache=new IColor[2][2];
+    public boolean creatingBGImage=false;
+    public boolean resetTexture=false;
     
     
     public PIGraphics3D[][] subGraphics=null;
+
+    public PIGraphics3D alias=null;
+
+    //public boolean firstPanelDraw = true;
     
     
     public PIGraphics3D(){ super(); }
+    
+    public PIGraphics3D(PIGraphics3D g){
+	super();
+	alias=g; // alias mode (use alias graphics in fullscreen but use own in multi view )
+    }
+    
+    public void initPrimary(){
+	super.initPrimary();
+
+	if(alias!=null) return;
+	
+	// only in processing 2.0?
+	Object canvasObj = pgl.getCanvas();
+	if(canvasObj instanceof Canvas){
+	    Canvas canvas = (Canvas)canvasObj;
+	    canvas.addMouseListener(panel);
+	    canvas.addMouseMotionListener(panel);
+	    canvas.addMouseWheelListener(panel);
+	    canvas.addKeyListener(panel);
+	    canvas.addFocusListener(panel);
+	    canvas.addComponentListener(panel);
+	}
+	else{
+	    IG.err("not canvas: "+canvasObj);
+	}
+    }
     
     
     /**
@@ -107,104 +134,78 @@ public class PIGraphics3D extends PGraphics3D
        @param parent parent PApplet of Processing.
     */
     public void setParent(PApplet parent){
-	
 	super.setParent(parent);
 	
-	try{
-	    
-	    subGraphics = new PIGraphics3D[2][2];
-	    subGraphics[0][0] = new PIGraphics3D();
-	    subGraphics[0][1] = new PIGraphics3D();
-	    subGraphics[1][0] = new PIGraphics3D();
-	    subGraphics[1][1] = new PIGraphics3D();
-	    
-	    //IG.p("w = "+super.width+", h="+super.height);
-	    //IG.p("parent = "+parent);
-	    
-	    for(int i=0; i<2; i++) for(int j=0; j<2; j++){
-		//subGraphics[i][j].setPrimary(true); // true?
-		subGraphics[i][j].setSize(parent.getWidth()/2, parent.getHeight()/2);
-	    }
-	    
-	    /*
-	    PIPaneApplet[][] panes = new PIPaneApplet[2][2];
-	    panes[0][0] = new PIPaneApplet();
-	    panes[0][1] = new PIPaneApplet();
-	    panes[1][0] = new PIPaneApplet();
-	    panes[1][1] = new PIPaneApplet();
-	    
-	    panes[0][0].init();
-	    panes[0][1].init();
-	    panes[1][0].init();
-	    panes[1][1].init();
-	    
-	    
-	    parent.setLayout(null);
-	    parent.add(panes[0][0]);
-	    parent.add(panes[0][1]);
-	    parent.add(panes[1][0]);
-	    parent.add(panes[1][1]);
-	    
-	    
-	    // initialize root GUI
-	    panel = new IGridPanel(0,0,parent.getWidth(),parent.getHeight(),2,2,panes);
-	    */
-	    
-	    panel = new IGridPanel(0,0,parent.getWidth(),parent.getHeight(),2,2, subGraphics);
-	    
-	    panel.setVisible(true); // ?
-	    
-	    panel.setParent(parent);
-	    //panel.setAdapter(this);
-	    
-	    // initialize iGeo 
-	    IG ig = IG.init(panel);
-	    
-	    ig.server().graphicServer().enableGL(); //
-	    
-	    //ig.setBasePath(parent.sketchPath("")); // not sketchPath
-	    
-	    ig.setOnline(parent.online);
-	    
-	    if(!parent.online){ // only when running local
-		ig.setBasePath(parent.dataPath("")); // for default path to read/write files
-	    }
-	    
-	    ig.setInputWrapper(new PIInput(parent));
-	    
-	    parent.addMouseListener(panel);
-	    parent.addMouseMotionListener(panel);
-	    parent.addMouseWheelListener(panel);
-	    parent.addKeyListener(panel);
-	    parent.addFocusListener(panel);
-	    parent.addComponentListener(panel);
-	    
-	    if(parent.frame!=null){
-		parent.frame.addWindowListener(panel);
-	    }
-	    //noSmooth();
-	    
-	    if(PIConfig.drawBeforeProcessing) parent.registerPre(this);
-	    else parent.registerDraw(this);
-	    parent.registerPost(this);
-	    
-	    if(PIConfig.resizable){ parent.frame.setResizable(true); }
-	    	    
-	    enableDepthSort=IConfig.depthSort;
-	    if(enableDepthSort){ super.hint(ENABLE_DEPTH_SORT); }
-	    else{ super.hint(DISABLE_DEPTH_SORT); }
-	    
-	}catch(Exception e){ e.printStackTrace(); }
+	if(alias!=null) return;
+	
+	subGraphics = new PIGraphics3D[2][2];
+	subGraphics[0][0] = new PIGraphics3D(this); //this; 
+	subGraphics[0][1] = new PIGraphics3D(this);
+	subGraphics[1][0] = new PIGraphics3D(this);
+	subGraphics[1][1] = new PIGraphics3D(this);
+	subGraphics[0][0].setParent(parent); // ?
+	subGraphics[0][1].setParent(parent); // ?
+	subGraphics[1][1].setParent(parent); // ?
+	subGraphics[1][0].setParent(parent); // ?
+
+	int w = parent.getWidth();
+	int h = parent.getHeight();
+	
+	//subGraphics[0][0].setSize(w/2,h/2);
+	//subGraphics[0][1].setSize(w/2,h/2);
+	//subGraphics[1][1].setSize(w/2,h/2);
+	//subGraphics[1][0].setSize(w/2,h/2);
+	
+	subGraphics[0][0].setBounds(0,0,w/2,h/2);
+	subGraphics[0][1].setBounds(w/2,0,w/2,h/2);
+	subGraphics[1][0].setBounds(0,h/2,w/2,h/2);
+	subGraphics[1][1].setBounds(w/2,h/2,w/2,h/2);
+	
+	//subGraphics[i][j].setPrimary(true); // true?
+	
+	
+	// panel = new IGridPanel(0,0,parent.getWidth(),parent.getHeight(),2,2, subGraphics);
+	//panel = new IGridPanel(0,0,parent.getWidth(),parent.getHeight(),1,1, new IPane[][]{ new IPane[]{ this } });
+	
+	panel = new IGridPanel(0,0,parent.getWidth(),parent.getHeight(),2,2, subGraphics);
+	
+	panel.setVisible(true); // ?
+	panel.setParent(parent);
+	//panel.setAdapter(this);
+	
+	// initialize iGeo 
+	IG ig = IG.init(panel);
+	ig.server().graphicServer().enableGL(); //
+	setColorMode();
+	
+	//ig.setBasePath(parent.sketchPath("")); // not sketchPath
+	
+	ig.setOnline(parent.online);
+	
+	if(!parent.online){ // only when running local
+	    ig.setBasePath(parent.dataPath("")); // for default path to read/write files
+	}
+	
+	ig.setInputWrapper(new PIInput(parent));
+	
+	if(parent.frame!=null){
+	    parent.frame.addWindowListener(panel);
+	}
+	//noSmooth();
+	
+	if(PIConfig.drawBeforeProcessing) parent.registerPre(this);
+	else parent.registerDraw(this);
+	parent.registerPost(this);
+	
+	if(PIConfig.resizable){ parent.frame.setResizable(true); }
+	
+	enableDepthSort=IConfig.depthSort;
+	if(enableDepthSort){ super.hint(ENABLE_DEPTH_SORT); }
+	else{ super.hint(DISABLE_DEPTH_SORT); }
     }
-    
-    public void setParentPGraphics3D(PApplet parent){
-	super.setParent(parent);
-    }
-    
     
     public void pre(){ drawIG(); }
     public void draw(){ drawIG(); }
-    
     
     
     // overriding PGraphics.vertex to avoid error of disappearing lines when their end and start points are at the same location and DEPTH_SORT is enabled. 
@@ -212,9 +213,9 @@ public class PIGraphics3D extends PGraphics3D
 	
 	// part of this is excluded in PGraphics.vertex(float,float,float)
 	if(hints[ENABLE_DEPTH_SORT] &&
-	   shape == POLYGON &&
+	   (shape == POLYGON || shape==LINE_STRIP || shape==LINE)&&
 	   vertexCount > 0 &&
-	   /* vertexCount == shapeFirst && */ // first vertex
+	   // vertexCount == shapeFirst &&  // first vertex
 	   (Math.abs(vertices[vertexCount-1][X] - x) < EPSILON) &&
 	   (Math.abs(vertices[vertexCount-1][Y] - y) < EPSILON) &&
 	   (Math.abs(vertices[vertexCount-1][Z] - z) < EPSILON)) {
@@ -285,18 +286,14 @@ public class PIGraphics3D extends PGraphics3D
     /*
     // for debug
     protected void render(){
-	//IOut.err("point="+super.pointCount+", line="+super.lineCount+", triangle="+super.triangleCount);
 	super.render();
     }
     // for debug
     protected void sort(){
-	//IOut.err();
-	//IOut.err("point="+super.pointCount+", line="+super.lineCount+", triangle="+super.triangleCount);
 	super.sort();
     }
     // debug
     protected void endShapeStroke(int mode) {
-	//IOut.err();
 	switch (shape) {
 	case POLYGON:
 	    {
@@ -316,7 +313,6 @@ public class PIGraphics3D extends PGraphics3D
     // debug
     protected void addLine(int a, int b) { addLineWithClip2(a, b); }
     protected final void addLineWithClip2(int a, int b) {
-	IOut.err();
 	float az = vertices[a][VZ];
 	float bz = vertices[b][VZ];
 	if (az > cameraNear) {
@@ -343,14 +339,81 @@ public class PIGraphics3D extends PGraphics3D
     }
     */
     
+    /*
+    public void translateImpl(float x, float y, float z){
+	IG.err(x+","+y+","+z+ " @"+this);
+	IErr.printStack();
+	super.translateImpl(x,y,z);
+    }
+    */
     
-    
+    /*
+    protected void begin2D(){
+	IG.err();
+	super.begin2D();
+    }
+    */
     
     /**
        Drawing all the iGeo objects through IPanel.
        Overlay is also used to draw 2D graphics on top of OpenGL 3D graphics.
     */
-    public void drawIG(){ if(panel!=null) panel.draw(this); }
+    public void drawIG(){
+	if(alias==null){ // main graphic
+	    if(((IScreenTogglePanel)panel).fullScreenPane!=null){
+		panel.predraw(this);
+		
+		IView vw = ((PIGraphics3D)(((IScreenTogglePanel)panel).fullScreenPane)).view;
+		ArrayList<IGraphicI> objects = panel.getIG().server().graphicServer().getObjects(vw);
+		this.draw(objects, vw); // not g.draw() but this.draw()
+		panel.postdraw(this);
+	    }
+	    else{
+		
+		//if(firstPanelDraw){ // debug
+		if(panel!=null) panel.draw(this);
+		//    firstPanelDraw=false;
+		//}
+		
+
+		
+		beginDraw();
+		
+		pushMatrix();
+		resetMatrix();
+		
+		
+		ortho(0,super.width,0,super.height);
+		translate(-super.width/2, -super.height/2);
+		
+		
+		//IG.err("super.w="+super.width+", super.h"+super.height); //
+		
+		//scale((float)texture.glWidth/super.width, (float)texture.glHeight/super.height); //
+		
+		for(int i=0; i<subGraphics.length; i++){
+		    for(int j=0; j<subGraphics[i].length; j++){
+			//IG.err("sub["+i+"]["+j+"].w=" +subGraphics[i][j].width +", "+"sub["+i+"]["+j+"].h=" +subGraphics[i][j].height); //
+			
+			//super.image(subGraphics[i][j],subGraphics[i][j].screenX,subGraphics[i][j].screenY,subGraphics[i][j].width, subGraphics[i][j].height);
+			super.image(subGraphics[i][j],
+				    subGraphics[i][j].screenX,
+				    subGraphics[i][j].screenY,
+				    subGraphics[i][j].width,
+				    subGraphics[i][j].height); //
+		    }
+		}
+		
+		popMatrix();
+		
+		endDraw();
+		
+		
+		
+		
+	    }
+	}
+    }
     
     
     public void post(){
@@ -374,7 +437,62 @@ public class PIGraphics3D extends PGraphics3D
     
     public IView view(){ return view; }
     
+    
+    public void updateBGImage(int w, int h, IView vw){
+	
+	if( vw!=null && vw.bgColor!=null ){
+	    
+	    boolean createImg=false;
+	    
+	    for(int i=0; i<2; i++){
+		for(int j=0; j<2; j++){
+		    if(bgColorCache[i][j] != vw.bgColor[i][j]){
+			bgColorCache[i][j] = vw.bgColor[i][j];
+			createImg=true;
+		    }
+		}
+	    }
+	    
+	    if(bgImage==null||createImg
+	       || bgImage.width!=w||bgImage.height!=h){ 
+		
+		PImage bg = createBGImage(w,h,vw);
+		creatingBGImage = true;
+		bgImage = bg;
+		creatingBGImage = false;
+	    }
+	    
+	    if(resetTexture &&
+	       texture!=null &&
+	       (texture.glWidth!=super.width || texture.glHeight!=super.height)){
+		//IG.err("primarySurface = "+primarySurface); //
+		/*
+		if(primarySurface){
+		    //unbindFrontTexture();
+		    texture = null;
+		    loadTextureImpl(POINT, false);
+		    //bindFrontTexture();
+		}
+		else{
+		*/
+		//unbindFrontTexture();
+		//createPTexture();
+		//bindFrontTexture();
+		
+		texture = null;
+		if(primarySurface) loadTextureImpl(POINT, false);
+		super.restartPGL();
+		
+		//}
+		resetTexture=false;		    
+	    }
+	    
+	}
+    }
+    
     public PImage createBGImage(int w, int h, IView v){
+	
+	//IG.err("w = "+w+", h = "+h+ " @"+this); //
 	
 	PImage bgimg = new PImage(w,h);
 	float[][][] cl = new float[2][2][3];
@@ -398,8 +516,8 @@ public class PIGraphics3D extends PGraphics3D
 		bgimg.set(i,j, 0xFF<<24|(red&0xFF)<<16|(green&0xFF)<<8|(blue&0xFF));
 	    }
 	}
-	return bgimg;
 	
+	return bgimg;
 	
 	/*
 	PGraphics g = new PGraphics2D();
@@ -429,84 +547,68 @@ public class PIGraphics3D extends PGraphics3D
 	*/
     }
     
-    public void drawBG(IView view){
+    public void drawBG(IView vw){
 	
 	//IG.p("firstDraw = "+firstDraw);
 	//IG.p("clearBG = "+IConfig.clearBG);
 	//IG.p("x = "+screenX+", y = "+screenY+", w = "+super.width+", h = "+super.height); //
 	
-	if(view.bgColor!=null){
-	    // modelview?
-	    // projection?
-	    // depth test?
+	if(vw.bgColor!=null){
 	    
+	    /*
 	    boolean createImg=false;
-	    
 	    for(int i=0; i<2; i++){
 		for(int j=0; j<2; j++){
-		    if(bgColorCache[i][i] != view.bgColor[i][j]){
-			bgColorCache[i][j] = view.bgColor[i][j];
+		    if(bgColorCache[i][j] != vw.bgColor[i][j]){
+			bgColorCache[i][j] = vw.bgColor[i][j];
 			createImg=true;
 		    }
 		}
 	    }
-	    if(bgImage==null||createImg||
-	       bgImage.width<super.width||bgImage.height<super.height) // added 20120915
-		bgImage = createBGImage(super.width,super.height,view); 
-	    
-	    //try{
-	    background(bgImage);
-	    //backgroundImpl(bgImage);
-	    //}catch(Exception e){
-	    //	IG.err("bgImage w = "+bgImage.width+" h = "+bgImage.height); //
-	    //	e.printStackTrace();
-	    //}
-	    
-	    /*
-	    //super.resetMatrix(); // ?
-	    super.ortho();
-	    super.noStroke();
-	    super.beginShape(QUADS);
-	    clr(view.bgColor[0][0]);
-	    super.vertex(0,0,-100); //vertex(-0.5f,-1);
-	    clr(view.bgColor[1][0]);
-	    super.vertex(width,0,-100); //vertex(-0.5f,-1);
-	    clr(view.bgColor[1][1]);
-	    super.vertex(width,height,-100);
-	    clr(view.bgColor[0][1]);
-	    super.vertex(0,height,-100);
-	    super.endShape();
+	    if(bgImage==null||createImg
+	       || bgImage.width<super.width||bgImage.height<super.height){ // added 20120915
+		PImage bg = createBGImage(super.width,super.height,vw);
+		creatingBGImage = true;
+		bgImage = bg;
+		creatingBGImage = false;
+	    }
 	    */
 	    
-	    /*
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
-	    gl.glPushMatrix();
-	    gl.glLoadIdentity();
-	    gl.glMatrixMode(GL.GL_PROJECTION);
-	    gl.glPushMatrix();
-	    gl.glLoadIdentity();
-	    gl.glDisable(GL.GL_DEPTH_TEST);
-	    //if(mode.isLight()) gl.glDisable(GL.GL_LIGHTING);
-	    gl.glBegin(GL.GL_QUADS);
-	    gl.glColor3dv(bgColor[0][1],0);
-	    gl.glVertex3d(-1.,-1.,0);
-	    gl.glColor3dv(bgColor[1][1],0);
-	    gl.glVertex3d(1.,-1.,0);
-	    gl.glColor3dv(bgColor[1][0],0);
-	    gl.glVertex3d(1.,1.,0);
-	    gl.glColor3dv(bgColor[0][0],0);
-	    gl.glVertex3d(-1.,1.,0);
-	    gl.glEnd();
-	    gl.glEnable(GL.GL_DEPTH_TEST);
-	    gl.glMatrixMode(GL.GL_MODELVIEW);
-	    gl.glPopMatrix();
-	    gl.glMatrixMode(GL.GL_PROJECTION);
-	    gl.glPopMatrix();
-	    */
+	    if(!creatingBGImage){
+
+		/*
+		if(resetTexture &&
+		   texture!=null&&
+		   (texture.glWidth!=super.width || texture.glHeight!=super.height)){
+		   //IG.err("primarySurface = "+primarySurface); //
+		    if(primarySurface){
+			//unbindFrontTexture();
+			texture = null;
+			loadTextureImpl(POINT, false);
+			//bindFrontTexture();
+
+		    }
+		    else{
+			//unbindFrontTexture();
+			//createPTexture();
+			//bindFrontTexture();
+		    }
+		    resetTexture=false;		    
+		}
+		*/
+		
+		background(bgImage);
+		//backgroundImpl(bgImage);
+		//backgroundImpl();
+		//super.setImpl(bgImage,0,0,super.width,super.height,0,0);
+		
+		//set(0,0,bgImage);
+		//image(bgImage, 0, 0); //
+	    }
+	    
 	}
 	
     }
-    
     
     public void drawView(IView view){
 	
@@ -526,7 +628,7 @@ public class PIGraphics3D extends PGraphics3D
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPushMatrix();
             gl.glLoadIdentity();
-
+	    
             gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, defaultGLLightPosition, 0);
             gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, defaultGLAmbientLight, 0);
             gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, defaultGLDiffuseLight, 0);
@@ -579,31 +681,40 @@ public class PIGraphics3D extends PGraphics3D
 	    super.smooth(); // this makes perspective close up very very heavy.
 	}
 	
+	// if(true)return;
 	
-	//super.resetMatrix();
+	// super.resetMatrix();
 	
 	// not sure why this is necessary. but it works.
-	super.translate(view.screenWidth/2, view.screenHeight/2, 0);
+	// super.translate(view.screenWidth/2, view.screenHeight/2, 0);
 	
-	//IG.p("view w = "+view.screenWidth + ", h = "+view.screenHeight); //
-	//IG.p("pane w = "+this.getWidth() + ", h = "+this.getHeight()); //
+	// IG.p("view w = "+view.screenWidth + ", h = "+view.screenHeight); //
+	// IG.p("pane w = "+this.getWidth() + ", h = "+this.getHeight()); //
+	
 	
 	super.scale(1,-1,1);
 	
         if(view.axonometric){
-            double glWidth = view.screenWidth*view.axonRatio;
+            double glWidth = view.screenWidth*view.axonRatio; 
             double glHeight = view.screenHeight*view.axonRatio;
-	    super.ortho((float)-glWidth/2,(float)glWidth/2,(float)-glHeight/2,(float)glHeight/2,
+	    
+	    super.ortho((float)-glWidth/2+(float)view.screenWidth/2,
+			(float)glWidth/2+(float)view.screenWidth/2,
+			(float)-glHeight/2+(float)view.screenHeight/2,
+			(float)glHeight/2+(float)view.screenHeight/2,
 			(float)view.near,(float)view.far);
+	    
+	    // not sure why +scrrenWidth/2, +screenHeight/2
         }
         else{
 	    super.scale(view.screenHeight);
-	    
 	    double glHeight = view.near*view.persRatio*2;
             double glWidth = glHeight*view.screenWidth/view.screenHeight;
-            super.frustum((float)-glWidth/2,(float)glWidth/2,(float)-glHeight/2,(float)glHeight/2,
-			  (float)view.near,(float)view.far);
-        }
+            super.frustum((float)-glWidth/2,(float)glWidth/2,
+			  (float)-glHeight/2,(float)glHeight/2,
+			  (float)view.near,
+			  (float)view.far*view.screenHeight);
+	}
 	
 	
 	super.applyMatrix((float)view.transformArray[0], (float)view.transformArray[4],
@@ -615,7 +726,7 @@ public class PIGraphics3D extends PGraphics3D
 			  (float)view.transformArray[3], (float)view.transformArray[7],
 			  (float)view.transformArray[11], (float)view.transformArray[15]);
 	
-		
+	
 	/*
         gl.glMatrixMode(GL.GL_MODELVIEW);
         //gl.glLoadIdentity();
@@ -647,15 +758,6 @@ public class PIGraphics3D extends PGraphics3D
 	view = v;
 	if(view.hide) return;
 	
-	/*
-	// test
-	ArrayList<IGraphicI> obj = new ArrayList<IGraphicI>();
-	for(int i=0; i<IConfig.maxObjectNumberForDepthSort&& i<objects.size(); i++){
-	    obj.add(objects.get(i));
-	}
-	objects = obj;
-	*/
-	
 	// check object num to determin depth sort
 	if(enableDepthSort){
 	    if(objects!=null &&
@@ -674,10 +776,18 @@ public class PIGraphics3D extends PGraphics3D
 	    }
 	}
 	
+	// bg image preparation
+	updateBGImage(super.width,super.height,view);
+	
+	//super.pushMatrix();
+	super.resetMatrix();
+	
 	super.beginDraw();
 	
 	drawView(view);
-
+	
+	//IG.err("drawing "+objects.size() +" objects");
+	
 	if(objects!=null)
 	    //for(int i=0; i<objects.size(); i++)
 	    for(int i=objects.size()-1; i>=0; i--)
@@ -701,6 +811,8 @@ public class PIGraphics3D extends PGraphics3D
 	*/
 	
 	super.endDraw();
+	
+	//super.popMatrix();
     }
     
     public boolean firstDraw(){ return firstDraw; }
@@ -709,7 +821,9 @@ public class PIGraphics3D extends PGraphics3D
 	if(subGraphics!=null){
 	    for(int i=0; i<subGraphics.length; i++){
 		for(int j=0; j<subGraphics[i].length; j++){
-		    subGraphics[i][j].firstDraw(f);
+		    if(subGraphics[i][j]!=this){
+			subGraphics[i][j].firstDraw(f);
+		    }
 		}
 	    }
 	}
@@ -742,85 +856,117 @@ public class PIGraphics3D extends PGraphics3D
     public void popColorMode(){
 	super.colorMode(origColorMode,origColorModeX,origColorModeY,origColorModeZ,origColorModeA);
     }
+    public void setColorMode(){
+	colorMode(RGB, 255);
+    }
     
-    public void clr(IColor c){ clr(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha()); }
-    public void clr(float r, float g, float b){ clr(r,g,b,255); }
+    public void clr(IColor c){ this.clr(c.red(),c.green(),c.blue(),c.alpha()); }
+    /* float 0 - 1 */
+    public void clr(float r, float g, float b){ this.clr(r,g,b,1f); }
+    /* float 0 - 1 */
     public void clr(float r, float g, float b, float a){
+	//IG.err(r+","+g+","+b+","+a); //
+	
 	if(keepColorMode && !isDefaultColorMode()){
 	    pushColorMode();
-	    super.fill(r,g,b,a);
+	    setColorMode();
+	    super.fill(r*255,g*255,b*255,a*255);
 	    popColorMode();
 	}
-	else{ super.fill(r,g,b,a); }
+	else{ super.fill(r*255,g*255,b*255,a*255); }
     }
-    public void clr(float[] rgba){ clr(rgba[0],rgba[1],rgba[2],rgba[3]); }
+    /* float 0 - 1 */
+    public void clr(float[] rgba){ this.clr(rgba[0],rgba[1],rgba[2],rgba[3]); }
     /** alpha : 0-1 */
     public void clr(IColor c, float alpha){
-	clr(c.getRed(),c.getGreen(),c.getBlue(),alpha*255);
+	this.clr(c.red(),c.green(),c.blue(),alpha);
     }
     
-    public void stroke(IColor c){ stroke(c.getRed(),c.getGreen(),c.getBlue(),c.getAlpha()); }
+    public void stroke(IColor c){ this.stroke(c.red(),c.green(),c.blue(),c.alpha()); }
     public void stroke(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
 	    pushColorMode();
-	    super.stroke(r,g,b,a);
+	    setColorMode();
+	    super.stroke(r*255,g*255,b*255,a*255);
 	    popColorMode();
 	}
-	else{ super.stroke(r,g,b,a); }
+	else{ super.stroke(r*255,g*255,b*255,a*255); }
     }
-    public void stroke(float r, float g, float b){ stroke(r,g,b,255); }
-    public void stroke(float[] rgba){ stroke(rgba[0],rgba[1],rgba[2],rgba[3]); }
+    public void stroke(float r, float g, float b){ this.stroke(r,g,b,1f); }
+    public void stroke(float[] rgba){ this.stroke(rgba[0],rgba[1],rgba[2],rgba[3]); }
+    public void stroke(IColor c, float alpha){ this.stroke(c.red(),c.green(),c.blue(),alpha); }
     
-    public void weight(float w){ /*this.weight=w;*/ super.strokeWeight(w); }
+    public void weight(float w){
+	/*this.weight=w;*/
+	
+	if(view.axonometric){
+	    super.strokeWeight(w);
+	}
+	else{
+	    super.strokeWeight(w/view.screenHeight); // somehow in perspective, line weight is scaled by screenHeight
+	}
+    }
     
-    public void diffuse(float r, float g, float b, float a){ clr(r,g,b,a); }
-    public void diffuse(float r, float g, float b){ clr(r,g,b,255); }
-    public void diffuse(IColor c){ clr(c); }
-    public void diffuse(IColor c,float alpha){ clr(c,alpha); }
-    public void diffuse(float[] rgba){ clr(rgba); }
+    public void diffuse(float r, float g, float b, float a){
+	clr(r,g,b,a);
+    }
+    
+    public void diffuse(float r, float g, float b){ this.diffuse(r,g,b,1f); }
+    public void diffuse(IColor c){
+	this.diffuse(c.red(), c.green(), c.blue(), c.alpha());
+    }
+    public void diffuse(IColor c,float alpha){
+	this.diffuse(c.red(), c.green(), c.blue(), alpha);
+    }
+    public void diffuse(float[] rgba){
+	this.diffuse(rgba[0], rgba[1], rgba[2], rgba[3]);
+    }
     
     
     public void ambient(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
 	    pushColorMode();
-	    super.ambient(r,g,b);
+	    setColorMode();
+	    super.ambient(r*255,g*255,b*255);
 	    popColorMode();
 	}
-	else{ super.ambient(r,g,b); }
+	else{ super.ambient(r*255,g*255,b*255); }
     }
-    public void ambient(float r, float g, float b){ this.ambient(r,g,b,255); }
-    public void ambient(float[] rgba){ ambient(rgba[0],rgba[1],rgba[2],rgba[3]); }
-    public void ambient(IColor c){ ambient(c.getRed(),c.getGreen(),c.getBlue()); }
-    public void ambient(IColor c, float alpha){ ambient(c.getRed(),c.getGreen(),alpha*255); }
+    public void ambient(float r, float g, float b){ this.ambient(r,g,b,1f); }
+    public void ambient(float[] rgba){ this.ambient(rgba[0],rgba[1],rgba[2],rgba[3]); }
+    public void ambient(IColor c){ this.ambient(c.red(),c.green(),c.blue(),c.alpha()); }
+    public void ambient(IColor c, float alpha){ this.ambient(c.red(),c.green(),alpha); }
     
     public void specular(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
 	    pushColorMode();
-	    super.specular(r,g,b);
+	    setColorMode();
+	    super.specular(r*255,g*255,b*255);
 	    popColorMode();
 	}
-	else{ super.specular(r,g,b); }
+	else{ super.specular(r*255,g*255,b*255); }
     }
-    public void specular(float r, float g, float b){ this.specular(r,g,b,255); }
+    public void specular(float r, float g, float b){ this.specular(r,g,b,1f); }
     public void specular(float[] rgba){ this.specular(rgba[0],rgba[1],rgba[2],rgba[3]); }
-    public void specular(IColor c){ specular(c.getRed(),c.getGreen(),c.getBlue()); }
-    public void specular(IColor c, float alpha){ specular(c.getRed(),c.getGreen(),c.getBlue(),alpha*255); }
+    public void specular(IColor c){ specular(c.red(),c.green(),c.blue(),c.alpha()); }
+    public void specular(IColor c, float alpha){ specular(c.red(),c.green(),c.blue(),alpha); }
     
     public void emissive(float r, float g, float b, float a){
 	if(keepColorMode && !isDefaultColorMode()){
 	    pushColorMode();
-	    super.emissive(r,g,b);
+	    setColorMode();
+	    super.emissive(r*255,g*255,b*255);
 	    popColorMode();
 	}
-	else{ super.emissive(r,g,b); }
+	else{ super.emissive(r*255,g*255,b*255); }
     }
-    public void emissive(float r, float g, float b){ this.emissive(r,g,b,255); }
+    public void emissive(float r, float g, float b){ this.emissive(r,g,b,1f); }
     public void emissive(float[] rgba){ this.emissive(rgba[0],rgba[1],rgba[2],rgba[3]); }
     public void emissive(IColor c){
-	emissive(c.getRed(),c.getGreen(),c.getBlue());
+	emissive(c.red(),c.green(),c.blue(),c.alpha());
     }
     public void emissive(IColor c, float alpha){
-	emissive(c.getRed(),c.getGreen(),c.getBlue(),alpha*255);
+	emissive(c.red(),c.green(),c.blue(),alpha);
     }
     
     public void shininess(float s){ super.shininess(s); }
@@ -830,11 +976,14 @@ public class PIGraphics3D extends PGraphics3D
     
     
     //public void pointSize(float sz){ pointSize=sz; }
-    public void pointSize(float sz){ weight(sz); } // point is drawn as line
+    public void pointSize(float sz){ // point is drawn as line
+	super.strokeWeight(sz);
+    } 
     
     
     public boolean isInFront(IVec p){
-	return p.dif(viewLocation).dot(viewDirection)>0;
+	return true;  // debug
+	//return p.dif(viewLocation).dot(viewDirection)>0;
     }
     
     
@@ -863,12 +1012,14 @@ public class PIGraphics3D extends PGraphics3D
 	super.stroke=true;
 	super.fill=false;
 	
-	//super.beginShape(POINTS);
-	super.beginShape(LINES); // use lines. POINTS in P3D has no control on size.
+	super.beginShape(POINTS); // use POINTS for processing 2.0
+	//super.beginShape(LINE); // use lines. POINTS in P3D has no control on size.
+	//super.beginShape(LINE_STRIP); // use lines. POINTS in P3D has no control on size.
+	
 	if(IConfig.cullVertexBehindViewInP3D){
-	    if(isInFront(p)){ vertex(p); vertex(p); }
+	    if(isInFront(p)){ vertex(p); /*vertex(p);*/ }
 	}
-	else{ vertex(p); vertex(p); }
+	else{ vertex(p); /*vertex(p);*/ }
 	super.endShape();
 	
 	/*
@@ -877,7 +1028,7 @@ public class PIGraphics3D extends PGraphics3D
 		super.beginShape(POINTS);
 		vertex(p);
 		super.endShape();
-		//super.strokeCap(ROUND); / /ROUND doesn't work in P3D
+		//super.strokeCap(ROUND); //ROUND doesn't work in P3D
 		//drawLines(new IVec[]{p, p});
 	    }
 	}
@@ -892,13 +1043,14 @@ public class PIGraphics3D extends PGraphics3D
     public void drawPoints(IVec[] p){
 	super.stroke=true;
 	super.fill=false;
-	//super.beginShape(POINTS);
-	super.beginShape(LINES); // use lines. POINTS in P3D has no control on size.
+	super.beginShape(POINTS); // use POINTS for processing 2.0
+	//super.beginShape(LINES); // use lines. POINTS in P3D has no control on size.
+	//super.beginShape(LINE_STRIP); // use lines. POINTS in P3D has no control on size.
 	for(int i=0; i<p.length; i++){
 	    if(IConfig.cullVertexBehindViewInP3D){
-		if(isInFront(p[i])){ vertex(p[i]); vertex(p[i]); }
+		if(isInFront(p[i])){ vertex(p[i]); /*vertex(p[i]);*/ }
 	    }
-	    else{ vertex(p[i]); vertex(p[i]); }
+	    else{ vertex(p[i]); /*vertex(p[i]);*/ }
 	}
 	super.endShape();
 	
@@ -945,7 +1097,8 @@ public class PIGraphics3D extends PGraphics3D
 		if(currentFront){
 		    if(isDrawing){ vertex(p[i]); }
 		    else{
-			super.beginShape(POLYGON);
+			//super.beginShape(POLYGON);
+			super.beginShape(LINE_STRIP);
 			vertex(p[i]);
 			isDrawing=true;
 		    }
@@ -962,7 +1115,8 @@ public class PIGraphics3D extends PGraphics3D
 	    if(isDrawing){ super.endShape(); }
 	}
 	else{
-	    super.beginShape(POLYGON);
+	    //super.beginShape(POLYGON);
+	    super.beginShape(LINE_STRIP);
 	    for(int i=0; i<p.length; i++){ vertex(p[i]); }
 	    //vertex(p);
 	    super.endShape();
@@ -1789,10 +1943,12 @@ public class PIGraphics3D extends PGraphics3D
         }
     }
     public void drawQuadMatrix(IVec[][] pts, IVec[][] nml){
+	
 	super.stroke= false;
 	super.fill = true;
+	
         for(int i=0; i<pts.length-1; i++){
-
+	    
 	    if(IConfig.cullVertexBehindViewInP3D){
 		boolean previousFront=false;
 		boolean isDrawing=false;
@@ -3066,21 +3222,96 @@ public class PIGraphics3D extends PGraphics3D
      * implementation of IPane
      *****************************************************************************/
     
-    
     public synchronized void setLocation(int x, int y){
 	screenX=x; screenY=y;
 	if(view!=null) view.setPane(this);
     }
+    
     public synchronized void setSize(int w, int h){
-	if(view!=null){ bgImage = createBGImage(w,h,view); } // create bg before setSize()
-	super.setSize(w,h); // set size before setPane
+
+	/*
+	creatingBGImage = true;
+	if(view!=null){
+	    PImage bg = createBGImage(w,h,view);
+	    bgImage = bg;
+	} // create bg before setSize()
+	*/
+
+	//if(!primarySurface){
+	resetTexture=true;
+	updateBGImage(w,h,view); 
+	//}
+	
+	super.setSize(w, h); // set size before setPane
+	
+	//super.texture = null; // to update OpenGL texture and pixels
+	
+	
+	//IErr.printStack(); //
+	
 	if(view!=null){ view.setPane(this); }
+	
+	creatingBGImage = false;
+	
+	/*
+	if(alias==null){ // main view
+	    subGraphics[0][0].setBounds(screenX,screenY,w/2,h/2);
+	    subGraphics[0][1].setBounds(screenX+w/2,screenY,w/2,h/2);
+	    subGraphics[1][0].setBounds(screenX,screenY+h/2,w/2,h/2);
+	    subGraphics[1][1].setBounds(screenX+w/2,screenY+h/2,w/2,h/2);
+	}
+	*/
+    }
+    /*
+    public void loadTextureImpl(int t, boolean b){
+	IG.err();
+	super.loadTextureImpl(t,b);
     }
     
+    public void drawTexture(int x, int y, int w, int h){
+	IG.err("x="+x+", y="+y+",w="+w+",h="+h+" @"+this); //
+	IG.err("width = "+width+", height = "+height);
+	IG.err("texture.glWidth="+texture.glWidth+", texture.glHeight="+texture.glHeight);
+	//IErr.printStack();
+	super.drawTexture(x,y,w,h);
+    }
+    */
+
+    /*
+    public void drawPixels(int x, int y, int w, int h){
+	IG.err("x="+x+", y="+y+",w="+w+",h="+h+" @"+this); //
+	IG.err("texture.glWidth="+texture.glWidth+", texture.glHeight="+texture.glHeight);
+	super.drawPixels(x,y,w,h);
+    }
+    */
+    
+    /*
+    public void updatePixels(int x, int y, int w, int h){
+	IG.err("x="+x+", y="+y+",w="+w+",h="+h+" @"+this); //
+	super.updatePixels(x,y,w,h);
+    }
+    */
+
+    
+    /*
+    public void setImpl(PImage i, int x, int y, int w, int h, int tx, int ty){
+	IG.err("img.w="+i.width+", img.h="+i.height+", x="+x+", y="+y+", w="+w+", h="+h+", tx="+tx+", ty="+ty); //
+	super.setImpl(i,x,y,w,h,tx,ty);
+    }
+    */
+
+    /*
+    public void initOffscreen(){
+	IG.err(); //
+	super.initOffscreen();
+    }
+    */
+    
+    
     public synchronized void setBounds(int x, int y, int w, int h){
-	//IG.p("x="+x+", y="+y+", w="+w+", h="+h); //
-	this.setSize(w,h);
+	//IG.err("x="+x+", y="+y+",w="+w+",h="+h+" @"+this); //
 	screenX=x; screenY=y;
+	this.setSize(w,h);
     }
     
     public float getX(){ return screenX; }
@@ -3099,7 +3330,7 @@ public class PIGraphics3D extends PGraphics3D
         return true;
     }
     
-    public void setPanel(IPanelI p){ if(p instanceof IPanel) panel = (IPanel)p; }
+    public void setPanel(IPanelI p){ panel = p; }
     public IPanelI getPanel(){ return panel; }
     
     public void setBorderWidth(float b){ borderWidth=b; }
@@ -3123,12 +3354,15 @@ public class PIGraphics3D extends PGraphics3D
     public IView getView(){ return view; }
     
     public void draw(IGraphics g){
+	
 	if(view!=null){
-	    ArrayList<IGraphicI> objects = panel.ig.server().graphicServer().getObjects(view);
+	    ArrayList<IGraphicI> objects = panel.getIG().server().graphicServer().getObjects(view);
 	    this.draw(objects, view); // not g.draw()
-	    //((PIGraphics3D)g).image(this,screenX,screenY);
 	    
-	    ((PIGraphics3D)g).set(screenX,screenY,this);
+	    // to be continued 20150101
+	    
+	    //((PIGraphics3D)g).image(this,screenX,screenY);
+	    //((PIGraphics3D)g).set(screenX,screenY,this); // necessary?
 	}
 	else{ IOut.err("view is null"); } //
     }
@@ -3216,7 +3450,7 @@ public class PIGraphics3D extends PGraphics3D
     ////////////////////////////////////////////////////////////////////////
     /*
     public static class SubApplet extends PApplet implements IPane{
-	public IPanel panel;
+	public IPanelI panel;
 	public float borderWidth;
 	public Color borderColor;
 	public INavigator navigator;
@@ -3240,8 +3474,8 @@ public class PIGraphics3D extends PGraphics3D
 	public boolean isVisible(){ return false; }
 	public void setVisible(boolean b){}
 	public boolean contains(int x, int y){ return false; }
-	public void setPanel(IPanel p){ panel = p; }
-	public IPanel getPanel(){ return panel; }
+	public void setPanel(IPanelI p){ panel = p; }
+	public IPanelI getPanel(){ return panel; }
 	public void setBorderWidth(float b){ borderWidth=b; }
 	public float getBorderWidth(){ return borderWidth; }
 	public Stroke getBorderStroke(){ return null; }
@@ -3306,6 +3540,5 @@ public class PIGraphics3D extends PGraphics3D
     }
     */
     
-
 }
 

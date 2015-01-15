@@ -41,6 +41,7 @@ public class ICurveTangentField extends I3DField{
     public ICurveTangentField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public ICurveTangentField gaussian(double threshold){ super.gaussian(threshold); return this; }
     public ICurveTangentField gauss(double threshold){ super.gauss(threshold); return this; }
+    public ICurveTangentField decay(IDecay decay, double threshold){ super.decay(decay,threshold); return this; }
     public ICurveTangentField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
     /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
     public ICurveTangentField bidirectional(boolean b){ super.bidirectional(b); return this; }

@@ -53,28 +53,49 @@ public class IArc extends ICurve{
     public IArc(){}
     
     public IArc(IVecI center, IVecI normal, IVecI startPt, double angle){
-	this(null,center,normal,startPt,angle);
+	this((IServerI)null,center,normal,startPt,angle);
     }
     public IArc(IVecI center, IVecI normal, IVecI startPt, IDoubleI angle){
-	this(null,center,normal,startPt,angle);
+	this((IServerI)null,center,normal,startPt,angle);
     }
     public IArc(IVecI center, IVecI startPt, double angle){
-	this(null,center,new IVec(0,0,1),startPt,angle);
+	this((IServerI)null,center,new IVec(0,0,1),startPt,angle);
     }
     public IArc(IVecI center, IVecI startPt, IDoubleI angle){
-	this(null,center,new IVec(0,0,1),startPt,angle);
+	this((IServerI)null,center,new IVec(0,0,1),startPt,angle);
     }
     public IArc(double x, double y, double z, double startX, double startY, double startZ, double angle){
-	this(null,new IVec(x,y,z),new IVec(0,0,1),new IVec(startX, startY, startZ), angle);
+	this((IServerI)null,new IVec(x,y,z),new IVec(0,0,1),new IVec(startX, startY, startZ), angle);
     }
     public IArc(IVecI center, IVecI startPt, IVecI endPt, IBoolI flipArcSide){
-	this(null,center,startPt,endPt,flipArcSide);
+	this((IServerI)null,center,startPt,endPt,flipArcSide);
     }
     public IArc(IVecI center, IVecI startPt, IVecI endPt, boolean flipArcSide){
-	this(null,center,startPt,endPt,flipArcSide);
+	this((IServerI)null,center,startPt,endPt,flipArcSide);
+    }
+    public IArc(IVecI center, IVecI startPt, IVecI endPt){
+	this((IServerI)null,center,startPt,endPt);
     }
     public IArc(IVecI center, IVecI startPt, IVecI midPt, IVecI endPt, IVecI normal){
-	this(null,center,startPt,midPt,endPt,normal);
+	this((IServerI)null,center,startPt,midPt,endPt,normal);
+    }
+    public IArc(IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, IDoubleI radius, IBoolI flipArcSide){
+	this((IServerI)null, line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius,flipArcSide);
+    }
+    public IArc(IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, double radius, boolean flipArcSide){
+	this((IServerI)null, line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius,flipArcSide);
+    }
+    public IArc(IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, IDoubleI radius){
+	this((IServerI)null, line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius);
+    }
+    public IArc(IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, double radius){
+	this((IServerI)null, line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius);
+    }
+    public IArc(IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, IDoubleI radius, IBoolI flipArcSide){
+	this((IServerI)null, sharedLinePt,line1Pt,line2Pt,radius,flipArcSide);
+    }
+    public IArc(IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, double radius, boolean flipArcSide){
+	this((IServerI)null, sharedLinePt,line1Pt,line2Pt,radius,flipArcSide);
     }
     
     public IArc(IServerI s, IVecI center, IVecI normal, IVecI startPt, double angle){
@@ -98,10 +119,30 @@ public class IArc extends ICurve{
     public IArc(IServerI s, IVecI center, IVecI startPt, IVecI endPt, boolean flipArcSide){
 	super(s, new IArcGeo(center,startPt,endPt,flipArcSide));
     }
+    public IArc(IServerI s, IVecI center, IVecI startPt, IVecI endPt){
+	super(s, new IArcGeo(center,startPt,endPt,false));
+    }
     public IArc(IServerI s, IVecI center, IVecI startPt, IVecI midPt, IVecI endPt, IVecI normal){
 	super(s, new IArcGeo(center,startPt,midPt,endPt,normal));
     }
-    
+    public IArc(IServerI s,IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, IDoubleI radius, IBoolI flipArcSide){
+	super(s, new IArcGeo(line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius,flipArcSide));
+    }
+    public IArc(IServerI s,IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, double radius, boolean flipArcSide){
+	super(s, new IArcGeo(line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius,flipArcSide));
+    }
+    public IArc(IServerI s,IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, IDoubleI radius){
+	super(s, new IArcGeo(line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius,new IBool(false)));
+    }
+    public IArc(IServerI s,IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, double radius){
+	super(s, new IArcGeo(line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius,false));
+    }
+    public IArc(IServerI s,IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, IDoubleI radius, IBoolI flipArcSide){
+	super(s, new IArcGeo(sharedLinePt,line1Pt,line2Pt,radius,flipArcSide));
+    }
+    public IArc(IServerI s,IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, double radius, boolean flipArcSide){
+	super(s, new IArcGeo(sharedLinePt,line1Pt,line2Pt,radius,flipArcSide));
+    }
     
     
     

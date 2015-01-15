@@ -46,7 +46,6 @@ public class IServer implements IServerI{
     public IDynamicServer dynamicServer; // non null when dynamic subobject is used
     
     public IG ig; // parent
-    //IPanelI panel; // non null in graphic mode
     
     // for updating logic of other object referring IServer
     public int stateCount=0; // incremented when any change happens in the state
@@ -121,8 +120,6 @@ public class IServer implements IServerI{
 	}
     }
     */
-    
-    //public IPanelI getPanel(){ return panel; }
     
     public boolean isGraphicMode(){ return graphicServer!=null; }
     

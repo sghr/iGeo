@@ -128,7 +128,7 @@ public class IArcGeo extends ICurveGeo{
     public IArcGeo(){}
     
     public IArcGeo(IVecI center, IVecI normal, IVecI startPt, double angle){
-	init(center,normal,startPt,new IDouble(angle));
+	init(center,normal,startPt,angle);
     }
     public IArcGeo(IVecI center, IVecI normal, IVecI startPt, IDoubleI angle){
 	init(center,normal,startPt,angle);
@@ -137,12 +137,23 @@ public class IArcGeo extends ICurveGeo{
 	init(center,startPt,endPt,flipArcSide);
     }
     public IArcGeo(IVecI center, IVecI startPt, IVecI endPt, boolean flipArcSide){
-	init(center,startPt,endPt,new IBool(flipArcSide));
+	init(center,startPt,endPt,flipArcSide);
     }
     public IArcGeo(IVecI center, IVecI startPt, IVecI midPt, IVecI endPt, IVecI normal){
 	init(center,startPt,midPt,endPt,normal);
     }
-    
+    public IArcGeo(IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, IDoubleI radius, IBoolI flipArcSide){
+	init(line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius,flipArcSide);
+    }
+    public IArcGeo(IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, double radius, boolean flipArcSide){
+	init(line1Pt1,line1Pt2,line2Pt1,line2Pt2,radius,flipArcSide);
+    }
+    public IArcGeo(IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, IDoubleI radius, IBoolI flipArcSide){
+	init(sharedLinePt,line1Pt,line2Pt,radius,flipArcSide);
+    }
+    public IArcGeo(IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, double radius, boolean flipArcSide){
+	init(sharedLinePt,line1Pt,line2Pt,radius,flipArcSide);
+    }
     
     public void init(IVecI center, IVecI normal, IVecI startPt, IDoubleI angle){
 	this.center = center;
@@ -150,23 +161,41 @@ public class IArcGeo extends ICurveGeo{
 	this.startPt = startPt;
 	this.angle = angle;
 	IVec4[] cpts = arcCP(center.get(),normal.get(),startPt.get(),angle.x());
-	
 	super.init(cpts,arcDeg(),arcKnots(angle.x()));
     }
     
+    public void init(IVecI center, IVecI normal, IVecI startPt, double angle){
+	this.center = center;
+	this.normal = normal;
+	this.startPt = startPt;
+	this.angle = new IDouble(angle);
+	IVec4[] cpts = arcCP(center.get(),normal.get(),startPt.get(),angle);
+	super.init(cpts,arcDeg(),arcKnots(angle));
+    }
+    
     public void init(IVecI center, IVecI startPt, IVecI endPt, IBoolI flipArcSide){
+	init(center,startPt, endPt, flipArcSide.x());
+    }
+    
+    public void init(IVecI center, IVecI startPt, IVecI endPt, boolean flipArcSide){
 	IVec dir1 = startPt.get().diff(center);
         IVec dir2 = endPt.get().diff(center);
         if(dir1.isParallel(dir2)) normal = dir2.cross(dir1.cross(IVec.zaxis));
 	else normal = dir2.cross(dir1); // not dir1.cross(dir2); ?
-        double a = dir1.angle(dir2);
+        double a = dir1.angle(dir2, normal);
         if(a == 0 || a == Math.PI){
             if(dir1.x !=0 || dir1.y !=0) normal = dir1.cross(IVec.zaxis);
             else normal = dir1.cross(IVec.xaxis);
         }
-	if(flipArcSide.x()){
-            a = Math.PI*2 - a;
-            normal.neg();
+	if(flipArcSide){
+	    if(a>=0){ // added 20141129
+		a = Math.PI*2 - a;
+		normal.neg();
+	    }
+	    else{
+		a += Math.PI*2;
+		//normal.neg();
+	    }
         }
 	init(center,normal,startPt,new IDouble(a));
     }
@@ -185,5 +214,66 @@ public class IArcGeo extends ICurveGeo{
     }
     
     
+    public void init(IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, IDoubleI radius, IBoolI flipArcSide){
+	init(line1Pt1, line1Pt2, line2Pt1, line2Pt2, radius.x(), flipArcSide.x());
+    }
     
+    public void init(IVecI line1Pt1, IVecI line1Pt2, IVecI line2Pt1, IVecI line2Pt2, double radius, boolean flipArcSide){
+	IVec itxn = IVec.intersect(line1Pt1.get(), line1Pt2.get(), line2Pt1.get(), line2Pt2.get());
+	IVec dir1 = line1Pt2.get().dif(itxn);
+	IVec dir2 = line2Pt2.get().dif(itxn);
+	if(dir1.len2()<IConfig.tolerance*IConfig.tolerance){
+	    dir1 = line1Pt1.get().dif(itxn);
+	}
+	if(dir2.len2()<IConfig.tolerance*IConfig.tolerance){
+	    dir2 = line2Pt1.get().dif(itxn);
+	}
+	
+	//if(itxn!=null){
+	if(itxn!=null && IVec.distBetween2Lines(line1Pt1,line1Pt2,line2Pt1,line2Pt2) < IConfig.tolerance){
+	    dir1.len(radius).add(itxn);
+	    dir2.len(radius).add(itxn);
+	    
+	    init(itxn, dir1, dir2, flipArcSide);
+	    return;
+	}
+	
+	IVec ldir1 = line1Pt2.get().dif(line1Pt1);
+	IVec ldir2 = line2Pt2.get().dif(line2Pt1);
+	if(!ldir1.isParallel(ldir2)){
+	    IVec[] pts = IVec.closestPointsOn2Lines(ldir1, line1Pt1, ldir2, line2Pt1);
+	    if(pts!=null && pts.length>=2){
+		IVec center = pts[0].mid(pts[1]);
+		
+		if(ldir1.dot(dir1)<0){ ldir1.neg(); }
+		if(ldir2.dot(dir2)<0){ ldir2.neg(); }
+		
+		IVec[] itxn1 = IVec.intersectLineAndSphere( ldir1, line1Pt1.get(), center, radius );
+		IVec[] itxn2 = IVec.intersectLineAndSphere( ldir2, line2Pt1.get(), center, radius );
+		if(itxn1==null || itxn2==null){
+		    IOut.err("Arc could not be created for non-intersecting lines. too small radius.");
+		    return;
+		}
+		init(center, itxn1[0], itxn2[0], flipArcSide);
+		return;
+	    }
+	    IOut.err("Arc could not be created.");
+	    return;
+	}
+	IOut.err("arc could not be created for parallel lines.");
+    }
+    
+    
+    public void init(IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, IDoubleI radius, IBoolI flipArcSide){
+	init(sharedLinePt, line1Pt, line2Pt, radius.x(), flipArcSide.x());
+    }
+    
+    public void init(IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, double radius, boolean flipArcSide){
+	IVec dir1 = line1Pt.get().dif(sharedLinePt);
+	IVec dir2 = line2Pt.get().dif(sharedLinePt);
+
+	dir1.len(radius).add(sharedLinePt);
+	dir2.len(radius).add(sharedLinePt);
+	init(sharedLinePt, dir1, dir2, flipArcSide);
+    }    
 }

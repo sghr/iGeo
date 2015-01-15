@@ -41,6 +41,7 @@ public class ISurfaceVTangentField extends I3DField{
     public ISurfaceVTangentField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public ISurfaceVTangentField gaussian(double threshold){ super.gaussian(threshold); return this; }
     public ISurfaceVTangentField gauss(double threshold){ super.gauss(threshold); return this; }
+    public ISurfaceVTangentField decay(IDecay decay, double threshold){ super.decay(decay,threshold); return this; }
     public ISurfaceVTangentField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
     /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
     public ISurfaceVTangentField bidirectional(boolean b){ super.bidirectional(b); return this; }

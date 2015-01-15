@@ -52,7 +52,7 @@ public class PIGraphicsGL2 extends PGraphics3D /*PGraphicsOpenGL*/
     /*implements IPanelAdapter*/ /*MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener,*/ /*ComponentListener*/
 {
     
-    public IPanel panel;
+    public IPanelI panel;
     public IGraphics3D igg;
 
     public PGL localPGL;

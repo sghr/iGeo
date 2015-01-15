@@ -57,6 +57,10 @@ public class I2DCurveFieldGeo extends IFieldGeo implements I2DFieldI{
 	    double dist = curve.pt(u).to2d().dist(pos.to2d());
 	    if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	}
+	else if(decay == Decay.Custom && customDecay!=null){
+	    double dist = curve.pt(u).to2d().dist(pos.to2d());
+	    r = customDecay.decay(intensity, dist, threshold);
+	}
 	
 	IVec2I vec = get(pos,vel,u);
 	
@@ -69,44 +73,6 @@ public class I2DCurveFieldGeo extends IFieldGeo implements I2DFieldI{
 	}
 	
 	return vec.mul(r);
-	
-	/*
-	switch(decay){
-	case None:{
-	    if(constantIntensity){
-		IVec2I vec = get(v,curve.u(v.to2d()));
-		double len = vec.len();
-		if(len<IConfig.tolerance){ return vec.zero(); }
-		return vec.len(intensity);
-	    }
-	    return get(v,curve.u(v.to2d())).mul(intensity); // variable intensity
-	}
-	case Linear:{
-	    double u = curve.u(v.to2d());
-	    double dist = curve.pt(u).to2d().dist(v.to2d());
-	    if(dist >= threshold) return new IVec2(); // zero
-	    if(constantIntensity){
-		IVec2I vec = get(v,u);
-		double len = vec.len();
-		if(len<IConfig.tolerance){ return vec.zero(); }
-		return vec.len(intensity*dist/threshold);
-	    }
-	    return get(v,u).mul(intensity*dist/threshold);
-	}
-	case Gaussian:{
-	    double u = curve.u(v.to2d());
-	    double dist = curve.pt(u).to2d().dist(v.to2d());
-	    if(constantIntensity){
-		IVec2I vec = get(v,u);
-		double len = vec.len();
-		if(len<IConfig.tolerance){ return vec.zero(); }
-		return vec.len(intensity*Math.exp(-2*dist*dist/(threshold*threshold)));
-	    }
-	    return get(v,u).mul(intensity*Math.exp(-2*dist*dist/(threshold*threshold)));
-	}
-	}
-	return new IVec2(); // should not reach here.
-	*/
     }
     
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */

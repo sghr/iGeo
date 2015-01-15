@@ -549,7 +549,8 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		g3d.diffuse(rgba);
 		//g3d.specular(rgba);
 		g3d.shininess(IConfig.shininess);
-		g3d.clr(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f);
+		//g3d.clr(rgba[0]*255,rgba[1]*255,rgba[2]*255,0f);
+		g3d.clr(rgba[0],rgba[1],rgba[2],0f);
 	    }
 	    //else{ g3d.clr(red,green,blue,alpha); }
 	    

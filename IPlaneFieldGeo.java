@@ -56,6 +56,11 @@ public class IPlaneFieldGeo extends IFieldGeo implements I3DFieldI{
 		double dist = pt.get().distToPlane(nml, this.pos);
 		if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	    }
+	    else if(decay == Decay.Custom && customDecay!=null){
+		double dist = pt.get().distToPlane(nml, this.pos);
+		r = customDecay.decay(intensity, dist, threshold);
+	    }
+	    
 	}
 	IVecI vec = getForce(pt,vel);
 	if(bidirectional && vec.get().dot(vel) < 0){ r=-r; }

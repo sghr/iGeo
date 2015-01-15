@@ -119,6 +119,23 @@ public class IOut {
 	return className+"."+stk.getMethodName();
     }
     
+    public static void printStack(PrintStream p){
+	final StackTraceElement[] stk = Thread.currentThread().getStackTrace();
+	if(stk!=null){
+	    final int defaultOffset=3;
+	    p.println("printStack: ");
+	    for(int i=defaultOffset; i<stk.length; i++){
+		p.print("  ");
+		printStack(p, stk[i]);
+		p.println();
+	    }
+	}
+    }
+    
+    public static void printStack(){
+	printStack(ps);
+    }
+        
     public static void p(Object str){
 	if(enabled){
 	    if(printPrefix) printCurrentStack(ps);

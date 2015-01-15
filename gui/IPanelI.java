@@ -23,6 +23,9 @@
 package igeo.gui;
 
 import igeo.*;
+import java.awt.*;
+import java.awt.event.*;
+
 
 /**
    Interface of a root GUI object of iGeo managing all IPane instance.
@@ -30,12 +33,13 @@ import igeo.*;
    
    @author Satoru Sugihara
 */
-public interface IPanelI extends IServerI /*, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener*/{
+public interface IPanelI extends IServerI, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener, WindowListener{
     
     
     public void setIG(IG ig);
     public IG getIG();
     public IServer server();
+    public void setParent(Container container); // added 20141230
     public void addPane(IPane p);
     public IPane pane(int i);
     public int paneNum();

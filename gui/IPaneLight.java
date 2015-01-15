@@ -43,7 +43,7 @@ import igeo.*;
 public class IPaneLight extends IComponent implements IPane{
     
     //IG ig;
-    public IPanel parent; // IPanelI?
+    public IPanelI parent; // IPanelI?
     public IView view;
     
     public INavigator navigator;
@@ -110,17 +110,17 @@ public class IPaneLight extends IComponent implements IPane{
 	if(view!=null){
 	    //g.setView(view);
 	    
-	    //if(objects==null) objectss = parent.ig.server().graphicServer().getObjects(view);
+	    //if(objects==null) objectss = parent.getIG().server().graphicServer().getObjects(view);
 	    //if(objects==null) return;
 	    
 	    // retrieved every time
-	    //ArrayList<IGraphicObject> objects = parent.ig.server().graphicServer().getObjects(view);
-	    ArrayList<IGraphicI> objects = parent.ig.server().graphicServer().getObjects(view);
+	    //ArrayList<IGraphicObject> objects = parent.getIG().server().graphicServer().getObjects(view);
+	    ArrayList<IGraphicI> objects = parent.getIG().server().graphicServer().getObjects(view);
 
-	    if(parent.ig.server().graphicServer().bgImageFilename!=null){
+	    if(parent.getIG().server().graphicServer().bgImageFilename!=null){
 		if(g instanceof IGraphicsGL){
-		    ((IGraphicsGL)g).setBGImage(parent.ig.server().graphicServer().bgImageFilename);
-		    parent.ig.server().graphicServer().bgImageFilename=null;
+		    ((IGraphicsGL)g).setBGImage(parent.getIG().server().graphicServer().bgImageFilename);
+		    parent.getIG().server().graphicServer().bgImageFilename=null;
 		}
 	    }
 	    

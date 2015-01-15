@@ -39,6 +39,7 @@ public class I2DSurfacePositionField extends I2DField{
     public I2DSurfacePositionField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public I2DSurfacePositionField gaussian(double threshold){ super.gaussian(threshold); return this; }
     public I2DSurfacePositionField gauss(double threshold){ super.gauss(threshold); return this; }
+    public I2DSurfacePositionField decay(IDecay decay, double threshold){ super.decay(decay,threshold); return this; }
     public I2DSurfacePositionField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
     /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
     public I2DSurfacePositionField bidirectional(boolean b){ super.bidirectional(b); return this; }

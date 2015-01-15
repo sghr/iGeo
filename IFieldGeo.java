@@ -30,9 +30,16 @@ package igeo;
 
 abstract public class IFieldGeo implements IFieldI{
     /** type of decay from surface position */
-    static public enum Decay{ None, Linear, Gaussian };
+    static public enum Decay{ None, Linear, Gaussian, Custom };
+    
+    static public INoDecay noDecay = new INoDecay();
+    static public ILinearDecay linearDecay = new ILinearDecay();
+    static public IGaussDecay gaussDecay = new IGaussDecay();
     
     public Decay decay = Decay.None; // default
+
+    public IDecay customDecay=null;
+    
     /** threshold for decay.
 	When decay is None, threshold isn't used.
 	In case of Linear, when distance is equal to threshold, output is zero.
@@ -73,6 +80,12 @@ abstract public class IFieldGeo implements IFieldI{
     
     public Decay decay(){ return decay; }
     
+    public IFieldGeo decay(IDecay d, double threshold){
+	customDecay = d;
+	this.threshold = threshold;
+	decay = Decay.Custom;
+	return this;
+    }
     
     /** if output vector is besed on constant length (intensity) or variable depending geometry when curve or surface tangent is used */
     public IFieldGeo constantIntensity(boolean b){ constantIntensity=b; return this; }

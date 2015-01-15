@@ -1944,10 +1944,21 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	IVecI planePt = corner(0,0);
 	IVecI planeDir = planePt.get().getNormal(corner(1,0),corner(0,1));
 	
-	if(!corner(1,1).get().isOnPlane(planeDir,planePt)) return false;
-	for(int i=1; i<ucpNum()-1; i++)
-	    for(int j=1; j<vcpNum()-1; j++)
-		if(!cp(i,j).get().isOnPlane(planeDir,planePt)) return false;
+	if(!corner(1,1).get().isOnPlane(planeDir,planePt)){
+	    return false;
+	}
+	if(ucpNum()==2 && vcpNum()==2) return true;
+	
+	//for(int i=1; i<ucpNum()-1; i++)
+	//    for(int j=1; j<vcpNum()-1; j++)
+	for(int i=0; i<ucpNum(); i++){
+	    for(int j=0; j<vcpNum(); j++){
+		if(!(i==0 && (j==0 || j==vcpNum()-1) ||
+		    i==ucpNum()-1 && (j==0 || j==vcpNum()-1))){
+		    if(!cp(i,j).get().isOnPlane(planeDir,planePt)) return false;
+		}
+	    }
+	}
 	
 	return true;
     }

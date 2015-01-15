@@ -87,9 +87,10 @@ public class IText extends IGeometry{
     }
     
     public IText(IServerI s, IText text){
-	super(s);
+	super(s, text);
 	this.text = new ITextGeo(text.text);
 	font = text.font; // sharrow copy ; ////font = new Font(text.font);
+	initText(s);
     }
     
     

@@ -72,7 +72,11 @@ public class I2DSurfaceFieldGeo extends IFieldGeo implements I2DFieldI{
 	    double dist = surface.pt(uv).to2d().dist(pos.to2d());
 	    if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
 	}
-	
+	else if(decay == Decay.Custom && customDecay!=null){
+	    double dist = surface.pt(uv).to2d().dist(pos.to2d());
+	    r = customDecay.decay(intensity, dist, threshold);
+	}
+
 	IVec2I vec = get(pos, vel, uv);
 	
 	if(bidirectional && vec.get().dot(vel.to2d()) < 0){ r=-r; }
@@ -84,48 +88,6 @@ public class I2DSurfaceFieldGeo extends IFieldGeo implements I2DFieldI{
 	}
 	
 	return vec.mul(r);
-	
-	/*
-	switch(decay){
-	case None:{
-	    if(constantIntensity){
-		IVec2I vec = get(v,surface.uv(v.to2d()));
-		double len = vec.len();
-		if(len<IConfig.tolerance){ return vec.zero(); }
-		return vec.len(intensity);
-	    }
-	    return get(v,surface.uv(v.to2d())).mul(intensity); // need get() in case of ISurfaceR ?
-	} 
-	case Linear:{
-	    IVec2I uv = surface.uv(v.to2d());
-	    double dist = surface.pt(uv).to2d().dist(v.to2d());
-	    if(dist >= threshold) return new IVec2(); // zero
-	    double r = intensity;
-	    if(threshold>0) r *= (threshold-dist)/threshold;
-	    if(constantIntensity){
-		IVec2I vec = get(v,uv);
-		double len = vec.len();
-		if(len<IConfig.tolerance){ return vec.zero(); }
-		return vec.len(r);
-	    }
-	    return get(v,uv).mul(r);
-	}
-	case Gaussian:{
-	    IVec2I uv = surface.uv(v.to2d());
-	    double dist = surface.pt(uv).to2d().dist(v.to2d());
-	    double r = intensity;
-	    if(threshold>0) r *= Math.exp(-2*dist*dist/(threshold*threshold));
-	    if(constantIntensity){
-		IVec2I vec = get(v,uv);
-		double len = vec.len();
-		if(len<IConfig.tolerance){ return vec.zero(); }
-		return vec.len(r);
-	    }
-	    return get(v,uv).mul(r);
-	}
-	}
-	return null;
-	*/
     }
     
     

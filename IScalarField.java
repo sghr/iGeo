@@ -48,6 +48,9 @@ abstract public class IScalarField extends IField implements IScalarFieldI{
     public IScalarField gaussianDecay(double threshold){ field.gaussianDecay(threshold); return this; }
     public IScalarField gaussian(double threshold){ field.gaussian(threshold); return this; }
     public IScalarField gauss(double threshold){ field.gauss(threshold); return this; }
+    /** custom decay */
+    public IScalarField decay(IDecay decay, double threshold){ field.decay(decay, threshold); return this; }
+    
     /** this returns current decay type */
     //public Decay decay();
     

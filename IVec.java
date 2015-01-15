@@ -2930,6 +2930,32 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	IVec circleNormal = dif.len(Math.sqrt(rad));
 	return new IVec[]{ circleNormal, circleCenter };
     }
+
+    /** intersection between an infinite line and a sphere. 
+	@return null if no intersection or
+	one point when the line intersects only at one point or 
+	two points if it intersects at two points.
+	
+    */
+    public static IVec[] intersectLineAndSphere(IVec lineDir, IVec linePt, IVec center, double radius){
+	
+	double dist = center.distToLine(lineDir, linePt);
+	if(dist > radius){
+	    return null; // no intersection
+	}
+	
+	IVec proj = center.cp().projectToLine(linePt, lineDir);
+	
+	if(dist == radius){
+	    return new IVec[]{ proj };
+	}
+	
+	double len = Math.sqrt(radius*radius - dist*dist);
+	IVec t = lineDir.cp().len(len);
+	
+	return new IVec[]{ proj.cp(t), proj.sub(t) };
+    }
+    
     
     public static IVec[] intersectCircle(IVec circleNormal1, IVec circleCenter1, double radius1,
 					 IVec circleNormal2, IVec circleCenter2, double radius2){
@@ -2952,7 +2978,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 
     /** find two closest points on two infinete lines in a skew relationship, which makes a segment perpendicular to two lines */
     public static IVec[] closestPointsOn2Lines(IVecI lineDir1, IVecI linePt1,
-					      IVecI lineDir2, IVecI linePt2){
+					       IVecI lineDir2, IVecI linePt2){
 	if(lineDir1.get().isParallel(lineDir2)){
 	    // when parallel, whatever points
 	    return new IVec[]{ linePt1.get().cp(), linePt1.get().cp().projectToLine(linePt2,lineDir2)  };

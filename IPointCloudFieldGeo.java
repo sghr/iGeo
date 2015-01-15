@@ -67,6 +67,9 @@ public class IPointCloudFieldGeo extends IFieldGeo implements I3DFieldI{
 	else if(decay == Decay.Gaussian){
 	    if(threshold>0) r *= Math.exp(-2*minDist*minDist/(threshold*threshold));
 	}
+	else if(decay == Decay.Custom && customDecay!=null){
+	    r = customDecay.decay(intensity, minDist, threshold);
+	}
 	
 	//IVecI vec = get(pos,vel,uv);
 	IVecI vec = forceDirs[minIdx];

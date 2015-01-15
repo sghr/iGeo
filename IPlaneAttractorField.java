@@ -58,6 +58,7 @@ public class IPlaneAttractorField extends I3DField{
     public IPlaneAttractorField gaussianDecay(double threshold){ super.gaussianDecay(threshold); return this; }
     public IPlaneAttractorField gaussian(double threshold){ super.gaussian(threshold); return this; }
     public IPlaneAttractorField gauss(double threshold){ super.gauss(threshold); return this; }
+    public IPlaneAttractorField decay(IDecay decay, double threshold){ super.decay(decay,threshold); return this; }
     public IPlaneAttractorField constantIntensity(boolean b){ super.constantIntensity(b); return this; }
     /** if bidirectional is on, field force vector is flipped when velocity of particle is going opposite */
     public IPlaneAttractorField bidirectional(boolean b){ super.bidirectional(b); return this; }

@@ -46,7 +46,7 @@ import igeo.gui.*;
 */
 public class PIGraphicsGL1 extends PGraphicsOpenGL /*implements IPanelAdapter*/ /*MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener,*/ /*ComponentListener*/{
     
-    public IPanel panel;
+    public IPanelI panel;
     public IGraphicsGL1 igg;
     
     /** To draw Java2D graphic over OpenGL graphic. */

@@ -38,7 +38,7 @@ import igeo.io.*;
    
    @author Satoru Sugihara
 */
-public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener, WindowListener{
+public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener, ComponentListener, WindowListener*/{
     
     public ArrayList<IPane> panes;
     
@@ -457,7 +457,7 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ , MouseLi
 	    if(ig.server.objectNum()>0){
 		bounds.setObjects(ig.server());
 		if(bounds.min!=null && bounds.max!=null){
-		    for(int i=0; i<panes.size(); i++){ 
+		    for(int i=0; i<panes.size(); i++){
 			panes.get(i).navigator().setRatioByBounds(bounds); // added 20130519
 			panes.get(i).getView().setParametersByBounds(bounds); // added 20130519
 		    }

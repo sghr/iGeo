@@ -57,6 +57,7 @@
       <exclude name="*/package-info.java"/>
       <exclude name="processing_zip/"/>
       <exclude name="p/PIGraphicsGL2.java"/>
+      <exclude name="p/PIGraphics3D.java"/>
       <exclude name="gui/IGraphicsGL2.java"/>
       <exclude name="IApplicationGL2.java"/>
       <exclude name="IAppletGL2.java"/>
