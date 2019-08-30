@@ -229,8 +229,7 @@ public class ICircleGeo extends ICurveGeo{
 	if(approx) initApprox();
 	else init();
     }
-    
-    
+        
     public ICircleGeo(IVecI center, IVecI normal, IVecI rollDir, double radius, boolean approx){
 	this(center,normal,rollDir,new IDouble(radius),approx);
     }
@@ -278,6 +277,106 @@ public class ICircleGeo extends ICurveGeo{
 	IVec[] cpts = circleCPApprox(center.get(),normal.get(),null,xradius.x(),yradius.x());
 	super.init(cpts,circleDeg());
     }
+    
+
+    
+    public ICircleGeo update(IVecI center, IVecI normal, IDoubleI xradius, IDoubleI yradius, boolean approx){
+	this.center = center;
+	this.normal = normal;
+	this.xradius = xradius;
+	this.yradius = yradius;
+	if(approx){
+	    IVec[] cpts = circleCPApprox(center.get(),normal.get(),null,xradius.x(),yradius.x());
+	    if(cpts.length==cpNum()){ cps(cpts); }
+	    else{ super.init(cpts,circleDeg()); }
+	}
+	else{
+	    IVec4[] cpts = circleCP(center.get(), normal.get(), null, xradius.x(), yradius.x());
+	    if(cpts.length==cpNum()){ cps(cpts); }
+	    else{ super.init(cpts,circleDeg(),circleKnots()); }
+	}
+	return this;
+    }
+    
+    public ICircleGeo update(IVecI center, IVecI normal, IVecI rollDir, IDoubleI xradius, IDoubleI yradius, boolean approx){
+	if(approx){
+	    IVec[] cpts = circleCPApprox(center.get(),normal.get(),rollDir.get(),xradius.x(),yradius.x());
+	    if(cpts.length==cpNum()){ cps(cpts); }
+	    else{ super.init(cpts,circleDeg()); }
+	}
+	else{
+	    IVec4[] cpts = circleCP(center.get(), normal.get(), null, xradius.x(), yradius.x());
+	    if(cpts.length==cpNum()){ cps(cpts); }
+	    else{ super.init(cpts,circleDeg(),circleKnots()); }
+	}
+	return this;
+    }
+    
+    public ICircleGeo update(IVecI center, IVecI xradiusVec, IVecI yradiusVec, boolean approx){
+	if(approx){
+	    IVec[] cpts = ovalCPApprox(center.get(),xradiusVec.get(),yradiusVec.get());
+	    if(cpts.length==cpNum()){ cps(cpts); }
+	    else{ super.init(cpts,circleDeg()); }
+	}
+	else{
+	    IVec4[] cpts = ovalCP(center.get(),xradiusVec.get(),yradiusVec.get());
+	    if(cpts.length==cpNum()){ cps(cpts); }
+	    else{ super.init(cpts,circleDeg(),circleKnots()); }
+	}
+	return this;
+    }
+    
+    public ICircleGeo cps(IVecI[] cps){ // set control point XYZ by array keeping the original cp vector objet
+	for(int i=0; i<cpNum() && i<cps.length; i++){
+	    cp(i).set(cps[i]);
+	}
+	return this;
+    }
+    
+    
+    public IVec center(){ return center.get(); }
+    public ICircleGeo center(IVecI c){
+	update(c, normal, xradius, yradius, false);
+	return this;
+    }
+    
+    public IVec nml(){ return normal.get(); }
+    public ICircleGeo nml(IVec n){
+	update(center, normal, xradius, yradius, false);
+	return this;
+    }
+    
+    public double radius(){ return xradius.x(); }
+    public ICircleGeo radius(double r){
+	IDouble rad = new IDouble(r);
+	update(center, normal, rad, rad, false);
+	return this;
+    }
+    public ICircleGeo radius(IDoubleI r){
+	update(center, normal, r, r, false);
+	return this;
+    }
+    
+    public double xradius(){ return xradius.x(); }
+    public ICircleGeo xradius(double r){
+	update(center, normal, new IDouble(r), yradius, false);
+	return this;
+    }
+    public ICircleGeo xradius(IDoubleI r){
+	update(center, normal, r, yradius, false);
+	return this;
+    }
+    
+    public double yradius(){ return xradius.x(); }
+    public ICircleGeo yradius(double r){
+	update(center, normal, xradius, new IDouble(r), false);
+	return this;
+    }
+    public ICircleGeo yradius(IDoubleI r){
+	update(center, normal, xradius, r, false);
+	return this;
+    }
+    
     
     /*
     // for debug

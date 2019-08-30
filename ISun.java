@@ -733,8 +733,8 @@ public class ISun {
 	    case Shanghai: // China
 		return new Location(31.230708, 121.472916, 4, +8);
 	    case Shenzhen: // China
-		//return new Location(22.543447, 114.057818, 4, +8);
-		return new Location(22., 114., 4, +8);
+		return new Location(22.543447, 114.057818, 4, +8);
+		//return new Location(22., 114., 4, +8);
 	    case Singapore: // Singapore
 		return new Location(1.2894, 103.8500, 0, +8);
 	    case Skopje: // Macedonia

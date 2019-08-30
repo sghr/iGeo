@@ -605,72 +605,6 @@ public class ISurfaceCreator{
     public static ISurface sweep(IVecI[] profile, int profileDeg, double[] profileKnots,
 				 IVecI profileCenter, IVecI profileDir, 
 				 IVecI[] rail, int railDeg, double[] railKnots){
-	/*
-	if(profile==null || profile.length<=1){
-	    IOut.err("profile is null or number of array is too less");
-	    return null;
-	}
-	if(rail==null || rail.length<=1){
-	    IOut.err("rail is null or number of array is too less");
-	    return null;
-	}
-	
-	if(profileKnots==null) profileKnots = INurbsGeo.createKnots(profileDeg,profile.length);
-	if(railKnots==null) railKnots = INurbsGeo.createKnots(railDeg,rail.length);
-	
-	IVec profileNormal = IVec.averageNormal(profile);
-	if(profileCenter==null) profileCenter = getCenter(profile,profileDeg);
-	else{ profileCenter = profileCenter.dup(); } // profileCenter changes
-	
-	boolean railClosed=isClosed(rail,railDeg);
-	
-	IVec railNormal = null;
-	if(profileDir!=null){ railNormal = IVec.averageNormal(rail); }
-		
-	IVecI[] ppts = duplicatePoints(profile);
-	IVecI[][] cpts = new IVecI[rail.length][];
-	
-	for(int i=0; i<rail.length; i++){
-	    IVecI dir = null;
-	    if(i==0){ // start point
-		if(!railClosed && i<rail.length-1) dir = rail[i+1].dif(rail[i]);
-		else if(railClosed && rail.length-railDeg>0){
-		    dir = rail[rail.length-railDeg].dif(rail[rail.length-railDeg-1]);
-		}
-		
-		//IVecI[] ppts2 = orient(ppts, profileCenter, profileNormal, rail[i], dir);
-		IVecI[] ppts2 = orient(ppts, profileCenter, profileNormal, profileDir,
-				       rail[i], dir, railNormal);
-		if(railClosed){
-		    if(i<rail.length-1){ dir = rail[i+1].dif(rail[i]); }
-		    //ppts2 = orientAndBisect(ppts, profileCenter, profileNormal, rail[i], dir);
-		    ppts2 = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
-					    rail[i], dir, railNormal);
-		}
-		//new ICurve(ppts2); //
-		cpts[i] = ppts2;
-	    }
-	    else if(railClosed && i >= rail.length-railDeg){
-		cpts[i] = duplicatePoints(cpts[i - (rail.length-railDeg)]);
-		//new ICurve(cpts[i]).clr(1.0,0,0); //
-	    }
-	    else if(i==rail.length-1){ // last rail point (not railClosed)
-		// direction is already set in the previous orientAndBisector
-		orient(ppts, profileCenter, rail[i]);
-		cpts[i] = ppts;
-	    }
-	    else{
-		if(i<rail.length-1) dir = rail[i+1].dif(rail[i]);
-		else dir = rail[i].dif(rail[i-1]);
-		
-		//IVecI[] bsct = orientAndBisect(ppts, profileCenter, profileNormal, rail[i], dir);
-		IVecI[] bsct = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
-					       rail[i], dir, railNormal);
-		//new ICurve(bsct); //
-		cpts[i] = bsct;
-	    }
-	}
-	*/
 	
 	IVecI[][] cpts = sweepPoints(profile,profileDeg,profileCenter,profileDir,rail,railDeg);
 	if(profileKnots==null) profileKnots = INurbsGeo.createKnots(profileDeg,profile.length);
@@ -717,9 +651,10 @@ public class ISurfaceCreator{
 		}
 		// auto adjust profileNormal to the first rail direction 
 		if(profileNormal.dot(dir) < 0){ profileNormal.neg(); } // added 20130525
-		
+				
 		IVecI[] ppts2 = orient(ppts, profileCenter, profileNormal, profileDir,
 				       rail[i], dir, railNormal);
+		
 		if(railClosed){
 		    if(i<rail.length-1){ dir = rail[i+1].dif(rail[i]); }
 		    ppts2 = orientAndBisect(ppts, profileCenter, profileNormal, profileDir,
@@ -809,7 +744,7 @@ public class ISurfaceCreator{
 	    if(axis!=null) p.rot(axis,angle);
 	    //p.add(railPt);
 	}
-
+	
 	if(axis!=null) profNml.rot(axis,angle);
 	if(profDir!=null){
 	    if(axis!=null) profDir.rot(axis,angle);
@@ -977,7 +912,6 @@ public class ISurfaceCreator{
 	IVec[] profile = ICircleGeo.circleCP(center, dir, nml, radius);
 	int profDeg = ICircleGeo.circleDeg();
 	double[] profKnots = ICircleGeo.circleKnots();
-	//return sweep(profile, profDeg, profKnots, center, rail, railDeg, railKnots);
 	return sweep(profile, profDeg, profKnots, center, nml, rail, railDeg, railKnots);
     }
     

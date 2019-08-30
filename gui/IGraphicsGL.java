@@ -24,8 +24,11 @@ package igeo.gui;
 
 
 import igeo.*;
-import javax.media.opengl.*;
 
+//import javax.media.opengl.*; // Processing 1 & 2
+import com.jogamp.opengl.*; // Processing 3
+
+import java.awt.image.*;
 
 /**
    Interface of Graphics to draw 3D geometry with OpenGL
@@ -35,4 +38,7 @@ public interface IGraphicsGL extends IGraphics3D{
     public GL getGL();
     public void setGL(GL g);
     public void setBGImage(String imageFilename);
+    
+    public ITextureGraphicGL getTextureGraphic(String filename);
+    public ITextureGraphicGL getTextureGraphic(BufferedImage image);
 }

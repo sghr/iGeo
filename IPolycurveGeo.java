@@ -51,6 +51,17 @@ abstract public class IPolycurveGeo implements ICurveI{
 	curves = new ArrayList<ICurveI>(crv.curves.size());
 	for(int i=0; i<crv.curves.size(); i++){ curves.add(crv.curves.get(i)); }
     }
+
+    public IVecI[] cps(){
+	ArrayList<IVecI> cpts = new ArrayList<IVecI>();
+	for(int i=0; i<curves.size(); i++){
+	    for(int j=0; j<curves.get(i).cpNum(); j++){
+		cpts.add(curves.get(i).cp(j));
+	    }
+	}
+	return cpts.toArray(new IVecI[cpts.size()]);
+    }
+
     
     // to be implemented...
     /*

@@ -263,6 +263,8 @@ public class IBrep extends IGeometry implements ITransformable{
     synchronized public IBrep clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     synchronized public IBrep clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     synchronized public IBrep clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    synchronized public IBrep clr(IObject o){ super.clr(o); return this; }
+    
     synchronized public IBrep clr(Color c){ super.clr(c); return this; }
     synchronized public IBrep clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     synchronized public IBrep clr(Color c, float alpha){ super.clr(c,alpha); return this; }

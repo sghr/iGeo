@@ -123,6 +123,11 @@ public class ISurface extends IGeometry implements ISurfaceI{
     public ISurface(ICurveI[] trimCurves){
 	surface = new ISurfaceGeo(trimCurves); initSurface(null);
     }
+    
+    public ISurface(ICurveI[] outerTrimCurves, ICurveI[][] innerTrimCurves){
+	surface = new ISurfaceGeo(outerTrimCurves, innerTrimCurves); initSurface(null);
+    }
+    
     public ISurface(IVecI[] trimCrvPts){
 	surface = new ISurfaceGeo(trimCrvPts); initSurface(null);
     }
@@ -131,6 +136,28 @@ public class ISurface extends IGeometry implements ISurfaceI{
     }
     public ISurface(IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots){
 	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, trimCrvKnots); initSurface(null);
+    }
+    
+    public ISurface(IVecI[] trimCrvPts, IVecI[] innerTrimCrvPts){
+	surface = new ISurfaceGeo(trimCrvPts, innerTrimCrvPts);
+    }
+    public ISurface(IVecI[] trimCrvPts, int trimCrvDeg, IVecI[] innerTrimCrvPts, int innerTrimCrvDeg){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, innerTrimCrvPts, innerTrimCrvDeg);
+    }
+    public ISurface(IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots,
+		    IVecI[] innerTrimCrvPts, int innerTrimCrvDeg, double[] innerTrimCrvKnots){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, trimCrvKnots, innerTrimCrvPts, innerTrimCrvDeg, innerTrimCrvKnots);
+    }
+    
+    public ISurface(IVecI[] trimCrvPts, IVecI[][] innerTrimCrvPts){
+	surface = new ISurfaceGeo(trimCrvPts, innerTrimCrvPts);
+    }
+    public ISurface(IVecI[] trimCrvPts, int trimCrvDeg, IVecI[][] innerTrimCrvPts, int[] innerTrimCrvDeg){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, innerTrimCrvPts, innerTrimCrvDeg);
+    }
+    public ISurface(IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots,
+		    IVecI[][] innerTrimCrvPts, int[] innerTrimCrvDeg, double[][] innerTrimCrvKnots){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, trimCrvKnots, innerTrimCrvPts, innerTrimCrvDeg, innerTrimCrvKnots);
     }
     
     
@@ -233,6 +260,9 @@ public class ISurface extends IGeometry implements ISurfaceI{
     public ISurface(IServerI s, ICurveI[] trimCurves){
 	super(s); surface = new ISurfaceGeo(trimCurves); initSurface(s);
     }
+    public ISurface(IServerI s, ICurveI[] outerTrimCurves, ICurveI[][] innerTrimCurves){
+	super(s); surface = new ISurfaceGeo(outerTrimCurves, innerTrimCurves); initSurface(s);
+    }
     public ISurface(IServerI s, IVecI[] trimCrvPts){
 	super(s); surface = new ISurfaceGeo(trimCrvPts); initSurface(s);
     }
@@ -241,6 +271,29 @@ public class ISurface extends IGeometry implements ISurfaceI{
     }
     public ISurface(IServerI s, IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots){
 	super(s); surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, trimCrvKnots); initSurface(s);
+    }
+    
+
+    public ISurface(IServerI s, IVecI[] trimCrvPts, IVecI[] innerTrimCrvPts){
+	surface = new ISurfaceGeo(trimCrvPts, innerTrimCrvPts);
+    }
+    public ISurface(IServerI s, IVecI[] trimCrvPts, int trimCrvDeg, IVecI[] innerTrimCrvPts, int innerTrimCrvDeg){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, innerTrimCrvPts, innerTrimCrvDeg);
+    }
+    public ISurface(IServerI s, IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots,
+		    IVecI[] innerTrimCrvPts, int innerTrimCrvDeg, double[] innerTrimCrvKnots){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, trimCrvKnots, innerTrimCrvPts, innerTrimCrvDeg, innerTrimCrvKnots);
+    }
+    
+    public ISurface(IServerI s, IVecI[] trimCrvPts, IVecI[][] innerTrimCrvPts){
+	surface = new ISurfaceGeo(trimCrvPts, innerTrimCrvPts);
+    }
+    public ISurface(IServerI s, IVecI[] trimCrvPts, int trimCrvDeg, IVecI[][] innerTrimCrvPts, int[] innerTrimCrvDeg){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, innerTrimCrvPts, innerTrimCrvDeg);
+    }
+    public ISurface(IServerI s, IVecI[] trimCrvPts, int trimCrvDeg, double[] trimCrvKnots,
+		    IVecI[][] innerTrimCrvPts, int[] innerTrimCrvDeg, double[][] innerTrimCrvKnots){
+	surface = new ISurfaceGeo(trimCrvPts, trimCrvDeg, trimCrvKnots, innerTrimCrvPts, innerTrimCrvDeg, innerTrimCrvKnots);
     }
     
     
@@ -816,6 +869,7 @@ public class ISurface extends IGeometry implements ISurfaceI{
     synchronized public ISurface clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     synchronized public ISurface clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     synchronized public ISurface clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    synchronized public ISurface clr(IObject o){ super.clr(o); return this; }
     synchronized public ISurface clr(Color c){ super.clr(c); return this; }
     synchronized public ISurface clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     synchronized public ISurface clr(Color c, float alpha){ super.clr(c,alpha); return this; }

@@ -207,6 +207,7 @@ public class ITensionLine extends ICurve implements ITensionI, IDynamics /*!!! a
     public ITensionLine clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public ITensionLine clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
     public ITensionLine clr(Color c){ super.clr(c); return this; }
+    public ITensionLine clr(IObject o){ super.clr(o); return this; }
     public ITensionLine clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ITensionLine clr(Color c, float alpha){ super.clr(c,alpha); return this; }
     public ITensionLine clr(Color c, double alpha){ super.clr(c,alpha); return this; }

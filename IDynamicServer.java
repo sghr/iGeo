@@ -48,6 +48,9 @@ public class IDynamicServer implements Runnable{
     public int duration = -1;
     public int time;
     
+    public boolean showTime=false;
+    
+    
     public IDynamicServer(IServerI s){
 	server = s.server();
 	dynamics = new ArrayList<IDynamics>();
@@ -146,6 +149,8 @@ public class IDynamicServer implements Runnable{
     
     public IDynamicServer time(int tm){ time = tm; return this; }
     public int time(){ return time; }
+
+    public IDynamicServer showTime(boolean flag){ showTime=flag; return this; }
     
     public void pause(){ runningDynamics=false; }
     public void resume(){ runningDynamics=true; }
@@ -171,9 +176,11 @@ public class IDynamicServer implements Runnable{
     }
     
     public void stop(){
-	runningDynamics=false;
-	thread=null;
-	IOut.debug(0,"dynamic server stopped");
+	if(runningDynamics || thread!=null){
+	    runningDynamics=false;
+	    thread=null;
+	    IOut.debug(0,"dynamic server stopped");
+	}
     }
     
     /** in case dynamicServer need to start again after stopped. */
@@ -329,7 +336,11 @@ public class IDynamicServer implements Runnable{
 		    }
 		}
 		time++;
-		IOut.debug(20,"time="+time); //
+		
+		//IOut.debug(20,"time="+time);
+		if(IOut.debugLevel()>=20 || IOut.debugLevel()<0 || showTime){
+		    IOut.debug(0,"time="+time); 
+		}
 	    }
 	}
     }

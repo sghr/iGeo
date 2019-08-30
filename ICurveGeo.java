@@ -22,6 +22,8 @@
 
 package igeo;
 
+import java.util.ArrayList;
+
 /**
    Geometry of NURBS curve.
    
@@ -999,6 +1001,59 @@ public class ICurveGeo extends INurbsGeo implements ICurveI, IEntityParameter{
     
     
     synchronized public ICurveGeo updateCache(){ uSearchCache = new ICurveCache(this); return this; }
+
+    
+    
+    
+    // intersection
+    
+    /** intersection of curve and plane.
+	@param segmentResolution segmentation resolution per EP count in degree &gt;= 1 curve. */
+    public IVec[] intersectPlane(IVecI planeDir, IVecI planePt, int segmentResolution){
+	ArrayList<IVec> itxns = new ArrayList<IVec>();
+	if(deg()>1){
+	    IVec prevPt = pt(u(0,0.0));
+	    double prevDot = prevPt.dif(planePt).dot(planeDir);
+	    if(prevDot==0) itxns.add(prevPt);
+	    for(int i=0; i<epNum(); i++){
+		int j=0;
+		if(i==0) j=1;
+		for(;j<segmentResolution; j++){
+		    IVec pt =  pt(u(i,(double)j/segmentResolution));
+		    double dot = pt.dif(planePt).dot(planeDir);
+		    if(dot==0) itxns.add(pt);
+		    else if(dot<0 && prevDot>0 || dot>0 && prevDot<0 ){
+			itxns.add(IVec.intersectPlaneAndLine(planeDir.get(),planePt.get(),
+							     pt.dif(prevPt),pt));
+		    }
+		    prevPt = pt;
+		    prevDot = dot;
+		}
+	    }
+	}
+	else{ // polyline
+	    double prevDot = cp(0).dif(planePt).dot(planeDir);
+	    if(prevDot==0) itxns.add(cp(0).get().dup());
+	    for(int i=1; i<cpNum(); i++){
+		double dot = cp(i).dif(planePt).dot(planeDir);
+		if(dot==0) itxns.add(cp(i).get().dup());
+		else if(dot<0 && prevDot>0 || dot>0 && prevDot<0 ){
+		    itxns.add(IVec.intersectPlaneAndLine(planeDir.get(), planePt.get(),
+							 cp(i).get().dif(cp(i-1)), cp(i).get()));
+		}
+		prevDot = dot;
+	    }
+	}
+	return itxns.toArray(new IVec[itxns.size()]);
+    }
+    
+    /** intersection of curve and plane. */
+    public IVec[] intersectPlane(IVecI planeDir, IVecI planePt){
+	return intersectPlane(planeDir, planePt, IConfig.segmentResolution);
+    }
+    
+    
+    
     
     
     /********************************************************************************

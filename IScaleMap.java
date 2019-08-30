@@ -33,7 +33,7 @@ public class IScaleMap extends IMap{
     public double scaleFactor;
     public IScaleMap(IMap m, double factor){ map = m; scaleFactor = factor; }
     public double get(double u, double v){ return map.get(u,v)*scaleFactor; }
-    public void flipU(){ map.flipU(); } //is it ok to modify the original?
-    public void flipV(){ map.flipV(); } //is it ok to modify the original?
+    public IScaleMap flipU(){ map.flipU(); return this; } //is it ok to modify the original?
+    public IScaleMap flipV(){ map.flipV(); return this; } //is it ok to modify the original?
 }
 

@@ -76,7 +76,7 @@ public class IDoubleMap extends IMap{
 	return map[ui][vi];
     }
     
-    public void flipU(){
+    public IDoubleMap flipU(){
 	double[][] fmap = new double[width][height];
 	for(int i=0; i<width; i++){
 	    for(int j=0; j<height; j++){
@@ -84,9 +84,10 @@ public class IDoubleMap extends IMap{
 	    }
 	}
 	map = fmap;
+	return this;
     }
     
-    public void flipV(){
+    public IDoubleMap flipV(){
 	double[][] fmap = new double[width][height];
 	for(int i=0; i<width; i++){
 	    for(int j=0; j<height; j++){
@@ -94,14 +95,17 @@ public class IDoubleMap extends IMap{
 	    }
 	}
 	map = fmap;
+	return this;
     }
     
-    public void scale(double factor){
+    public IDoubleMap scale(double factor){
 	for(int i=0; i<width; i++) for(int j=0; j<height; j++) map[i][j] *= factor;
+	return this;
     }
     
-    public void add(double val){
+    public IDoubleMap add(double val){
 	for(int i=0; i<width; i++) for(int j=0; j<height; j++) map[i][j] += val;
+	return this;
     }
     
 }

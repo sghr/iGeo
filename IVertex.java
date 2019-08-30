@@ -737,7 +737,9 @@ public class IVertex implements IVecI{
     public IVertex clr(IColor c, double alpha){
 	return clr(new IColor(c,alpha));
     }
-
+    public IVertex clr(IObject o){ clr(o.clr()); return this; }
+    public IVertex clr(IVertex v){ clr(v.clr()); return this; }
+    
     public IVertex clr(Color c){ return clr(new IColor(c)); }
     public IVertex clr(Color c, int alpha){ return clr(new IColor(c),alpha); }
     public IVertex clr(Color c, float alpha){ return clr(new IColor(c),alpha); }

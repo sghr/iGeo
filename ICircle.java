@@ -288,6 +288,75 @@ public class ICircle extends ICurve{
     public ICircle(IServerI s, ICircleGeo cir){ super(s,cir); }
     
     
+    public ICircle update(IVecI center, IVecI normal, IDoubleI xradius, IDoubleI yradius, boolean approx){
+	((ICircleGeo)curve).update(center,normal,xradius,yradius,approx);
+	updateGraphic();
+	return this;
+    }
+
+    public ICircle update(IVecI center, IVecI normal, IVecI rollDir, IDoubleI xradius, IDoubleI yradius, boolean approx){
+	((ICircleGeo)curve).update(center,normal,rollDir,xradius,yradius,approx);
+	updateGraphic();
+	return this;
+    }
+    
+    public ICircle update(IVecI center, IVecI xradiusVec, IVecI yradiusVec, boolean approx){
+	((ICircleGeo)curve).update(center,xradiusVec,yradiusVec,approx);
+	updateGraphic();
+	return this;
+    }
+    
+    
+    public IVec center(){ return ((ICircleGeo)curve).center(); }
+    public ICircle center(IVecI c){
+	((ICircleGeo)curve).center(c);
+        updateGraphic();
+        return this;
+    }
+    
+    public IVecI nml(){ return ((ICircleGeo)curve).nml(); }
+    public ICircle nml(IVec n){
+        ((ICircleGeo)curve).nml(n);
+	updateGraphic();
+        return this;
+    }
+
+    public double radius(){ return ((ICircleGeo)curve).radius(); }
+    public ICircle radius(double r){
+        ((ICircleGeo)curve).radius(r);
+	updateGraphic();
+        return this;
+    }
+    public ICircle radius(IDoubleI r){
+        ((ICircleGeo)curve).radius(r);
+	updateGraphic();
+        return this;
+    }
+
+    public double xradius(){ return ((ICircleGeo)curve).xradius(); }
+    public ICircle xradius(double r){
+        ((ICircleGeo)curve).xradius(r);
+	updateGraphic();
+        return this;
+    }
+    public ICircle xradius(IDoubleI r){
+        ((ICircleGeo)curve).xradius(r);
+	updateGraphic();
+        return this;
+    }
+
+    public double yradius(){ return ((ICircleGeo)curve).yradius(); }
+    public ICircle yradius(double r){
+        ((ICircleGeo)curve).yradius(r);
+	updateGraphic();
+        return this;
+    }
+    public ICircle yradius(IDoubleI r){
+        ((ICircleGeo)curve).yradius(r);
+	updateGraphic();
+        return this;
+    }
+    
     
     // name(), layer(), clr() etc.
     
@@ -301,7 +370,8 @@ public class ICircle extends ICurve{
     public ICircle clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public ICircle clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public ICircle clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
-
+    public ICircle clr(IObject o){ super.clr(o); return this; }
+    
     public ICircle clr(Color c){ super.clr(c); return this; }
     public ICircle clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ICircle clr(int gray){ super.clr(gray); return this; }

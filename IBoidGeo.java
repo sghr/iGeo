@@ -166,6 +166,9 @@ public class IBoidGeo extends IParticleGeo implements IBoidI{
     public IBoidGeo target(Class<? extends IBoidI>... targets){ return targetClass(targets); }
     
     public boolean isTargetClass(Object obj){
+	if(targetClasses==null){
+	    return obj instanceof IBoidI;
+	}
 	for(int i=0; i<targetClasses.size(); i++){
 	    if(targetClasses.get(i).isInstance(obj)) return true;
 	}

@@ -100,6 +100,8 @@ public class IPolynomialFunction implements IFunction{
 	if(degree==0){
 	    double[] newcoeff = new double[1];
 	    newcoeff[0] = 0;
+	    coeff = newcoeff;
+	    degree = 0;
 	    return;
 	    //return new IPolynomialFunction(newcoeff);
 	}

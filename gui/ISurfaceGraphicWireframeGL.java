@@ -50,7 +50,7 @@ public class ISurfaceGraphicWireframeGL extends IGraphicObject{
     public IPolyline2D[] uline2, vline2;
     public IPolyline2D[] inTrim2=null, outTrim2=null;
     
-    /** true when unum==2 && vnum==2 and flat */
+    /** true when unum==2 and vnum==2 and flat */
     public boolean simpleFlat=false; 
     
     public boolean initialized=false;

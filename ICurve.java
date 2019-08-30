@@ -471,6 +471,18 @@ public class ICurve extends IGeometry implements ICurveI{
     public boolean isInside2d(IVecI pt){ return curve.isInside2d(pt); }
     
     
+    /** intersection of curve and plane.
+	@param segmentResolution segmentation resolution per EP count in degree &gt;= 1 curve. */
+    public IVec[] intersectPlane(IVecI planeDir, IVecI planePt, int segmentResolution){
+	return curve.intersectPlane(planeDir,planePt,segmentResolution);
+    }
+
+    /** intersection of curve */
+    public IVec[] intersectPlane(IVecI planeDir, IVecI planePt){
+	return curve.intersectPlane(planeDir,planePt);
+    }
+
+    
     
     /******************************************************************************
      * transformation methods; API of ITransformable interface
@@ -516,6 +528,7 @@ public class ICurve extends IGeometry implements ICurveI{
 	curve.rot(center,axis,angle); return this;
     }
     synchronized public ICurve rot(IVecI center, IVecI axis, double angle){
+	//IG.err(center+", "+axis+", "+angle); //
 	curve.rot(center,axis,angle); return this;
     }
     
@@ -647,6 +660,8 @@ public class ICurve extends IGeometry implements ICurveI{
     synchronized public ICurve clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     synchronized public ICurve clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     synchronized public ICurve clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    synchronized public ICurve clr(IObject o){ super.clr(o); return this; }
+    
     synchronized public ICurve clr(Color c){ super.clr(c); return this; }
     synchronized public ICurve clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     synchronized public ICurve clr(Color c, float alpha){ super.clr(c,alpha); return this; }

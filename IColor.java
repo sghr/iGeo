@@ -99,6 +99,7 @@ public class IColor{
     public static IColor hsb(float h, float s, float b){ return hsb(h,s,b,1f); }
     public static IColor hsb(double h, double s, double b, double a){ return hsb((float)h,(float)s,(float)b,(float)a); }
     public static IColor hsb(double h, double s, double b){ return hsb((float)h,(float)s,(float)b,1f); }
+    
 
     /** returns array of 4 float in the order of RGBA */
     public float[] rgba(){ return rgba; }
@@ -190,6 +191,7 @@ public class IColor{
     public float blue(){ return b(); }
     public float alpha(){ return a(); }
     public float grey(){ return (r()+g()+b())/3; } // brightness
+    public float gray(){ return grey(); } // alias
     
     public IColor r(float r){ rgba[0]=r; return this; }
     public IColor g(float g){ rgba[1]=g; return this; }
@@ -201,12 +203,21 @@ public class IColor{
     public IColor blue(float b){ return b(b); }
     public IColor alpha(float a){ return a(a); }
     public IColor grey(float grey){ r(grey); g(grey); b(grey); return this; } // brightness
+    public IColor gray(float grey){ grey(grey); return this; } // alias
     
     public int getRed(){ return (int)(r()*255); }
     public int getGreen(){ return (int)(g()*255); }
     public int getBlue(){ return (int)(b()*255); }
     public int getAlpha(){ return (int)(a()*255); }
     public int getGrey(){ return (int)((r()+g()+b())*255/3); } // brightness
+    public int getGray(){ return getGrey(); } // alias
+    
+    public float[] hsb(){ return Color.RGBtoHSB(getRed(),getGreen(),getBlue(),null); }
+    
+    public float hue(){ float[] hsb = hsb(); return hsb[0]; }
+    public float saturation(){ float[] hsb = hsb(); return hsb[1]; }
+    public float brightness(){ float[] hsb = hsb(); return hsb[2]; }
+    
     
     public Color awt(){
 	float r = r();

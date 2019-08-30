@@ -323,43 +323,38 @@ public class IDelaunay2D {
 	    IOut.debug(40, (i+1)+"/"+(pts.length-2)); //
 	    for(int j=i+1; j<pts.length-1; j++){
 		
-		if(maxDistToCheck < 0 ||
-		   maxDistToCheck >= 0 && pts[i].dist(pts[j]) <= maxDistToCheck){
+		if(maxDistToCheck < 0 || maxDistToCheck >= 0 && pts[i].dist(pts[j]) <= maxDistToCheck){
 		    
-		    
-		for(int k=j+1; k<pts.length; k++){
-
-		    if(maxDistToCheck < 0 ||
-		       maxDistToCheck >= 0 && pts[i].dist(pts[k]) <= maxDistToCheck){
+		    for(int k=j+1; k<pts.length; k++){
 			
-			
-		    boolean anyInside=false;
-		    for(int l=0; l<pts.length && !anyInside; l++)
-			
-			
-			if(l!=i && l!=j && l!=k){
-			    //IOut.p("<"+i+","+j+","+k+","+l+">"); //
-			    if(isInsideCircumcircle(pts[l],pts[i],pts[j],pts[k])){
-				anyInside=true;
-				//IOut.p(pts[l] + " is inside <"+pts[i]+", "+pts[j]+", "+pts[k]+">"); //
-				//IOut.p("pt["+l+"] is INside pt["+i+"], pt["+j+"], pt["+k+"]"); //
+			if(maxDistToCheck < 0 || maxDistToCheck >= 0 && pts[i].dist(pts[k]) <= maxDistToCheck){
+			    
+			    boolean anyInside=false;
+			    for(int l=0; l<pts.length && !anyInside; l++){
+				
+				if(l!=i && l!=j && l!=k){
+				    //IOut.p("<"+i+","+j+","+k+","+l+">"); //
+				    if(isInsideCircumcircle(pts[l],pts[i],pts[j],pts[k])){
+					anyInside=true;
+					//IOut.p(pts[l] + " is inside <"+pts[i]+", "+pts[j]+", "+pts[k]+">"); //
+					//IOut.p("pt["+l+"] is INside pt["+i+"], pt["+j+"], pt["+k+"]"); //
+				    }
+				    else{
+					//IOut.p(pts[l] + " is outside <"+pts[i]+", "+pts[j]+", "+pts[k]+">"); //
+					//IOut.p("pt["+l+"] is OUTside pt["+i+"], pt["+j+"], pt["+k+"]"); //
+				    }
+				}
 			    }
-			    else{
-				//IOut.p(pts[l] + " is outside <"+pts[i]+", "+pts[j]+", "+pts[k]+">"); //
-				//IOut.p("pt["+l+"] is OUTside pt["+i+"], pt["+j+"], pt["+k+"]"); //
+			    if(!anyInside){ // nothing is inside
+				//IOut.p("<"+i+","+j+","+k+">: triangle is added"); //
+				if(isClockwise(pts[i],pts[j],pts[k]))
+				    triangles.add(new IVec2[]{ pts[i], pts[k], pts[j] });
+				else
+				    triangles.add(new IVec2[]{ pts[i], pts[j], pts[k] });
 			    }
+			    //else IOut.p("pt out"); //
 			}
-		    if(!anyInside){ // nothing is inside
-			//IOut.p("<"+i+","+j+","+k+">: triangle is added"); //
-			if(isClockwise(pts[i],pts[j],pts[k]))
-			    triangles.add(new IVec2[]{ pts[i], pts[k], pts[j] });
-			else
-			    triangles.add(new IVec2[]{ pts[i], pts[j], pts[k] });
 		    }
-		    //else IOut.p("pt out"); //
-		    }
-		}
-		    
 		}
 	    }
 	}
@@ -391,7 +386,7 @@ public class IDelaunay2D {
 
     /**
        Getting edges of delaunay triangles out of array of 2D points
-       @return array of triangles, which consist of array of 3 points of IVec2
+       @return array of pairs of IVec2 points, which represent edges.
     */
     public static IVec2[][] getEdges(IVec2[] pts){
 	IVec2[][] tri = getTriangles(pts);
@@ -417,14 +412,13 @@ public class IDelaunay2D {
     
     /**
        Getting edges of 2D delaunay triangles out of array of 3D points and projection vector.
-       @return array of triangles, which consist of array of 3 points of IVec2
+       @return array of pairs of IVec2 points, which represent edges.
     */
     public static IVecI[][] getEdges(IVecI[] pts){ return getEdges(pts,null); }
     
-    
     /**
        Getting edges of 2D delaunay triangles out of array of 3D points and projection vector.
-       @return array of triangles, which consist of array of 3 points of IVec2
+       @return array of pairs of IVec2 points, which represent edges.
     */
     public static IVecI[][] getEdges(IVecI[] pts, IVecI projectionDir){
 	IVec2[] pts2 = new IVec2[pts.length];
@@ -444,16 +438,16 @@ public class IDelaunay2D {
 	}
 	return ret;
     }
-
+    
     /**
        Getting edges of 2D delaunay triangles out of array of 3D points and projection vector.
-       @return array of triangles, which consist of array of 3 points of IVec2
+       @return array of pairs of IVec2 points, which represent edges.
     */
     public static IVec[][] getEdges(IVec[] pts){ return getEdges(pts,null); }
     
     /**
        Getting edges of 2D delaunay triangles out of array of 3D points and projection vector.
-       @return array of triangles, which consist of array of 3 points of IVec2
+       @return array of pairs of IVec2 points, which represent edges.
     */
     public static IVec[][] getEdges(IVec[] pts, IVecI projectionDir){
 	IVec2[] pts2 = new IVec2[pts.length];
@@ -470,6 +464,126 @@ public class IDelaunay2D {
 		int idx = pts2list.indexOf(ret2[i][j]);
 		if(idx>=0){ ret[i][j] = pts[idx]; }
 	    }
+	}
+	return ret;
+    }
+
+
+    /**
+       Getting outline (hull) points of delaunay triangles out of array of 2D points
+       @return array of IVec2 points which reprenst outline polyline
+    */
+    public static IVec2[] getOutline(IVec2[] pts){
+	IVec2[][] tri = getTriangles(pts);
+	boolean[] hasPair = new boolean[tri.length*3];
+	for(int i=0; i<hasPair.length; i++){ hasPair[i]=false; }
+	ArrayList<IVec2[]> outlinePairs = new ArrayList<IVec2[]>();
+	for(int i=0; i<tri.length; i++){
+	    for(int j=0; j<tri[i].length; j++){
+		if(!hasPair[i*3+j]){
+		    for(int k=i+1; k<tri.length&&!hasPair[i*3+j]; k++){
+			for(int l=0; l<tri[k].length&&!hasPair[i*3+j]; l++){
+			    if(tri[i][j]==tri[k][l] &&
+			       tri[i][(j+1)%tri[i].length]==tri[k][(l+1)%tri[k].length] ||
+			       tri[i][j]==tri[k][(l+1)%tri[k].length] &&
+			       tri[i][(j+1)%tri[i].length]==tri[k][l]){
+				hasPair[i*3+j]=true;
+				hasPair[k*3+l]=true;
+			    }
+			}
+		    }
+		    if(!hasPair[i*3+j]){
+			outlinePairs.add(new IVec2[]{ tri[i][j], tri[i][(j+1)%tri[i].length] });
+		    }
+		}
+	    }
+	}
+	IVec2[] outlinePts = new IVec2[outlinePairs.size()];
+	int idx=0;
+	outlinePts[idx] = outlinePairs.get(0)[0];
+	idx++;
+	outlinePts[idx] = outlinePairs.get(0)[1];
+	outlinePairs.set(0, null);
+	while(idx<outlinePts.length-1){
+	    boolean found=false;
+	    for(int i=1; i<outlinePairs.size() && !found; i++){
+		if(outlinePairs.get(i)!=null){
+		    if(outlinePts[idx] == outlinePairs.get(i)[0]){
+			idx++;
+			outlinePts[idx] = outlinePairs.get(i)[1];
+			outlinePairs.set(i,null);
+			found=true;
+		    }
+		    else if(outlinePts[idx] == outlinePairs.get(i)[1]){
+			idx++;
+			outlinePts[idx] = outlinePairs.get(i)[0];
+			outlinePairs.set(i,null);
+			found=true;
+		    }
+		}
+	    }
+	    if(!found){
+		IG.err("continuous outline not found");
+		IVec2[] partialOutline = new IVec2[idx+1];
+		for(int i=0; i<=idx; i++){
+		    partialOutline[i] = outlinePts[i];
+		}
+		return partialOutline;
+	    }
+	}
+	
+	return outlinePts;
+    }
+
+
+    /**
+       Getting outline (hull) points of delaunay triangles out of array of 3D points
+       @return array of IVec2 points which reprenst outline polyline
+    */
+    public static IVecI[] getOutline(IVecI[] pts){ return getOutline(pts,null); }
+    
+    /**
+       Getting outline (hull) points of delaunay triangles out of array of 3D points and projection direction.
+       @return array of IVec2 points which reprenst outline polyline
+    */
+    public static IVecI[] getOutline(IVecI[] pts, IVecI projectionDir){
+	IVec2[] pts2 = new IVec2[pts.length];
+	for(int i=0; i<pts2.length; i++){
+	    if(projectionDir!=null){ pts2[i] = pts[i].get().to2d(projectionDir); }
+	    else{ pts2[i] = pts[i].get().to2d(); }
+	}
+	IVec2[] ret2 = getOutline(pts2);
+	IVecI[] ret = new IVecI[ret2.length];
+	List<IVec2> pts2list = Arrays.asList(pts2);
+	for(int i=0; i<ret2.length; i++){
+	    int idx = pts2list.indexOf(ret2[i]);
+	    if(idx>=0){ ret[i] = pts[idx]; }
+	}
+	return ret;
+    }
+    
+    /**
+       Getting outline (hull) points of delaunay triangles out of array of 3D points
+       @return array of IVec2 points which reprenst outline polyline
+    */
+    public static IVec[] getOutline(IVec[] pts){ return getOutline(pts,null); }
+    
+    /**
+       Getting outline (hull) points of delaunay triangles out of array of 3D points and projection direction.
+       @return array of IVec2 points which reprenst outline polyline
+    */
+    public static IVec[] getOutline(IVec[] pts, IVecI projectionDir){
+	IVec2[] pts2 = new IVec2[pts.length];
+	for(int i=0; i<pts2.length; i++){
+	    if(projectionDir!=null){ pts2[i] = pts[i].to2d(projectionDir); }
+	    else{ pts2[i] = pts[i].to2d(); }
+	}
+	IVec2[] ret2 = getOutline(pts2);
+	IVec[] ret = new IVec[ret2.length];
+	List<IVec2> pts2list = Arrays.asList(pts2);
+	for(int i=0; i<ret2.length; i++){
+	    int idx = pts2list.indexOf(ret2[i]);
+	    if(idx>=0){ ret[i] = pts[idx]; }
 	}
 	return ret;
     }
@@ -491,6 +605,19 @@ public class IDelaunay2D {
 			(tpt2.x*tpt2.x - pt.x*pt.x) + (tpt2.y*tpt2.y - pt.y*pt.y),
 			tpt3.x - pt.x, tpt3.y - pt.y,
 			(tpt3.x*tpt3.x - pt.x*pt.x) + (tpt3.y*tpt3.y - pt.y*pt.y) );
+
+	if(det==0){
+	    IVec2 v = tpt2.dif(tpt1);
+	    if(v.isParallel(tpt3.dif(tpt1)) && v.isParallel(pt.dif(tpt1))){ // all parallel
+		double d1 = v.len();
+		double d2 = tpt3.dot(v)/d1;
+		double d = pt.dif(tpt1).dot(v)/d1;
+		if(d < 0 && d < d1 && d < d2 || d > 0 && d > d1 && d > d2){
+		    return false;
+		}
+		return true;
+	    }
+	}
 	//IOut.p("determinant = "+det); //
 	//return det > 0;
 	//final double minDeterminant = 0.000001; // is this number valid?
@@ -992,7 +1119,7 @@ public class IDelaunay2D {
     }
     
     /**
-       @param ptIdx1 requirement: ptIdx1 < ptIdx2
+       @param ptIdx1 requirement: ptIdx1 &lt; ptIdx2
     */
     static public FaceIndex findTriangleIndexWithEdge(ArrayList<FaceIndex> faceIdx,
 						      int ptIdx1, int ptIdx2){
@@ -1018,9 +1145,9 @@ public class IDelaunay2D {
     */
     
     /**
-       @param ptNum: total point num
-       @param ptIdx1: [0 - (ptNum-2)]
-       @param ptIdx2: [ptIdx1+1 - (ptNum-1)]
+       //@param ptNum: total point num
+       //@param ptIdx1: [0 - (ptNum-2)]
+       //@param ptIdx2: [ptIdx1+1 - (ptNum-1)]
     */
     /*
     public static int getEdgeIndex(int ptNum, int ptIdx1, int ptIdx2){

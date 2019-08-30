@@ -36,8 +36,13 @@ import igeo.gui.IView;
 
 public class IAIExporter {
     
-    static boolean ignoreOutOfView = false; //true; // temporarily
-    static boolean enableScreenBoundaryIntersection = true;
+    public static boolean ignoreOutOfView = false; //true; // temporarily
+    public static boolean enableScreenBoundaryIntersection = true;
+    
+    public static boolean enableViewBasedWeight = false; // make closer stroke weight thicker farther one thinner
+    public static double viewBasedWeightScale = 100.0;
+    public static double minViewBasedWeight = 0.01;
+    public static double maxViewBasedWeight = 10;
     
     public static double minimumPoint = 0.00001f; //0.001f; //0.01f;
     
@@ -913,6 +918,29 @@ public class IAIExporter {
 	
 	return createPolylinePointArrayList(pts);
     }
+
+    /**
+       calculate stroke weight based on view distance
+     */
+    public static double weightByView(IVecI pt, IView view){
+	double weight = viewBasedWeightScale/pt.dif(view.getLocation()).dot(view.frontDirection().unit());
+	IG.p("view based weight = "+weight); //
+	if(weight < minViewBasedWeight) return minViewBasedWeight;
+	if(weight > maxViewBasedWeight) return maxViewBasedWeight;
+	return weight;
+    }
+
+    /**
+       calculate stroke weight based on view distance
+     */
+    public static double weightByView(IVecI[] pts, IView view){
+	if(pts.length==0) return minViewBasedWeight;
+	double weight = 0;
+	for(int i=0; i<pts.length; i++){
+	    weight += weightByView(pts[i],view);
+	}
+	return weight/pts.length;
+    }
     
     
     public static IVec2 convertTo2DPoint(IVecI pt,double scale, IView view){
@@ -946,6 +974,11 @@ public class IAIExporter {
 	if(pt2==null) return;
 	
 	double lineWeight = defaultPointWeight;
+	
+	if(enableViewBasedWeight){
+	    lineWeight = weightByView(point, view);
+	}
+	
 	IColor color = null;
 	if(point instanceof IObject) color = ((IObject)point).clr();
 	
@@ -966,6 +999,13 @@ public class IAIExporter {
 	final boolean useCurveColor=true; //false;
 	
 	double lineWeight = defaultLineWeight;
+	if(curve instanceof ICurve){
+	   lineWeight = ((ICurve)curve).weight();
+	}
+
+	if(enableViewBasedWeight){
+	    lineWeight = weightByView(curve.cps(), view);
+	}
 	
 	IColor color = new IColor(0.5); // default? // null;
 	if(curve instanceof IObject) color = ((IObject)curve).clr();
@@ -1105,6 +1145,10 @@ public class IAIExporter {
 	
 	for(int i=0; i<faces.size(); i++){
 	    IFace f = faces.get(i);
+
+	    if(enableViewBasedWeight){
+		lineWeight = weightByView(f.vertices, view);
+	    }
 	    
 	    IVec2[] pts=convertTo2DPoints(f.vertices,scale,view);
 	    if(pts!=null){
@@ -1394,7 +1438,7 @@ public class IAIExporter {
 	    }
 	else
 	*/
-
+	
 	
 	IColor strokeColor = null;
 	IColor fillColor = null;
@@ -1425,13 +1469,13 @@ public class IAIExporter {
 	    
 	    //IColor color = new IColor(0.5); // default? // null;
 	    //if(surface instanceof IObject) color = ((IObject)surface).clr();
-	    writePaintStyle(ps, fillColor, strokeColor, 0); //
+	    writePaintStyle(ps, fillColor, strokeColor, 0); // 
 	    writeTrimLoops(ps,surface,scale,fillColor,strokeColor,view);
 	    //endMask(ps);
 	    endLayer(ps);
 	}
 	//ps.println("U"); //
-
+	
 	/*
 	if(surface.getStrokeColor()!=null){
 	    if(surface.hasTrim()){
@@ -1517,6 +1561,14 @@ public class IAIExporter {
 		if(!ignoreOutOfView && !flag && !view.isAxonometric()) return; // don't write
 		convertCoordinates(pts2[i][j],scale,view);
 	    }
+	}
+
+	if(enableViewBasedWeight){
+	    lineWeight = 0;
+	    for(int i=0; i<pts.length; i++){
+		lineWeight += weightByView(outlinePts[i], view);
+	    }
+	    lineWeight /= pts.length;
 	}
 	
 	//ArrayList<IVec2>[] pts3 = new ArrayList<IVec2>[pts2.length];

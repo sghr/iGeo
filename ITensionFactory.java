@@ -20,29 +20,8 @@
 
 ---*/
 
-package igeo.gui;
-//package igeo.gl;
+package igeo;
 
-import javax.media.opengl.*;
-
-import igeo.*;
-
-/**
-   Objectified OpenGL polygon drawing process.
-   
-   @author Satoru Sugihara
-*/
-public class IGLPolygon extends IGLElement{
-    
-    private IGLPolygon(){}
-    //public IGLPolygon(IPolyline pl){ super(pl.get()); }
-    private IGLPolygon(IVec[] pts){ super(pts); }
-    
-    public void draw(GL2 gl){
-	gl.glBegin(GL2.GL_POLYGON);
-	drawPoints(gl);
-	gl.glEnd();
-    }
-    
-    
+public interface ITensionFactory {
+    public ITensionI create(IVecI pt1, IVecI pt2, double tension);
 }

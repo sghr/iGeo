@@ -197,10 +197,7 @@ public class IParticleGeo extends IDynamicsBase implements IParticleI, IVecI{
     
     /** adding force */
     synchronized public IParticleGeo push(IVecI f){
-	//IG.p(IOut.currentStack(5)); //
-	//IG.p(parent.name()+": f = "+f.z()); //
 	if(!fixed){ frc.add(f); }
-	//IG.p(parent.name()+": frc = "+frc.z); //
 	return this;
     }
     /** adding force */
@@ -209,12 +206,8 @@ public class IParticleGeo extends IDynamicsBase implements IParticleI, IVecI{
     }
     /** adding negative force */
     synchronized public IParticleGeo pull(IVecI f){
-	//IG.p(IOut.currentStack(5)); //
-	//IG.p(parent.name()+": f = "+f.z()); //
 	if(!fixed){ frc.sub(f); }
-	//IG.p(parent.name()+": frc = "+frc.z); //
 	return this;
-	
     }
     /** adding negative force */
     synchronized public IParticleGeo pull(double fx, double fy, double fz){
@@ -246,11 +239,9 @@ public class IParticleGeo extends IDynamicsBase implements IParticleI, IVecI{
     /** update of velocity is done in preupdate and update of position is done in update() (updated 2012/08/26) */
     synchronized public void update(){
 	if(skipUpdateOnce){ skipUpdateOnce=false; return; } // added 20120827
-	
 	if(fixed) return;
 	//vel.add(frc.mul(IConfig.updateRate/mass)).mul(1.0-friction);
 	//pos.add(vel.dup().mul(IConfig.updateRate));
-	
 	pos.add(vel, IConfig.updateRate);
 	//frc.zero();
 	

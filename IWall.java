@@ -63,6 +63,9 @@ public class IWall extends IAgent{
     /** coefficent for tangent part of bouncing. when friction is zero, the tangent part of bounced velocity
 	doesn't change. if friction is 1.0, the tangent part of bounced velocity becomes zero */
     public double friction = 0.0;
+
+    /** A boolean option to force all particles behind the plane (opposite direction of plane normal) to be moved to be on the wall */
+    public boolean forceToMoveToFront = false;
     
     
     public IWall(IVecI planeDir, IVecI planePt){
@@ -95,7 +98,13 @@ public class IWall extends IAgent{
     public double elast(){ return elasticity; }
     public IWall elasticity(double el){ return elast(el); }
     public double elasticity(){ return elast(); }
-
+    
+    public IWall forceToMoveToFront(boolean flag){
+	forceToMoveToFront=flag;
+	return this;
+    }
+    
+    
     /** in case somebody needs to measure distance to the wall. */
     //public double dist(IVecI pt){ return pt.get().distToPlane(planeDir,planePt); }
     
@@ -195,6 +204,15 @@ public class IWall extends IAgent{
        IWall inserts an intersection point into the trajectory curve.
     */
     public void bounce(IParticleI particle, ArrayList<IDynamics> agents){
+
+	
+	if(forceToMoveToFront){
+	    IVec curPos = particle.pos().dup();
+	    if(curPos.dif(planePt).dot(planeDir) < 0){ // particle is on the back side of the plane
+		curPos.projectToPlane(planeDir, planeDir, planePt);
+		particle.pos(curPos);
+	    }
+	}
 	
 	double vlen2=particle.vel().len2();
 	if(vlen2>0){

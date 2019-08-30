@@ -27,7 +27,20 @@ import java.util.ArrayList;
 
 //import javax.media.opengl.*;
 
+//import javax.media.opengl.*; // Processing 1 & 2
+
+//import com.jogamp.opengl.util.texture.*;
+//import com.jogamp.opengl.util.texture.awt.*;
+
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.awt.*;
+
+
+
+
 import igeo.*;
+
 
 /**
    Graphic subobject class to draw filled faces of a surface object by OpenGL.
@@ -50,8 +63,12 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     
     public IVec[][] quads;
     public IVec[][] quadsNormal;
+    public IVec2f[][] quadsUV;
     public IVec[][] triangles;
     public IVec[][] trianglesNormal;
+    public IVec2f[][] trianglesUV;
+    
+    public ITexture texture;
     
     
     // cache to update surface 
@@ -59,7 +76,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
     public IVec2[][] triangles2DCache;
     
     public boolean initialized=false;
-
+    
     int origUEPNum, origVEPNum; // added 20121111
     
     public ISurfaceGraphicFillGL(ISurface srf){
@@ -108,111 +125,126 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	initialized=true;
     }
     
+    public void setAttribute(IAttribute attr){
+	super.setAttribute(attr);
+	texture = attr.texture;
+    }
+    
     synchronized public void initWithoutTrim(){
 	synchronized(parent){
 	
-	double[] uval;
-	double[] vval;
-	if(surface.udeg()==1){
-	    int num = surface.unum();
-	    uval = new double[num];
-	    for(int i=0; i<num; i++) uval[i] = surface.u(i,0);
-	}
-	else{
-	    int epnum = surface.uepNum();
-	    int num = (epnum-1)*isoparmRatioU+1;
-	    uval = new double[num];
-	    for(int i=0; i<epnum; i++)
-		for(int j=0; j<isoparmRatioU; j++)
-		    if(i<epnum-1||j==0)
-			uval[i*isoparmRatioU + j] = surface.u(i, (double)j/isoparmRatioU);
-	}
-	
-	if(surface.vdeg()==1){
-	    int num = surface.vnum();
-	    vval = new double[num];
-	    for(int i=0; i<num; i++) vval[i] = surface.v(i,0);
-	}
-	else{
-	    int epnum = surface.vepNum();
-	    int num = (epnum-1)*isoparmRatioV+1;
-	    vval = new double[num];
-	    for(int i=0; i<epnum; i++)
-		for(int j=0; j<isoparmRatioV; j++)
-		    if(i<epnum-1||j==0)
-			vval[i*isoparmRatioV + j] = surface.v(i, (double)j/isoparmRatioV);
-	}
-	
-	// insert points for deg 1 twisted surface
-	if(insertPointOnDegree1TwistedSurface&&
-	   surface.udeg()==1 && surface.vdeg()==1){
-	    
-	    boolean uinsert[] = new boolean[uval.length-1];
-	    boolean vinsert[] = new boolean[vval.length-1];
-	    boolean anyInsert=false;
-	    for(int i=0; i<uval.length-1; i++) uinsert[i] = false;
-	    for(int i=0; i<vval.length-1; i++) vinsert[i] = false;
-	    
-	    for(int i=0; i<uval.length-1; i++){
-		for(int j=0; j<vval.length-1; j++){
-		    if(!IVec.isFlat(surface.pt(uval[i],vval[j]),
-				    surface.pt(uval[i+1],vval[j]),
-				    surface.pt(uval[i+1],vval[j+1]),
-				    surface.pt(uval[i],vval[j+1]))){
-			uinsert[i] = true;
-			vinsert[j] = true;
-			anyInsert = true;
-		    }
-		}
+	    double[] uval;
+	    double[] vval;
+	    if(surface.udeg()==1){
+		int num = surface.unum();
+		uval = new double[num];
+		for(int i=0; i<num; i++) uval[i] = surface.u(i,0);
+	    }
+	    else{
+		int epnum = surface.uepNum();
+		int num = (epnum-1)*isoparmRatioU+1;
+		uval = new double[num];
+		for(int i=0; i<epnum; i++)
+		    for(int j=0; j<isoparmRatioU; j++)
+			if(i<epnum-1||j==0)
+			    uval[i*isoparmRatioU + j] = surface.u(i, (double)j/isoparmRatioU);
 	    }
 	    
-	    if(anyInsert){
-		ArrayList<Double> uval2 = new ArrayList<Double>();
+	    if(surface.vdeg()==1){
+		int num = surface.vnum();
+		vval = new double[num];
+		for(int i=0; i<num; i++) vval[i] = surface.v(i,0);
+	    }
+	    else{
+		int epnum = surface.vepNum();
+		int num = (epnum-1)*isoparmRatioV+1;
+		vval = new double[num];
+		for(int i=0; i<epnum; i++)
+		    for(int j=0; j<isoparmRatioV; j++)
+			if(i<epnum-1||j==0)
+			    vval[i*isoparmRatioV + j] = surface.v(i, (double)j/isoparmRatioV);
+	    }
+	    
+	    // insert points for deg 1 twisted surface
+	    if(insertPointOnDegree1TwistedSurface&&
+	       surface.udeg()==1 && surface.vdeg()==1){
+		
+		boolean uinsert[] = new boolean[uval.length-1];
+		boolean vinsert[] = new boolean[vval.length-1];
+		boolean anyInsert=false;
+		for(int i=0; i<uval.length-1; i++) uinsert[i] = false;
+		for(int i=0; i<vval.length-1; i++) vinsert[i] = false;
+		
 		for(int i=0; i<uval.length-1; i++){
-		    uval2.add(uval[i]);
-		    if(uinsert[i]){
-			for(int j=1; j<isoparmRatioU; j++){
-			    uval2.add(((uval[i+1]-uval[i])*j)/isoparmRatioU+uval[i]);
+		    for(int j=0; j<vval.length-1; j++){
+			if(!IVec.isFlat(surface.pt(uval[i],vval[j]),
+					surface.pt(uval[i+1],vval[j]),
+					surface.pt(uval[i+1],vval[j+1]),
+					surface.pt(uval[i],vval[j+1]))){
+			    uinsert[i] = true;
+			    vinsert[j] = true;
+			    anyInsert = true;
 			}
 		    }
 		}
-		uval2.add(uval[uval.length-1]);
 		
-		ArrayList<Double> vval2 = new ArrayList<Double>();
-		for(int i=0; i<vval.length-1; i++){
-		    vval2.add(vval[i]);
-		    if(vinsert[i]){
-			for(int j=1; j<isoparmRatioV; j++){
-			    vval2.add(((vval[i+1]-vval[i])*j)/isoparmRatioV+vval[i]);
+		if(anyInsert){
+		    ArrayList<Double> uval2 = new ArrayList<Double>();
+		    for(int i=0; i<uval.length-1; i++){
+			uval2.add(uval[i]);
+			if(uinsert[i]){
+			    for(int j=1; j<isoparmRatioU; j++){
+				uval2.add(((uval[i+1]-uval[i])*j)/isoparmRatioU+uval[i]);
+			    }
 			}
 		    }
+		    uval2.add(uval[uval.length-1]);
+		
+		    ArrayList<Double> vval2 = new ArrayList<Double>();
+		    for(int i=0; i<vval.length-1; i++){
+			vval2.add(vval[i]);
+			if(vinsert[i]){
+			    for(int j=1; j<isoparmRatioV; j++){
+				vval2.add(((vval[i+1]-vval[i])*j)/isoparmRatioV+vval[i]);
+			    }
+			}
+		    }
+		    vval2.add(vval[vval.length-1]);
+		
+		    uval = new double[uval2.size()];
+		    for(int i=0; i<uval2.size(); i++) uval[i] = uval2.get(i);
+		
+		    vval = new double[vval2.size()];
+		    for(int i=0; i<vval2.size(); i++) vval[i] = vval2.get(i);
 		}
-		vval2.add(vval[vval.length-1]);
-		
-		uval = new double[uval2.size()];
-		for(int i=0; i<uval2.size(); i++) uval[i] = uval2.get(i);
-		
-		vval = new double[vval2.size()];
-		for(int i=0; i<vval2.size(); i++) vval[i] = vval2.get(i);
 	    }
-	}
-	
-	IVec[][] pts = new IVec[uval.length][vval.length];
-	IVec[][] nrm = new IVec[uval.length][vval.length];
-	for(int i=0; i<uval.length; i++){
-	    for(int j=0; j<vval.length; j++){
-		pts[i][j] = surface.pt(uval[i], vval[j]).get();
-		nrm[i][j] = surface.normal(uval[i], vval[j]).get().unit();
+	    
+	    IVec[][] pts = new IVec[uval.length][vval.length];
+	    IVec[][] nrm = new IVec[uval.length][vval.length];
+	    for(int i=0; i<uval.length; i++){
+		for(int j=0; j<vval.length; j++){
+		    pts[i][j] = surface.pt(uval[i], vval[j]).get();
+		    nrm[i][j] = surface.normal(uval[i], vval[j]).get().unit();
+		}
 	    }
-	}
+	    
+	    if(texture!=null){
+		IVec2f[][] uv = new IVec2f[uval.length][vval.length];
+		for(int i=0; i<uval.length; i++){
+		    for(int j=0; j<vval.length; j++){
+			uv[i][j] = new IVec2f(i*1f/(uval.length-1), j*1f/(vval.length-1));
+		    }
+		}
+		quadsUV = uv;
+	    }
+	    
+	    //quadMatrix = new IGLQuadMatrix(pts,nrm);
+	    quads = pts;
+	    quadsNormal = nrm;
 	
-	//quadMatrix = new IGLQuadMatrix(pts,nrm);
-	quads = pts;
-	quadsNormal = nrm;
-	
-	uvalCache=uval;
-	vvalCache=vval;
-
+	    uvalCache=uval;
+	    vvalCache=vval;
+	    
 	}
     }
     
@@ -368,13 +400,22 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	}
 	
 	IVec2[][] triangles2D = ISurfaceMesh.getTriangles(surfPts,outerPts,innerPts);
-		
+	
 	IVec[][] triangles3D = new IVec[triangles2D.length][3];
 	IVec[][] trianglesNml = new IVec[triangles2D.length][3];
 	for(int i=0; i<triangles2D.length; i++){
 	    for(int j=0; j<triangles2D[i].length; j++){
 		triangles3D[i][j] = surface.pt(triangles2D[i][j]).get();
 		trianglesNml[i][j] = surface.normal(triangles2D[i][j]).get().unit();
+	    }
+	}
+	
+	if(texture!=null){
+	    trianglesUV = new IVec2f[triangles2D.length][3];
+	    for(int i=0; i<triangles2D.length; i++){
+		for(int j=0; j<triangles2D[i].length; j++){
+		    trianglesUV[i][j] = new IVec2f((float)triangles2D[i][j].x, (float)triangles2D[i][j].y);
+		}
 	    }
 	}
 	
@@ -509,9 +550,8 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	return m.isGraphic3D()&&m.isFill();
     }
     
+    
     synchronized public void draw(IGraphics g){
-
-	
 	
 	//if(surface==null) initSurface(); // not initizlized at the constructor // shouldn't it?
 	if(!initialized) initSurface();
@@ -519,7 +559,6 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	
 	if(g.type() == IGraphicMode.GraphicType.GL||
 	   g.type() == IGraphicMode.GraphicType.P3D){
-	   
 	    
 	    IGraphics3D g3d = (IGraphics3D)g;
 	    
@@ -555,20 +594,90 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    //else{ g3d.clr(red,green,blue,alpha); }
 	    
 	    g3d.clr(rgba);
+
+
+	    if(texture!=null){
+		g3d.beginTexture(texture);
+	    }
 	    
-	    if(quads!=null){
-		if(quadsNormal==null){ g3d.drawQuadMatrix(quads); }
-		else{ g3d.drawQuadMatrix(quads,quadsNormal); }
-            }
-	    if(triangles!=null){
-		if(trianglesNormal==null){
-		    for(int i=0; i<triangles.length; i++) g3d.drawTriangles(triangles[i]);
+	    /*
+	    // texture test
+	    GL2 gl2 = null;
+	    if(texture!=null){
+		Texture tex = texture.getTexture(g3d);
+		int textureID = tex.getTextureObject();
+		
+		gl2.glDisable(GL2.GL_BLEND); // important
+		gl2.glEnable(GL2.GL_TEXTURE_2D);
+		gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE); // GL_DECAL
+		
+		gl2.glBindTexture(GL2.GL_TEXTURE_2D, textureID);
+	    }
+	    */
+
+	    
+	    /*
+	    gl2.glDisable(GL2.GL_BLEND); // important
+	    gl2.glEnable(GL2.GL_TEXTURE_2D);
+	    gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE); // GL_DECAL
+	    
+	    gl2.glBindTexture(GL2.GL_TEXTURE_2D, textureID);
+	    
+	    gl2.glBegin(GL2.GL_QUADS);
+	    gl2.glTexCoord2f(0f,0f);
+	    gl2.glVertex3d(-1,-1,0);
+	    gl2.glTexCoord2f(1f,0f);
+	    gl2.glVertex3d(1,-1,0);
+            gl2.glTexCoord2f(1f,1f);
+	    gl2.glVertex3d(1,1,0);
+	    gl2.glTexCoord2f(0f,1f);
+	    gl2.glVertex3d(-1,1,0);
+	    
+            gl2.glEnd();
+	    */
+	    
+	    if(texture!=null){
+		if(quads!=null){
+		    if(quadsNormal==null){ g3d.drawQuadMatrix(quads,quadsUV); }
+		    else{ g3d.drawQuadMatrix(quads,quadsNormal,quadsUV); }
 		}
-		else{
-		    for(int i=0; i<triangles.length; i++)
-			g3d.drawTriangles(triangles[i], trianglesNormal[i]);
+		if(triangles!=null){
+		    if(trianglesNormal==null){
+			for(int i=0; i<triangles.length; i++) g3d.drawTriangles(triangles[i],trianglesUV[i]);
+		    }
+		    else{
+			for(int i=0; i<triangles.length; i++)
+			    g3d.drawTriangles(triangles[i], trianglesNormal[i], trianglesUV[i]);
+		    }
 		}
 	    }
+	    else{
+		if(quads!=null){
+		    if(quadsNormal==null){ g3d.drawQuadMatrix(quads); }
+		    else{ g3d.drawQuadMatrix(quads,quadsNormal); }
+		}
+		if(triangles!=null){
+		    if(trianglesNormal==null){
+			for(int i=0; i<triangles.length; i++) g3d.drawTriangles(triangles[i]);
+		    }
+		    else{
+			for(int i=0; i<triangles.length; i++)
+			    g3d.drawTriangles(triangles[i], trianglesNormal[i]);
+		    }
+		}
+	    }
+	    
+	    // texture test
+	    if(texture!=null){
+		g3d.endTexture();
+	    }
+	    
+	    /*
+	    if(texture!=null){
+		gl2.glBindTexture(GL2.GL_TEXTURE_2D, 0); // bind no texture
+		gl2.glEnable(GL2.GL_BLEND);
+	    }
+	    */
 	    
 	    /*
 	    if(quadMatrix!=null){

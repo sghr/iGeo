@@ -197,27 +197,54 @@ public class IStick extends IDynamicsBase{
 	IVec dif = pt2.pos().dif(pt1.pos());
 	double l = dif.len();
 	
-
 	//if(pt1.dist(pt2) > len+IConfig.tolerance){
 	//IG.p(this+": "+pt1.pos().dist(pt2.pos()) + "/"+len); // debug
 	//}
 	
+	// move particles forcefully
 	if(!pt1.fixed()&&!pt2.fixed()){
+	    /*
+	    IG.p("post: "+pt1.pos().dist(pt2.pos()) + "/"+len); // debug
+	    IG.p("post: pt1.vel "+pt1.vel());
+	    IG.p("post: pt2.vel "+pt2.vel());
+	    IVec mid2 = pt1.pos().mid(pt2.pos());
+	    IVec pt1orig = pt1.pos().cp();
+	    IVec pt2orig = pt2.pos().cp();
+	    */
 	    IVec mid = pt1.pos().mid(pt2.pos());
 	    dif.len(len);
 	    pt1.set(mid.add(dif,-0.5));
 	    pt2.set(mid.add(dif));
+	    
+	    dif.unit();
+	    pt1.vel().add(dif, -pt1.vel().dot(dif));
+	    pt2.vel().add(dif, -pt2.vel().dot(dif));
+	    /*
+	    if(IG.time()%100==0){
+		new IPoint(mid2.cp()).clr(0,1.,0);
+		new IPoint(mid2.add(dif,-0.5).cp()).clr(1.,0,0);
+		new IPoint(mid2.add(dif).cp()).clr(1,0.5,0);
+		new IPoint(pt1orig).clr(1.,0,0);
+		new IPoint(pt2orig).clr(1.,0.5,0);
+	    }
+	    */
 	}
 	else if(!pt2.fixed()){
 	    dif.len(len);
 	    pt2.set(dif.add(pt1.pos()));
+	    
+	    dif.unit();
+	    pt2.vel().add(dif, -pt2.vel().dot(dif));
 	}
 	else if(!pt1.fixed()){
 	    dif.len(len);
 	    pt1.set(dif.neg().add(pt2.pos()));
+	    
+	    dif.unit();
+	    pt1.vel().add(dif, -pt1.vel().dot(dif));
 	}
 	
-	//IG.p("post: "+pt1.pos().dist(pt2.pos()) + "/"+len); // debug
+	
     }
     
     

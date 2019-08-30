@@ -40,7 +40,10 @@ public class IParticle extends IPointAgent implements IParticleI{
     public IParticle(double x, double y, double z){ super(x,y,z); initParticleAgent(); }
     public IParticle(IVec p){ super(p); initParticleAgent(); }
     public IParticle(IVecI p){ super(p); initParticleAgent(); }
-    public IParticle(IParticleGeo ptcl){ super(ptcl.pos); initParticleAgent(ptcl); }
+    public IParticle(IParticleGeo ptcl){
+	super(ptcl.pos);
+	initParticleAgent(ptcl);
+    }
     public IParticle(IParticle p){ super((IPointAgent)p); initParticleAgent(p); }    
     
     public IParticle(double x, double y, double z, double vx, double vy, double vz){ super(x,y,z); initParticleAgent(new IVec(vx,vy,vz)); }
@@ -452,6 +455,7 @@ public class IParticle extends IPointAgent implements IParticleI{
     public IParticle clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IParticle clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IParticle clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IParticle clr(IObject o){ super.clr(o); return this; }
     //public IParticle clr(Color c){ super.clr(c); return this; }
     //public IParticle clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     //public IParticle clr(Color c, float alpha){ super.clr(c,alpha); return this; }

@@ -211,6 +211,11 @@ public class IAgentTracker extends IDynamicsBase{
 	for(int i=0; i<geometries.length; i++) geometries[i].clr(c,alpha);
 	return this;
     }
+    public IAgentTracker clr(IObject o){
+	for(int i=0; i<geometries.length; i++) geometries[i].clr(o);
+	return this;
+    }
+    
     //public IAgentTracker clr(Color c){ super.clr(c); point.clr(c); return this; }
     //public IAgentTracker clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     //public IAgentTracker clr(Color c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }

@@ -20,27 +20,29 @@
 
 ---*/
 
-package igeo.gui;
-//package igeo.gl;
+package igeo;
 
-import javax.media.opengl.*;
+import java.awt.image.*;
+import java.awt.*;
 
-/**
-   Objectified OpenGL line loop drawing process.
-   
-   @author Satoru Sugihara
-*/
-public class IGLLineLoop extends IGLElement{
+import igeo.*;
+import igeo.gui.*;
+
+/** 
+    Texture class out of matrix of pixels
+ */
+public class IPixelTexture extends ITexture{
+    public int[] pixels;
     
-    private IGLLineLoop(){}
-    private IGLLineLoop(int size){ super(size); }
+    /** constructor with pixel size */
+    public IPixelTexture(int width, int height){
+	super(width,height);
+	pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+    }
     
-    private IGLLineLoop(IPolyline pl){ super(pl.get()); }
-    
-    public void draw(GL2 gl){
-	gl.glBegin(GL2.GL_LINE_LOOP);
-	drawPoints(gl);
-	gl.glEnd();
+    public IPixelTexture(String file, int width, int height){
+	super(file, width, height);
+	pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
     }
     
     

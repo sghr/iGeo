@@ -20,30 +20,8 @@
 
 ---*/
 
-package igeo.gui;
-//package igeo.gl;
+package igeo;
 
-import javax.media.opengl.*;
-
-import igeo.*;
-
-/**
-   Objectified OpenGL line strip drawing process.
-   
-   @author Satoru Sugihara
-*/
-public class IGLLineStrip extends IGLElement{
-    
-    private IGLLineStrip(){}
-    private IGLLineStrip(int size){ super(size); }
-    private IGLLineStrip(IVec[] pts){ super(pts); }
-    private IGLLineStrip(IPolyline pl){ super(pl.get()); }
-    
-    public void draw(GL2 gl){
-	gl.glBegin(GL2.GL_LINE_STRIP);
-	drawPoints(gl);
-	gl.glEnd();
-    }
-    
-    
+public interface IParticleOnCurveFactory {
+    public IParticleOnCurveI create(ICurveI crv, double upos, IVec pos);
 }

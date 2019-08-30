@@ -33,7 +33,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     public ArrayList<IVertex> vertices;
     public ArrayList<IEdge> edges;
     public ArrayList<IFace> faces;
-
+    
     /** just setting boolean value to closed. checking no connection of mesh. used to set closed flag in saving */
     public boolean closed=false;
     
@@ -883,6 +883,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     /** center of mesh, calculated by average of all vertices */
     public IVec center(){
 	IVec cnt = new IVec();
+	if(vertices.size()==0) return cnt;
 	for(int i=0; i<vertices.size(); i++) cnt.add(vertices.get(i).pos());
 	return cnt.div(vertices.size());
     }
@@ -1429,7 +1430,7 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     
 
     /** divide by multiple ratios. ratios need to be orderd from smaller to larger 
-	@param ratios  [0-1]: 0 -> e.vertices[0], 1->e.vertices[1]
+	@param ratios  [0-1]: 0 -&gt; e.vertices[0], 1-&gt;e.vertices[1]
 	@return divided edges.
     */
     public IEdge[] divideEdge(IEdge e, double[] ratios, IMeshType creator){
@@ -1850,6 +1851,9 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
     }
     
     /** subdivide all triangle faces into 4 triangles each divided at each mid point of edges. */
+    public IMeshGeo subD(){ return subdivide(); }
+    
+    /** subdivide all triangle faces into 4 triangles each divided at each mid point of edges. */
     public IMeshGeo subdivide(){
 	
 	IVertex[] midVtx = new IVertex[edges.size()];
@@ -2176,6 +2180,168 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	}
 	return this;
     }
+
+    /** Loop-subdivision */
+    public IMeshGeo loopSubD(){ return loopSubdivide(); }
+    /** Loop-subdivision */
+    public IMeshGeo loopSubdivide(){ return loopSubdivide(null); }
+    
+    /** Loop-subdivision */
+    public IMeshGeo loopSubD(IVec[] fixedEdges){ return loopSubdivide(fixedEdges); }
+    /** Loop-subdivision */
+    public IMeshGeo loopSubdivide(IVec[] fixedEdges){
+	
+	IVertex[] vtx = new IVertex[vertexNum()];
+	IVertex[] vtx2 = new IVertex[edgeNum()];
+	
+	for(int i=0; i<vertexNum(); i++){
+	    vtx[i] = new IVertex(vertex(i).pos());
+	}
+	
+	IEdge[] edges = new IEdge[edgeNum()*2];
+	
+	for(int i=0; i<edgeNum(); i++){
+	    int v1 = vertexIndex(edge(i).vertex(0));
+	    int v2 = vertexIndex(edge(i).vertex(1));
+	    vtx2[i] = new IVertex(edge(i).vertex(0).pos().mid(edge(i).vertex(1).pos()));
+	    edges[i*2] = new IEdge(vtx[v1], vtx2[i]);
+	    edges[i*2+1] = new IEdge(vtx2[i], vtx[v2]);
+	}
+	
+	IFace[] faces = new IFace[faceNum()*4];
+	IEdge[] medges = new IEdge[faceNum()*3];
+	
+	for(int i=0; i<faceNum(); i++){
+	    IFace f = face(i);
+	    
+	    int e1 = edgeIndex(f.edge(0));
+	    int e2 = edgeIndex(f.edge(1));
+	    int e3 = edgeIndex(f.edge(2));
+	    
+	    IEdge[] edges2 = new IEdge[6];
+	    edges2[0] = edges[e1*2];
+	    edges2[1] = edges[e1*2+1];
+	    edges2[2] = edges[e2*2];
+	    edges2[3] = edges[e2*2+1];
+	    edges2[4] = edges[e3*2];
+	    edges2[5] = edges[e3*2+1];
+	    
+	    IVertex mv1 = vtx2[e1];
+	    IVertex mv2 = vtx2[e2];
+	    IVertex mv3 = vtx2[e3];
+	    
+	    IEdge me1 = new IEdge(mv1, mv2);
+	    IEdge me2 = new IEdge(mv2, mv3);
+	    IEdge me3 = new IEdge(mv3, mv1);
+	    medges[i*3] = me1;
+	    medges[i*3+1] = me2;
+	    medges[i*3+2] = me3;
+	    
+	    IEdge[] tedge1 = faceEdges(me1, edges2);
+	    IEdge[] tedge2 = faceEdges(me2, edges2);
+	    IEdge[] tedge3 = faceEdges(me3, edges2);
+	    
+	    IEdge[] tedge4 = new IEdge[]{ me1, me2, me3 };
+	    
+	    faces[i*4] = new IFace(tedge1);
+	    faces[i*4+1] = new IFace(tedge2);
+	    faces[i*4+2] = new IFace(tedge3);
+	    faces[i*4+3] = new IFace(tedge4);
+	}
+	
+	// deformation
+	for(int i=0; i<vtx2.length; i++){
+	    boolean fixed=false;
+	    if(fixedEdges!=null){
+		for(int j=0; j<fixedEdges.length/2 && !fixed; j++){
+		    if(vtx2[i].get().isOnSegment(fixedEdges[j*2], fixedEdges[j*2+1])){
+			fixed=true;
+		    } 
+		}
+	    }
+	    if(!fixed){
+		IVertex v1 = edge(i).face(0).getOtherVertex(edge(i));
+		IVertex v2 = edge(i).face(1).getOtherVertex(edge(i));
+		IVec pos = new IVec();
+		pos.add(edge(i).vertex(0).pos(), 3.0/8);
+		pos.add(edge(i).vertex(1).pos(), 3.0/8);
+		pos.add(v1.pos(), 1.0/8);
+		pos.add(v2.pos(), 1.0/8);
+		vtx2[i].set(pos);
+	    }
+	}
+	
+	for(int i=0; i<vtx.length; i++){
+	    boolean fixed=false;
+	    if(fixedEdges!=null){
+		for(int j=0; j<fixedEdges.length/2 && !fixed; j++){
+		    if(vertex(i).get().isOnSegment(fixedEdges[j*2], fixedEdges[j*2+1])){
+			fixed=true;
+		    } 
+		}
+	    }
+	    if(!fixed){
+		IVec pos = new IVec();
+		for(int j=0; j<vertex(i).linkedVertices.size(); j++){
+		    pos.add(vertex(i).linkedVertices.get(j).pos());
+		}
+		double weight = 3.0/8/vertex(i).linkedVertices.size();
+		if(vertex(i).linkedVertices.size()==3){
+		    weight = 3.0/16;
+		}
+		pos.mul(weight);
+		pos.add(vtx[i].pos(), 1 - weight*vertex(i).linkedVertices.size());
+		vtx[i].set(pos);
+	    }
+	}
+	
+	IVertex[] allvtx = new IVertex[vtx.length+vtx2.length];
+	IEdge[] alledges = new IEdge[edges.length+medges.length];
+	for(int i=0; i<vtx.length; i++){
+	    allvtx[i] = vtx[i];
+	}
+	for(int i=0; i<vtx2.length; i++){
+	    allvtx[i+vtx.length] = vtx2[i];
+	}
+	for(int i=0; i<edges.length; i++){
+	    alledges[i] = edges[i];
+	}
+	for(int i=0; i<medges.length; i++){
+	    alledges[i+edges.length] = medges[i];
+	}
+	
+	return new IMeshGeo(allvtx,alledges,faces);
+    }
+    
+    public IEdge[] faceEdges(IEdge e, IEdge[] edges){
+	int idx=0;
+	for(int i=0; i<edges.length; i++){
+	    for(int j=0; j<edges.length; j++){
+		if(i!=j){
+		    if(edges[i].contains(e.vertex(0)) && edges[j].contains(e.vertex(1)) &&
+		       edges[i].getOtherVertex(e.vertex(0)) == edges[j].getOtherVertex(e.vertex(1))){
+			return new IEdge[]{ edges[j], e, edges[i] };
+		    }
+		}
+	    }
+	}
+	IG.p("no edge found");
+	return null;
+    }
+    
+    public int edgeIndex(IEdge e){
+	for(int i=0; i<edgeNum(); i++){ if(edge(i)==e){ return i; }}
+	return -1;
+    }
+    
+    public int vertexIndex(IVertex v){
+	for(int i=0; i<vertexNum(); i++){
+	    if(vertex(i)==v){ return i; }
+	}
+	return -1;
+    }
+    
+    
     
     
     /** remove duplicated vertices and edges */
@@ -2253,6 +2419,111 @@ public class IMeshGeo extends IParameterObject implements IMeshI{
 	return new IMeshGeo(newFaces);
     }
     */
+
+    /** offset each vertex towards vertex normal and return the mesh. It modifies the exisiting mesh instead of creating new one. 
+	@param offsetList An array of offset distance of each vertex. Size and order of the array needs to match with vertex size and order. If the array size is smaller than vertex size, the last member is applied to the remaining. 
+    */
+    public IMeshGeo offset(double[] offsetList){
+	for(int i=0; i<vertices.size(); i++){
+	    double dist = 0;
+	    if(offsetList.length<i){
+		dist = offsetList[i];
+	    }
+	    else{
+		dist = offsetList[offsetList.length-1];
+	    }
+	    if(dist!=0){
+		IVec n = vertices.get(i).nml().get().cp();
+		if(n.len2()>0){
+		    vertices.get(i).add(n.len(dist));
+		}
+	    }
+	}
+	return this;
+    }
+    
+    /** offset each vertex towards vertex normal and return the mesh. It modifies the exisiting mesh instead of creating new one. 
+	@param offsetDist offset distance.
+    */
+    public IMeshGeo offset(double offsetDist){
+	if(offsetDist!=0){
+	    for(int i=0; i<vertices.size(); i++){
+		IVec n = vertices.get(i).nml().get().cp();
+		if(n.len2()>0){
+		    vertices.get(i).add(n.len(offsetDist));
+		}
+	    }
+	}
+	return this;
+    }
+    
+    public IMeshGeo flipNormal(){ flipNml(); return this; }
+    public IMeshGeo flipNml(){
+	for(int i=0; i<faces.size(); i++){
+	    faces.get(i).flipNml();
+	}
+	for(int i=0; i<vertices.size(); i++){
+	    vertices.get(i).calcNormal();
+	}
+	return this;
+    }
+    
+    public IMeshGeo unifyNormal(){ unifyNml(); return this; }
+    public IMeshGeo unifyNml(){ return unifyNml(0); }
+    public IMeshGeo unifyNml(int faceIdx){
+	boolean[] checkedFace = new boolean[faces.size()];
+	IFace f = faces.get(faceIdx);
+	checkedFace[faceIdx]=true;
+	for(int i=0; i<faces.size(); i++){
+	    if(f==null){ IG.err("face iteration failed. no face found"); return this; }
+	    /*
+	    //debug
+	    if(f.vertices.length==3){
+		ISurface s = new ISurface(f.vertices[0].cp(), f.vertices[1].cp(), f.vertices[2].cp()).clr(0,0,1.);//
+		s.scale(s.center(),0.8);
+	    }
+	    else{
+		ISurface s = new ISurface(f.vertices[0].cp(), f.vertices[1].cp(), f.vertices[2].cp(),f.vertices[3].cp()).clr(0,0,1.);//
+		s.scale(s.center(),0.8);
+	    }
+	    */
+	    IFace f2 = iterateFace(f, checkedFace);
+	    if(f2!=null){
+		if(f.sharedVertexOrder(f2)==0){ f2.flipNml(); }
+	    }
+	    else{
+		for(int j=0; j<faces.size() && f2==null; j++){
+		    if(!checkedFace[j]){
+			f2=faces.get(j);
+			checkedFace[j]=true;
+		    }
+		}
+	    }
+	    f = f2;
+	}
+	return this;
+    }
+    
+    public IFace iterateFace(IFace f, boolean[] checkedFaces){
+	for(int i=0; i<f.edges.length; i++){
+	    IFace f2 = f.edges[i].getOtherFace(f);
+	    if(f2!=null){
+		int idx = faces.indexOf(f2);
+		if(idx<0){
+		    IG.err("other face is not contained in mesh");
+		    return null;
+		}
+		if(!checkedFaces[idx]){
+		    IG.p("index = "+idx); //
+		    checkedFaces[idx]=true;
+		    return f2;
+		}
+	    }
+	}
+	return null;
+    }
+    
+    
     
     
     /*************************************************

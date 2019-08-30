@@ -24,6 +24,7 @@ package igeo.io;
 
 import java.io.*;
 import java.util.ArrayList;
+import javax.imageio.*;
 import igeo.*;
 
 
@@ -55,6 +56,12 @@ public class IIO{
 	return seg[seg.length-1];
     }
     
+    public static String getFilenameWithoutExtension(String filename){
+	int idx = filename.lastIndexOf('.');
+	if(idx<0) return filename;
+	return filename.substring(0,idx);
+    }
+    
     public static FileType getFileType(String filename){
 	if(isExtension(filename, extensionRhino)) return FileType.RHINO;
 	if(isExtension(filename, extensionObj)) return FileType.OBJ;
@@ -75,14 +82,13 @@ public class IIO{
 	    IOut.err("the input file doesn't exist : "+file.getPath());
 	    return null;
 	}
-	ArrayList<IObject> objects=null;
 	FileType type = getFileType(file.getName());
-	if(type == FileType.OBJ) objects =  openOBJ(file,server);
-	if(type == FileType.RHINO) objects = openRhino(file,server);
-	if(type == FileType._3DXML) objects = open3DXML(file,server);
-	if(type == FileType.SHP) objects = openShape(file,server);
+	if(type == FileType.OBJ) return openOBJ(file,server);
+	if(type == FileType.RHINO) return openRhino(file,server);
+	if(type == FileType._3DXML) return open3DXML(file,server);
+	if(type == FileType.SHP) return openShape(file,server);
 	IOut.err("file extension ."+getExtension(file.getName())+" is not supported");
-	return objects;
+	return null;
     }
 
     
@@ -261,6 +267,7 @@ public class IIO{
     
     
     public static boolean save(String filename, IServerI server){
+	saveTextureAsPNG(filename, server); //
 	FileType type = getFileType(filename);
 	if(type == FileType.OBJ) return saveOBJ(new File(filename),server);
 	if(type == FileType.RHINO) return saveRhino(new File(filename),server);
@@ -270,6 +277,7 @@ public class IIO{
     }
     
     public static boolean save(File file, IServerI server){
+	saveTextureAsPNG(file.getName(), server); //
 	FileType type = getFileType(file.getName());
 	if(type == FileType.OBJ) return saveOBJ(file,server);
 	if(type == FileType.RHINO) return saveRhino(file,server);
@@ -313,4 +321,21 @@ public class IIO{
 	return false;
     }
     
+    public static void saveTextureAsPNG(String filename, IServerI server){
+	int objectNum = server.server().objectNum();
+	
+	String basename = getFilenameWithoutExtension(filename);
+	int objCount=0;
+	for(int i=0; i<objectNum; i++){
+	    IObject obj = server.server().getObject(i);
+	    IAttribute attr = obj.attr();
+	    if(attr!=null && attr.texture!=null && attr.texture.image!=null){
+		String filePath = basename+"_"+String.valueOf(i)+".png";
+		filePath = IG.cur().formatOutputFilePath(filePath);
+		IOut.debug(0,"saving png file: "+filePath);
+		try{ ImageIO.write(attr.texture.image,"png",new File(filePath)); }
+		catch(IOException ioe){ ioe.printStackTrace(); }
+	    }
+	}
+    }
 }

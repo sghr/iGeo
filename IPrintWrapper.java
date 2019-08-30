@@ -20,23 +20,28 @@
 
 ---*/
 
-package igeo.gui;
-//package igeo.gl;
+package igeo;
 
-import javax.media.opengl.*;
-
-/**
-   Objectified OpenGL quad strip drawing process.
-   
-   @author Satoru Sugihara
-*/
-public class IGLQuadStrip extends IGLElement{
-    private IGLQuadStrip(){}
-    private IGLQuadStrip(int size){ super(size); }
+import java.io.*;
+import java.util.Arrays;
     
-    public void draw(GL2 gl){
-	gl.glBegin(GL2.GL_QUAD_STRIP);
-	drawPoints(gl);
-	gl.glEnd();
+public class IPrintWrapper extends OutputStream{
+    public IPrintWrapper(){}
+    
+    public void p(String str) {}
+    
+    public void write(byte[] b){
+	p(new String(b));
+    }
+    
+    public void write(byte[] b, int off, int len){
+	//p(new String(Arrays.copyOfRange(b, off, off+len))); // for jdk1.6+
+	byte[] b2 = new byte[len];
+	for(int i=0; i<len; i++) b2[i] = b[off+i];
+	p(new String(b2));
+    }
+    
+    public void write(int b){
+	p(String.valueOf((char)b));
     }
 }

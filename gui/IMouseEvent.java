@@ -42,7 +42,7 @@ public class IMouseEvent{
     public boolean altDown;
 
     public float mouseX, mouseY;
-    
+    int count = 1;
     //int mask;
     
     public IMouseEvent(){
@@ -82,11 +82,40 @@ public class IMouseEvent{
 	
 	mouseX = e.getX();
 	mouseY = e.getY();
+	
+	count = e.getClickCount();
     }
+    
+    // doesn't compile in processing 1.5
+    public IMouseEvent(processing.event.MouseEvent e){
+	if(e.getButton()==processing.core.PConstants.LEFT){
+	   button = Button1;
+	}
+        else if(e.getButton()==processing.core.PConstants.CENTER){
+	   button = Button2;
+	}
+        else if(e.getButton()==processing.core.PConstants.RIGHT){
+	   button = Button3;
+	}
+	
+	shiftDown = e.isShiftDown();
+	controlDown = e.isControlDown();
+	altDown = e.isAltDown();
+	mouseX = e.getX();
+	mouseY = e.getY();
+	
+	//IG.p("button = "+button+", shiftDown = "+shiftDown+", controlDown = "+controlDown+", altDown = "+altDown+", mouseX = "+mouseX+", mouseY = "+mouseY); //
+	
+	count = e.getCount();
+    }
+    
     
     public int getX(){ return (int)mouseX; }
     public int getY(){ return (int)mouseY; }
-    
+
+    public int getCount(){ return count; }
+
+
     /*
     // SHIFT_DOWN or SHIFT_DOWN_MASK?
     // -> SHIFT_DOWN.

@@ -50,6 +50,18 @@ public class IKeyEvent{
 	metaDown = e.isMetaDown();
 	shiftDown = e.isShiftDown();
     }
+    // doesn't compile in processing 1.5
+    public IKeyEvent(processing.event.KeyEvent e){
+	character = e.getKey();
+	keyCode = e.getKeyCode();
+	//keyLocation = e.getKeyLocation();
+	//actionKey = e.isActionKey();
+	altDown = e.isAltDown();
+	controlDown = e.isControlDown();
+	metaDown = e.isMetaDown();
+	shiftDown = e.isShiftDown();
+    }
+    
     
     public char getKeyChar(){ return character; }
     public int getKeyCode(){ return keyCode; }

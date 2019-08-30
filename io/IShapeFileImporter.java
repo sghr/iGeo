@@ -1429,7 +1429,7 @@ public class IShapeFileImporter{
     /**
        Reading a SHP file and creating objects in a server.
        The main entry of the importer class.
-       @param file An importing file object.
+       @param filename An importing file name.
        @param server A server interface to put imported objects in. 
        @return ArrayList of created IObject.
     */
@@ -1459,7 +1459,7 @@ public class IShapeFileImporter{
     /**
        Reading a SHP file and creating objects in a server.
        The main entry of the importer class.
-       @param file An importing file object.
+       @param filename An importing file name.
        @param server A server interface to put imported objects in. 
        @return ArrayList of created IObject.
     */
@@ -1562,7 +1562,7 @@ public class IShapeFileImporter{
     /**
        Reading a DBF file 
        The main entry of the importer class.
-       @param file An importing file object.
+       @param filename An importing filename.
        @param server A server interface to put imported objects in. 
        @return ArrayList of created IObject.
     */

@@ -405,6 +405,9 @@ public class ILayer extends IObject{
     
     public ILayer name(String layerName){ attribute.name = layerName; return this; }
     
+    public String toString(){ return name(); }
+    
+    
     @Override public boolean visible(){ return attribute.visible(); }
     
     public ILayer setVisible(boolean v){ return visible(v); }
@@ -434,6 +437,7 @@ public class ILayer extends IObject{
     public ILayer clr(IColor c, int alpha){ attribute.clr(c,alpha); return this; }
     public ILayer clr(IColor c, float alpha){ attribute.clr(c,alpha); return this; }
     public ILayer clr(IColor c, double alpha){ attribute.clr(c,alpha); return this; }
+    public ILayer clr(IObject o){ super.clr(o); return this; }
     public ILayer clr(Color c){ attribute.clr(c); return this; }
     public ILayer clr(Color c, int alpha){ attribute.clr(c,alpha); return this; }
     public ILayer clr(Color c, float alpha){ attribute.clr(c,alpha); return this; }

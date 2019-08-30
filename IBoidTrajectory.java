@@ -34,16 +34,18 @@ public class IBoidTrajectory extends IBoid implements ITrajectoryI{
     public ITrajectoryGeo trajectory;
     
     public IBoidTrajectory(){ super(); initTrajectory(); }
-    public IBoidTrajectory(double x, double y, double z){ super(x,y,z); initTrajectory(); }
     public IBoidTrajectory(IVec p){ super(p); initTrajectory(); }
     public IBoidTrajectory(IVecI p){ super(p); initTrajectory(); }
-    public IBoidTrajectory(IParticleGeo ptcl){ super(ptcl); initTrajectory(); }
-    public IBoidTrajectory(IParticle p){ super(p); initTrajectory(); }
-    public IBoidTrajectory(double x, double y, double z, double vx, double vy, double vz){ super(x,y,z,vx,vy,vz); initTrajectory(); }
     public IBoidTrajectory(IVec p, IVec vel){ super(p,vel); initTrajectory(); }
     public IBoidTrajectory(IVecI p, IVecI vel){ super(p,vel); initTrajectory(); }
-    public IBoidTrajectory(IParticleGeo ptcl, IVecI vel){ super(ptcl,vel); initTrajectory(); }
-    public IBoidTrajectory(IParticle p, IVecI vel){ super(p,vel); initTrajectory(); }
+    public IBoidTrajectory(double x, double y, double z){ super(x,y,z); initTrajectory(); }
+    public IBoidTrajectory(double x, double y, double z, double vx, double vy, double vz){ super(x,y,z,vx,vy,vz); initTrajectory(); }
+    public IBoidTrajectory(IBoidGeo ptcl){ super(ptcl); initTrajectory(); }
+    public IBoidTrajectory(IBoidGeo ptcl, IVecI vel){ super(ptcl,vel); initTrajectory(); }
+    
+    public IBoidTrajectory(IBoidTrajectory b){ super(b); initTrajectory(b.trajectory); }
+    public IBoidTrajectory(IBoidTrajectory b, IVecI vel){ super(b,vel); initTrajectory(b.trajectory); }
+    
     
     // out of attached geometries
     public IBoidTrajectory(IGeometry... geometries){
@@ -63,6 +65,7 @@ public class IBoidTrajectory extends IBoid implements ITrajectoryI{
     
     
     public void initTrajectory(){ trajectory = new ITrajectoryGeo(this); }
+    public void initTrajectory(ITrajectoryGeo tr){ trajectory = new ITrajectoryGeo(tr); }
     
     public int deg(){ if(trajectory!=null){ return trajectory.deg(); } return 1; }
     public IBoidTrajectory deg(int newDegree){ if(trajectory!=null){ trajectory.deg(newDegree); } return this; }
@@ -376,6 +379,7 @@ public class IBoidTrajectory extends IBoid implements ITrajectoryI{
     public IBoidTrajectory clr(IColor c, int alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
     public IBoidTrajectory clr(IColor c, float alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
     public IBoidTrajectory clr(IColor c, double alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
+    public IBoidTrajectory clr(IObject o){ super.clr(o); if(trajectory!=null){ trajectory.clr(o); } return this; }
     //public IBoidTrajectory clr(Color c){ super.clr(c); if(trajectory!=null){ trajectory.clr(c); } return this; }
     //public IBoidTrajectory clr(Color c, int alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
     //public IBoidTrajectory clr(Color c, float alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }

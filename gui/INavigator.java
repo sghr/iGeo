@@ -298,6 +298,8 @@ public class INavigator{
     }
     
     public void mousePressed(IMouseEvent e){
+
+
 	mouseX = e.getX();
 	mouseY = e.getY();
 	mousePressed=true;
@@ -307,6 +309,8 @@ public class INavigator{
 	//else dragType = DragType.Rotate;
 	
 	dragType = getDragType(e);
+	
+	//IG.err("dragType = "+dragType); //
 	
 	// all?
 	viewPos = view.location();

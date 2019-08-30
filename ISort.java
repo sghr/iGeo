@@ -26,7 +26,7 @@ package igeo;
 
 //import java.util.Vector;
 //import java.util.AbstractList;
-//import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -73,6 +73,15 @@ public class ISort/*<T>*/{
 	    }
 	}
 	return target;
+    }
+
+    public static<T> T[] sort(T[] target,IComparator<T> comparator){
+	ArrayList<T> array = new ArrayList<T>(target.length);
+	for(int i=0; i<target.length; i++){
+	    array.add(target[i]);
+	}
+	List<T> sorted = sort((List<T>)array, comparator);
+	return (T[]) sorted.toArray(target);
     }
     
     /*

@@ -208,14 +208,42 @@ public class IString extends IDynamicsBase{
 		dif.len(len);
 		pt1.set(mid.add(dif,-0.5));
 		pt2.set(mid.add(dif));
+		
+		dif.unit();
+		double d1 = pt1.vel().dot(dif);
+		double d2 = pt2.vel().dot(dif);
+		if(d1<0) pt1.vel().add(dif, -d1);
+		if(d2>0) pt2.vel().add(dif, -d2);
 	    }
 	    else if(!pt2.fixed()){
 		dif.len(len);
 		pt2.set(dif.add(pt1.pos()));
+		
+		dif.unit();
+		double d2 = pt2.vel().dot(dif);
+		if(d2>0) pt2.vel().add(dif, -d2);
+		/*
+		if(IG.time()%100==0){
+		    dif = pt2.pos().dif(pt1.pos());
+		    dif.len(len);
+		    new IPoint(dif.add(pt1.pos())).clr(0,0,1.0);
+		}
+		*/
 	    }
 	    else if(!pt1.fixed()){
 		dif.len(len);
 		pt1.set(dif.neg().add(pt2.pos()));
+		
+		dif.unit();
+		double d1 = pt1.vel().dot(dif);
+		if(d1<0) pt1.vel().add(dif, -d1);
+		/*
+		if(IG.time()%100==0){
+		    dif = pt2.pos().dif(pt1.pos());
+		    dif.len(len);
+		    new IPoint(dif.neg().add(pt2.pos())).clr(0,0,1.0);
+		}
+		*/
 	    }
 	}
 	

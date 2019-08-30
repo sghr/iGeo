@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.awt.event.*;
 import java.awt.geom.*;
 
-import javax.media.opengl.*;
+import javax.media.opengl.*; // Processing 1 & 2
+//import com.jogamp.opengl.*; // Processing 3 change
 
 
 import igeo.gui.*;

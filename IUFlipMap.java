@@ -31,6 +31,6 @@ public class IUFlipMap extends IMap{
     public IMap map;
     public IUFlipMap(IMap m){ map = m; }
     public double get(double u, double v){ return map.get(1-u,v); }
-    public void flipU(){ map.flipU(); } //is it ok to modify the original?
-    public void flipV(){ map.flipV(); } //is it ok to modify the original?
+    public IUFlipMap flipU(){ map.flipU(); return this; } //is it ok to modify the original?
+    public IUFlipMap flipV(){ map.flipV(); return this; } //is it ok to modify the original?
 }

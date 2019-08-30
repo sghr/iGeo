@@ -31,8 +31,8 @@ import java.util.ArrayList;
 */
 public class IFoldableStrip implements IFoldable{
     
-    ArrayList<IVecI[]> pts;
-    ArrayList<ITransformable> faces;
+    public ArrayList<IVecI[]> pts;
+    public ArrayList<ITransformable> faces;
     
     public IFoldableStrip(IVecI[][] foldLinePts){
 	setFold(foldLinePts);

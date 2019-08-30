@@ -31,7 +31,7 @@ public class IVFlipMap extends IMap{
     public IMap map;
     public IVFlipMap(IMap m){ map = m; }
     public double get(double u, double v){ return map.get(u,1-v); }
-    public void flipU(){ map.flipU(); } //is it ok to modify the original?
-    public void flipV(){ map.flipV(); } //is it ok to modify the original?
+    public IVFlipMap flipU(){ map.flipU(); return this; } //is it ok to modify the original?
+    public IVFlipMap flipV(){ map.flipV(); return this; } //is it ok to modify the original?
 }
 

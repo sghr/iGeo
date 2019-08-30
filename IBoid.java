@@ -41,8 +41,12 @@ public class IBoid extends IParticle implements IBoidI{
     public IBoid(double x, double y, double z, double vx, double vy, double vz){
 	super(new IBoidGeo(x,y,z,vx,vy,vz)); 
     }
-    public IBoid(IBoid b){ super(new IBoidGeo((IBoidGeo)b.particle));}
+    public IBoid(IBoid b){ super(new IBoidGeo((IBoidGeo)b.particle)); }
+    public IBoid(IBoid b, IVecI vel){ super(new IBoidGeo((IBoidGeo)b.particle),vel); }
     
+    public IBoid(IBoidGeo boid){ super(boid); }
+    public IBoid(IBoidGeo boid, IVecI vel){ super(boid, vel); }
+        
     
     // out of attached geometries
     public IBoid(IGeometry... geometries){
@@ -60,8 +64,8 @@ public class IBoid extends IParticle implements IBoidI{
 	super(geometryOrigin, geometryOrientation, geometries);
 	initParticleAgent(new IBoidGeo(pos));
     }
-    
-    
+
+
     
     public IBoidGeo boid(){ return (IBoidGeo)particle; } // (IParticleGeo)particle in IParticle
     
@@ -448,6 +452,7 @@ public class IBoid extends IParticle implements IBoidI{
     public IBoid clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IBoid clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IBoid clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IBoid clr(IObject o){ super.clr(o); return this; }
     //public IBoid clr(Color c){ super.clr(c); return this; }
     //public IBoid clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     //public IBoid clr(Color c, float alpha){ super.clr(c,alpha); return this; }

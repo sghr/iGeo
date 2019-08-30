@@ -137,6 +137,20 @@ public class IRhino3dmImporter extends IRhino3dm{
 	return buf;
     }
     
+    public static void skip(InputStream is, int len) throws IOException{
+	long ptr=0, res=0;
+	while(ptr<len){ // is this safe?
+	    res = is.skip(len-ptr);
+	    if(res==0){ // end of file (?)
+		IG.err("unexpected end of file");
+		return;
+	    }
+	    else{
+		ptr += res;
+	    }
+	}
+    }
+    
     public static char readChar(InputStream is)throws IOException{
 	int ret = is.read();
 	if(ret<0) throw new EOFException();
@@ -596,7 +610,6 @@ public class IRhino3dmImporter extends IRhino3dm{
 	return chunks.toArray(new Chunk[chunks.size()]);
     }
     
-    
     public static Chunk readNestedChunk(Chunk chunk){
 	if(chunk==null){
 	    IOut.err("input chunk is null"); //
@@ -928,7 +941,9 @@ public class IRhino3dmImporter extends IRhino3dm{
 			    readHistoryRecordTable(chunk);
 			    break;
 			case tcodeUserTable:
-			    readUserDataTable(chunk);
+			    if(IConfig.read3dmUserData){
+				readUserDataTable(chunk);
+			    }
 			    break;
 			case tcodeEndOfFile:
 			    readEndMark(chunk);

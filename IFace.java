@@ -37,7 +37,9 @@ public class IFace{
     
     /** used in deleting process */
     public boolean deleted=false;
-
+    
+    public boolean invalid=false; // in case init fails due to unmatching edge, vertex etc
+    
     public IColor clr; // face color
     
     public IFace(IEdge[] e){ init(e); }
@@ -57,7 +59,7 @@ public class IFace{
     
     public IFace(IVertex v1, IVertex v2, IVertex v3){ this(new IVertex[]{v1,v2,v3}); }
     public IFace(IVertex v1, IVertex v2, IVertex v3, IVertex v4){ this(new IVertex[]{v1,v2,v3,v4}); }
-
+    
     /**
        Copis a face but shareing same vertices and edges with the original
     */
@@ -67,6 +69,18 @@ public class IFace{
 	edges = new IEdge[f.edges.length];
 	for(int i=0; i<edges.length; i++) edges[i]=f.edges[i];
 	if(f.normal!=null) normal = f.normal.dup();
+    }
+
+    public boolean isValid(){
+	if(invalid) return false;
+	if(vertices==null || edges==null) return false;
+	for(int i=0; i<vertices.length; i++){
+	    if(vertices[i]==null) return false;
+	}
+	for(int i=0; i<edges.length; i++){
+	    if(edges[i]==null) return false;
+	}
+	return true;
     }
     
     public void init(IEdge[] e){
@@ -80,6 +94,7 @@ public class IFace{
 	if(edges[1].contains(edges[0].vertices[0])) vertices[0]=edges[0].vertices[1];
 	else if(edges[1].contains(edges[0].vertices[1])) vertices[0]=edges[0].vertices[0];
 	else{
+	    invalid=true;
 	    IOut.err("first&second edges don't match");
 	    IOut.err("edges[0] = "+edges[0].vertices[0].pos+", "+edges[0].vertices[1].pos); //
 	    IOut.err("edges[1] = "+edges[1].vertices[0].pos+", "+edges[1].vertices[1].pos); //
@@ -89,6 +104,7 @@ public class IFace{
 	    if(edges[i-1].contains(vertices[i-1]))
 		vertices[i]=edges[i-1].getOtherVertex(vertices[i-1]);
 	    else{
+		invalid=true;
 		IOut.err((i-1)+"&"+i+" edges don't match");
 		//IOut.err("vertex["+(i-1)+"] =" + vertices[i-1]); //
 		//IOut.err("edges["+(i-1)+"] = "+edges[i-1].vertices[0]+", "+edges[i-1].vertices[1]); //
@@ -96,11 +112,14 @@ public class IFace{
 	}
 	
 	if(edges[num-1].getOtherVertex(vertices[num-1]) != vertices[0]){
+	    invalid=true;
 	    IOut.err("first&last vertex doesn't match");
 	    //new ICurve(edges[num-1]).clr(1.0,0,0).weight(5); //
 	    //new IPoint(vertices[0]).clr(1.0,0,0).size(6); //
 	    //new ISurface(vertices[0],vertices[1],vertices[2]).clr(1.0,0,0); //
 	}
+
+	if(invalid) return; // exit in case of error
 	
 	for(int i=0; i<num; i++){
 	    vertices[i].addFace(this);
@@ -277,6 +296,29 @@ public class IFace{
 	return null;
     }
     
+    /** check if two faces have shared pair of vertices
+	@return -1 if no shared pair of vertices, 
+	        0 if shared pair of vertices in the same order (opposite loop direction), 
+		1 if shared pair of vertices in the opposite order (opposite loop direction)
+    */
+    public int sharedVertexOrder(IFace f){
+	for(int i=0; i<vertices.length; i++){
+	    for(int j=0; j<f.vertices.length; j++){
+		if(vertices[i]==f.vertices[j]){
+		    if(vertices[(i+1)%vertices.length]==f.vertices[(j+1)%f.vertices.length] ||
+		       vertices[(i-1+vertices.length)%vertices.length]==f.vertices[(j-1+f.vertices.length)%f.vertices.length]){
+			return 0;
+		    }
+		    else if(vertices[(i+1)%vertices.length]==f.vertices[(j-1+f.vertices.length)%f.vertices.length] ||
+			    vertices[(i-1+vertices.length)%vertices.length]==f.vertices[(j+1)%f.vertices.length]){
+			return 1;
+		    }
+		}
+	    }
+	}
+	return -1;
+    }
+    
     /** direction of edge based on the sequence of vertices array inside a face 
 	@return true if it's same with vertices array sequence, otherwise false and also if edge is not included inside face, false.
     */
@@ -295,6 +337,7 @@ public class IFace{
 	if(vertices[(startIdx-1+vertices.length)%vertices.length].eq(edge.vertex(1))){ return false; }
 	
 	IOut.err("edge is not in the face");
+
 	return false;
     }
     
@@ -447,7 +490,9 @@ public class IFace{
 	//for(IVertex v: vertices) v.normal(normal); ?
     }
     
-    public void flipNormal(){
+    public void flipNormal(){ flipNml(); }
+    
+    public void flipNml(){
 	if(normal!=null) normal.neg();
 	
 	IVertex[] tmpvtx = new IVertex[vertices.length];
@@ -772,7 +817,9 @@ public class IFace{
     public IFace clr(IColor c, double alpha){
 	return clr(new IColor(c,alpha));
     }
-
+    public IFace clr(IObject o){ clr(o.clr()); return this; }
+    public IFace clr(IFace f){ clr(f.clr()); return this; }
+    
     public IFace clr(Color c){ return clr(new IColor(c)); }
     public IFace clr(Color c, int alpha){ return clr(new IColor(c),alpha); }
     public IFace clr(Color c, float alpha){ return clr(new IColor(c),alpha); }

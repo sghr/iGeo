@@ -23,6 +23,7 @@
 package igeo;
 
 import java.io.*;
+import java.util.Arrays;
 
 /**
    A class to provide default static output stream.
@@ -63,6 +64,13 @@ public class IOut {
     public static void disableErrorPrefix(){ printErrorPrefix=false; }
     public static void enableDebugPrefix(){ printDebugPrefix=true; }
     public static void disableDebugPrefix(){ printDebugPrefix=false; }
+    
+    public static void noPrefix(){
+	printPrefix=false;
+	printErrorPrefix=false;
+	printDebugPrefix=false;
+    }
+    
     
     public static void debugLevel(int level){ debugLevel=level; }
     public static int debugLevel(){ return debugLevel; }
@@ -271,5 +279,37 @@ public class IOut {
     public static void flush(){ if(enabled) ps.flush(); }
     
     public static PrintStream get(){ return ps; }
+    
+    
+    
+    public static void setPS(IPrintWrapper pw){
+	IOut.ps = new PrintStream(pw);
+    }
+    
+    public static void setErr(IPrintWrapper pw){
+	IOut.err = new PrintStream(pw);
+    }
+    
+    public static void setDebug(IPrintWrapper pw){
+	IOut.debug = new PrintStream(pw);
+    }
+    
+    public static void setPrint(IPrintWrapper pw, IPrintWrapper epw, IPrintWrapper dpw){
+	IOut.ps = new PrintStream(pw);
+	IOut.err = new PrintStream(epw);
+	IOut.debug = new PrintStream(dpw);
+    }
+    
+    public static void setPrint(IPrintWrapper pw, IPrintWrapper epw){
+	IOut.ps = new PrintStream(pw);
+	IOut.err = new PrintStream(epw);
+	IOut.debug = new PrintStream(pw);
+    }
+    
+    public static void setPrint(IPrintWrapper pw){
+	IOut.ps = new PrintStream(pw);
+	IOut.err = new PrintStream(pw);
+	IOut.debug = new PrintStream(pw);
+    }
     
 }

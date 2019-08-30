@@ -312,6 +312,7 @@ public class IParticleOnCurveAgent extends IParticleOnCurve{
     public IParticleOnCurveAgent clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IParticleOnCurveAgent clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IParticleOnCurveAgent clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IParticleOnCurveAgent clr(IObject o){ super.clr(o); return this; }
     public IParticleOnCurveAgent clr(Color c){ super.clr(c); return this; }
     public IParticleOnCurveAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IParticleOnCurveAgent clr(Color c, float alpha){ super.clr(c,alpha); return this; }

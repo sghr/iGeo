@@ -102,6 +102,19 @@ public class IMatrix4 extends IMatrix implements IMatrix4I{
 	    det(val[2][0],val[2][1],val[3][0],val[3][1]);
     }
     
+    public static double determinant(double v00, double v01, double v02, double v03,
+				     double v10, double v11, double v12, double v13,
+				     double v20, double v21, double v22, double v23,
+				     double v30, double v31, double v32, double v33){
+	return
+	    det(v00,v01,v10,v11)* det(v22,v23,v32,v33) +
+	    det(v00,v02,v10,v12)* det(v23,v21,v33,v31) +
+	    det(v00,v03,v10,v13)* det(v21,v22,v31,v32) +
+	    det(v01,v02,v11,v12)* det(v20,v23,v30,v33) +
+	    det(v03,v01,v13,v11)* det(v20,v22,v30,v32) +
+	    det(v02,v03,v12,v13)* det(v20,v21,v30,v31);
+    }
+    
     public /*void*/ IMatrix4 invert(){
 	double det = determinant();
 	

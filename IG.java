@@ -49,9 +49,9 @@ public class IG implements IServerI{
     
     public static int majorVersion(){ return 0; }
     public static int minorVersion(){ return 9; }
-    public static int buildVersion(){ return 1; }
-    public static int revisionVersion(){ return 4; }
-    public static Calendar versionDate(){ return new GregorianCalendar(2015, 1, 15); }
+    public static int buildVersion(){ return 3; }
+    public static int revisionVersion(){ return 0; }
+    public static Calendar versionDate(){ return new GregorianCalendar(2019, 8, 14); }
     public static String version(){
 	return String.valueOf(majorVersion())+"."+String.valueOf(minorVersion())+"."+
 	    String.valueOf(buildVersion())+"."+String.valueOf(revisionVersion());
@@ -65,8 +65,10 @@ public class IG implements IServerI{
     /** Processing Graphics using OpenGL to be put in size() method in Processing */
     public static final String GL1 = "igeo.p.PIGraphicsGL1";
     public static final String GL2 = "igeo.p.PIGraphicsGL2";
+    public static final String GL3 = "igeo.p.PIGraphicsGL3";
     //public static final String GL = GL1; // switch before compile for target // for processing 1.5
-    public static final String GL = GL2; // switch before compile for target // for processing 2.0
+    //public static final String GL = GL2; // switch before compile for target // for processing 2.0
+    public static final String GL = GL3; // switch before compile for target // for processing 3.0
     
     /** Processing Graphics using P3D to be put in size() method in Processing; under development. do not use yet. */
     public static final String P3D = "igeo.p.PIGraphics3D";
@@ -738,6 +740,15 @@ public class IG implements IServerI{
 	return null;
     }
     
+    /** put the specified pane on the full screen inside the window if the panel is IGridPanel with 2x2 grid */
+    public static void disableFullScreen(){
+	IG ig = cur(); if(ig==null) return;
+	if(ig.panel!=null && ig.panel instanceof IGridPanel){
+	    IGridPanel gpanel = (IGridPanel)ig.panel;
+	    gpanel.disableFullScreen();
+	}
+    }
+    
     /** put top pane on the full screen inside the window if the panel is IGridPanel */
     public static IPane topPane(){ return gridPane(0,0); }
     
@@ -791,6 +802,26 @@ public class IG implements IServerI{
 	top(x,y,z,axonRatio);
     }
     
+    /** get camera position in top view pane */
+    public static IVec topPos(){ return getViewPos(topPane()); }
+    
+    /** get camera direction vector in top view pane */
+    public static IVec topDir(){ return getViewDir(topPane()); }
+    
+    /** get camera target position in top view pane */
+    public static IVec topTarget(){ return getViewTarget(topPane()); }
+    
+    /** get camera direction yaw angle in top view pane */
+    public static double topYaw(){ return getViewYaw(topPane()); }
+    
+    /** get camera direction pitch angle in top view pane */
+    public static double topPitch(){ return getViewPitch(topPane()); }
+    
+    /** get camera direction roll angle in top view pane */
+    public static double topRoll(){ return getViewPitch(topPane()); }
+    
+    
+    
     /** put bottom view on the full screen inside the window */
     public static void bottom(){
 	IPane pane = bottomPane();
@@ -815,6 +846,25 @@ public class IG implements IServerI{
     public static void bottomView(double x, double y){ bottom(x,y); }
     public static void bottomView(double x, double y, double z){ bottom(x,y,z); }
     public static void bottomView(double x, double y, double z, double axonRatio){ bottom(x,y,z,axonRatio); }
+    
+    /** get camera position in bottom view pane */
+    public static IVec bottomPos(){ return getViewPos(bottomPane()); }
+    
+    /** get camera direction vector in bottom view pane */
+    public static IVec bottomDir(){ return getViewDir(bottomPane()); }
+    
+    /** get camera target position in bottom view pane */
+    public static IVec bottomTarget(){ return getViewTarget(bottomPane()); }
+    
+    /** get camera direction yaw angle in bottom view pane */
+    public static double bottomYaw(){ return getViewYaw(bottomPane()); }
+    
+    /** get camera direction pitch angle in bottom view pane */
+    public static double bottomPitch(){ return getViewPitch(bottomPane()); }
+    
+    /** get camera direction roll angle in bottom view pane */
+    public static double bottomRoll(){ return getViewPitch(bottomPane()); }
+    
     
     
     /** put perspective view on the full screen inside the window */
@@ -901,6 +951,69 @@ public class IG implements IServerI{
 	perspective(pos,dir,perspectiveAngle);
     }
     
+    /** get camera position out of pane */
+    public static IVec getViewPos(IPane pane){
+	if(pane==null){ IG.err("no pane found"); return new IVec(); }
+	IView view = pane.getView();
+	if(view==null){ IG.err("no view found"); return new IVec(); }
+	return view.location();
+    }
+    /** get camera direction out of pane */
+    public static IVec getViewDir(IPane pane){
+	if(pane==null){ IG.err("no pane found"); return new IVec(); }
+	IView view = pane.getView();
+	if(view==null){ IG.err("no view found"); return new IVec(); }
+	return view.frontDirection();
+    }
+    /** get camera target position out of pane */
+    public static IVec getViewTarget(IPane pane){
+	if(pane==null){ IG.err("no pane found"); return new IVec(); }
+	IView view = pane.getView();
+	if(view==null){ IG.err("no view found"); return new IVec(); }
+	return view.target();
+    }
+    /** get camera directio yaw angle out of pane */
+    public static double getViewYaw(IPane pane){
+	if(pane==null){ IG.err("no pane found"); return 0; }
+	IView view = pane.getView();
+	if(view==null){ IG.err("no view found"); return 0; }
+	return view.getYaw();
+    }
+    /** get camera directio pitch angle out of pane */
+    public static double getViewPitch(IPane pane){
+	if(pane==null){ IG.err("no pane found"); return 0; }
+	IView view = pane.getView();
+	if(view==null){ IG.err("no view found"); return 0; }
+	return view.getPitch();
+    }
+    /** get camera directio roll angle out of pane */
+    public static double getViewRoll(IPane pane){
+	if(pane==null){ IG.err("no pane found"); return 0; }
+	IView view = pane.getView();
+	if(view==null){ IG.err("no view found"); return 0; }
+	return view.getRoll();
+    }
+    
+    /** get camera position in perspective view pane */
+    public static IVec persPos(){ return getViewPos(perspectivePane()); }
+    
+    /** get camera direction vector in perspective view pane */
+    public static IVec persDir(){ return getViewDir(perspectivePane()); }
+    
+    /** get camera target position in perspective view pane */
+    public static IVec persTarget(){ return getViewTarget(perspectivePane()); }
+    
+    /** get camera direction yaw angle in perspective view pane */
+    public static double persYaw(){ return getViewYaw(perspectivePane()); }
+    
+    /** get camera direction pitch angle in perspective view pane */
+    public static double persPitch(){ return getViewPitch(perspectivePane()); }
+    
+    /** get camera direction roll angle in perspective view pane */
+    public static double persRoll(){ return getViewPitch(perspectivePane()); }
+    
+    
+    
     /** put axonometric view on the full screen inside the window */
     public static void axonometric(){
 	IPane pane = axonometricPane();
@@ -974,6 +1087,25 @@ public class IG implements IServerI{
 	axonometric(pos,dir,axonRatio);
     }
     
+    /** get camera position in axonometric view pane (same pane with perspective pane) */
+    public static IVec axonPos(){ return getViewPos(axonometricPane()); }
+    
+    /** get camera direction vector in axonometric view pane (same pane with perspective pane) */
+    public static IVec axonDir(){ return getViewDir(axonometricPane()); }
+    
+    /** get camera target position in axonometric view pane (same pane with perspective pane) */
+    public static IVec axonTarget(){ return getViewTarget(axonometricPane()); }
+    
+    /** get camera direction yaw angle in axonometric view pane (same pane with perspective pane) */
+    public static double axonYaw(){ return getViewYaw(axonometricPane()); }
+    
+    /** get camera direction pitch angle in axonometric view pane (same pane with perspective pane) */
+    public static double axonPitch(){ return getViewPitch(axonometricPane()); }
+    
+    /** get camera direction roll angle in axonometric view pane (same pane with perspective pane) */
+    public static double axonRoll(){ return getViewPitch(axonometricPane()); }
+    
+    
     
     /** put front view on the full screen inside the window */
     public static void front(){
@@ -1000,6 +1132,26 @@ public class IG implements IServerI{
     public static void frontView(double x, double y, double z){ front(x,y,z); }
     public static void frontView(double x, double y, double z, double axonRatio){ front(x,y,z,axonRatio); }
     
+    
+    /** get camera position in front view pane */
+    public static IVec frontPos(){ return getViewPos(frontPane()); }
+    
+    /** get camera direction vector in front view pane */
+    public static IVec frontDir(){ return getViewDir(frontPane()); }
+    
+    /** get camera target position in front view pane */
+    public static IVec frontTarget(){ return getViewTarget(frontPane()); }
+    
+    /** get camera direction yaw angle in front view pane */
+    public static double frontYaw(){ return getViewYaw(frontPane()); }
+    
+    /** get camera direction pitch angle in front view pane */
+    public static double frontPitch(){ return getViewPitch(frontPane()); }
+    
+    /** get camera direction roll angle in front view pane */
+    public static double frontRoll(){ return getViewPitch(frontPane()); }
+    
+    
     /** put back view on the full screen inside the window */
     public static void back(){
 	IPane pane = backPane();
@@ -1024,6 +1176,26 @@ public class IG implements IServerI{
     public static void backView(double x, double z){ back(x,z); }
     public static void backView(double x, double y, double z){ back(x,y,z); }
     public static void backView(double x, double y, double z, double axonRatio){ back(x,y,z,axonRatio); }
+    
+    
+    /** get camera position in back view pane */
+    public static IVec backPos(){ return getViewPos(backPane()); }
+    
+    /** get camera direction vector in back view pane */
+    public static IVec backDir(){ return getViewDir(backPane()); }
+    
+    /** get camera target position in back view pane */
+    public static IVec backTarget(){ return getViewTarget(backPane()); }
+    
+    /** get camera direction yaw angle in back view pane */
+    public static double backYaw(){ return getViewYaw(backPane()); }
+    
+    /** get camera direction pitch angle in back view pane */
+    public static double backPitch(){ return getViewPitch(backPane()); }
+    
+    /** get camera direction roll angle in back view pane */
+    public static double backRoll(){ return getViewPitch(backPane()); }
+    
     
     /** put right view on the full screen inside the window */
     public static void right(){
@@ -1050,6 +1222,25 @@ public class IG implements IServerI{
     public static void rightView(double x, double y, double z){ right(x,y,z); }
     public static void rightView(double x, double y, double z, double axonRatio){ right(x,y,z,axonRatio); }
     
+    /** get camera position in right view pane */
+    public static IVec rightPos(){ return getViewPos(rightPane()); }
+    
+    /** get camera direction vector in right view pane */
+    public static IVec rightDir(){ return getViewDir(rightPane()); }
+    
+    /** get camera target position in right view pane */
+    public static IVec rightTarget(){ return getViewTarget(rightPane()); }
+    
+    /** get camera direction yaw angle in right view pane */
+    public static double rightYaw(){ return getViewYaw(rightPane()); }
+    
+    /** get camera direction pitch angle in right view pane */
+    public static double rightPitch(){ return getViewPitch(rightPane()); }
+    
+    /** get camera direction roll angle in right view pane */
+    public static double rightRoll(){ return getViewPitch(rightPane()); }
+    
+    
     /** put left view on the full screen inside the window */
     public static void left(){
 	IPane pane = leftPane();
@@ -1074,6 +1265,25 @@ public class IG implements IServerI{
     public static void leftView(double y, double z){ left(y,z); }
     public static void leftView(double x, double y, double z){ left(x,y,z); }
     public static void leftView(double x, double y, double z, double axonRatio){ left(x,y,z,axonRatio); }
+    
+    /** get camera position in left view pane */
+    public static IVec leftPos(){ return getViewPos(leftPane()); }
+    
+    /** get camera direction vector in left view pane */
+    public static IVec leftDir(){ return getViewDir(leftPane()); }
+    
+    /** get camera target position in left view pane */
+    public static IVec leftTarget(){ return getViewTarget(leftPane()); }
+    
+    /** get camera direction yaw angle in left view pane */
+    public static double leftYaw(){ return getViewYaw(leftPane()); }
+    
+    /** get camera direction pitch angle in left view pane */
+    public static double leftPitch(){ return getViewPitch(leftPane()); }
+    
+    /** get camera direction roll angle in left view pane */
+    public static double leftRoll(){ return getViewPitch(leftPane()); }
+    
     
     
     /****************************
@@ -1270,6 +1480,48 @@ public class IG implements IServerI{
     
     /** returns the current debugLevel */
     public static int debugLevel(){ return IOut.debugLevel(); }
+    
+    /** enable printing time to console */
+    public static void showTime(){ showTime(true); }
+    
+    /** enable/disable printing time to console */
+    public static void showTime(boolean flag){
+	IG ig = cur(); if(ig==null) return;
+	if(ig.dynamicServer()==null) return;
+	ig.dynamicServer().showTime(flag);
+    }
+    
+    /** redirect print to print wrapper */
+    public static void setPrint(IPrintWrapper pw){ IOut.setPrint(pw); }
+    
+    /** redirect print to print wrapper */
+    public static void setPrint(IPrintWrapper pw, IPrintWrapper errpw){ IOut.setPrint(pw, errpw); }
+    
+    /** redirect print to print wrapper */
+    public static void setPrint(IPrintWrapper pw, IPrintWrapper errpw, IPrintWrapper debugpw){
+	IOut.setPrint(pw, errpw, debugpw);
+    }
+    
+    /** redirect print to print stream */
+    public static void setPrintStream(PrintStream ps){
+	IOut.ps = ps;
+	IOut.err = ps;
+	IOut.debug = ps;
+    }
+    
+    /** redirect print to print stream */
+    public static void setPrintStream(PrintStream ps, PrintStream errps){
+	IOut.ps = ps;
+	IOut.err = errps;
+	IOut.debug = ps;
+    }
+    
+    /** redirect print to print stream */
+    public static void setPrintStream(PrintStream ps, PrintStream errps, PrintStream debugps){
+	IOut.ps = ps;
+	IOut.err = errps;
+	IOut.debug = debugps;
+    }
     
     
     
@@ -2663,9 +2915,13 @@ public class IG implements IServerI{
     }
     public static IMesh mesh(IFace[] fcs){ return IMeshCreator.mesh(fcs); }
     
+    /** create polygon mesh out of array of triangle points which is array of 3 IVec */
+    public static IMesh meshFromTriangles(IVecI[][] trianglePts){
+	return IMeshCreator.meshFromTriangles(trianglePts);
+    }
     
-
-
+    
+    
     /*********************************************************
      * creating solid mesh
      ********************************************************/
@@ -2692,9 +2948,13 @@ public class IG implements IServerI{
     }
     public static IMesh meshBox(IVecI[][][] corners){ return IMeshCreator.box(corners); }
     public static IMesh meshBox(IVertex[][][] corners){ return IMeshCreator.box(corners); }
-
-
-
+    
+    public static IMesh meshTetrahedron(IVecI v1, IVecI v2, IVecI v3, IVecI v4){ return IMeshCreator.tetrahedron(v1,v2,v3,v4); }
+    public static IMesh meshTetrahedron(IVecI[] vtx){ return IMeshCreator.tetrahedron(vtx); }
+    public static IMesh meshTetrahedron(IVertex v1, IVertex v2, IVertex v3, IVertex v4){ return IMeshCreator.tetrahedron(v1,v2,v3,v4); }
+    public static IMesh meshTetrahedron(IVertex[] vtx){ return IMeshCreator.tetrahedron(vtx); }
+    
+    
 
 /** mesh sphere
      @param topDir length of vector is radius in vertical direction
@@ -2885,6 +3145,32 @@ public class IG implements IServerI{
     
     
     
+    /** open pipe mesh */
+    public static IMesh meshRectPipe(IVecI pt1, IVecI pt2, IVecI udir, IVecI vdir){
+	return IMeshCreator.rectPipe(pt1,pt2,udir,vdir);
+    }
+    /**
+       creating open mesh pipe with 2 points and with and height
+       @param heightDir it provides reference to the direction of height but actual direction is re-calculated to be perpendicular to pt1-pt2 direction.
+    */
+    public static IMesh meshRectPipe(IVecI pt1, IVecI pt2, double width, double height, IVecI heightDir){
+	return IMeshCreator.rectPipe(pt1,pt2,width,height,heightDir);
+    }
+    /** creating open mesh pipe. reference height direction is z axis */
+    public static IMesh meshRectPipe(IVecI pt1, IVecI pt2, double width, double height){
+	return IMeshCreator.rectPipe(pt1,pt2,width,height);
+    }
+    /**
+       creating open mesh pipe with square profile. 
+       @param heightDir it provides reference to the direction of height but actual direction is re-calculated to be perpendicular to pt1-pt2 direction.
+    */
+    public static IMesh meshSquarePipe(IVecI pt1, IVecI pt2, double width, IVecI heightDir){
+	return IMeshCreator.squarePipe(pt1,pt2,width,heightDir);
+    }
+    /** creating open mesh stick. height direction is z axis */
+    public static IMesh meshSquarePipe(IVecI pt1, IVecI pt2, double width){
+	return IMeshCreator.squarePipe(pt1,pt2,width);
+    }
     
     /*********************************************************
      * creating vector 

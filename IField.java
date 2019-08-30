@@ -95,6 +95,7 @@ abstract public class IField extends IAgent implements IFieldI{
     public IField clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IField clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IField clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IField clr(IObject o){ super.clr(o); return this; }
     public IField clr(Color c){ super.clr(c); return this; }
     public IField clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IField clr(Color c, float alpha){ super.clr(c,alpha); return this; }

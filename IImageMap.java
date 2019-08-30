@@ -108,8 +108,8 @@ public class IImageMap extends IDoubleMap{
 	return (double)(color[1]+color[2]+color[3])/(3*255)*((double)color[0]/255);
     }
     
-    public void initDensityMapU(){ initDensityMapU(this.width, this.height); }
-    public void initDensityMapV(){ initDensityMapV(this.width, this.height); }
+    public IImageMap initDensityMapU(){ initDensityMapU(this.width, this.height); return this; }
+    public IImageMap initDensityMapV(){ initDensityMapV(this.width, this.height); return this; }
 
     public Color getColor(double u, double v){ return clr(u,v); }
     public Color clr(double u, double v){

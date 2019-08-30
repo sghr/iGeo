@@ -57,39 +57,40 @@ public class IULinearMap extends IMap{
     /**
        adding (inserting) value between the domain of 0 - 1
     */
-    public void add(double u, double value){
-	if(IG.eq(u, 0.0, IConfig.parameterTolerance)){ start = value; return; }
-	if(IG.eq(u, 1.0, IConfig.parameterTolerance)){ end = value; return; }
+    public IULinearMap add(double u, double value){
+	if(IG.eq(u, 0.0, IConfig.parameterTolerance)){ start = value; return this; }
+	if(IG.eq(u, 1.0, IConfig.parameterTolerance)){ end = value; return this; }
 	
-	if(u < 0.0 || u > 1.0){ IOut.err("u ("+u+") is out of range. skipped"); return; }
+	if(u < 0.0 || u > 1.0){ IOut.err("u ("+u+") is out of range. skipped"); return this; }
 	
 	if(domains==null){
 	    domains = new ArrayList<Double>();
 	    values = new ArrayList<Double>();
 	    domains.add(u);
 	    values.add(value);
-	    return;
+	    return this;
 	}
 	
 	for(int i=0; i<domains.size(); i++){
 	    if(IG.eq(u, domains.get(i), IConfig.parameterTolerance)){
 		domains.set(i, u);
 		values.set(i, value);
-		return;
+		return this;
 	    }
 	    else if(u < domains.get(i)){
 		domains.add(i, u);
 		values.add(i, value);
-		return;
+		return this;
 	    }
 	}
 	domains.add(u);
 	values.add(value);
+	return this;
     }
     /** alias of add(double,double) */
-    public void addValue(double u, double value){ add(u,value); }
+    public IULinearMap addValue(double u, double value){ return add(u,value); }
     /** alias of add(double,double) */
-    public void insert(double u, double value){ add(u,value); }
+    public IULinearMap insert(double u, double value){ return add(u,value); }
     
     
     public double get(double u, double v){ return get(u); }
@@ -118,7 +119,7 @@ public class IULinearMap extends IMap{
     }
     
     
-    public void flipU(){
+    public IULinearMap flipU(){
 	double tmp = start; start = end; end = tmp;
 	if(domains!=null && domains.size()>1){
 	    ArrayList<Double> newdomains = new ArrayList<Double>();
@@ -130,5 +131,6 @@ public class IULinearMap extends IMap{
 	    domains = newdomains;
 	    values = newvalues;
 	}
+	return this;
     }
 }

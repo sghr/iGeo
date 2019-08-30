@@ -1107,13 +1107,35 @@ public class IObjFileImporter {
     
     public static class MaterialName extends Entity{
 	public String getLabel(){ return("usemtl"); }
+	public EntityData parse(String line){
+	    Data d = new Data();
+	    String[] args = line.split(" +", 2);
+	    d.setMaterialName(args[1]);
+	    return d;
+	}
 	public class Data extends EntityData{
+	    public String materialName;
+	    public void setMaterialName(String name){
+		materialName = name;
+	    }
 	}
     }
     
     public static class MaterialLibrary extends Entity{
 	public String getLabel(){ return("mtllib"); }
+	public EntityData parse(String[] args){
+	    Data d = new Data();
+	    d.setMaterialFileName(args[1]);
+	    return d;
+	}
 	public class Data extends EntityData{
+	    public String materialFileName;
+	    public void setMaterialFileName(String name){
+		materialFileName = name;
+	    }
+	    public void read(){
+		// todo
+            }
 	}
     }
     
@@ -1141,6 +1163,68 @@ public class IObjFileImporter {
 	}
     }
     
+    /***********************************************
+     MTL file entities
+     **********************************************/
+    public static class Material extends Entity{
+	public String getLabel(){ return("newmtl"); }
+	public class Data extends EntityData{
+	    public String name;
+	    public AmbientColor.Data ambient;
+	    public DiffuseColor.Data diffuse;
+	    public SpecularColor.Data specular;
+	    public IlluminationMode.Data illuminationMode;
+	    public Shininess.Data shininess;
+	    public Transparency.Data transparency;
+	    public TextureMap.Data textureMap;
+	}
+    }
+    
+    public static class AmbientColor extends Entity{
+	public String getLabel(){ return("Ka"); }
+	public class Data extends EntityData{
+	    public double r,g,b;
+	}
+    }
+    public static class DiffuseColor extends Entity{
+	public String getLabel(){ return("Kd"); }
+	public class Data extends EntityData{
+	    public double r,g,b;
+	}
+    }
+    public static class SpecularColor extends Entity{
+	public String getLabel(){ return("Ks"); }
+	public class Data extends EntityData{
+	    public double r,g,b;
+	}
+    }
+    public static class IlluminationMode extends Entity{
+	public String getLabel(){ return("illum"); }
+	public class Data extends EntityData{
+	    public int mode;
+	}
+    }
+    public static class Shininess extends Entity{
+	public String getLabel(){ return("Ns"); }
+	public class Data extends EntityData{
+	    public double shininess;
+	}
+    }
+    public static class Transparency extends Entity{
+	public String getLabel(){ return("Tr"); }
+	public class Data extends EntityData{
+	    public double transparency;
+	}
+    }
+    public static class Transparency2 extends Transparency{
+	public String getLabel(){ return("d"); } // alias name of Tr
+    }
+    public static class TextureMap extends Entity{
+	public String getLabel(){ return("map_Ka"); }
+	public class Data extends EntityData{
+	    public String filename;
+	}
+    }
     
     
     // ///////////////////////////////////////////////////////////////////////
@@ -1277,6 +1361,7 @@ public class IObjFileImporter {
 	    
 	    GroupName.Data currentGroup=null;
 	    ParametricGeometryData currentGeometry=null;
+	    MaterialName.Data currentMaterial=null;
 	    
 	    synchronized(IG.lock){
 		
@@ -1345,6 +1430,13 @@ public class IObjFileImporter {
 				currentGeometry instanceof Surface.Data ){
 			    ((Surface.Data)currentGeometry).setOuterTrimmingLoop((OuterTrimmingLoop.Data)currentEntity.getLatestData());
 			}
+			else if(currentEntity instanceof MaterialLibrary ){
+			    ((MaterialLibrary.Data)((MaterialLibrary)currentEntity).getLatestData()).read();
+			}
+			else if(currentEntity instanceof MaterialName){
+			    currentMaterial = (MaterialName.Data)((MaterialName)currentEntity).getLatestData();
+			}
+
 			
 			if(currentEntity != faceProcessor){
 			    if(faceProcessor.creatingMesh()){
@@ -1371,6 +1463,161 @@ public class IObjFileImporter {
 	
 	IOut.debug(0,"reading complete"); //
 	return(createdObjects);
+    }
+
+
+
+    /**
+       Reading an OBJ file and creating objects in a server.
+       The main entry of the importer class.
+       @param file An importing file object.
+       @param server A server interface to put imported objects in. 
+       @return ArrayList of created IObject.
+    */
+    static public ArrayList<Material.Data> readMTL(File file, IServerI server){
+        try{ return IObjFileImporter.readMTL(new FileReader(file), server); }
+        catch(IOException e){ e.printStackTrace(); }
+	return null; 
+    }
+    
+    /**
+       Reading an OBJ file and creating objects in a server.
+       The main entry of the importer class.
+       @param stream An input stream.
+       @param server A server interface to put imported objects in. 
+       @return ArrayList of created IObject.
+    */
+    static public ArrayList<Material.Data> readMTL(InputStream stream, IServerI server){
+        return IObjFileImporter.readMTL(new InputStreamReader(stream), server);
+    }
+    
+    /**
+       Reading an MTL file and creating material list
+       @param filereader Reader object of an importing file.
+       @return ArrayList of created IObject.
+    */
+    static public ArrayList<Material.Data> readMTL(Reader filereader, IServerI server){
+	
+	BufferedReader reader = null;
+	
+	ArrayList<IObject> createdObjects = new ArrayList<IObject>();
+	ArrayList<Entity> entityProcessors = init(server, createdObjects);
+	
+	// assume sequential creation of face means they are in one mesh
+	Face faceProcessor=null;
+	for(int i=0; i<entityProcessors.size() && faceProcessor==null; i++)
+	    if(entityProcessors.get(i) instanceof Face)
+		faceProcessor = (Face)entityProcessors.get(i);
+	
+	try {
+	    reader = new BufferedReader(filereader);
+	    String line, line2;
+	    
+	    GroupName.Data currentGroup=null;
+	    ParametricGeometryData currentGeometry=null;
+	    MaterialName.Data currentMaterial=null;
+	    
+	    synchronized(IG.lock){
+		
+		while ((line = readwoBS(reader)) != null) {
+		    
+		    //IOut.print("."); //
+		    
+		    Entity currentEntity=null;
+		    
+		    for(int i=0; i<entityProcessors.size()&&currentEntity==null; i++){
+			Entity e = entityProcessors.get(i);
+			if((line.split(" +"))[0].equals(e.getLabel())) currentEntity = e; // better split beforehand?
+			//if(line.startsWith(e.getLabel())) currentEntity = e;
+		    }
+		    
+		    if(currentEntity!=null){
+			
+			currentEntity.read(line);
+			
+			// post process
+			if(currentEntity instanceof GroupName){
+			    currentGroup = (GroupName.Data)currentEntity.getLatestData();
+			}
+			else if(currentEntity instanceof Curve){
+			    currentGeometry =
+				(ParametricGeometryData)currentEntity.getLatestData();
+			}
+			
+			else if(currentEntity instanceof Curve2D){
+			    currentGeometry =
+				(ParametricGeometryData)currentEntity.getLatestData();
+			}
+			else if(currentEntity instanceof Surface){
+			    currentGeometry =
+				(ParametricGeometryData)currentEntity.getLatestData();
+			}
+			else if(currentEntity instanceof CurveType){
+			    currentGeometry=null; // reset for next parametric geometry
+			}
+			else if(currentEntity instanceof EndStatement){
+			    if(currentGeometry!=null){
+				// curve2d is instantiated later in surface
+				if(!(currentGeometry instanceof Curve2D.Data)){
+				    if(currentGroup!=null) currentGeometry.setGroup(currentGroup);
+				    currentGeometry.instantiate();
+				    currentGeometry = null;
+				}
+			    }
+			    else{
+				IOut.err("no correspondent statement to end statement"); //
+			    }
+			}
+			else if(currentEntity instanceof Degree){
+			    if(currentGeometry!=null){
+				currentGeometry.setDegree((Degree.Data)currentEntity.getLatestData());
+			    }
+			}
+			else if(currentEntity instanceof Parameter){
+			    currentGeometry.setKnots((Parameter.Data)currentEntity.getLatestData());
+			}
+			else if(currentEntity instanceof InnerTrimmingLoop &&
+				currentGeometry instanceof Surface.Data ){
+			    ((Surface.Data)currentGeometry).setInnerTrimmingLoop((InnerTrimmingLoop.Data)currentEntity.getLatestData());
+			}
+			else if(currentEntity instanceof OuterTrimmingLoop &&
+				currentGeometry instanceof Surface.Data ){
+			    ((Surface.Data)currentGeometry).setOuterTrimmingLoop((OuterTrimmingLoop.Data)currentEntity.getLatestData());
+			}
+			else if(currentEntity instanceof MaterialLibrary ){
+			    ((MaterialLibrary.Data)((MaterialLibrary)currentEntity).getLatestData()).read();
+			}
+			else if(currentEntity instanceof MaterialName){
+			    currentMaterial = (MaterialName.Data)((MaterialName)currentEntity).getLatestData();
+			}
+
+			
+			if(currentEntity != faceProcessor){
+			    if(faceProcessor.creatingMesh()){
+				if(currentGroup!=null) faceProcessor.setGroup(currentGroup);
+				faceProcessor.resetMesh();
+			    }
+			}
+			
+		    }
+		    
+		}
+		
+	    }
+	    
+	}catch(FileNotFoundException e) {
+	    e.printStackTrace();
+	    //doRecovery(e);
+	}catch(IOException e) {
+	    //doRecovery(e);
+	    e.printStackTrace();
+	}finally{
+	    try{ if(reader!=null) reader.close(); }catch(Exception e){ e.printStackTrace(); }
+	}
+	
+	IOut.debug(0,"reading complete"); //
+	//return(createdObjects);
+        return(null); 
     }
     
     /*

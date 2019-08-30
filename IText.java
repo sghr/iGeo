@@ -235,6 +235,7 @@ public class IText extends IGeometry{
     public IText clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IText clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IText clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IText clr(IObject o){ super.clr(o); return this; }
     public IText clr(Color c){ super.clr(c); return this; }
     public IText clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IText clr(Color c, float alpha){ super.clr(c,alpha); return this; }

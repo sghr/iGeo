@@ -949,9 +949,9 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
 	return distToLine(v2.get().dif(v1),v1)<tolerance; // should it calculate mean line dir, not only v1&v2?
     }
 
-    /** determine if it's on & inside the line  */
+    /** determine if it's on and inside the line  */
     public boolean isOnLine(IVecI v1, IVecI v2){ return isOnLine(v1,v2,IConfig.tolerance); }
-    /** determine if it's on & inside the line  */
+    /** determine if it's on and inside the line  */
     public boolean isOnLine(IVecI v1, IVecI v2, double tolerance){
 	if(!isStraight(v1,v2,tolerance)) return false;
 	IVec dif1 = dif(v1);
@@ -989,7 +989,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public boolean isInsideTriangle(IVecI pt1, IVecI pt2, IVecI pt3){
 	double[] coef = this.dif(pt1).projectTo2Vec(pt2.get().dif(pt1), pt3.get().dif(pt1));
 	//orig = coef[0] * v1 + coef[1] * v2 + coef[2] * v1.cross(v2); (this is already projected)
-	if(coef[0]<0 || coef[0]>1 || coef[1] < 0 || coef[1]>1) return false;
+	if(coef[0]<0 || coef[0]>1 || coef[1] < 0 || coef[1]>1 || coef[0]+coef[1]>1 ) return false;
 	return true;
     }
     
@@ -1218,7 +1218,7 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     /** ratio of projected point between two points (line segment). 0.0 is at linePt1, 1.0 is at linePt2. */
     public double ratioOnSegment(IVecI linePt1, IVecI linePt2){
 	IVec lineDir = linePt2.get().dif(linePt1);
-	double len2 = lineDir.len2();
+	//double len2 = lineDir.len2();
 	if(lineDir.len2()==0){ // linePt1 and linePt2 are same
 	    return 0; // just return one number
 	}
@@ -1473,17 +1473,22 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
         if(n==3) return pts[1].get().dif(pts[0]).cross(pts[2].get().dif(pts[1])).unit();
         
         IVec nml = new IVec();
+	IVec diff1 = pts[1].get().dif(pts[0]);
         for(int i=0; i<n; i++){
-            IVec diff1 = pts[(i+1)%n].get().dif(pts[i]);
+            //IVec diff1 = pts[(i+1)%n].get().dif(pts[i]);
             IVec diff2 = pts[(i+2)%n].get().dif(pts[(i+1)%n]);
-            //nml.add(diff1.cross(diff2));
-	    diff1.icross(diff2);
-	    if(diff1.dot(nml)<0){ diff1.neg(); } // when convex & concave
-	    nml.add(diff1);
+            if(diff2.len2()>0){ // to skip duplicated points
+		if(diff1.len()>0){ // to skip duplicated points
+		    diff1.icross(diff2);
+		    if(diff1.dot(nml)<0){ diff1.neg(); } // when convex & concave
+		    nml.add(diff1);
+		}
+		diff1 = diff2;
+	    }
         }
 	
 	// when all the points are on a stragiht line
-	if(nml.eq(origin)) return new IVec(0,0,1); /* default */
+	//if(nml.eq(origin)) return new IVec(0,0,1); /* default */ // debug of small one all becoming 0,0,1
 	
         return nml.unit();
     }
@@ -2975,41 +2980,327 @@ public class IVec extends IParameterObject implements IVecI, IEntityParameter{
     public static double angle(IVecI pt1, IVecI pt2, IVecI pt3){
 	return pt1.dif(pt2).angle(pt3.dif(pt2));
     }
-
+    
     /** find two closest points on two infinete lines in a skew relationship, which makes a segment perpendicular to two lines */
     public static IVec[] closestPointsOn2Lines(IVecI lineDir1, IVecI linePt1,
 					       IVecI lineDir2, IVecI linePt2){
+	return closestPtsOnLines(lineDir1.get(),linePt1.get(),lineDir2.get(),linePt2.get());
+    }
+    /** find two closest points on two infinete lines in a skew relationship, which makes a segment perpendicular to two lines */
+    public static IVec[] closestPointsOnLines(IVecI lineDir1, IVecI linePt1,
+					      IVecI lineDir2, IVecI linePt2){
+	return closestPtsOnLines(lineDir1.get(),linePt1.get(),lineDir2.get(),linePt2.get());
+    }
+    /** find two closest points on two infinete lines in a skew relationship, which makes a segment perpendicular to two lines */
+    public static IVec[] closestPtsOnLines(IVecI lineDir1, IVecI linePt1,
+					   IVecI lineDir2, IVecI linePt2){
+	return closestPtsOnLines(lineDir1.get(),linePt1.get(),lineDir2.get(),linePt2.get());
+	/*
 	if(lineDir1.get().isParallel(lineDir2)){
 	    // when parallel, whatever points
 	    return new IVec[]{ linePt1.get().cp(), linePt1.get().cp().projectToLine(linePt2,lineDir2)  };
 	}
-	
 	IVec d1 = lineDir1.get().cp().unit();
 	IVec d2 = lineDir2.get().cp().unit();
-	
 	IVec dif = linePt1.get().dif(linePt2);
 	double d12 = d1.dot(d2);
-	
         double k1 = ( - d1.dot(dif) + d2.dot(dif)*d12 ) / (1.0 - d12*d12);
         double k2 = ( d2.dot(dif) - d1.dot(dif)*d12 ) / (1.0 - d12*d12);
-	
         d1.mul(k1);
         d2.mul(k2);
         d1.add(linePt1);
         d2.add(linePt2);
 	return new IVec[]{ d1,d2 };
+	*/
     }
-
+    
+    /** find two closest points on two infinete lines in a skew relationship, which makes a segment perpendicular to two lines */
+    public static IVec[] closestPointsOn2Lines(IVec lineDir1, IVec linePt1,
+					       IVec lineDir2, IVec linePt2){
+	return closestPtsOnLines(lineDir1,linePt1,lineDir2,linePt2);
+    }
+    /** find two closest points on two infinete lines in a skew relationship, which makes a segment perpendicular to two lines */
+    public static IVec[] closestPointsOnLines(IVec lineDir1, IVec linePt1,
+					      IVec lineDir2, IVec linePt2){
+	return closestPtsOnLines(lineDir1,linePt1,lineDir2,linePt2);
+    }
+    /** find two closest points on two infinete lines in a skew relationship, which makes a segment perpendicular to two lines */
+    public static IVec[] closestPtsOnLines(IVec lineDir1, IVec linePt1,
+					   IVec lineDir2, IVec linePt2){
+	if(lineDir1.isParallel(lineDir2)){
+	    // when parallel, whatever points
+	    return new IVec[]{ linePt1.cp(), linePt1.cp().projectToLine(linePt2,lineDir2)  };
+	}
+	
+	//IVec d1 = lineDir1.cp().unit();
+	//IVec d2 = lineDir2.cp().unit();
+	
+	IVec dif = linePt1.dif(linePt2);
+	//double d12 = d1.dot(d2);
+	double d12 = lineDir1.dot(lineDir2);
+	double l1 = lineDir1.len2();
+	double l2 = lineDir2.len2();
+	
+        //double k1 = ( - d1.dot(dif) + d2.dot(dif)*d12 ) / (1.0 - d12*d12);
+        //double k2 = ( d2.dot(dif) - d1.dot(dif)*d12 ) / (1.0 - d12*d12);
+	double k1 = (-l2*lineDir1.dot(dif) + lineDir2.dot(dif)*d12)/(l1*l2-d12*d12);
+	double k2 = (l1*lineDir2.dot(dif) - lineDir1.dot(dif)*d12)/(l1*l2-d12*d12);
+	
+        //d1.mul(k1);
+        //d2.mul(k2);
+        //d1.add(linePt1);
+        //d2.add(linePt2);
+	return new IVec[]{ linePt1.cp().add(lineDir1, k1), linePt2.cp().add(lineDir2, k2) };
+    }
+    
     /** alias to closestPointsOn2Lines */
     public static IVec[] perpendicularTo2Lines(IVecI lineDir1, IVecI linePt1,
 					       IVecI lineDir2, IVecI linePt2){
-	return closestPointsOn2Lines(lineDir1,linePt1,lineDir2,linePt2);
+	return closestPtsOnLines(lineDir1,linePt1,lineDir2,linePt2);
+    }
+    
+    /** alias to closestPointsOn2Lines */
+    public static IVec[] perpendicularTo2Lines(IVec lineDir1, IVec linePt1,
+					       IVec lineDir2, IVec linePt2){
+	return closestPtsOnLines(lineDir1,linePt1,lineDir2,linePt2);
+    }
+    
+    public static double distBetween2Lines(IVecI lineDir1, IVecI linePt1,
+					   IVecI lineDir2, IVecI linePt2){
+	return lineDist(lineDir1.get(),linePt1.get(),lineDir2.get(),linePt2.get());
+    }
+    
+    public static double distBetween2Lines(IVec lineDir1, IVec linePt1,
+					   IVec lineDir2, IVec linePt2){
+	return lineDist(lineDir1,linePt1,lineDir2,linePt2);
+    }
+    
+    public static double distBetweenLines(IVecI lineDir1, IVecI linePt1,
+					  IVecI lineDir2, IVecI linePt2){
+	return lineDist(lineDir1.get(),linePt1.get(),lineDir2.get(),linePt2.get());
+    }
+    
+    public static double distBetweenLines(IVec lineDir1, IVec linePt1,
+					  IVec lineDir2, IVec linePt2){
+	return lineDist(lineDir1,linePt1,lineDir2,linePt2);
+    }
+    
+    public static double lineDist(IVecI lineDir1, IVecI linePt1,
+				  IVecI lineDir2, IVecI linePt2){
+	return lineDist(lineDir1.get(),linePt1.get(),lineDir2.get(),linePt2.get());
+    }
+    
+    public static double lineDist(IVec lineDir1, IVec linePt1,
+				  IVec lineDir2, IVec linePt2){
+	IVec[] pts = closestPtsOnLines(lineDir1,linePt1,lineDir2,linePt2);
+	return pts[0].dist(pts[1]);
+    }
+    
+    
+    /** find two closest points on two finete line segments in a skew relationship */
+    public static IVec[] closestPtsOnSegments(IVecI line1Pt1, IVecI line1Pt2,
+					      IVecI line2Pt1, IVecI line2Pt2){
+	return closestPtsOnSegments(line1Pt1.get(), line1Pt2.get(), line2Pt1.get(), line2Pt2.get());
     }
 
-     public static double distBetween2Lines(IVecI lineDir1, IVecI linePt1,
-				     IVecI lineDir2, IVecI linePt2){
-	 IVec[] pts = closestPointsOn2Lines(lineDir1,linePt1,lineDir2,linePt2);
-	 return pts[0].dist(pts[1]);
-     }
+    /** find two closest points on two finete line segments in a skew relationship */
+    public static IVec[] closestPointsOnSegments(IVecI line1Pt1, IVecI line1Pt2,
+						 IVecI line2Pt1, IVecI line2Pt2){
+	return closestPtsOnSegments(line1Pt1.get(), line1Pt2.get(), line2Pt1.get(), line2Pt2.get());
+    }
 
+    /** find two closest points on two finete line segments in a skew relationship */
+    public static IVec[] closestPointsOnSegments(IVec line1Pt1, IVec line1Pt2,
+					      IVec line2Pt1, IVec line2Pt2){
+	return closestPtsOnSegments(line1Pt1, line1Pt2, line2Pt1, line2Pt2);
+    }
+    
+    /** find two closest points on two finete line segments in a skew relationship */
+    public static IVec[] closestPtsOnSegments(IVec line1Pt1, IVec line1Pt2,
+					      IVec line2Pt1, IVec line2Pt2){
+	IVec lineDir1 = line1Pt2.dif(line1Pt1);
+	IVec lineDir2 = line2Pt2.dif(line2Pt1);
+	if(lineDir1.isParallel(lineDir2)){
+	    // when parallel, whatever points
+	    //return new IVec[]{ line1Pt1.cp(), line1Pt1.cp().projectToLine(line2Pt1,lineDir2)  };
+	    double d1 = lineDir1.len();
+	    lineDir1.unit();
+	    double d2 = line2Pt1.dif(line1Pt1).dot(lineDir1);
+	    double d3 = line2Pt2.dif(line1Pt1).dot(lineDir1);
+	    if(d2<d3){
+		if(d3 < 0){ // line1Pt1's dot is 0
+		    return new IVec[]{ line1Pt1.cp(), line2Pt2.cp() };
+		}
+		if(d1 < d2){ // line1Pt2's dot is d1
+		    return new IVec[]{ line1Pt2.cp(), line2Pt1.cp() };
+		}
+		if(d2 < 0){
+		    return new IVec[]{ line1Pt1.cp(), line2Pt1.cp().add(lineDir2, -d2/(d3-d2)) };
+		}
+		if(d3 > d1){
+		    return new IVec[]{ line1Pt2.cp(), line2Pt1.cp().add(lineDir2, (d1-d2)/(d3-d2)) };
+		}
+		return new IVec[]{ line1Pt1.cp().add(lineDir1, d2/d1), line2Pt1.cp() };
+	    } 
+	    // d2 >= d3  
+	    if(d2 < 0){ // line1Pt1's dot is 0
+		return new IVec[]{ line1Pt1.cp(), line2Pt1.cp() };
+	    }
+	    if(d1 < d3){ // line1Pt2's dot is d1
+		return new IVec[]{ line1Pt2.cp(), line2Pt2.cp() };
+	    }
+	    if(d3 < 0){
+		return new IVec[]{ line1Pt1.cp(), line2Pt1.cp().add(lineDir2, d2/(d2-d3)) };
+	    }
+	    if(d2 > d1){
+		return new IVec[]{ line1Pt2.cp(), line2Pt1.cp().add(lineDir2, (d2-d1)/(d2-d3)) };
+	    }
+	    return new IVec[]{ line1Pt1.cp().add(lineDir1, d2/d1), line2Pt1.cp() };
+	}
+	
+	IVec dif = line1Pt1.dif(line2Pt1);
+	double d12 = lineDir1.dot(lineDir2);
+	double l1 = lineDir1.len2();
+	double l2 = lineDir2.len2();
+	double k1 = (-l2*lineDir1.dot(dif) + lineDir2.dot(dif)*d12)/(l1*l2-d12*d12);
+	double k2 = (l1*lineDir2.dot(dif) - lineDir1.dot(dif)*d12)/(l1*l2-d12*d12);
+
+	if(k1>=0 && k1<=1 && k2>=0 && k2<=1){
+	    return new IVec[]{ line1Pt1.cp().add(lineDir1, k1), line2Pt1.cp().add(lineDir2, k2) };
+	}
+
+	// closest points are between end point to somewhere
+	IVec p11 = line1Pt1.cp().projectToSegment(line2Pt1, line2Pt2);
+	IVec p12 = line1Pt2.cp().projectToSegment(line2Pt1, line2Pt2);
+	IVec p21 = line2Pt1.cp().projectToSegment(line1Pt1, line1Pt2);
+	IVec p22 = line2Pt2.cp().projectToSegment(line1Pt1, line1Pt2);
+	
+	double dist11 = line1Pt1.dist(p11);
+	double dist12 = line1Pt2.dist(p12);
+	double dist21 = line2Pt1.dist(p21);
+	double dist22 = line2Pt2.dist(p22);
+	if(dist11<dist12){
+	    if(dist11<dist21){
+		if(dist11<dist22){
+		    return new IVec[]{ line1Pt1.cp(), p11 };
+		}
+		return new IVec[]{ p22, line2Pt2.cp() };
+	    }
+	    if(dist21 < dist22){
+		return new IVec[]{ p21, line2Pt1.cp() };
+	    }
+	    return new IVec[]{ p22, line2Pt2.cp() };
+	}
+	if(dist12 < dist21){
+	    if(dist12 < dist22){
+		return new IVec[]{ line1Pt2.cp(), p12 };
+	    }
+	    return new IVec[]{ p22, line2Pt2.cp() };
+	}
+	if(dist21 < dist22){
+	    return new IVec[]{ p21, line2Pt1.cp() };
+	}
+	return new IVec[]{ p22, line2Pt2.cp() };
+    }
+    
+    
+    public static double distBetween2Segments(IVecI line1Pt1, IVecI line1Pt2,
+					     IVecI line2Pt1, IVecI line2Pt2){
+	
+	return segDist(line1Pt1.get(), line1Pt2.get(), line2Pt1.get(), line2Pt2.get());
+    }
+    
+    public static double distBetweenSegments(IVecI line1Pt1, IVecI line1Pt2,
+					     IVecI line2Pt1, IVecI line2Pt2){
+	return segDist(line1Pt1.get(), line1Pt2.get(), line2Pt1.get(), line2Pt2.get());
+    }
+    
+    public static double distBetween2Segments(IVec line1Pt1, IVec line1Pt2,
+					      IVec line2Pt1, IVec line2Pt2){
+	return segDist(line1Pt1, line1Pt2, line2Pt1, line2Pt2);
+    }
+    
+    public static double segmentDist(IVecI line1Pt1, IVecI line1Pt2,
+				     IVecI line2Pt1, IVecI line2Pt2){
+	return segDist(line1Pt1.get(), line1Pt2.get(), line2Pt1.get(), line2Pt2.get());
+    }
+    
+    public static double segmentDist(IVec line1Pt1, IVec line1Pt2,
+				     IVec line2Pt1, IVec line2Pt2){
+	return segDist(line1Pt1, line1Pt2, line2Pt1, line2Pt2);
+    }
+    
+    public static double segDist(IVecI line1Pt1, IVecI line1Pt2,
+				 IVecI line2Pt1, IVecI line2Pt2){
+	return segDist(line1Pt1.get(), line1Pt2.get(), line2Pt1.get(), line2Pt2.get());
+    }
+    
+    public static double segDist(IVec line1Pt1, IVec line1Pt2, IVec line2Pt1, IVec line2Pt2){
+	IVec[] pts = closestPtsOnSegments(line1Pt1,line1Pt2,line2Pt1,line2Pt2);
+	return pts[0].dist(pts[1]);
+    }
+    
+    public static boolean isSegmentsCloserThan(IVecI line1Pt1, IVecI line1Pt2,
+					       IVecI line2Pt1, IVecI line2Pt2,
+					       double thresholdDist){
+	return isSegCloserThan(line1Pt1.get(),line1Pt2.get(),line2Pt1.get(),line2Pt2.get(),thresholdDist);
+    }
+    
+    public static boolean isSegCloserThan(IVecI line1Pt1, IVecI line1Pt2,
+					  IVecI line2Pt1, IVecI line2Pt2,
+					  double thresholdDist){
+	return isSegCloserThan(line1Pt1.get(),line1Pt2.get(),line2Pt1.get(),line2Pt2.get(),thresholdDist);
+    }
+    
+    public static boolean isSegmentsCloserThan(IVec line1Pt1, IVec line1Pt2,
+					       IVec line2Pt1, IVec line2Pt2,
+					       double thresholdDist){
+	return isSegCloserThan(line1Pt1,line1Pt2,line2Pt1,line2Pt2,thresholdDist);
+    }
+    
+    public static boolean isSegCloserThan(IVec line1Pt1, IVec line1Pt2,
+					  IVec line2Pt1, IVec line2Pt2,
+					  double thresholdDist){
+	double max1=0,min1=0,max2=0,min2=0;
+	if(line1Pt1.x < line1Pt2.x){ min1=line1Pt1.x; max1=line1Pt2.x; }
+	else{ min1=line1Pt2.x; max1=line1Pt1.x; }
+	if(line2Pt1.x < line2Pt2.x){ min2=line2Pt1.x; max2=line2Pt2.x; }
+	else{ min2=line2Pt2.x; max2=line2Pt1.x; }
+	
+	if(min2-max1 >= thresholdDist) return false;
+	if(min1-max2 >= thresholdDist) return false;
+	
+	if(line1Pt1.y < line1Pt2.y){ min1=line1Pt1.y; max1=line1Pt2.y; }
+	else{ min1=line1Pt2.y; max1=line1Pt1.y; }
+	if(line2Pt1.y < line2Pt2.y){ min2=line2Pt1.y; max2=line2Pt2.y; }
+	else{ min2=line2Pt2.y; max2=line2Pt1.y; }
+	
+	if(min2-max1 >= thresholdDist) return false;
+	if(min1-max2 >= thresholdDist) return false;
+	
+	if(line1Pt1.z < line1Pt2.z){ min1=line1Pt1.z; max1=line1Pt2.z; }
+	else{ min1=line1Pt2.z; max1=line1Pt1.z; }
+	if(line2Pt1.z < line2Pt2.z){ min2=line2Pt1.z; max2=line2Pt2.z; }
+	else{ min2=line2Pt2.z; max2=line2Pt1.z; }
+	
+	if(min2-max1 >= thresholdDist) return false;
+	if(min1-max2 >= thresholdDist) return false;
+	
+	return segDist(line1Pt1,line1Pt2,line2Pt1,line2Pt2) < thresholdDist;
+    }
+    
+    
+    public static boolean isLinesCloserThan(IVecI lineDir1, IVecI linePt1,
+					    IVecI lineDir2, IVecI linePt2,
+					    double thresholdDist){
+	return isLinesCloserThan(lineDir1.get(),linePt1.get(),lineDir1.get(),linePt2.get(),thresholdDist);
+    }
+    
+    public static boolean isLinesCloserThan(IVec lineDir1, IVec linePt1,
+					    IVec lineDir2, IVec linePt2,
+					    double thresholdDist){
+	return lineDist(lineDir1,linePt1,lineDir2,linePt2) < thresholdDist;
+    }
+    
+    
 }

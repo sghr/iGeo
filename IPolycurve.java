@@ -86,7 +86,15 @@ public class IPolycurve extends IObject /*implements ICurveI*/{
 	return curves.get(0).start().eq(curves.get(curves.size()-1).end());
     }
     
-    
+    public IVecI[] cps(){
+	ArrayList<IVecI> cpts = new ArrayList<IVecI>();
+	for(int i=0; i<curves.size(); i++){
+	    for(int j=0; j<curves.get(i).cpNum(); j++){
+		cpts.add(curves.get(i).cp(j));
+	    }
+	}
+	return cpts.toArray(new IVecI[cpts.size()]);
+    }
     
 
     /****************************************************
@@ -139,6 +147,11 @@ public class IPolycurve extends IObject /*implements ICurveI*/{
         super.clr(c,alpha);
         for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(c,alpha);
         return this;
+    }
+    public IPolycurve clr(IObject o){
+	super.clr(o);
+        for(int i=0;curves!=null&&i<curves.size();i++) curves.get(i).clr(o);
+	return this;
     }
     public IPolycurve clr(Color c){
         super.clr(c);

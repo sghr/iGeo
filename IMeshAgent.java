@@ -75,6 +75,7 @@ public class IMeshAgent extends IAgent{
     public IMeshAgent clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IMeshAgent clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IMeshAgent clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IMeshAgent clr(IObject o){ super.clr(o); return this; }
     public IMeshAgent clr(Color c){ super.clr(c); return this; }
     public IMeshAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IMeshAgent clr(Color c, float alpha){ super.clr(c,alpha); return this; }

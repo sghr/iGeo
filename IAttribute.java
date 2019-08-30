@@ -55,6 +55,9 @@ public class IAttribute{
     /** object's render material */
     public IMaterial material;
     
+    /** object's texture (only for surface) */
+    public ITexture texture;
+    
     /** visibility switch of the object */
     public boolean visible=true;
     
@@ -63,8 +66,13 @@ public class IAttribute{
     public IAttribute(IAttribute attr){
 	//id=-1;
 	//name;
+	if(attr.name!=null){
+	    name = new String(attr.name); // added 20150904
+	}
 	layer = attr.layer;
-	color = attr.color;
+	if(attr.color!=null){
+	    color = attr.color.dup();
+	}
 	size = attr.size;
 	weight = attr.weight;
 	material = attr.material;
@@ -75,8 +83,9 @@ public class IAttribute{
     public IAttribute cp(){ return dup(); }
     
     public IAttribute set(IAttribute attr){
+	name = new String(attr.name); // added 20150904
 	layer = attr.layer;
-	color = attr.color;
+	color = attr.color.dup();
 	size = attr.size;
 	weight = attr.weight;
 	material = attr.material;

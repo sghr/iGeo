@@ -22,7 +22,8 @@
 
 package igeo.gui;
 
-import javax.media.opengl.*;
+import javax.media.opengl.*; // Processing 1 & 2
+//import com.jogamp.opengl.*; // Processing 3 change
 
 /**
    Fake GL2 interface for compiling old GL code

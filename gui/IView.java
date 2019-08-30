@@ -71,9 +71,9 @@ public class IView{
     
     /**  screen location */
     public int screenX, screenY;
-    /**  screen width & height */
+    /**  screen width and height */
     public int screenWidth, screenHeight;
-    /**  screen width & height for save and record in conversion */
+    /**  screen width and height for save and record in conversion */
     //public int screenOffsetX=0, screenOffsetY=0;
     
     /** perspective ratio = tan(angle of view) */

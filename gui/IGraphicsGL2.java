@@ -25,7 +25,8 @@ package igeo.gui;
 //import processing.core.*;
 //import processing.opengl.*;
 
-import javax.media.opengl.*;
+//import javax.media.opengl.*; // Processing 1 & 2
+import com.jogamp.opengl.*; // Processing 3
 
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -39,6 +40,7 @@ import java.io.*;
 import com.jogamp.opengl.util.awt.Overlay; // processing 2.0
 
 import com.jogamp.opengl.util.texture.*;
+import com.jogamp.opengl.util.texture.awt.*;
 
 
 
@@ -58,7 +60,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public static float[] defaultGLAmbientLight = {.4f,.4f,.4f,1f};
     public static float[] defaultGLDiffuseLight = {.7f,.7f,.7f,1f};
     public static float[] defaultGLSpecularLight = {.0f,.0f,.0f,1f};
-
+    
     public static boolean defaultGLTwoSidedLighting = false; //true; // when this is true, it seems to cause weird behavior looking like some of normals are flipped or messed up
     
     public GL gl;
@@ -110,12 +112,16 @@ public class IGraphicsGL2 implements IGraphicsGL{
     }
     */
 
+    
     String imageFile; // debug
     
     public void setBGImage(String imageFilename){
-	
 	imageFile = imageFilename; // debug
-	
+	bgTexture = ITextureGraphicGL2.getTexture(imageFile);
+	if(bgTexture!=null){
+	    bgTextureID = bgTexture.getTextureObject();
+	}
+	/*
 	IG ig = IG.cur();
 	if(ig!=null){
 	    String suffix = null;
@@ -145,6 +151,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	else{
 	    IOut.err("no IG instance found");
 	}
+	*/
     }
     
     
@@ -250,7 +257,8 @@ public class IGraphicsGL2 implements IGraphicsGL{
             drawBG(gl, view);
         }
 	
-	if(view.mode.isTransparent() && !view.mode.isWireframe()){ gl2.glDisable(GL2.GL_DEPTH_TEST); } // for transparency, ignore order to show objects in the back
+	
+	if(view.mode.isTransparent() && !view.mode.isWireframe() || IConfig.disableDepthTest){ gl2.glDisable(GL2.GL_DEPTH_TEST); } // for transparency, ignore order to show objects in the back
         else if(IConfig.depthSort) gl2.glEnable(GL2.GL_DEPTH_TEST);
         // should DEPTH_TEST be changed to set to hint[ENABLE_DEPTH_TEST] later?
 	
@@ -303,8 +311,8 @@ public class IGraphicsGL2 implements IGraphicsGL{
         gl2.glLoadMatrixd(view.transformArray,0);
 
     }
+    
     public void draw(ArrayList<IGraphicI> objects, IView v){
-
 	/*
 	gl2.glClear(GL.GL_COLOR_BUFFER_BIT);
 	gl2.glBegin(GL.GL_TRIANGLES);
@@ -318,14 +326,13 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	if(true)return; // test
 	*/
 	
-	
         view = v; // current view
 	
         //if(view==null || view.hide) return; // view==null is already checked in IPane
         if(view.hide) return;
-
+	
         drawView(view);
-
+	
         if(objects!=null){
             if(IConfig.drawOrderForward){
                 for(int i=0; i<objects.size(); i++)
@@ -336,7 +343,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
                     if(objects.get(i).isVisible()) objects.get(i).draw(this);
             }
         }
-
+	
         if(view.mode().isLight()){
             gl2.glDisable(GL2.GL_LIGHTING);
             gl2.glDisable(GL2.GL_LIGHT1);
@@ -357,7 +364,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
             }
         }
     }
-
+    
     public boolean firstDraw(){ return firstDraw; }
     public void firstDraw(boolean f){ firstDraw=f; }
 
@@ -479,6 +486,15 @@ public class IGraphicsGL2 implements IGraphicsGL{
         }
         gl2.glEnd();
     }
+    public void drawPolygon(IVec[] pts, IVec[] nml, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_POLYGON);
+        for(int i=0; i<pts.length; i++){
+            gl2.glTexCoord2f(uv[i].x, uv[i].y);
+            gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+            gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+        }
+        gl2.glEnd();
+    }
     public void drawPolygon(IVec[] pts, IVec[] nml, IColor[] clr, float alpha, boolean light){
         gl2.glBegin(GL2.GL_POLYGON);
 	if(light){
@@ -523,6 +539,16 @@ public class IGraphicsGL2 implements IGraphicsGL{
         for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
         gl2.glEnd();
     }
+    
+    public void drawPolygon(IVec[] pts, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_POLYGON);
+        for(int i=0; i<pts.length; i++){
+	    gl2.glTexCoord2f(uv[i].x,uv[i].y);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	}
+        gl2.glEnd();
+    }
+    
     public void drawPolygon(IVec[] pts, IColor[] clr, float alpha, boolean light){
         gl2.glBegin(GL2.GL_POLYGON);
 	if(light){
@@ -563,6 +589,14 @@ public class IGraphicsGL2 implements IGraphicsGL{
         for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
         gl2.glEnd();
     }
+    public void drawQuads(IVec[] pts, IVec2f[] uv){
+	gl2.glBegin(GL2.GL_QUADS);
+        for(int i=0; i<pts.length; i++){
+	    gl2.glTexCoord2f(uv[i].x,uv[i].y);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	}
+        gl2.glEnd();
+    }
     public void drawQuads(IVec[] pts, IColor[] clr, float alpha, boolean light){
 	gl2.glBegin(GL2.GL_QUADS);
 	if(light){
@@ -600,6 +634,15 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public void drawQuads(IVec[] pts, IVec[] nml){
 	gl2.glBegin(GL2.GL_QUADS);
         for(int i=0; i<pts.length; i++){
+	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+            gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+        }
+        gl2.glEnd();
+    }
+    public void drawQuads(IVec[] pts, IVec[] nml, IVec2f[] uv){
+	gl2.glBegin(GL2.GL_QUADS);
+        for(int i=0; i<pts.length; i++){
+	    gl2.glTexCoord2f(uv[i].x,uv[i].y);
 	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
             gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
         }
@@ -648,6 +691,14 @@ public class IGraphicsGL2 implements IGraphicsGL{
         for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
         gl2.glEnd();
     }
+    public void drawQuadStrip(IVec[] pts, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_QUAD_STRIP);
+        for(int i=0; i<pts.length; i++){
+	    gl2.glTexCoord2f(uv[i].x,uv[i].y);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	}
+        gl2.glEnd();
+    }
     public void drawQuadStrip(IVec[] pts, IColor[] clr, float alpha, boolean light){
         gl2.glBegin(GL2.GL_QUAD_STRIP);
 	if(light){
@@ -685,6 +736,15 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public void drawQuadStrip(IVec[] pts, IVec[] nml){
         gl2.glBegin(GL2.GL_QUAD_STRIP);
         for(int i=0; i<pts.length; i++){
+            gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+            gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+        }
+        gl2.glEnd();
+    }
+    public void drawQuadStrip(IVec[] pts, IVec[] nml, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_QUAD_STRIP);
+        for(int i=0; i<pts.length; i++){
+            gl2.glTexCoord2f(uv[i].x,uv[i].y);
             gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
             gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
         }
@@ -733,6 +793,18 @@ public class IGraphicsGL2 implements IGraphicsGL{
             gl2.glBegin(GL2.GL_QUAD_STRIP);
             for(int j=0; j<pts[i].length; j++){
                 gl2.glVertex3d(pts[i][j].x,pts[i][j].y,pts[i][j].z);
+                gl2.glVertex3d(pts[i+1][j].x,pts[i+1][j].y,pts[i+1][j].z);
+            }
+            gl2.glEnd();
+        }
+    }
+    public void drawQuadMatrix(IVec[][] pts, IVec2f[][] uv){
+        for(int i=0; i<pts.length-1; i++){
+            gl2.glBegin(GL2.GL_QUAD_STRIP);
+            for(int j=0; j<pts[i].length; j++){
+                gl2.glTexCoord2f(uv[i][j].x,uv[i][j].y);
+                gl2.glVertex3d(pts[i][j].x,pts[i][j].y,pts[i][j].z);
+                gl2.glTexCoord2f(uv[i+1][j].x,uv[i+1][j].y);
                 gl2.glVertex3d(pts[i+1][j].x,pts[i+1][j].y,pts[i+1][j].z);
             }
             gl2.glEnd();
@@ -802,6 +874,20 @@ public class IGraphicsGL2 implements IGraphicsGL{
             for(int j=0; j<pts[i].length; j++){
 		gl2.glNormal3d(nml[i][j].x,nml[i][j].y,nml[i][j].z);
 		gl2.glVertex3d(pts[i][j].x,pts[i][j].y,pts[i][j].z);
+		gl2.glNormal3d(nml[i+1][j].x,nml[i+1][j].y,nml[i+1][j].z);
+                gl2.glVertex3d(pts[i+1][j].x,pts[i+1][j].y,pts[i+1][j].z);
+            }
+            gl2.glEnd();
+        }
+    }
+    public void drawQuadMatrix(IVec[][] pts, IVec[][] nml, IVec2f[][] uv){
+        for(int i=0; i<pts.length-1; i++){
+            gl2.glBegin(GL2.GL_QUAD_STRIP);
+            for(int j=0; j<pts[i].length; j++){
+		gl2.glTexCoord2f(uv[i][j].x,uv[i][j].y);
+		gl2.glNormal3d(nml[i][j].x,nml[i][j].y,nml[i][j].z);
+		gl2.glVertex3d(pts[i][j].x,pts[i][j].y,pts[i][j].z);
+		gl2.glTexCoord2f(uv[i+1][j].x,uv[i+1][j].y);
 		gl2.glNormal3d(nml[i+1][j].x,nml[i+1][j].y,nml[i+1][j].z);
                 gl2.glVertex3d(pts[i+1][j].x,pts[i+1][j].y,pts[i+1][j].z);
             }
@@ -882,6 +968,15 @@ public class IGraphicsGL2 implements IGraphicsGL{
         }
         gl2.glEnd();
     }
+    public void drawTriangles(IVec[] pts, IVec[] nml, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_TRIANGLES);
+        for(int i=0; i<pts.length; i++){
+	    gl2.glTexCoord2f(uv[i].x,uv[i].y);
+	    gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+        }
+        gl2.glEnd();
+    }
     public void drawTriangles(IVec[] pts, IVec[] nml, IColor[] clr, float alpha, boolean light){
 	gl2.glBegin(GL2.GL_TRIANGLES);
 	if(light){
@@ -925,6 +1020,14 @@ public class IGraphicsGL2 implements IGraphicsGL{
         for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
         gl2.glEnd();
     }
+    public void drawTriangles(IVec[] pts, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_TRIANGLES);
+        for(int i=0; i<pts.length; i++){
+	    gl2.glTexCoord2f(uv[i].x,uv[i].y);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	}
+        gl2.glEnd();
+    }
     public void drawTriangles(IVec[] pts, IColor[] clr, float alpha, boolean light){
         gl2.glBegin(GL2.GL_TRIANGLES);
 	if(light){
@@ -962,6 +1065,15 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public void drawTriangleStrip(IVec[] pts, IVec[] nml){
         gl2.glBegin(GL2.GL_TRIANGLE_STRIP);
         for(int i=0; i<pts.length; i++){
+            gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+            gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+        }
+        gl2.glEnd();
+    }
+    public void drawTriangleStrip(IVec[] pts, IVec[] nml, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_TRIANGLE_STRIP);
+        for(int i=0; i<pts.length; i++){
+            gl2.glTexCoord2f(uv[i].x,uv[i].y);
             gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
             gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
         }
@@ -1010,6 +1122,14 @@ public class IGraphicsGL2 implements IGraphicsGL{
         for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
         gl2.glEnd();
     }
+    public void drawTriangleStrip(IVec[] pts, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_TRIANGLE_STRIP);
+        for(int i=0; i<pts.length; i++){
+	    gl2.glTexCoord2f(uv[i].x,uv[i].y);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	}
+        gl2.glEnd();
+    }
     public void drawTriangleStrip(IVec[] pts, IColor[] clr, float alpha, boolean light){
         gl2.glBegin(GL2.GL_TRIANGLE_STRIP);
 	if(light){
@@ -1047,6 +1167,15 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public void drawTriangleFan(IVec[] pts, IVec[] nml){
         gl2.glBegin(GL2.GL_TRIANGLE_FAN);
         for(int i=0; i<pts.length; i++){
+            gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
+            gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+        }
+        gl2.glEnd();
+    }
+    public void drawTriangleFan(IVec[] pts, IVec[] nml, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+        for(int i=0; i<pts.length; i++){
+            gl2.glTexCoord2f(uv[i].x,uv[i].y);
             gl2.glNormal3d(nml[i].x,nml[i].y,nml[i].z);
             gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
         }
@@ -1095,6 +1224,14 @@ public class IGraphicsGL2 implements IGraphicsGL{
         for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
         gl2.glEnd();
     }
+    public void drawTriangleFan(IVec[] pts, IVec2f[] uv){
+        gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+        for(int i=0; i<pts.length; i++){
+	    gl2.glTexCoord2f(uv[i].x,uv[i].y);
+	    gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z);
+	}
+        gl2.glEnd();
+    }
     public void drawTriangleFan(IVec[] pts, IColor[] clr, float alpha, boolean light){
         gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 	if(light){
@@ -1130,5 +1267,22 @@ public class IGraphicsGL2 implements IGraphicsGL{
         gl2.glEnd();
     }
     
+    public void beginTexture(ITexture tex){
+	gl2.glDisable(GL2.GL_BLEND); // important
+	gl2.glEnable(GL2.GL_TEXTURE_2D);
+	gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE); // GL_DECAL
+	gl2.glBindTexture(GL2.GL_TEXTURE_2D, tex.id(this));
+    }
+    public void endTexture(){
+	gl2.glBindTexture(GL2.GL_TEXTURE_2D, 0); // bind no texture
+	gl2.glEnable(GL2.GL_BLEND);
+    }
+    
+    public ITextureGraphicGL getTextureGraphic(String filename){
+	return new ITextureGraphicGL2(filename, getGL());
+    }
+    public ITextureGraphicGL getTextureGraphic(BufferedImage image){
+	return new ITextureGraphicGL2(image, getGL());
+    }
 }
 

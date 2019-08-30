@@ -30,9 +30,11 @@ import java.lang.reflect.*;
 import igeo.*;
 
 
-import javax.media.opengl.*;
+//import javax.media.opengl.*; // Processing 1 & 2
+import com.jogamp.opengl.*; // Processing 3 change
+
 //import com.sun.opengl.util.j2d.TextRenderer; // processing 1.5
-import com.jogamp.opengl.util.awt.TextRenderer; // processing 2.0
+import com.jogamp.opengl.util.awt.TextRenderer; // processing 2.0 & 3
 
 /**
    Base class of OpenGL graphic vertex data collection
@@ -137,7 +139,7 @@ public class ITextGraphicGL extends IGraphicObject{
 	    
 	    
 	    //GL gl = ggl.getGL(); // for processing 1.5
-	    GL2 gl = (GL2) ((IGraphicsGL2)ggl).getGL(); // for processing 2.0
+	    GL2 gl = (GL2) ((IGraphicsGL2)ggl).getGL(); // for processing 2.0 & 3
 	    
 	    gl.glPushMatrix();
 	    gl.glMultMatrixd(mat.toArray(),0);

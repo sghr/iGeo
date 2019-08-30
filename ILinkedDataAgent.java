@@ -127,6 +127,7 @@ public class ILinkedDataAgent<T extends IArithmeticVal<T,IDoubleI>> extends IDat
     public ILinkedDataAgent clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public ILinkedDataAgent clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public ILinkedDataAgent clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public ILinkedDataAgent clr(IObject o){ super.clr(o); return this; }
     //public ILinkedDataAgent clr(Color c){ super.clr(c); return this; }
     //public ILinkedDataAgent clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     //public ILinkedDataAgent clr(Color c, float alpha){ super.clr(c,alpha); return this; }

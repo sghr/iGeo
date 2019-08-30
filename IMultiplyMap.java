@@ -32,6 +32,6 @@ public class IMultiplyMap extends IMap{
     public IMap map1, map2;
     public IMultiplyMap(IMap m1,IMap m2){ map1=m1; map2=m2; }
     public double get(double u, double v){ return map1.get(u,v)*map2.get(u,v); }
-    public void flipU(){ map1.flipU(); map2.flipU(); } //is it ok to modify the original?
-    public void flipV(){ map1.flipV(); map2.flipV(); } //is it ok to modify the original?
+    public IMultiplyMap flipU(){ map1.flipU(); map2.flipU(); return this; } //is it ok to modify the original?
+    public IMultiplyMap flipV(){ map1.flipV(); map2.flipV(); return this; } //is it ok to modify the original?
 }

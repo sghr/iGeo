@@ -57,6 +57,10 @@ public class IMatrix2 extends IMatrix implements IMatrix2I{
 	return det(val[0][0],val[0][1],val[1][0],val[1][1]);
     }
     
+    public static double determinant(double v00, double v01, double v10, double v11){
+	return det(v00,v01,v10,v11);
+    }
+    
     
     public IMatrix2 invert(){
 	double det = determinant();

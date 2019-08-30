@@ -108,6 +108,7 @@ public class ITensionLineOnCurve extends ICurve implements ITensionI{
     public ITensionLineOnCurve clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public ITensionLineOnCurve clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public ITensionLineOnCurve clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public ITensionLineOnCurve clr(IObject o){ super.clr(o); return this; }
     public ITensionLineOnCurve clr(Color c){ super.clr(c); return this; }
     public ITensionLineOnCurve clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ITensionLineOnCurve clr(Color c, float alpha){ super.clr(c,alpha); return this; }

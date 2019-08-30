@@ -59,6 +59,12 @@ public class IBounds{
 	for(int i=0; i<objects.size(); i++){ compare(objects.get(i)); }
     }
     
+    public IBounds(IBounds b){
+	min = b.min.cp();
+	max = b.max.cp();
+    }
+    
+    public IBounds cp(){ return new IBounds(this); }
     
     public IVec min(){ return min; }
     public IVec getMin(){ return min(); }
@@ -157,7 +163,7 @@ public class IBounds{
 	    }
 	    else if(e instanceof IVectorObject){
 		IVectorObject vobj = (IVectorObject)e;
-		compare(vobj.vec.get());
+		compare(vobj.vec.get().cp(vobj.root));
 		compare(vobj.root.get());
 	    }
 	    else if(e instanceof IText){
@@ -315,6 +321,16 @@ public class IBounds{
 	String s2 = "null";
 	if(max!=null) s2=max.toString();
 	return s1+"-"+s2;
+    }
+    
+    public boolean isCloserThan(IBounds b, double thresholdDist){
+	if(b.min.x - max.x >= thresholdDist) return false;
+	if(min.x - b.max.x >= thresholdDist) return false;
+	if(b.min.y - max.y >= thresholdDist) return false;
+	if(min.y - b.max.y >= thresholdDist) return false;
+	if(b.min.z - max.z >= thresholdDist) return false;
+	if(min.z - b.max.z >= thresholdDist) return false;
+	return true;
     }
     
 }

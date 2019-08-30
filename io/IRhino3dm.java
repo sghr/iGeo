@@ -5160,7 +5160,8 @@ public class IRhino3dm{
 	    for(int i=0; i<srf.innerTrimLoopNum(); i++){
 		ArrayList<ITrimCurve> inLoop = new ArrayList<ITrimCurve>();
 		for(int j=0; j<srf.innerTrimNum(i); j++){
-		    if(srf.outerTrim(i,j).deg()==1){ // split into lines
+		    //if(srf.outerTrim(i,j).deg()==1){ // split into lines
+		    if(srf.innerTrim(i,j).deg()==1){ // split into lines
 			ITrimCurve tcrv = srf.innerTrim(i,j).get();
 			for(int k=0; k<tcrv.num()-1; k++){
 			    inLoop.add(new ITrimCurve(tcrv.cp(k), tcrv.cp(k+1)).surface(srf));
@@ -6568,7 +6569,10 @@ public class IRhino3dm{
 			for(int j=0; j<vi.size(); j++){
 			    ivtx[j] = ivertices.get(vi.get(j));
 			}
-			ifaces.add(new IFace(ivtx));
+			IFace f = new IFace(ivtx);
+			if(f.isValid()){ // if something goes wrong, not added
+			    ifaces.add(f); 
+			}
 		    }
 		    else{ IOut.err("no vertices is created"); }
 		}

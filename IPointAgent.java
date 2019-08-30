@@ -589,6 +589,7 @@ public class IPointAgent extends IAgent implements IVecI{
     public IPointAgent clr(IColor c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); if(tracker!=null){ tracker.clr(c,alpha); } return this; }
     public IPointAgent clr(IColor c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); if(tracker!=null){ tracker.clr(c,alpha); } return this; }
     public IPointAgent clr(IColor c, double alpha){ super.clr(c,alpha); point.clr(c,alpha); if(tracker!=null){ tracker.clr(c,alpha); } return this; }
+    public IPointAgent clr(IObject o){ super.clr(o); return this; }
     //public IPointAgent clr(Color c){ super.clr(c); point.clr(c); return this; }
     //public IPointAgent clr(Color c, int alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }
     //public IPointAgent clr(Color c, float alpha){ super.clr(c,alpha); point.clr(c,alpha); return this; }

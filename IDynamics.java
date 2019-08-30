@@ -45,9 +45,9 @@ public /*class*/interface IDynamics extends ISubobject{
     /** behavior definition of updating dynamics in each time frame */
     public void update();
     
-    /** executed before interact(ArrayList<IDynamics>). behavior can be changed by IConfig.enablePreinteract and IConfig.loopPreinteract. */
+    /** executed before interact(ArrayList&lt;IDynamics&gt;). behavior can be changed by IConfig.enablePreinteract and IConfig.loopPreinteract. */
     public void preinteract(ArrayList<IDynamics> dynamics);
-    /** executed after interact(ArrayList<IDynamics>). behavior can be changed by IConfig.enablePostinteract and IConfig.loopPostinteract.
+    /** executed after interact(ArrayList&lt;IDynamics&gt;). behavior can be changed by IConfig.enablePostinteract and IConfig.loopPostinteract.
      	If IConfig.loopPostinteract is false, preupdate is executed before post interact (updated 2012/08/26).
     */
     public void postinteract(ArrayList<IDynamics> dynamics);

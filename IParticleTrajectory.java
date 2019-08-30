@@ -45,6 +45,9 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     public IParticleTrajectory(IParticleGeo ptcl, IVecI vel){ super(ptcl,vel); initTrajectory(); }
     public IParticleTrajectory(IParticle p, IVecI vel){ super(p,vel); initTrajectory(); }
     
+    public IParticleTrajectory(IParticleTrajectory p){ super(p); initTrajectory(p.trajectory); }
+    public IParticleTrajectory(IParticleTrajectory p, IVecI vel){ super(p,vel); initTrajectory(p.trajectory); }
+    
     // out of attached geometries
     public IParticleTrajectory(IGeometry... geometries){
 	super(geometries);
@@ -63,6 +66,7 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     }
     
     public void initTrajectory(){ trajectory = new ITrajectoryGeo(this); }
+    public void initTrajectory(ITrajectoryGeo tr){ trajectory = new ITrajectoryGeo(tr); }
     
     public int deg(){ if(trajectory!=null){ return trajectory.deg(); } return 1; }
     public IParticleTrajectory deg(int newDegree){ if(trajectory!=null){ trajectory.deg(newDegree); } return this; }
@@ -346,6 +350,7 @@ public class IParticleTrajectory extends IParticle implements ITrajectoryI{
     public IParticleTrajectory clr(IColor c, int alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
     public IParticleTrajectory clr(IColor c, float alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
     public IParticleTrajectory clr(IColor c, double alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
+    public IParticleTrajectory clr(IObject o){ super.clr(o); if(trajectory!=null){ trajectory.clr(o); } return this; }
     //public IParticleTrajectory clr(Color c){ super.clr(c); if(trajectory!=null){ trajectory.clr(c); } return this; }
     //public IParticleTrajectory clr(Color c, int alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }
     //public IParticleTrajectory clr(Color c, float alpha){ super.clr(c,alpha); if(trajectory!=null){ trajectory.clr(c,alpha); } return this; }

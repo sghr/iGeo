@@ -380,6 +380,8 @@ public class ICurveR extends IObject implements ICurveI{ // not extends IGeometr
     public ICurveR clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public ICurveR clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public ICurveR clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public ICurveR clr(IObject o){ super.clr(o); return this; }
+    
     public ICurveR clr(Color c){ super.clr(c); return this; }
     public ICurveR clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public ICurveR clr(Color c, float alpha){ super.clr(c,alpha); return this; }

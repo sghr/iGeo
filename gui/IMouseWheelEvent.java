@@ -43,6 +43,14 @@ public class IMouseWheelEvent{
 	scrollAmount = e.getScrollAmount();
 	scrollType = e.getScrollType();
     }
+
+    // doesn't compile in processing 1.5
+    public IMouseWheelEvent(processing.event.MouseEvent e){
+	rotation = e.getCount();
+	scrollAmount = 1; // not sure
+	scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL;
+    }
+    
     
     public int getScrollAmount(){ return scrollAmount; }
     public int getScrollType(){ return scrollType; }

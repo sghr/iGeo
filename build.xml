@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="Shift_JIS" ?>
 
 <project name="igeo" default="copy_jar2">
+
 <!--<project name="igeo" default="all">-->
 
 
@@ -10,26 +11,66 @@
 
 <property name="processing1_path" value="C:\Program Files (x86)\processing-1.5.1" />
 <!--<property name="processing2_path" value="C:\Program Files\processing-2.0.3" /> -->
-<property name="processing2_path" value="C:\Program Files\processing-2.1.1" /> 
-<property name="processing_home" value="C:\Users\Satoru\Documents\processing" />
+<property name="processing2_path" value="C:\Program Files\processing-2.2.1" /> 
+<!--<property name="processing3_path" value="C:\Program Files\processing-3.0.1" />--> 
+<property name="processing3_path" value="C:\Program Files\processing-3.5.3" /> 
+<property name="processing_home" value="C:\Users\s\Documents\processing" />
+<property name="processing3_home" value="C:\Users\s\Documents\Processing3" />
 <property name="processing_zip_path" value="processing_zip\igeo\" />
 <property name="javadoc_path" value="${processing_zip_path}\reference\" />
-<property name="javadoc_resource" value="C:\Users\Satoru\Documents\www\igeo\doc\" />
-<property name="igeo_www" value="C:\Users\Satoru\Documents\www\igeo\" />
+<property name="javadoc_resource" value="C:\Users\s\Documents\www\igeo\doc\" />
+<property name="igeo_www" value="C:\Users\s\Documents\www\igeo\" />
 
-<property name="igeo_dir" value="C:\Users\Satoru\Documents\java\igeo\" />
+<property name="igeo_dir" value="C:\Users\s\Documents\java\igeo\" />
+<property name="java5bootclasspath" value="C:\Program Files\Java\jdk1.5.0_22\jre\lib\rt.jar" />
 
 
-  <target name="compile2"> <!-- compile for processing 2.0 -->
+  <target name="compile3"> <!-- compile for processing 3.0 -->
     <javac srcdir="${igeo_dir}" includeantruntime="false">
       <exclude name="package-info.java"/>
       <exclude name="*/package-info.java"/>
       <exclude name="processing_zip/"/>
       <exclude name="p/PIGraphicsGL1.java"/>
+      <exclude name="p/PIGraphicsGL2.java"/>
+      <exclude name="p/PIGraphics3D.java"/>
+      <exclude name="gui/IGraphicsGL1.java"/>
+      <exclude name="gui/GL2.java"/>
+      <exclude name="gui/ITextureGraphicGL1.java"/>
+      <exclude name="gui/IGLElement.java"/>
+      <exclude name="gui/IGLLineLoop.java"/>
+      <exclude name="gui/IGLLineStrip.java"/>
+      <exclude name="gui/IGLPolygon.java"/>
+      <exclude name="gui/IGLQuadMatrix.java"/>
+      <exclude name="gui/IGLQuadStrip.java"/>
+      <exclude name="gui/IGLTriangles.java"/>
+      <exclude name="IApplicationGL1.java"/>
+      <exclude name="IAppletGL1.java"/>
+      <exclude name="IApplicationGL2.java"/>
+      <exclude name="IAppletGL2.java"/>
+      <classpath>
+        <pathelement path="${igeo_dir}" />
+        <pathelement path="${igeo_dir}\.." />
+        <pathelement path="${processing3_path}\core\library\core.jar" />
+        <pathelement path="${processing3_path}\core\library\jogl-all.jar" />
+        <pathelement path="${processing3_path}\core\library\gluegen-rt.jar" />
+
+      </classpath>
+      <compilerarg line="-Xlint:unchecked -g:lines,source"/>
+    </javac>
+  </target>
+
+  <target name="compile2"> <!-- compile for processing 2.0 -->
+    <javac srcdir="${igeo_dir}" source="1.6" target="1.6" includeantruntime="false">
+      <exclude name="package-info.java"/>
+      <exclude name="*/package-info.java"/>
+      <exclude name="processing_zip/"/>
+      <exclude name="p/PIGraphicsGL1.java"/>
+      <exclude name="p/PIGraphicsGL3.java"/>
       <exclude name="gui/IGraphicsGL1.java"/>
       <exclude name="gui/GL2.java"/>
       <exclude name="IApplicationGL1.java"/>
       <exclude name="IAppletGL1.java"/>
+      <exclude name="gui/ITextureGraphicGL1.java"/>
       <classpath>
         <pathelement path="${igeo_dir}" />
         <pathelement path="${igeo_dir}\.." />
@@ -41,7 +82,7 @@
 -->
         <pathelement path="${processing2_path}\core\library\core.jar" />
         <pathelement path="${processing2_path}\core\library\jogl-all.jar" />
-        <pathelement path="${processing2_path}\core\library\glugen-rt.jar" />
+        <pathelement path="${processing2_path}\core\library\gluegen-rt.jar" />
 
       </classpath>
       <!--<compilerarg value="-g:lines,source -Xlint"/>-->
@@ -52,22 +93,24 @@
 
   <!-- compile for processing 1.5 -->
   <target name="compile1"> 
-    <javac srcdir="${igeo_dir}" includeantruntime="false">
+    <javac target="1.5" source="1.5" bootclasspath="${java5bootclasspath}" srcdir="${igeo_dir}" includeantruntime="false">
       <exclude name="package-info.java"/>
       <exclude name="*/package-info.java"/>
       <exclude name="processing_zip/"/>
       <exclude name="p/PIGraphicsGL2.java"/>
+      <exclude name="p/PIGraphicsGL3.java"/>
       <exclude name="p/PIGraphics3D.java"/>
       <exclude name="gui/IGraphicsGL2.java"/>
       <exclude name="IApplicationGL2.java"/>
       <exclude name="IAppletGL2.java"/>
+      <exclude name="gui/ITextureGraphicGL2.java"/>
       <classpath>
         <pathelement path="${igeo_dir}" />
         <pathelement path="${igeo_dir}\.." />
         <pathelement path="${processing1_path}\lib\core.jar" />
         <pathelement path="${processing1_path}\modes\java\libraries\opengl\library\opengl.jar" />
         <pathelement path="${processing1_path}\modes\java\libraries\opengl\library\jogl.jar" />
-        <pathelement path="${processing1_path}\modes\java\libraries\opengl\library\glugen-rt.jar" />
+        <pathelement path="${processing1_path}\modes\java\libraries\opengl\library\gluegen-rt.jar" />
       </classpath>
       <!-- <compilerarg value="-g:lines,source -Xlint"/> -->
       <compilerarg line="-Xlint:unchecked -g:lines,source"/>
@@ -75,6 +118,12 @@
     </javac>
   </target>
 
+
+  <target name="jar3" depends="compile3">
+    <jar jarfile="igeo.jar" basedir="${igeo_dir}\.." 
+      includes="igeo/*.class igeo/gui/*.class igeo/io/*.class igeo/p/*.class" 
+     />
+  </target>
 
   <target name="jar2" depends="compile2">
     <jar jarfile="igeo.jar" basedir="${igeo_dir}\.." 
@@ -88,6 +137,11 @@
      />
   </target>
 
+
+  <target name="copy_jar3" depends="jar3">
+    <copy file="${igeo_dir}/igeo.jar" todir="${processing3_home}\libraries\igeo\library\" />
+    <copy file="${igeo_dir}/igeo.jar" todir="${processing_zip_path}\library\" />
+  </target>
 
   <target name="copy_jar2" depends="jar2">
     <copy file="${igeo_dir}/igeo.jar" todir="${processing_home}\libraries\igeo\library\" />
@@ -123,30 +177,41 @@
       <package name="igeo.io" />
       <package name="igeo.gui" />
 -->
-  <target name="javadoc">
+  <target name="javadoc2">
     <javadoc destdir="${javadoc_path}" private="true">
 
-      <packageset dir="${igeo_dir}\.." defaultexcludes="yes">
+<!--    <packageset dir="${igeo_dir}\.." defaultexcludes="yes"> 
         <include name="igeo" />
         <include name="igeo.p" />
         <include name="igeo.io" />
         <include name="igeo.gui" />
+-->
 
+        <fileset dir="${igeo_dir}" defaultexcludes="yes">
+
+	<include name="*.java"/>
+	<include name="p/*.java"/>
+	<include name="io/*.java"/>
+	<include name="gui/*.java"/>
         <exclude name="p/PIGraphicsGL1.java"/>
+        <exclude name="p/PIGraphicsGL3.java"/>
         <exclude name="gui/IGraphicsGL1.java"/>
         <exclude name="gui/GL2.java"/>
         <exclude name="IApplicationGL1.java"/>
         <exclude name="IAppletGL1.java"/>
-      </packageset>
+<!--      </packageset> -->
+        </fileset>
 
       <classpath>
+<!--    
         <pathelement path="${igeo_dir}" />
         <pathelement path="${igeo_dir}\.." />
+-->
 <!--
         <pathelement path="${processing2_path}\lib\core.jar" />
         <pathelement path="${processing2_path}\modes\java\libraries\opengl\library\opengl.jar" />
         <pathelement path="${processing2_path}\modes\java\libraries\opengl\library\jogl.jar" />
-        <pathelement path="${processing2_path}\modes\java\libraries\opengl\library\glugen-rt.jar" />
+        <pathelement path="${processing2_path}\modes\java\libraries\opengl\library\gluegen-rt.jar" />
 -->
         <pathelement path="${processing2_path}\core\library\core.jar" />
         <pathelement path="${processing2_path}\core\library\jogl-all.jar" />
@@ -167,9 +232,70 @@
   </target>
 
 
+  <target name="javadoc3">
+    <javadoc destdir="${javadoc_path}" private="true">
 
-  <target name="copy_javadoc" depends="javadoc">
 
+      <fileset dir="${igeo_dir}" defaultexcludes="yes">
+	<include name="*.java"/>
+	<include name="p/*.java"/>
+	<include name="io/*.java"/>
+	<include name="gui/*.java"/>
+        <exclude name="p/PIGraphicsGL1.java"/>
+        <exclude name="p/PIGraphicsGL2.java"/>
+        <exclude name="p/PIGraphics3D.java"/>
+        <exclude name="gui/IGraphicsGL1.java"/>
+        <exclude name="gui/GL2.java"/>
+        <exclude name="gui/ITextureGraphicGL1.java"/>
+        <exclude name="gui/IGLElement.java"/>
+        <exclude name="gui/IGLLineLoop.java"/>
+        <exclude name="gui/IGLLineStrip.java"/>
+        <exclude name="gui/IGLPolygon.java"/>
+        <exclude name="gui/IGLQuadMatrix.java"/>
+        <exclude name="gui/IGLQuadStrip.java"/>
+        <exclude name="gui/IGLTriangles.java"/>
+        <exclude name="IApplicationGL1.java"/>
+        <exclude name="IAppletGL1.java"/>
+        <exclude name="IApplicationGL2.java"/>
+        <exclude name="IAppletGL2.java"/>
+      </fileset>
+
+      <classpath>
+<!--    
+        <pathelement path="${igeo_dir}" />
+        <pathelement path="${igeo_dir}\.." />
+-->
+        <pathelement path="${processing3_path}\core\library\core.jar" />
+        <pathelement path="${processing3_path}\core\library\jogl-all.jar" />
+        <pathelement path="${processing3_path}\core\library\glugen-rt.jar" />
+
+      </classpath>
+
+    </javadoc>
+
+    <copy todir="${javadoc_path}\resources\" overwrite="true">
+      <fileset dir="${javadoc_resource}\resources" />
+    </copy>
+
+    <copy file="${javadoc_resource}\stylesheet.css" todir="${javadoc_path}\" overwrite="true" />
+
+    <copy file="${javadoc_resource}\index.html" todir="${javadoc_path}\" overwrite="true" />
+
+  </target>
+
+
+
+  <target name="copy_javadoc2" depends="javadoc2">
+    <copy todir="${igeo_www}\doc\" overwrite="true">
+      <fileset dir="${javadoc_path}\" >
+        <exclude name="resources\" />
+        <exclude name="index.html" />
+        <exclude name="stylesheet.css" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="copy_javadoc3" depends="javadoc3">
     <copy todir="${igeo_www}\doc\" overwrite="true">
       <fileset dir="${javadoc_path}\" >
         <exclude name="resources\" />
@@ -188,8 +314,10 @@
     </delete>
   </target>
 
+  <target name="all3" depends="clean,compile3,jar3,copy_jar3,copy_src,javadoc3,copy_javadoc3">
+  </target>
 
-  <target name="all2" depends="clean,compile2,jar2,copy_jar2,copy_src,javadoc,copy_javadoc">
+  <target name="all2" depends="clean,compile2,jar2,copy_jar2,copy_src,javadoc2,copy_javadoc2">
   </target>
 
   <target name="all1" depends="clean,compile1,jar1,copy_jar1,copy_src">

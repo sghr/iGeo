@@ -86,6 +86,31 @@ public class IMeshCreator{
     }
     public static IMesh mesh(IFace[] fcs){ return new IMesh(server,fcs); }
     
+    /** create polygon mesh out of array of triangle points which is array of 3 IVec */
+    public static IMesh meshFromTriangles(IVecI[][] trianglePts){
+	ArrayList<IVecI> uniqPts = new ArrayList<IVecI>(); // IVecI without duplicates
+	for(int i=0; i<trianglePts.length; i++){
+	    for(int j=0; j<trianglePts[i].length; j++){
+		if(!uniqPts.contains(trianglePts[i][j])){
+		    uniqPts.add(trianglePts[i][j]);
+		}
+	    }
+	}
+	IVertex[] vtx = new IVertex[uniqPts.size()];
+	for(int i=0; i<uniqPts.size(); i++){
+	    vtx[i] = new IVertex(uniqPts.get(i));
+	}
+	IFace[] fcs = new IFace[trianglePts.length];
+	for(int i=0; i<trianglePts.length; i++){
+	    IVertex[] fv = new IVertex[trianglePts[i].length];
+	    for(int j=0; j<trianglePts[i].length; j++){
+		int idx = uniqPts.indexOf(trianglePts[i][j]);
+		fv[j] = vtx[idx];
+	    }
+	    fcs[i] = new IFace(fv);
+	}
+	return new IMesh(fcs);
+    }
     
     public static IMesh box(double x, double y, double z, double size){
 	return box(new IVec(x,y,z),size,size,size);
@@ -264,6 +289,187 @@ public class IMeshCreator{
 	mesh.close();
 	return mesh;
     }
+    
+
+    /** make a mesh tetrahedron */
+    public static IMesh tetrahedron(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4){
+	return tetrahedron(new IVertex(pt1),new IVertex(pt2),new IVertex(pt3),new IVertex(pt4));
+    }
+    
+    /** make a mesh tetrahedron */
+    public static IMesh tetrahedron(IVecI[] pts){
+	IVertex[] vtx = new IVertex[pts.length];
+	for(int i=0; i<pts.length; i++){ vtx[i] = new IVertex(pts[i]); }
+	return tetrahedron(vtx);
+    }
+    
+    /** make a mesh tetrahedron */
+    public static IMesh tetrahedron(IVertex v1, IVertex v2, IVertex v3, IVertex v4){
+	return tetrahedron(new IVertex[]{ v1,v2,v3,v4 });
+    }
+    
+    /** make a mesh tetrahedron */
+    public static IMesh tetrahedron(IVertex[] vtx){
+	if(vtx==null || vtx.length<4){ 
+	    IG.err("tetrahedron cannot be generated with less than 4 points");
+	    return null;
+	}
+	
+	IEdge[] edges = new IEdge[6];
+	IFace[] faces = new IFace[4];
+
+	edges[0] = type.createEdge(vtx[0],vtx[1]);
+	edges[1] = type.createEdge(vtx[0],vtx[2]);
+	edges[2] = type.createEdge(vtx[0],vtx[3]);
+	edges[3] = type.createEdge(vtx[1],vtx[2]);
+	edges[4] = type.createEdge(vtx[1],vtx[3]);
+	edges[5] = type.createEdge(vtx[2],vtx[3]);
+	
+	if(IVec.nml(vtx[0],vtx[1],vtx[2]).dot(IVec.center(vtx[0],vtx[1],vtx[2]).dif(IVec.center(vtx[0],vtx[1],vtx[2],vtx[3]))) > 0){
+	    // vtx0,1,2
+	    faces[0] = type.createFace(edges[0],edges[3],edges[1]);
+	    // vtx0,3,1
+	    faces[1] = type.createFace(edges[2],edges[4],edges[0]);
+	    // vtx0,2,3
+	    faces[2] = type.createFace(edges[1],edges[5],edges[2]);
+	    // vtx2,1,3
+	    faces[3] = type.createFace(edges[3],edges[4],edges[5]);
+	}
+	else{
+	    // vtx0,2,1
+	    faces[0] = type.createFace(edges[1],edges[3],edges[0]);
+	    // vtx0,1,3
+	    faces[1] = type.createFace(edges[0],edges[4],edges[2]);
+	    // vtx0,3,2
+	    faces[2] = type.createFace(edges[2],edges[5],edges[1]);
+	    // vtx2,3,1
+	    faces[3] = type.createFace(edges[5],edges[4],edges[3]);
+	}
+	
+	ArrayList<IVertex> vertexArray = new ArrayList<IVertex>();
+	ArrayList<IEdge> edgeArray = new ArrayList<IEdge>();
+	ArrayList<IFace> faceArray = new ArrayList<IFace>();
+	
+	for(int i=0; i<4; i++) vertexArray.add(vtx[i]);
+	for(int i=0; i<6; i++) edgeArray.add(edges[i]);
+	for(int i=0; i<4; i++) faceArray.add(faces[i]); 
+	IMesh mesh = new IMesh(vertexArray,edgeArray,faceArray);
+	mesh.close();
+	return mesh;
+    }
+    
+    /** 
+	open cap mesh pipe
+	@param vtx  n x 2 vertex array
+    */
+    public static IMesh pipe(IVertex[][] vtx){
+	if(vtx==null || vtx.length<2 || vtx[0].length != 2){
+	    IG.err("wrong vertex array");
+	    return null;
+	}
+	
+	int n = vtx.length;
+	IEdge[] sideEdge1 = new IEdge[n];
+	IEdge[] sideEdge2 = new IEdge[n];
+	IEdge[] longEdge = new IEdge[n];
+
+	ArrayList<IVertex> varray = new ArrayList<IVertex>();
+	ArrayList<IEdge> earray = new ArrayList<IEdge>();
+	ArrayList<IFace> farray = new ArrayList<IFace>();
+	
+	for(int i=0; i<n; i++){
+	    varray.add(vtx[i][0]);
+	    varray.add(vtx[i][1]);
+	    longEdge[i] = type.createEdge(vtx[i][0], vtx[i][1]);
+	    sideEdge1[i] = type.createEdge(vtx[i][0], vtx[(i+1)%n][0]);
+	    sideEdge2[i] = type.createEdge(vtx[i][1], vtx[(i+1)%n][1]);
+	    earray.add(longEdge[i]);
+	    earray.add(sideEdge1[i]);
+	    earray.add(sideEdge2[i]);
+	}
+	
+	for(int i=0; i<n; i++){
+	    IFace f = type.createFace(longEdge[i],sideEdge1[i],longEdge[(i+1)%n],sideEdge2[i]);
+	    farray.add(f);
+	}
+	
+	return new IMesh(varray,earray,farray);
+    }
+
+    /** 
+	open cap mesh pipe
+	@param pts  n x 2 point array
+    */
+    public static IMesh pipe(IVecI[][] pts){
+	if(pts==null || pts.length<2 || pts[0].length != 2){
+	    IG.err("wrong point array");
+	    return null;
+	}
+	IVertex[][] vtx = new IVertex[pts.length][2];
+	for(int i=0; i<pts.length; i++){
+	    vtx[i][0] = type.createVertex(pts[i][0]);
+	    vtx[i][1] = type.createVertex(pts[i][1]);
+	}
+	return pipe(vtx);
+    }
+    
+    public static IMesh rectPipe(IVecI pt1, IVecI pt2, IVecI udir, IVecI vdir){
+	IVec[][] pts = new IVec[4][2];
+	IVec v1 = pt1.get();
+	IVec v2 = pt2.get();
+	pts[0][0] = v1.dup().add(-0.5, udir).add(-0.5, vdir);
+	pts[1][0] = v1.dup().add( 0.5, udir).add(-0.5, vdir);
+	pts[2][0] = v1.dup().add( 0.5, udir).add( 0.5, vdir);
+	pts[3][0] = v1.dup().add(-0.5, udir).add( 0.5, vdir);
+	pts[0][1] = v2.dup().add(-0.5, udir).add(-0.5, vdir);
+	pts[1][1] = v2.dup().add( 0.5, udir).add(-0.5, vdir);
+	pts[2][1] = v2.dup().add( 0.5, udir).add( 0.5, vdir);
+	pts[3][1] = v2.dup().add(-0.5, udir).add( 0.5, vdir);
+	return pipe(pts);
+    }
+    
+    /**
+       @param heightDir it provides reference to the direction of height but actual direction is re-calculated to be perpendicular to pt1-pt2 direction.
+    */
+    public static IMesh rectPipe(IVecI pt1, IVecI pt2, double width, double height, IVecI heightDir){
+	IVec dir = pt2.get().dif(pt1);
+	IVec udir = dir.cross(heightDir);
+	// < IConfig.tolerance or < IConfig.tolerance*IConfig.tolerance
+	if(udir.len2()<IConfig.tolerance){
+	    udir = dir.cross(IVec.zaxis); // if heightDir is parallel to dir, use z axis
+	    if(udir.len2()<IConfig.tolerance) udir = dir.cross(IVec.xaxis); // if still parallel, use x axis
+	}
+	IVec vdir = udir.cross(dir);
+	udir.len(width);
+	vdir.len(height);
+	return rectPipe(pt1,pt2,udir,vdir);
+    }
+    
+    /** height direction is z axis */
+    public static IMesh rectPipe(IVecI pt1, IVecI pt2, double width, double height){
+	IVec dir = pt2.get().dif(pt1);
+	IVec udir = dir.cross(IVec.zaxis);
+	if(udir.len2()<IConfig.tolerance) udir = dir.cross(IVec.xaxis); // if parallel, use x axis
+	IVec vdir = udir.cross(dir);
+	udir.len(width);
+	vdir.len(height);
+	return rectPipe(pt1,pt2,udir,vdir);
+    }
+    
+    /**
+       @param heightDir it provides reference to the direction of height but actual direction is re-calculated to be perpendicular to pt1-pt2 direction.
+    */
+    public static IMesh squarePipe(IVecI pt1, IVecI pt2, double width, IVecI heightDir){
+	return rectPipe(pt1,pt2,width,width,heightDir);
+    }
+    
+    /** height direction is z axis */
+    public static IMesh squarePipe(IVecI pt1, IVecI pt2, double width){
+	return rectPipe(pt1,pt2,width,width);
+    }
+    
+    
+    
     
     public static IMesh rectStick(IVecI pt1, IVecI pt2, IVecI udir, IVecI vdir){
 	IVec[][][] pts = new IVec[2][2][2];
@@ -503,7 +709,7 @@ public class IMeshCreator{
 	    return null;
 	}
 	if(pts[0].length<=2){
-	    IOut.err("pts unum needs to be more than 3");
+	    IOut.err("pts vnum needs to be more than 3");
 	    return null;
 	}
 	
@@ -782,7 +988,6 @@ public class IMeshCreator{
 	}
 	IVec roll = dir.cross(n);
 	IVec[] profilePts = polygonProfile(center, dir, roll, radius, polygonVertexNum);
-	
 	boolean closed=crv.isClosed();
 	IVecI[] railPts=null;
 	if(crv.deg()==1){

@@ -487,16 +487,21 @@ public class IObject{
     public int greenInt(){ return clr().getGreen(); }
     public int blueInt(){ return clr().getBlue(); }
     public int alphaInt(){ return clr().getAlpha(); }
-    public int grayInt(){ return clr().getGrey(); }
-    public int greyInt(){ return grayInt(); }
+    public int greyInt(){ return clr().getGrey(); }
+    public int grayInt(){ return greyInt(); }
     
-    public double red(){ return ((double)redInt()/255.); }
-    public double green(){ return ((double)greenInt()/255.); }
-    public double blue(){ return ((double)blueInt()/255.); }
-    public double alpha(){ return ((double)alphaInt()/255.); }
-    public double gray(){ return ((double)grayInt()/255.); }
+    public float red(){ return clr().red(); }
+    public float green(){ return clr().green(); }
+    public float blue(){ return clr().blue(); }
+    public float alpha(){ return clr().alpha(); }
+    public float grey(){ return clr().grey(); }
+    public float gray(){ return clr().gray(); }
     
+    public float hue(){ return clr().hue(); }
+    public float saturation(){ return clr().saturation(); }
+    public float brightness(){ return clr().brightness(); }
     
+    /** to set an object color */
     public IObject clr(IColor c){
 	if(c==null) return this; // if null, do nothing, don't create attribute
 	if(attribute==null) attribute = defaultAttribute();
@@ -522,6 +527,8 @@ public class IObject{
     /** to set color, with alpha value overwritten */
     public IObject clr(IColor c, double alpha){ return clr(c,(float)alpha); }
     
+    /** to set the same color with the object */
+    public IObject clr(IObject o){ clr(o.clr()); return this; }
     
     
     /** @return returns whatever Color of any graphics member. (first found) */
@@ -683,6 +690,18 @@ public class IObject{
     public IObject setHSBColor(float h, float s, float b){ return hsb(h,s,b); }
     public IObject setHSBColor(double h, double s, double b){ return hsb(h,s,b); }
     
+    
+    public IObject texture(ITexture tex){ // texture
+	if(attribute==null) attribute = defaultAttribute();
+    	attribute.texture = tex;
+	if(graphics!=null){
+	    for(IGraphicObject gr:graphics) gr.setAttribute(attribute);
+	}
+	return this;
+    }
+    public IObject setTexture(ITexture tex){ // texture
+	return texture(tex);
+    }
     
     /*
     public void setGraphic(IGraphicObject graf){

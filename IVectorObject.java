@@ -513,6 +513,7 @@ public class IVectorObject extends IObject implements IVecI{
     public IVectorObject clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IVectorObject clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IVectorObject clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IVectorObject clr(IObject o){ super.clr(o); return this; }
     public IVectorObject clr(Color c){ super.clr(c); return this; }
     public IVectorObject clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IVectorObject clr(Color c, float alpha){ super.clr(c,alpha); return this; }

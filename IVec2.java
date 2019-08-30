@@ -810,10 +810,57 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
 	return pts2.toArray(new IVec2I[pts2.size()]);
     }
     
+    /**
+       Check if polyline loop defined by the point array is clockwise or not. 
+       When loop area is zero (line) false (counterclockwise)
+    */
+    public static boolean clockwise(IVec2[] pts){
+	if(signedArea(pts)<0) return true;
+	return false;
+    }
+
+    /**
+       Check if polyline loop defined by the point array is counterclockwise or not. 
+       When loop area is zero (line) true
+    */
+    public static boolean counterclockwise(IVec2[] pts){
+	return !clockwise(pts);
+    }
+    
+    /**
+       true if polyline loop defined by the point array is counter-clockwise. clockwise is false. (right hand screw rule).
+     */
+    public static boolean loopdir(IVec2[] pts){
+	return !clockwise(pts);
+    }
+    
+    /**
+       normal vector of polyline loop defined by input points. the z value of the normal is equals to signed area of the loop.
+    */
+    public static IVec nml(IVec2[] pts){
+	return new IVec(0,0,signedArea(pts));
+    }
+    
+    /** 
+	Calculate area of the polyline loop defined by the input points. If the loop is clockwise, the area is negative. 
+     */
+    public static double signedArea(IVec2[] pts){
+	double area = 0;
+	for(int i=0; i<pts.length; i++){
+	    area += pts[i].cross(pts[(i+1)%pts.length]).z;
+	}
+	return area/2;
+    }
+    
+    public static double area(IVec2[] pts){
+	return Math.abs(signedArea(pts));
+    }
+    
+    
+    
     
     /**
        determine if the point is insde the polygon defined by the argument
-       
     */
     public boolean isInside(IVec2I[] pts){
     	
@@ -904,6 +951,11 @@ public class IVec2 extends IParameterObject implements IVec2I, IEntityParameter{
     
     public boolean isOnLine(IVec2 pt1, IVec2 pt2){
 	return distToLine(pt1,pt2)<IConfig.tolerance;
+    }
+    
+    public boolean isOnSegment(IVec2I pt1, IVec2I pt2){
+	if(!isStraight(pt1,pt2)) return false;
+	return isBetween(pt1,pt2);
     }
     
     public boolean isBetween(IVec2I pt1, IVec2I pt2){

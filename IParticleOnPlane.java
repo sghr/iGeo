@@ -378,6 +378,7 @@ public class IParticleOnPlane extends IPointAgent implements IParticleI /*IParti
     public IParticleOnPlane clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IParticleOnPlane clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IParticleOnPlane clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IParticleOnPlane clr(IObject o){ super.clr(o); return this; }
     public IParticleOnPlane clr(Color c){ super.clr(c); return this; }
     public IParticleOnPlane clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IParticleOnPlane clr(Color c, float alpha){ super.clr(c,alpha); return this; }

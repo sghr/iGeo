@@ -131,19 +131,19 @@ public class IScreenTogglePanel extends IPanel{
     
     
     public void mouseClicked(MouseEvent e){
-	super.mouseClicked(e);
-	
-	IMouseEvent me = new IMouseEvent(e);
-	//IOut.p("click count="+e.getClickCount());//
-	if(e.getClickCount()>=2 &&e.getClickCount()%2==0){ // double click
+	mouseClicked(new IMouseEvent(e));
+    }
+    
+    public void mouseClicked(IMouseEvent me){
+	super.mouseClicked(me);
+	if(me.getCount()>=2 &&me.getCount()%2==0){ // double click
 	    IPane p = getPaneAt(me);
 	    if(fullScreenPane==null){ if(p!=null) enableFullScreen(p); }
 	    else disableFullScreen();
 	}
     }
-
     
-    public void keyPressed(KeyEvent e){
+    public void keyPressed(IKeyEvent e){
 	// toggle screen by space key
 	// shortcut for toggle of full screen is changed to shift+space (to use space for play & stop simulation) 2011/12/24
 	if(e.getKeyCode()==KeyEvent.VK_SPACE && e.isShiftDown()){
@@ -153,6 +153,5 @@ public class IScreenTogglePanel extends IPanel{
 	}
 	super.keyPressed(e);
     }
-    
     
 }

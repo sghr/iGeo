@@ -159,6 +159,9 @@ public /*interface*/ class IConfig{
     
     /** enable depth test in GL graphics / depth sort in P3D graphics. if there are many faces, this makes it very slow to deisplay */
     public static boolean depthSort=true;
+
+    /** forcefully disable depth test in GL */
+    public static boolean disableDepthTest = false;
     
     
     /** if number of objects exceeds this, it automatically turn off depth sort in P3D. if number is negative, number is not checked. */
@@ -274,6 +277,7 @@ public /*interface*/ class IConfig{
     /** foceStayOnWallOnce option is removed. Insteady IWall inserts intersection point into trajectory curve.
 	see IConfig.insertBouncePointInTrajectory */
     //public static boolean forceStayOnWallOnce = false; //true;
+
     
     /** Boolean option to turn on/off inserting an interesection point on IWall when bouncing into
 	a trajectory curve of ITrajectoryI. Default is true */
@@ -429,13 +433,17 @@ public /*interface*/ class IConfig{
     /** when NURBS geometry is created at a constructor, checking validity (not infinite nor NaN) of numbers if this is true. */
     public static boolean checkValidControlPoint=true;
 
-
+    
     /*************************************************************************************
      * AI Export
      ************************************************************************************/
     public static double defaultAIExportScale = 0.00001; //0.01;
     public static double defaultAIExportPixelScale = 0.1; //0.01;
     
+    /*************************************************************************************
+     * Rhino 3dm Import
+     ************************************************************************************/
+    public static boolean read3dmUserData = false;
     
     /*************************************************************************************
      * Text Object Property

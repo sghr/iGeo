@@ -73,9 +73,13 @@ public class IArc extends ICurve{
     public IArc(IVecI center, IVecI startPt, IVecI endPt, boolean flipArcSide){
 	this((IServerI)null,center,startPt,endPt,flipArcSide);
     }
+    /*
+    // IArc(IVecI center,IVecI startPt,IVecI endPt) is replaced with IArc(IVecI artStartPt,IVecI arcMidPt, IVecI arcEndPt).
+    // For the original purpose, please use IArc(IVecI center, IVecI startPt, IVecI endPt, boolean flipArcSide=false)
     public IArc(IVecI center, IVecI startPt, IVecI endPt){
 	this((IServerI)null,center,startPt,endPt);
     }
+    */
     public IArc(IVecI center, IVecI startPt, IVecI midPt, IVecI endPt, IVecI normal){
 	this((IServerI)null,center,startPt,midPt,endPt,normal);
     }
@@ -96,6 +100,10 @@ public class IArc extends ICurve{
     }
     public IArc(IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, double radius, boolean flipArcSide){
 	this((IServerI)null, sharedLinePt,line1Pt,line2Pt,radius,flipArcSide);
+    }
+    
+    public IArc(IVecI arcStartPt, IVecI arcMidPt, IVecI arcEndPt){
+	this((IServerI)null, arcStartPt, arcMidPt, arcEndPt);
     }
     
     public IArc(IServerI s, IVecI center, IVecI normal, IVecI startPt, double angle){
@@ -119,9 +127,11 @@ public class IArc extends ICurve{
     public IArc(IServerI s, IVecI center, IVecI startPt, IVecI endPt, boolean flipArcSide){
 	super(s, new IArcGeo(center,startPt,endPt,flipArcSide));
     }
+    /*
     public IArc(IServerI s, IVecI center, IVecI startPt, IVecI endPt){
 	super(s, new IArcGeo(center,startPt,endPt,false));
     }
+    */
     public IArc(IServerI s, IVecI center, IVecI startPt, IVecI midPt, IVecI endPt, IVecI normal){
 	super(s, new IArcGeo(center,startPt,midPt,endPt,normal));
     }
@@ -143,7 +153,9 @@ public class IArc extends ICurve{
     public IArc(IServerI s,IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, double radius, boolean flipArcSide){
 	super(s, new IArcGeo(sharedLinePt,line1Pt,line2Pt,radius,flipArcSide));
     }
-    
+    public IArc(IServerI s, IVecI arcStartPt, IVecI arcMidPt, IVecI arcEndPt){
+	super(s, new IArcGeo(arcStartPt, arcMidPt, arcEndPt));
+    }
     
     
     /******************************************************************************
@@ -165,6 +177,7 @@ public class IArc extends ICurve{
     public IArc clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IArc clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IArc clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IArc clr(IObject o){ super.clr(o); return this; }
     
     public IArc clr(Color c){ super.clr(c); return this; }
     public IArc clr(Color c, int alpha){ super.clr(c,alpha); return this; }

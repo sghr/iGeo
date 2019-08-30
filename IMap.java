@@ -61,10 +61,10 @@ public class IMap{
     
     public double get(IVec2I v){ return get(v.x(),v.y()); }
     
-    public void initDensityMapU(){ initDensityMapU(defaultDensityWidth, defaultDensityHeight); }
-    public void initDensityMapV(){ initDensityMapV(defaultDensityWidth, defaultDensityHeight); }
+    public IMap initDensityMapU(){ initDensityMapU(defaultDensityWidth, defaultDensityHeight); return this; }
+    public IMap initDensityMapV(){ initDensityMapV(defaultDensityWidth, defaultDensityHeight); return this; }
     
-    public void initDensityMapU(int width, int height){
+    public IMap initDensityMapU(int width, int height){
 	uIntegration = new IDoubleMap(width+1,height);
 	
 	for(int j=0; j<height; j++){
@@ -83,8 +83,9 @@ public class IMap{
 		else uIntegration.map[i][j]/=(double)i/width;
 	    }
 	}
+	return this;
     }
-    public void initDensityMapV(int width, int height){
+    public IMap initDensityMapV(int width, int height){
 	vIntegration = new IDoubleMap(width,height+1);
 	
 	for(int i=0; i<width; i++){
@@ -104,35 +105,35 @@ public class IMap{
 		else vIntegration.map[i][j]/=(double)j/height;
 	    }
 	}
+	return this;
     }
     
     
+    public IMap scaleDensityMapU(double factor){ uIntegration.scale(factor); return this; }
+    public IMap scaleDensityMapV(double factor){ vIntegration.scale(factor); return this; }
     
-    
-    
-    public void scaleDensityMapU(double factor){ uIntegration.scale(factor); }
-    public void scaleDensityMapV(double factor){ vIntegration.scale(factor); }
-    
-    public void matchUDensityWithMap(IMap map, double u, double v){
-	matchUDensityWithMap(map,u,u+densityMinDelta,v);
+    public IMap matchUDensityWithMap(IMap map, double u, double v){
+	matchUDensityWithMap(map,u,u+densityMinDelta,v); return this;
     }
-    public void matchUDensityWithMap(IMap map, double u1, double u2, double v){
+    public IMap matchUDensityWithMap(IMap map, double u1, double u2, double v){
 	double upos11 = this.projectU(u1,v);
 	double upos12 = this.projectU(u2,v);
 	double upos21 = map.projectU(u1,v);
 	double upos22 = map.projectU(u2,v);
 	this.scaleDensityMapU((upos22-upos21)/(upos12-upos11));
+	return this;
     }
     
-    public void matchVDensityWithMap(IMap map, double u, double v){
-	matchVDensityWithMap(map,u,v,v+densityMinDelta);
+    public IMap matchVDensityWithMap(IMap map, double u, double v){
+	matchVDensityWithMap(map,u,v,v+densityMinDelta); return this;
     }
-    public void matchVDensityWithMap(IMap map, double u, double v1, double v2){
+    public IMap matchVDensityWithMap(IMap map, double u, double v1, double v2){
 	double vpos11 = this.projectU(u,v1);
 	double vpos12 = this.projectU(u,v2);
 	double vpos21 = map.projectU(u,v1);
 	double vpos22 = map.projectU(u,v2);
 	this.scaleDensityMapV((vpos22-vpos21)/(vpos12-vpos11));
+	return this;
     }
     
     
@@ -229,11 +230,11 @@ public class IMap{
     /**
        to be defined in sub class
     */
-    public void flipU(){}
+    public IMap flipU(){ return this; }
     /**
        to be defined in sub class
     */
-    public void flipV(){}
+    public IMap flipV(){ return this; }
     
     
     /**

@@ -37,6 +37,6 @@ public class IAddMap extends IMap{
 	if(val<0) return 0;
 	return val;
     }
-    public void flipU(){ map1.flipU(); map2.flipU(); } //is it ok to modify the original?
-    public void flipV(){ map1.flipV(); map2.flipV(); } //is it ok to modify the original?
+    public IAddMap flipU(){ map1.flipU(); map2.flipU(); return this; } //is it ok to modify the original?
+    public IAddMap flipV(){ map1.flipV(); map2.flipV(); return this; } //is it ok to modify the original?
 }

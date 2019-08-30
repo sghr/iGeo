@@ -39,13 +39,14 @@ public class ISurfaceDensityMap extends IMap{
 	initMap();
     }
     
-    public void initMap(){
+    public ISurfaceDensityMap initMap(){
 	orig = surface.corner(0,0).get();
 	uvec = surface.corner(1,0).diff(orig).get();
 	vvec = surface.corner(0,1).diff(orig).get();
+	return this;
     }
     
-    public void initDensityMapU(int width, int height){ } // do nothing
+    public ISurfaceDensityMap initDensityMapU(int width, int height){ return this; } // do nothing
     
     public double projectU(double u, double v){
 	IVec pt = surface.pt(u,v).get();

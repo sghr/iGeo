@@ -36,6 +36,6 @@ public class IMinMap extends IMap{
 	if(v1<v2) return v1;
 	return v2;
     }
-    public void flipU(){ map1.flipU(); map2.flipU(); } //is it ok to modify the original?
-    public void flipV(){ map1.flipV(); map2.flipV(); } //is it ok to modify the original?
+    public IMinMap flipU(){ map1.flipU(); map2.flipU(); return this; } //is it ok to modify the original?
+    public IMinMap flipV(){ map1.flipV(); map2.flipV(); return this; } //is it ok to modify the original?
 }

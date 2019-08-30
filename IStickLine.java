@@ -159,6 +159,7 @@ public class IStickLine extends ICurve implements IDynamics{
     public IStickLine clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IStickLine clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IStickLine clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IStickLine clr(IObject o){ super.clr(o); return this; }
     public IStickLine clr(Color c){ super.clr(c); return this; }
     public IStickLine clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IStickLine clr(Color c, float alpha){ super.clr(c,alpha); return this; }

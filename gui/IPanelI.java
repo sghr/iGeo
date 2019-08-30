@@ -59,22 +59,22 @@ public interface IPanelI extends IServerI, MouseListener, MouseMotionListener, M
     /** returns current pane; if null, it returns first pane. */
     public IPane currentPane();
     
-    /*
+    
     public void mousePressed(IMouseEvent e);
     public void mouseReleased(IMouseEvent e);
     public void mouseClicked(IMouseEvent e);
-    public void mouseEntered(IMouseEvent e);
-    public void mouseExited(IMouseEvent e);
+    //public void mouseEntered(IMouseEvent e);
+    //public void mouseExited(IMouseEvent e);
     public void mouseMoved(IMouseEvent e);
     public void mouseDragged(IMouseEvent e);
-    */
+    
+    public void mouseWheelMoved(IMouseWheelEvent e);
+    
+    public void keyPressed(IKeyEvent e);
+    public void keyReleased(IKeyEvent e);
+    public void keyTyped(IKeyEvent e);
+    
     /*
-    public void mouseWheelMoved(MouseWheelEvent e);
-    public void keyPressed(KeyEvent e);
-    public void keyReleased(KeyEvent e);
-    public void keyTyped(KeyEvent e);
-    
-    
     public void focusLost(FocusEvent e);
     public void focusGained(FocusEvent e);
     

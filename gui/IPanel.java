@@ -139,7 +139,14 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	    startDynamicServer=false;
 	}
     }
-    
+
+    public void stopDynamicServer(){
+	if(ig!=null &&ig.dynamicServer()!=null){
+	    ig.dynamicServer().stop();
+	    startDynamicServer=false;
+	}
+    }
+
     public void skipAutoFocus(){ skipAutoFocus=true; }
     
     public void predraw(IGraphics g){
@@ -204,11 +211,7 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	return panes.get(0);
     }
     
-    
-    public void mousePressed(MouseEvent e){
-	//IG.err();
-	
-	IMouseEvent me = new IMouseEvent(e);
+    public void mousePressed(IMouseEvent me){
 	IPane p = getPaneAt(me);
 	if(p!=null){
 	    currentMousePane = p;
@@ -218,8 +221,12 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	    IOut.err("no pane"); //
 	}
     }
-    public void mouseReleased(MouseEvent e){
-	IMouseEvent me = new IMouseEvent(e);
+    
+    public void mousePressed(MouseEvent e){
+	mousePressed(new IMouseEvent(e));
+    }
+    
+    public void mouseReleased(IMouseEvent me){
 	IPane p=null;
 	if(currentMousePane!=null){
 	    //p = currentMousePane;
@@ -235,8 +242,16 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	    }
 	}
     }
+    
+    public void mouseReleased(MouseEvent e){
+	mouseReleased(new IMouseEvent(e));
+    }
+
     public void mouseClicked(MouseEvent e){
-	IMouseEvent me = new IMouseEvent(e);
+	mouseClicked(new IMouseEvent(e));
+    }
+    
+    public void mouseClicked(IMouseEvent me){
 	IPane p = getPaneAt(me);
 	if(p!=null){ p.mouseClicked(me); }
 	
@@ -245,9 +260,9 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	
 	currentMousePane = p; // update
     }
+    
+    
     public void mouseEntered(MouseEvent e){
-	//IG.err();
-	
 	//IPane p = getPaneAt(e);
 	//if(p!=null){ currentMousePane = p; }
 	
@@ -258,19 +273,24 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	//IPane p = getPaneAt(e);
 	//if(p!=null){ p.mouseExited(e); }
     }
+    
+
     public void mouseMoved(MouseEvent e){
-	//IG.err();
-	
-	IMouseEvent me = new IMouseEvent(e);
+	mouseMoved(new IMouseEvent(e));
+    }
+    
+    public void mouseMoved(IMouseEvent me){
 	IPane p = getPaneAt(me);
 	if(p!=null){
 	    p.mouseMoved(me);
 	}
     }
+
     public void mouseDragged(MouseEvent e){
-	//IG.err();
-	
-	IMouseEvent me = new IMouseEvent(e);
+	mouseDragged(new IMouseEvent(e));
+    }
+    
+    public void mouseDragged(IMouseEvent me){
 	IPane p=null;
 	if(currentMousePane!=null){ p = currentMousePane; }
 	else{ p = getPaneAt(me); }
@@ -279,11 +299,10 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	}
     }
     
-    
     public void mouseWheelMoved(MouseWheelEvent e){
-	//IG.err();
-	
-	IMouseWheelEvent me = new IMouseWheelEvent(e);
+	mouseWheelMoved(new IMouseWheelEvent(e));
+    }
+    public void mouseWheelMoved(IMouseWheelEvent me){
 	if(currentMousePane!=null){ currentMousePane.mouseWheelMoved(me); }
 	/*
 	IPane p = getPaneAt(e);
@@ -294,17 +313,17 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	*/
     }
     
-    
     public void keyPressed(KeyEvent e){
-	//IG.err();
-	
+	keyPressed(new IKeyEvent(e));
+    }
+    
+    public void keyPressed(IKeyEvent e){
 	int key = e.getKeyCode();
 	boolean shift = e.isShiftDown();
 	boolean control = e.isControlDown();
-
+	
 	// for mac
 	if(e.isMetaDown()){ control = true; }
-	
 	
 	if(key==KeyEvent.VK_F && /*!shift &&*/!control){
 	    currentMousePane.focus();
@@ -349,6 +368,7 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	else if( (key==KeyEvent.VK_W || key==KeyEvent.VK_Q)
 		 && control&& !shift){ // to match with Processing closing behavior
 	    if(!ig.isOnline()){
+		stopDynamicServer();
 		System.exit(0); // temporary.
 	    }
 	    // if applet, this doesn't quit by key
@@ -370,17 +390,21 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	    //else{ ig.resumeDynamics(); }
 	}
 	
-	//if(currentMousePane!=null){ currentMousePane.keyPressed(e); }
-	if(currentMousePane!=null){ currentMousePane.keyPressed(new IKeyEvent(e)); }
+	if(currentMousePane!=null){ currentMousePane.keyPressed(e); }
     }
     public void keyReleased(KeyEvent e){
-	//IG.err();
-	if(currentMousePane!=null){ currentMousePane.keyReleased(new IKeyEvent(e)); }
+	keyReleased(new IKeyEvent(e));
+    }
+    public void keyReleased(IKeyEvent e){
+	if(currentMousePane!=null){ currentMousePane.keyReleased(e); }
     }
     public void keyTyped(KeyEvent e){
-	//IG.err();
-	if(currentMousePane!=null){ currentMousePane.keyTyped(new IKeyEvent(e)); }
+	keyTyped(new IKeyEvent(e));
     }
+    public void keyTyped(IKeyEvent e){
+	if(currentMousePane!=null){ currentMousePane.keyTyped(e); }
+    }
+    
     
     public void focusLost(FocusEvent e){
 	//IG.err();

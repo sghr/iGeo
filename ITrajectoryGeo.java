@@ -44,6 +44,13 @@ public class ITrajectoryGeo extends IDynamicsBase implements ITrajectoryI{
     public ITrajectoryGeo(IPointAgent agent){ super(agent); pos = agent.pos(); degree=1; initTrajectory(); }
     public ITrajectoryGeo(IPointAgent agent, int curveDegree){ super(agent); pos = agent.pos(); degree=curveDegree; initTrajectory(); }
     
+    public ITrajectoryGeo(ITrajectoryGeo traj){
+	super((IDynamicsBase)traj);
+	degree = traj.degree;
+	curve = traj.curve.dup();
+	pos = traj.pos.dup();
+    }
+    
     public void initTrajectory(){
 	update(); // add first point // added 2013/02/13
     }
@@ -71,19 +78,7 @@ public class ITrajectoryGeo extends IDynamicsBase implements ITrajectoryI{
 	return this;
     }
     
-    public void update(){
-	addCP(pos.get().dup());
-	/*
-	if(curve==null){
-	    curve = new ICurve(pos.get().dup());
-	    if(parent!=null){
-		if(parent.attr()!=null){ curve.attr(parent.attr()); }
-		else if(parent.clr()!=null){ curve.clr(parent.clr()); }
-	    }
-	}
-	else{ curve.addCP(pos.get().dup(), degree); }
-	*/
-    }
+    public void update(){ addCP(pos.get().dup()); }
     
     
     // Curve Object methods
@@ -92,6 +87,7 @@ public class ITrajectoryGeo extends IDynamicsBase implements ITrajectoryI{
     public ITrajectoryGeo clr(IColor c, int alpha){ if(curve!=null) curve.clr(c,alpha); return this; }
     public ITrajectoryGeo clr(IColor c, float alpha){ if(curve!=null) curve.clr(c,alpha); return this; }
     public ITrajectoryGeo clr(IColor c, double alpha){ if(curve!=null) curve.clr(c,alpha); return this; }
+    public ITrajectoryGeo clr(IObject o){ if(curve!=null) curve.clr(o); return this; }
     //public ITrajectoryGeo clr(Color c){ if(curve!=null) curve.clr(c); return this; }
     //public ITrajectoryGeo clr(Color c, int alpha){ if(curve!=null) curve.clr(c,alpha); return this; }
     //public ITrajectoryGeo clr(Color c, float alpha){ if(curve!=null) curve.clr(c,alpha); return this; }

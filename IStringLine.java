@@ -176,6 +176,7 @@ public class IStringLine extends ICurve implements IDynamics{
     public IStringLine clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IStringLine clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IStringLine clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IStringLine clr(IObject o){ super.clr(o); return this; }
     public IStringLine clr(Color c){ super.clr(c); return this; }
     public IStringLine clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IStringLine clr(Color c, float alpha){ super.clr(c,alpha); return this; }

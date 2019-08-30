@@ -154,6 +154,19 @@ public class IArcGeo extends ICurveGeo{
     public IArcGeo(IVecI sharedLinePt, IVecI line1Pt, IVecI line2Pt, double radius, boolean flipArcSide){
 	init(sharedLinePt,line1Pt,line2Pt,radius,flipArcSide);
     }
+
+    public IArcGeo(IVecI arcStartPt, IVecI arcMidPt, IVecI arcEndPt){
+	IVec nml = arcStartPt.get().nml(arcMidPt, arcEndPt);
+	IVec dir1 = arcMidPt.get().dif(arcStartPt);
+	IVec dir2 = arcEndPt.get().dif(arcMidPt);
+	IVec mid1 = arcMidPt.get().mid(arcStartPt);
+	IVec mid2 = arcEndPt.get().mid(arcMidPt);
+	
+	dir1.rot(nml,Math.PI/2);
+	dir2.rot(nml,Math.PI/2);
+	IVec center = IVec.intersect(mid1, mid1.cp(dir1), mid2, mid2.cp(dir2));
+	init(center, arcStartPt, arcMidPt, arcEndPt, nml);
+    }
     
     public void init(IVecI center, IVecI normal, IVecI startPt, IDoubleI angle){
 	this.center = center;
@@ -209,7 +222,7 @@ public class IArcGeo extends ICurveGeo{
         if( ang>0 && mangle<0 ) ang = -(Math.PI*2 - ang);
         else if( ang<0 && mangle>0) ang = Math.PI*2 + ang;
         if(ang<0){ normal.neg(); ang = -ang; }
-        normal.neg(); // why?
+        //normal.neg(); // why? // commented out 20150903
         init(center,normal,startPt,new IDouble(ang));
     }
     

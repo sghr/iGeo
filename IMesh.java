@@ -534,37 +534,67 @@ public class IMesh extends IGeometry implements IMeshI{
     
     
     // necessary? shold this be here?
-    synchronized public IMesh addFace(IFace f){ mesh.addFace(f); return this; }
-    synchronized public IMesh addFace(IFace f, boolean checkExistingVertex, boolean checkExistingEdge, boolean checkExistingFace){ mesh.addFace(f,checkExistingVertex,checkExistingEdge,checkExistingFace); return this; }
+    synchronized public IMesh addFace(IFace f){ mesh.addFace(f); updateGraphic(); return this; }
+    synchronized public IMesh addFace(IFace f, boolean checkExistingVertex, boolean checkExistingEdge, boolean checkExistingFace){
+	mesh.addFace(f,checkExistingVertex,checkExistingEdge,checkExistingFace); updateGraphic(); return this;
+    }
     
     // OpenGL way of adding mesh faces
-    synchronized public IMesh addTriangles(IVertex[] v){ mesh.addTriangles(v); resetGraphic(); return this; }
-    synchronized public IMesh addTriangles(IVec[] v){ mesh.addTriangles(v); resetGraphic(); return this; }
-    synchronized public IMesh addQuads(IVertex[] v){ mesh.addQuads(v); resetGraphic(); return this; }
-    synchronized public IMesh addQuads(IVec[] v){ mesh.addQuads(v); resetGraphic(); return this; }
-    synchronized public IMesh addPolygon(IVertex[] v){ mesh.addPolygon(v); resetGraphic(); return this; }
-    synchronized public IMesh addPolygon(IVec[] v){ mesh.addPolygon(v); resetGraphic(); return this; }
-    synchronized public IMesh addTriangleStrip(IVertex[] v){ mesh.addTriangleStrip(v); resetGraphic(); return this; }
-    synchronized public IMesh addTriangleStrip(IVec[] v){ mesh.addTriangleStrip(v); resetGraphic(); return this; }
-    synchronized public IMesh addQuadStrip(IVertex[] v){ mesh.addQuadStrip(v); resetGraphic(); return this; }
-    synchronized public IMesh addQuadStrip(IVec[] v){ mesh.addQuadStrip(v); resetGraphic(); return this; }
-    synchronized public IMesh addTriangleFan(IVertex[] v){ mesh.addTriangleFan(v); resetGraphic(); return this; }
-    synchronized public IMesh addTriangleFan(IVec[] v){ mesh.addTriangleFan(v); resetGraphic(); return this; }
+    synchronized public IMesh addTriangles(IVertex[] v){ mesh.addTriangles(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addTriangles(IVec[] v){ mesh.addTriangles(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addQuads(IVertex[] v){ mesh.addQuads(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addQuads(IVec[] v){ mesh.addQuads(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addPolygon(IVertex[] v){ mesh.addPolygon(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addPolygon(IVec[] v){ mesh.addPolygon(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addTriangleStrip(IVertex[] v){ mesh.addTriangleStrip(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addTriangleStrip(IVec[] v){ mesh.addTriangleStrip(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addQuadStrip(IVertex[] v){ mesh.addQuadStrip(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addQuadStrip(IVec[] v){ mesh.addQuadStrip(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addTriangleFan(IVertex[] v){ mesh.addTriangleFan(v); updateGraphic(); /*resetGraphic();*/ return this; }
+    synchronized public IMesh addTriangleFan(IVec[] v){ mesh.addTriangleFan(v); updateGraphic(); /*resetGraphic();*/ return this; }
     
     
     // so far only for IMeshGeo and IMesh
     /** triangulate quad mesh to triangles */
-    public IMesh triangulate(){ mesh.triangulate(); resetGraphic(); return this; }
+    public IMesh triangulate(){ mesh.triangulate(); updateGraphic(); /*resetGraphic();*/ return this; }
     /** triangulate quad mesh to triangles */
-    public IMesh triangulate(boolean triangulateDir){ mesh.triangulate(triangulateDir); resetGraphic(); return this; }
+    public IMesh triangulate(boolean triangulateDir){ mesh.triangulate(triangulateDir); updateGraphic(); /*resetGraphic();*/ return this; }
     
     /** returns naked edges of the mesh */
     public IEdge[] nakedEdges(){ return mesh.nakedEdges(); }
 
-    
+    /** simply subdivide one trianlge into 4 triangles */
     public IMesh subdivide(){ return new IMesh(mesh.subdivide()); }
     
+    /** Loop-subdivision */
+    public IMesh loopSubD(){ return loopSubdivide(); }
+    /** Loop-subdivision */
+    public IMesh loopSubdivide(){ return new IMesh(mesh.loopSubdivide()); }
     
+    /** Loop-subdivision */
+    public IMesh loopSubD(IVec[] fixedEdges){ return loopSubdivide(fixedEdges); }
+    /** Loop-subdivision */
+    public IMesh loopSubdivide(IVec[] fixedEdges){
+	return new IMesh(mesh.loopSubdivide(fixedEdges));
+    }
+    
+
+    /** offset each vertex towards vertex normal and return the mesh. It modifies the exisiting mesh instead of creating new one. 
+	@param offsetList An array of offset distance of each vertex. Size and order of the array needs to match with vertex size and order. If the array size is smaller than vertex size, the last member is applied to the remaining. 
+    */
+    public IMesh offset(double[] offsetList){ mesh.offset(offsetList); return this; }
+    
+    /** offset each vertex towards vertex normal and return the mesh. It modifies the exisiting mesh instead of creating new one. 
+	@param offsetDist offset distance.
+    */
+    public IMesh offset(double offsetDist){ mesh.offset(offsetDist); return this; }
+    
+    public IMesh unifyNormal(){ mesh.unifyNormal(); return this; }
+    public IMesh unifyNml(){ mesh.unifyNml(); return this; }
+    public IMesh unifyNml(int faceIdx){ mesh.unifyNml(faceIdx); return this; }
+    
+
+
     synchronized public IMesh name(String nm){ super.name(nm); return this; }
     synchronized public IMesh layer(ILayer l){ super.layer(l); return this; }
     synchronized public IMesh layer(String l){ super.layer(l); return this; }
@@ -579,6 +609,7 @@ public class IMesh extends IGeometry implements IMeshI{
     synchronized public IMesh clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     synchronized public IMesh clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     synchronized public IMesh clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    synchronized public IMesh clr(IObject o){ super.clr(o); return this; }
     synchronized public IMesh clr(Color c){ super.clr(c); return this; }
     synchronized public IMesh clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     synchronized public IMesh clr(Color c, float alpha){ super.clr(c,alpha); return this; }

@@ -991,9 +991,19 @@ public class PIGraphics3D extends PGraphics3D
 	vertex((float)p.x, (float)p.y, (float)p.z);
     }
     
+    public void vertex(IVec p, IVec2f uv){
+	vertex((float)p.x, (float)p.y, (float)p.z, uv.x, uv.y);
+    }
+    
     public void vertex(IVec[] p){
 	for(int i=0; i<p.length; i++){
 	    vertex((float)p[i].x, (float)p[i].y, (float)p[i].z);
+	}
+    }
+    
+    public void vertex(IVec[] p, IVec2f[] uv){
+	for(int i=0; i<p.length; i++){
+	    vertex((float)p[i].x, (float)p[i].y, (float)p[i].z, uv[i].x, uv[i].y);
 	}
     }
     
@@ -1002,6 +1012,17 @@ public class PIGraphics3D extends PGraphics3D
 	    super.normal((float)n[i].x, (float)n[i].y, (float)n[i].z);
 	    vertex((float)p[i].x, (float)p[i].y, (float)p[i].z);
 	}
+    }
+    
+    public void vertex(IVec[] p, IVec[] n, IVec2f[] uv){
+	for(int i=0; i<p.length; i++){
+	    super.normal((float)n[i].x, (float)n[i].y, (float)n[i].z);
+	    vertex((float)p[i].x, (float)p[i].y, (float)p[i].z, uv[i].x, uv[i].y);
+	}
+    }
+    
+    public void vertexTexture(IVec2f uv){
+	super.vertexTexture(uv.x,uv.y);
     }
     
     public void normal(IVec n){
@@ -1187,6 +1208,19 @@ public class PIGraphics3D extends PGraphics3D
 	//vertex(p);
 	super.endShape(CLOSE);
     }
+    public void drawPolygon(IVec[] p, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(POLYGON);
+	for(int i=0; i<p.length; i++){
+	    if(IConfig.cullVertexBehindViewInP3D){
+		if(isInFront(p[i])){ vertex(p[i],uv[i]); }
+	    }
+	    else{ vertex(p[i],uv[i]); }
+	}
+	//vertex(p);
+	super.endShape(CLOSE);
+    }
     public void drawPolygon(IVec[] p, IVec[] n){
 	super.stroke= false;
 	super.fill = true;
@@ -1196,6 +1230,19 @@ public class PIGraphics3D extends PGraphics3D
 		if(isInFront(p[i])){ normal(n[i]); vertex(p[i]); }
 	    }
 	    else{ normal(n[i]); vertex(p[i]); }
+	}
+	//vertex(p,n);
+	super.endShape(CLOSE);
+    }
+    public void drawPolygon(IVec[] p, IVec[] n, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(POLYGON);
+	for(int i=0; i<p.length; i++){
+	    if(IConfig.cullVertexBehindViewInP3D){
+		if(isInFront(p[i])){ normal(n[i]); vertex(p[i],uv[i]); }
+	    }
+	    else{ normal(n[i]); vertex(p[i],uv[i]); }
 	}
 	//vertex(p,n);
 	super.endShape(CLOSE);
@@ -1319,6 +1366,29 @@ public class PIGraphics3D extends PGraphics3D
 	}
 	super.endShape();
     }
+    public void drawQuads(IVec[] p, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(QUADS);
+	for(int i=0; i<p.length-3; i+=4){
+	    if(IConfig.cullVertexBehindViewInP3D){
+		if(isInFront(p[i]) && isInFront(p[i+1]) &&
+		   isInFront(p[i+2]) && isInFront(p[i+3])){
+		    vertex(p[i],uv[i]);
+		    vertex(p[i+1],uv[i+1]);
+		    vertex(p[i+2],uv[i+2]);
+		    vertex(p[i+3],uv[i+3]);
+		}
+	    }
+	    else{
+		vertex(p[i],uv[i]);
+		vertex(p[i+1],uv[i+1]);
+		vertex(p[i+2],uv[i+2]);
+		vertex(p[i+3],uv[i+3]);
+	    }
+	}
+	super.endShape();
+    }
     public void drawQuads(IVec[] p, IVec[] n){
 	super.stroke= false;
 	super.fill = true;
@@ -1338,6 +1408,30 @@ public class PIGraphics3D extends PGraphics3D
 		normal(n[i+1]); vertex(p[i+1]);
 		normal(n[i+2]); vertex(p[i+2]);
 		normal(n[i+3]); vertex(p[i+3]);
+	    }
+	}
+	//vertex(p,n);
+	super.endShape();
+    }
+    public void drawQuads(IVec[] p, IVec[] n, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(QUADS);
+	for(int i=0; i<p.length-3; i+=4){
+	    if(IConfig.cullVertexBehindViewInP3D){
+		if(isInFront(p[i]) && isInFront(p[i+1]) &&
+		   isInFront(p[i+2]) && isInFront(p[i+3])){
+		    normal(n[i]); vertex(p[i], uv[i]);
+		    normal(n[i+1]); vertex(p[i+1], uv[i+1]);
+		    normal(n[i+2]); vertex(p[i+2], uv[i+2]);
+		    normal(n[i+3]); vertex(p[i+3], uv[i+3]);
+		}
+	    }
+	    else{
+		normal(n[i]); vertex(p[i], uv[i]);
+		normal(n[i+1]); vertex(p[i+1], uv[i+1]);
+		normal(n[i+2]); vertex(p[i+2], uv[i+2]);
+		normal(n[i+3]); vertex(p[i+3], uv[i+3]);
 	    }
 	}
 	//vertex(p,n);
@@ -1594,6 +1688,37 @@ public class PIGraphics3D extends PGraphics3D
 	    super.endShape();
 	}
     }
+    public void drawQuadStrip(IVec[] p, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    boolean previousFront=false;
+	    boolean isDrawing=false;
+	    for(int i=0; i<p.length-1; i+=2){
+		boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+		if(currentFront){
+		    if(isDrawing){
+			vertex(p[i], uv[i]);
+			vertex(p[i+1], uv[i+1]);
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			vertex(p[i], uv[i]);
+			vertex(p[i+1], uv[i+1]);
+			isDrawing=true;
+		    }
+		}
+		else if(isDrawing){ super.endShape(); isDrawing=false; }
+		previousFront = currentFront;
+	    }
+	    if(isDrawing){ super.endShape(); }
+	}
+	else{
+	    super.beginShape(QUAD_STRIP);
+	    for(int i=0; i<p.length; i++){ vertex(p[i]); }
+	    super.endShape();
+	}
+    }
     public void drawQuadStrip(IVec[] p, IVec[] n){
 	super.stroke= false;
 	super.fill = true;
@@ -1626,6 +1751,41 @@ public class PIGraphics3D extends PGraphics3D
 	else{
 	    super.beginShape(QUAD_STRIP);
 	    for(int i=0; i<p.length; i++){ normal(n[i]); vertex(p[i]); }
+	    super.endShape();
+	}
+    }
+    public void drawQuadStrip(IVec[] p, IVec[] n, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    boolean previousFront=false;
+	    boolean isDrawing=false;
+	    for(int i=0; i<p.length-1; i+=2){
+		boolean currentFront = isInFront(p[i]) && isInFront(p[i+1]);
+		if(currentFront){
+		    if(isDrawing){
+			normal(n[i]);
+			vertex(p[i], uv[i]);
+			normal(n[i+1]);
+			vertex(p[i+1], uv[i+1]);
+		    }
+		    else{
+			super.beginShape(QUAD_STRIP);
+			normal(n[i]);
+			vertex(p[i], uv[i]);
+			normal(n[i+1]);
+			vertex(p[i+1], uv[i+1]);
+			isDrawing=true;
+		    }
+		}
+		else if(isDrawing){ super.endShape(); isDrawing=false; }
+		previousFront = currentFront;
+	    }
+	    if(isDrawing){ super.endShape(); }
+	}
+	else{
+	    super.beginShape(QUAD_STRIP);
+	    for(int i=0; i<p.length; i++){ normal(n[i]); vertex(p[i], uv[i]); }
 	    super.endShape();
 	}
     }
@@ -1942,6 +2102,43 @@ public class PIGraphics3D extends PGraphics3D
 	    }
         }
     }
+    public void drawQuadMatrix(IVec[][] pts, IVec2f[][] uv){
+	super.stroke= false;
+	super.fill = true;
+        for(int i=0; i<pts.length-1; i++){
+	    
+	    if(IConfig.cullVertexBehindViewInP3D){
+		boolean previousFront=false;
+		boolean isDrawing=false;
+		for(int j=0; j<pts[i].length; j++){
+		    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+		    if(currentFront){
+			if(isDrawing){
+			    vertex(pts[i][j], uv[i][j]);
+			    vertex(pts[i+1][j], uv[i+1][j]);
+			}
+			else{
+			    super.beginShape(QUAD_STRIP);
+			    vertex(pts[i][j], uv[i][j]);
+			    vertex(pts[i+1][j], uv[i+1][j]);
+			    isDrawing=true;
+			}
+		    }
+		    else if(isDrawing){ super.endShape(); isDrawing=false; }
+		    previousFront = currentFront;
+		}
+		if(isDrawing){ super.endShape(); }
+	    }
+	    else{
+		super.beginShape(QUAD_STRIP);
+		for(int j=0; j<pts[i].length; j++){
+		    vertex(pts[i][j], uv[i][j]);
+		    vertex(pts[i+1][j], uv[i+1][j]);
+		}
+		super.endShape();
+	    }
+        }
+    }
     public void drawQuadMatrix(IVec[][] pts, IVec[][] nml){
 	
 	super.stroke= false;
@@ -1982,6 +2179,50 @@ public class PIGraphics3D extends PGraphics3D
 		    vertex(pts[i][j]);
 		    normal(nml[i+1][j]);
 		    vertex(pts[i+1][j]);
+		}
+		super.endShape();
+	    }
+        }
+    }
+    public void drawQuadMatrix(IVec[][] pts, IVec[][] nml, IVec2f[][] uv){
+	super.stroke= false;
+	super.fill = true;
+	
+        for(int i=0; i<pts.length-1; i++){
+	    
+	    if(IConfig.cullVertexBehindViewInP3D){
+		boolean previousFront=false;
+		boolean isDrawing=false;
+		for(int j=0; j<pts[i].length; j++){
+		    boolean currentFront = isInFront(pts[i][j]) && isInFront(pts[i+1][j]);
+		    if(currentFront){
+			if(isDrawing){
+			    normal(nml[i][j]);
+			    vertex(pts[i][j], uv[i][j]);
+			    normal(nml[i+1][j]);
+			    vertex(pts[i+1][j], uv[i+1][j]);
+			}
+			else{
+			    super.beginShape(QUAD_STRIP);
+			    normal(nml[i][j]);
+			    vertex(pts[i][j], uv[i][j]);
+			    normal(nml[i+1][j]);
+			    vertex(pts[i+1][j], uv[i+1][j]);
+			    isDrawing=true;
+			}
+		    }
+		    else if(isDrawing){ super.endShape(); isDrawing=false; }
+		    previousFront = currentFront;
+		}
+		if(isDrawing){ super.endShape(); }
+	    }
+	    else{
+		super.beginShape(QUAD_STRIP);
+		for(int j=0; j<pts[i].length; j++){
+		    normal(nml[i][j]);
+		    vertex(pts[i][j], uv[i][j]);
+		    normal(nml[i+1][j]);
+		    vertex(pts[i+1][j], uv[i+1][j]);
 		}
 		super.endShape();
 	    }
@@ -2392,6 +2633,27 @@ public class PIGraphics3D extends PGraphics3D
 	//vertex(p);
 	super.endShape();
     }
+    public void drawTriangles(IVec[] p, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(TRIANGLES);
+	for(int i=0; i<p.length-2; i+=3){
+	    if(IConfig.cullVertexBehindViewInP3D){
+		if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+		    vertex(p[i], uv[i]);
+		    vertex(p[i+1], uv[i]);
+		    vertex(p[i+2], uv[i]);
+		}
+	    }
+	    else{
+		vertex(p[i], uv[i]);
+		vertex(p[i+1], uv[i+1]);
+		vertex(p[i+2], uv[i+1]);
+	    }
+	}
+	//vertex(p);
+	super.endShape();
+    }
     public void drawTriangles(IVec[] p, IVec[] n){
 	super.stroke= false;
 	super.fill = true;
@@ -2408,6 +2670,27 @@ public class PIGraphics3D extends PGraphics3D
 		normal(n[i]); vertex(p[i]);
 		normal(n[i+1]); vertex(p[i+1]);
 		normal(n[i+2]); vertex(p[i+2]);
+	    }
+	}
+	//vertex(p,n);
+	super.endShape();
+    }
+    public void drawTriangles(IVec[] p, IVec[] n, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	super.beginShape(TRIANGLES);
+	for(int i=0; i<p.length-2; i+=3){
+	    if(IConfig.cullVertexBehindViewInP3D){
+		if(isInFront(p[i]) && isInFront(p[i+1]) && isInFront(p[i+2])){
+		    normal(n[i]); vertex(p[i], uv[i]);
+		    normal(n[i+1]); vertex(p[i+1], uv[i+1]);
+		    normal(n[i+2]); vertex(p[i+2], uv[i+2]);
+		}
+	    }
+	    else{
+		normal(n[i]); vertex(p[i], uv[i]);
+		normal(n[i+1]); vertex(p[i+1], uv[i+1]);
+		normal(n[i+2]); vertex(p[i+2], uv[i+2]);
 	    }
 	}
 	//vertex(p,n);
@@ -2655,6 +2938,43 @@ public class PIGraphics3D extends PGraphics3D
 	    super.endShape();
 	}
     }
+    public void drawTriangleStrip(IVec[] p, IVec2f[] uv){
+	if(p.length<3) return;
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    boolean isDrawing = false;
+	    boolean previous1Front = false;
+	    boolean previous2Front = false;
+	    for(int i=0; i<p.length; i++){
+		boolean isFront = isInFront(p[i]);
+		if(isFront){
+		    if(isDrawing){
+			vertex(p[i], uv[i]);
+		    }
+		    else{
+			super.beginShape(TRIANGLE_STRIP);
+			vertex(p[i], uv[i]);
+			isDrawing=true;
+		    }
+		}
+		else{
+		    if(isDrawing){
+			super.endShape();
+			isDrawing=false;
+		    }
+		}
+		previous2Front = previous1Front;
+		previous1Front = isFront;
+	    }
+	    if(isDrawing){ super.endShape(); }
+	}
+	else{
+	    super.beginShape(TRIANGLE_STRIP);
+	    vertex(p, uv);
+	    super.endShape();
+	}
+    }
     public void drawTriangleStrip(IVec[] p, IVec[] n){
 	if(p.length<3) return;
 	super.stroke= false;
@@ -2711,6 +3031,44 @@ public class PIGraphics3D extends PGraphics3D
 	else{
 	    super.beginShape(TRIANGLE_STRIP);
 	    vertex(p,n);
+	    super.endShape();
+	}
+    }
+    public void drawTriangleStrip(IVec[] p, IVec[] n, IVec2f[] uv){
+	if(p.length<3) return;
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    boolean isDrawing = false;
+	    boolean previous1Front = false; 
+	    boolean previous2Front = false;
+	    for(int i=0; i<p.length; i++){
+		boolean isFront = isInFront(p[i]);
+		if(isFront){
+		    if(isDrawing){
+			normal(n[i]);
+			vertex(p[i], uv[i]);
+		    }
+		    else{
+			super.beginShape(TRIANGLE_STRIP);
+			normal(n[i]);
+			vertex(p[i], uv[i]);
+		    }
+		}
+		else{
+		    if(isDrawing){
+			super.endShape();
+			isDrawing=false;
+		    }
+		}
+		previous2Front = previous1Front;
+		previous1Front = isFront;
+	    }
+	    if(isDrawing){ super.endShape(); }
+	}
+	else{
+	    super.beginShape(TRIANGLE_STRIP);
+	    vertex(p,n,uv);
 	    super.endShape();
 	}
     }
@@ -3025,6 +3383,27 @@ public class PIGraphics3D extends PGraphics3D
 	    super.endShape();
 	}
     }
+    public void drawTriangleFan(IVec[] p, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    super.beginShape(TRIANGLE_FAN);
+	    vertex(p[0],uv[0]);
+	    boolean firstFront=isInFront(p[0]);
+	    boolean prevFront= firstFront;
+	    for(int i=1; i<p.length; i++){
+		boolean currentFront = isInFront(p[i]);
+		if(firstFront||prevFront||currentFront){ vertex(p[i], uv[i]); }
+		prevFront=currentFront;
+	    }
+	    super.endShape();
+	}
+	else{
+	    super.beginShape(TRIANGLE_FAN);
+	    vertex(p, uv);
+	    super.endShape();
+	}
+    }
     public void drawTriangleFan(IVec[] p, IVec[] n){
 	super.stroke= false;
 	super.fill = true;
@@ -3049,7 +3428,30 @@ public class PIGraphics3D extends PGraphics3D
 	    super.endShape();
 	}
     }
-    
+    public void drawTriangleFan(IVec[] p, IVec[] n, IVec2f[] uv){
+	super.stroke= false;
+	super.fill = true;
+	if(IConfig.cullVertexBehindViewInP3D){
+	    super.beginShape(TRIANGLE_FAN);
+	    normal(n[0]);
+	    vertex(p[0],uv[0]);
+	    boolean firstFront=isInFront(p[0]);
+	    boolean prevFront= firstFront;
+	    for(int i=1; i<p.length; i++){
+		boolean currentFront = isInFront(p[i]);
+		if(firstFront||prevFront||currentFront){
+		    normal(n[i]); vertex(p[i], uv[i]);
+		}
+		prevFront=currentFront;
+	    }
+	    super.endShape();
+	}
+	else{
+	    super.beginShape(TRIANGLE_FAN);
+	    vertex(p,n,uv);
+	    super.endShape();
+	}
+    }
     public void drawTriangleFan(IVec[] p, IColor[] clr, float alpha, boolean light){
 	super.stroke= false;
 	super.fill = true;
@@ -3540,5 +3942,9 @@ public class PIGraphics3D extends PGraphics3D
     }
     */
     
+    public void beginTexture(ITexture tex){ // to be implemented
+    }
+    public void endTexture(){ // to be implemented
+    }
 }
 

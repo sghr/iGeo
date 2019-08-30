@@ -108,6 +108,7 @@ public class ISphere extends ISurface{
     public ISphere clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public ISphere clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public ISphere clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public ISphere clr(IObject o){ super.clr(o); return this; }
     
     public ISphere clr(Color c){ super.clr(c); return this; }
     public ISphere clr(Color c, int alpha){ super.clr(c,alpha); return this; }

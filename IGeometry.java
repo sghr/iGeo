@@ -67,6 +67,7 @@ public abstract class IGeometry extends IObject implements ITransformable{
     public IGeometry clr(IColor c, int alpha){ super.clr(c,alpha); return this; }
     public IGeometry clr(IColor c, float alpha){ super.clr(c,alpha); return this; }
     public IGeometry clr(IColor c, double alpha){ super.clr(c,alpha); return this; }
+    public IGeometry clr(IObject o){ super.clr(o); return this; }
     public IGeometry clr(Color c){ super.clr(c); return this; }
     public IGeometry clr(Color c, int alpha){ super.clr(c,alpha); return this; }
     public IGeometry clr(Color c, float alpha){ super.clr(c,alpha); return this; }

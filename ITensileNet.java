@@ -340,17 +340,32 @@ public class ITensileNet{
     /** class for a custom particle class */
     public static void particleClass(Class<? extends IParticleI> cls){ particleClass = cls; }
     
+    /** factory class for a custom particle class. factory's priority is higher than class */
+    public static IParticleFactory particleFactory=null;
+    /** factory class for a custom particle class */
+    public static void particleFactory(IParticleFactory f){ particleFactory = f; }
+    
     /** class for a custom tension class */
     public static Class<? extends ITensionI> tensionClass=null;
     /** class for a custom tension class */
     public static void tensionClass(Class<? extends ITensionI> cls){ tensionClass=cls; }
+    
+    /** factory class for a custom tension class. factory's priority is higher than class */
+    public static ITensionFactory tensionFactory=null;
+    /** factory class for a custom tension class */
+    public static void tensionFactory(ITensionFactory f){ tensionFactory = f; }
     
     /** class for a custom particle on curve class */
     public static Class<? extends IParticleOnCurveI> particleOnCurveClass=null;
     /** class for a custom particle on curve class */
     public static void particleOnCurveClass(Class<? extends IParticleOnCurveI> cls){ particleOnCurveClass=cls; }
     
-    /** constructor for a custom particle class */
+    /** factory class for a custom particle on curve class. factory's priority is higher than class */
+    public static IParticleOnCurveFactory particleOnCurveFactory=null;
+    /** factory class for a custom particleOnCurve class */
+    public static void particleOnCurveFactory(IParticleOnCurveFactory f){ particleOnCurveFactory = f; }
+    
+/** constructor for a custom particle class */
     //public static Constructor<? extends IParticleI> particleConstructor;
     /** constructor for a custom particle class */
     //public static void particleConstructor(Constructor<? extends IParticleI> c){ particleConstructor=c; }
@@ -424,7 +439,6 @@ public class ITensileNet{
     public ITensileNet(ArrayList<ITensionI> links, ArrayList<IParticleI> nodes, ArrayList<IStraightenerI> straighteners){
 	this.links = links; this.nodes = nodes; this.straighteners = straighteners;
     }
-    
     
     /**
        create a network of tension line.
@@ -951,7 +965,20 @@ public class ITensileNet{
 	    IParticleI ptcl=null;
 	    // custom particle class instantiation
 	    //if(particleConstructor!=null && particleConstructorParameters!=null){
-	    if(particleConst!=null){
+	    if(particleFactory != null){ // factory's priority is higher
+		ptcl = particleFactory.create(pointList.get(i), new IVec());
+		if(ptcl!=null){
+		    ptcl.fric(friction);
+		    if(ptcl instanceof IObject){
+			((IObject)ptcl).clr(pointColor);
+			if(pointLayer!=null) ((IObject)ptcl).layer(IG.layer(pointLayer).clr(pointColor));
+		    }
+		}
+	    }
+	    else if(particleConst!=null){
+		
+		//IG.err("instantiate ptcl @"+i+ "/"+pointList.size()+pointList.get(i).get()); //
+		
 		ptcl = getParticleInstance(pointList.get(i).get(), /**IVecI -> IVec **/
 					   particleConst.constructor,particleConst.parameters);
 		if(ptcl!=null){
@@ -1011,8 +1038,22 @@ public class ITensileNet{
 		// custom tension class instantiation
 		ConstructorAndParameters<ITensionI> tensionConst = null;
 		if(customTensionClass!=null) tensionConst = searchTensionConstructor(customTensionClass);
-		
-		if(tensionConst!=null){
+		if(tensionFactory!=null){ // factory's priority is higher
+		    tnsn = tensionFactory.create(pa1, pa2, tension);
+		    if(tnsn!=null){
+			if(tnsn instanceof IObject){
+			    if(tensionColor!=null) ((IObject)tnsn).clr(tensionColor);
+			    else if(linkColors[i]!=null) ((IObject)tnsn).clr(linkColors[i]);
+			    
+			    if(tensionLayer!=null) ((IObject)tnsn).layer(tensionLayer);
+			    else if(linkLayer[i]!=null) ((IObject)tnsn).layer(linkLayer[i]);
+			}
+			tnsn.tension(tension);
+			tnsn.constant(constantTension);
+			tlines.add(tnsn);
+		    }
+		}
+		else if(tensionConst!=null){
 		    tnsn = getTensionInstance(pa1,pa2,tensionConst.constructor,tensionConst.parameters);
 		    if(tnsn!=null){
 			if(tnsn instanceof IObject){
@@ -1155,6 +1196,8 @@ public class ITensileNet{
 	    
 	    for(int i=0; i<constructors.length; i++){
 		Class<?>[] param = constructors[i].getParameterTypes();
+
+		//IG.err("constructor["+i+"] = " + constructors[i]);
 		
 		if(param==null || param.length==0){
 		    constructorNull = constructors[i];
@@ -2151,34 +2194,49 @@ public class ITensileNet{
 						 Class<?>[] ptclConstructorParameters){
 	
 	IParticleI ptcl=null;
+	
+	//IG.err(); //
+	
 	try{
 	    if(ptclConstructorParameters.length==0){
+		//IG.err(1); //
 		ptcl =  ptclConstructor.newInstance();
 		ptcl.pos().set(pt); // would this always work?
 	    }
 	    else if(ptclConstructorParameters.length==1 &&
 		    ptclConstructorParameters[0] == IVecI.class){
+		//IG.err(2); //
 		ptcl =  ptclConstructor.newInstance(pt);
 	    }
 	    else if(ptclConstructorParameters.length==2 &&
 		    ptclConstructorParameters[0] == IVecI.class){
+		//IG.err(3); //
 		// second parameter is velocity (zero)
 		ptcl =  ptclConstructor.newInstance(pt,new IVec());
 	    }
 	    else if(ptclConstructorParameters.length==1 &&
 		    ptclConstructorParameters[0] == Object.class){
+		//IG.err(4); //
 		ptcl =  ptclConstructor.newInstance((Object)null);
 		ptcl.pos().set(pt); // would this always work?
 	    }
 	    else if(ptclConstructorParameters.length==2 &&
 		    ptclConstructorParameters[0] == Object.class){
+		//IG.err(5); //
 		ptcl =  ptclConstructor.newInstance(null, pt);
 	    }
 	    else if(ptclConstructorParameters.length==3 &&
 		    ptclConstructorParameters[0] == Object.class){
+		//IG.err(6); //
 		ptcl =  ptclConstructor.newInstance(null, pt, new IVec());
 	    }
-	}catch(Exception e){ e.printStackTrace(); }
+	}catch(Exception e){
+	    e.printStackTrace();
+	    //IG.err(e); //
+	}
+	
+	//IG.err("end"); //
+	
 	return ptcl;
     }
     
@@ -3221,7 +3279,21 @@ public class ITensileNet{
 	if(closenessTolerance >= 0 && minDist > closenessTolerance) return null; // no particle found
 	
 	//if(particleOnCurveConstructor!=null && particleOnCurveConstructorParameters!=null){
-	if(particleOnCurveConst!=null){
+
+	if(particleOnCurveFactory!=null){ // factory's priority is higher
+	    IParticleOnCurveI ptcl = particleOnCurveFactory.create(curve, minU, pos);
+	    
+	    if(ptcl!=null){
+		ptcl.friction(friction);
+		if(ptcl instanceof IObject){
+		    if(pointLayer!=null) ((IObject)ptcl).layer(IG.layer(pointLayer).clr(pointColor));
+		    ((IObject)ptcl).clr(railPointColor);
+		    
+		}
+		return ptcl;
+	    }
+	}
+	else if(particleOnCurveConst!=null){
 	    //IParticleOnCurveI ptcl = getParticleOnCurveInstance(curve,minU,pos);
 	    IParticleOnCurveI ptcl = getParticleOnCurveInstance(curve,minU,pos,
 								particleOnCurveConst.constructor,

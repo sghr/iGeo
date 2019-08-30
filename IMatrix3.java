@@ -85,6 +85,12 @@ public class IMatrix3 extends IMatrix implements IMatrix3I{
 	    +val[0][2]*det(val[1][0],val[1][1],val[2][0],val[2][1]);
     }
     
+    public static double determinant(double v00, double v01, double v02,
+				     double v10, double v11, double v12,
+				     double v20, double v21, double v22){
+	return v00*det(v11,v12,v21,v22) +v01*det(v12,v10,v22,v20) +v02*det(v10,v11,v20,v21);
+    }
+    
         
     public /*void*/ IMatrix3 invert(){
 	double det = determinant();

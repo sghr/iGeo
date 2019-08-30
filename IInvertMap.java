@@ -31,7 +31,7 @@ public class IInvertMap extends IMap{
     public IMap map;
     public IInvertMap(IMap m){ map = m; }
     public double get(double u, double v){ return 1.0 - map.get(u,v); }
-    public void flipU(){ map.flipU(); } //is it ok to modify the original?
-    public void flipV(){ map.flipV(); } //is it ok to modify the original?
+    public IInvertMap flipU(){ map.flipU(); return this; } //is it ok to modify the original?
+    public IInvertMap flipV(){ map.flipV(); return this; } //is it ok to modify the original?
 }
 
