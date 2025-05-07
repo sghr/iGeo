@@ -29,31 +29,31 @@ import igeo.gui.*;
 /**
    A class of server to contain and manage instances of IObject.
    Drawing function is separated to IGraphicServer.
-   
+
    @see IGraphicServer
-   
+
    @author Satoru Sugihara
 */
 public class IServer implements IServerI{
-    
+
     public ArrayList<IObject> objects; // elements
     //ArrayList<IGraphicObject> graphics;
     //public ArrayList<IDynamicObject> dynamics;
-    
+
     public ArrayList<ILayer> layers;
-    
+
     public IGraphicServer graphicServer; // non null in graphic mode
     public IDynamicServer dynamicServer; // non null when dynamic subobject is used
-    
+
     public IG ig; // parent
-    
+
     // for updating logic of other object referring IServer
     public int stateCount=0; // incremented when any change happens in the state
-    
-    
+
+
     public IUnit unit;
-    
-    
+
+    /*
     // non graphic mode
     public IServer(IG ig){
 	this.ig =ig;
@@ -63,35 +63,36 @@ public class IServer implements IServerI{
 	//graphicServer = new IGraphicServer(this);
 	dynamicServer = new IDynamicServer(this);
 	layers = new ArrayList<ILayer>();
-	
+
 	unit = new IUnit(); // default
     }
-    
-    // graphic mode
+    */
+
+    // panel==null: non-graphic mode ; panel!=null: graphic mode
     public IServer(IG ig, IPanelI panel){
 	this.ig =ig;
 	objects = new ArrayList<IObject>();
 	//graphics = new ArrayList<IGraphicObject>();
 	//dynamics = new ArrayList<IDynamicObject>();
 	//graphicServer = new IGraphicServer(this);
-	graphicServer = new IGraphicServer(this, panel);
+  if(panel!=null)	graphicServer = new IGraphicServer(this, panel);
 	dynamicServer = new IDynamicServer(this);
 	layers = new ArrayList<ILayer>();
-	
+
 	unit = new IUnit(); // default
     }
-    
+
     public IServer server(){ return this; }
     public IDynamicServer dynamicServer(){ return dynamicServer; }
-    
+
     public IGraphicServer graphicServer(){ return graphicServer; }
-    
-    
+
+
     public IUnit unit(){ return unit; }
     public void unit(IUnit u){ unit = u; }
     public void unit(IUnit.Type u){ unit = new IUnit(u); }
     public void unit(String unitName){ unit = new IUnit(unitName); }
-    
+
     public void add(IObject e){
 	//synchronized(IG.lock){
 	synchronized(ig){
@@ -103,7 +104,7 @@ public class IServer implements IServerI{
 	    updateState();
 	}
     }
-    
+
     /*
     public void add(IGraphicObject e){
 	synchronized(IG.lock){ graphics.add(e); }
@@ -120,14 +121,14 @@ public class IServer implements IServerI{
 	}
     }
     */
-    
+
     public boolean isGraphicMode(){ return graphicServer!=null; }
-    
+
     public void setGraphicMode(IGraphicMode mode){
 	if(graphicServer!=null) graphicServer.setMode(mode);
 	else{ IOut.err("graphicServer is null"); }
     }
-    
+
     public void bg(IColor c1, IColor c2, IColor c3, IColor c4){
 	if(graphicServer!=null) graphicServer.background(c1,c2,c3,c4);
 	else{ IOut.err("graphicServer is null"); }
@@ -146,11 +147,11 @@ public class IServer implements IServerI{
 	else{ IOut.err("graphicServer is null"); }
     }
     public void background(String imageFilename){ bg(imageFilename); }
-    
-    
+
+
     public ArrayList<IObject> getAllObjects(){ return allObjects(); }
     public ArrayList<IObject> allObjects(){ return objects; }
-    
+
     //public IObject getObject(int i){ return objects.get(i); }
     public IObject getObject(int i){ return object(i); }
     public IObject object(int i){
@@ -161,15 +162,15 @@ public class IServer implements IServerI{
     //public IDynamicObject getDynamicObject(int i){ return dynamics.get(i); }
     //public IDynamicObject getDynamicObject(int i){ return dynamicObject(i); }
     //public IDynamicObject dynamicObject(int i){ if(i<0||i>=dynamics.size()){ return null; } return dynamics.get(i); }
-    
+
     public int objectNum(){ return objects.size(); }
     /** alias of objectNum() */
     public int getObjectNum(){ return objectNum(); }
     //public int graphicObjectNum(){ return graphics.size(); }
     //public int dynamicObjectNum(){ return dynamics.size(); }
-    
-    
-    
+
+
+
     public void remove(int i){
 	if(i<0||i>=objects.size()) return;
 	//synchronized(IG.lock){
@@ -186,7 +187,7 @@ public class IServer implements IServerI{
 	    updateState();
 	}
     }
-    
+
     public void remove(IObject e){
 	//synchronized(IG.lock){
 	synchronized(ig){
@@ -204,8 +205,8 @@ public class IServer implements IServerI{
 	    updateState();
 	}
     }
-    
-    
+
+
     //public void removeGraphicObject(int i){ graphics.remove(i); }
     //public void removeGraphicObject(IGraphicObject g){ graphics.remove(g); }
     /*
@@ -223,9 +224,9 @@ public class IServer implements IServerI{
 	updateState();
     }
     */
-    
+
     //public void getGraphic(IGraphicObject e, IView v){ graphicServer.add(e,v); }
-    
+
     //public void delete(){ objects.clear(); }
     public void clear(){
 	objects.clear();
@@ -235,10 +236,10 @@ public class IServer implements IServerI{
 	layers.clear();
 	updateState(); // not clearing the number
     }
-    
+
     public int stateCount(){ return stateCount; }
     public void updateState(){ stateCount++; }
-    
+
     /*
     public void setGraphicMode(IGraphicMode mode){
 	//for(IObject e:objects) e.setGraphicMode(mode);
@@ -252,26 +253,26 @@ public class IServer implements IServerI{
 	}
     }
     */
-    
-    
+
+
     public void duration(int dur){ dynamicServer.duration(dur); }
     public int duration(){ return dynamicServer.duration(); }
-    
+
     public void time(int tm){ dynamicServer.time(tm); }
     public int time(){ return dynamicServer.time(); }
-    
+
     public void pause(){ dynamicServer.pause(); }
     public void resume(){ dynamicServer.resume(); }
     public boolean isRunning(){ return dynamicServer.isRunning(); }
-    
+
     public void start(){ dynamicServer.start(); }
     public void stop(){ dynamicServer.stop(); }
-    
-    
+
+
     /***********************************************************************
      * Object Selection
      **********************************************************************/
-    
+
     /** Returns all point objects contained in objects.
 	IPointR objects are not included.
     */
@@ -286,7 +287,7 @@ public class IServer implements IServerI{
     }
     /** alias of points() */
     public IPoint[] getPoints(){ return points(); }
-    
+
     /** Returns all curve objects contained in objects.
 	ICurveR objects are not included.
     */
@@ -301,8 +302,8 @@ public class IServer implements IServerI{
     }
     /** alias of curves() */
     public ICurve[] getCurves(){ return curves(); }
-    
-    
+
+
     /** Returns all polycurve objects contained in objects.
 	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
 	ICurve - IPolycurve relationship is still under work. This is temporary measure.
@@ -318,8 +319,8 @@ public class IServer implements IServerI{
     }
     /** alias of curves() */
     public IPolycurve[] getPolycurves(){ return polycurves(); }
-    
-    
+
+
     /** Returns all surface objects contained in objects.
 	ISurfaceR objects are not included.
     */
@@ -334,7 +335,7 @@ public class IServer implements IServerI{
     }
     /** alias of surfaces() */
     public ISurface[] getSurfaces(){ return surfaces(); }
-    
+
     /** Returns all meshe objects contained in objects.
 	IMeshR objects are not included.
     */
@@ -349,7 +350,7 @@ public class IServer implements IServerI{
     }
     /** alias of meshes() */
     public IMesh[] getMeshes(){ return meshes(); }
-    
+
     /** Returns all brep objects contained in objects. */
     public IBrep[] breps(){
 	ArrayList<IBrep> breps = new ArrayList<IBrep>();
@@ -362,7 +363,7 @@ public class IServer implements IServerI{
     }
     /** alias of breps */
     public IBrep[] getBreps(){ return breps(); }
-    
+
     /** Returns all text objects contained in objects. */
     public IText[] texts(){
 	ArrayList<IText> texts = new ArrayList<IText>();
@@ -375,7 +376,7 @@ public class IServer implements IServerI{
     }
     /** alias of texts */
     public IText[] getTexts(){ return texts(); }
-    
+
     /** Returns all geometry objects contained in objects. */
     public IGeometry[] geometries(){
 	ArrayList<IGeometry> geoms = new ArrayList<IGeometry>();
@@ -388,7 +389,7 @@ public class IServer implements IServerI{
     }
     /** alias of breps */
     public IGeometry[] getGeometries(){ return breps(); }
-    
+
     /** Returns all objects of specified class contained in objects.
      */
     public IObject[] objects(Class cls){
@@ -401,13 +402,13 @@ public class IServer implements IServerI{
     }
     /** alias of objects(Class) */
     public IObject[] getObjects(Class cls){ return objects(cls); }
-    
+
     /** Returns all objects contained in objects.
      */
     public IObject[] objects(){ return objects.toArray(new IObject[objects.size()]); }
     public IObject[] getObjects(){ return objects(); }
-    
-    
+
+
     /** Returns i-th IPoint object contained in objects or null if not found.
 	IPointR objects are not included.
     */
@@ -422,8 +423,8 @@ public class IServer implements IServerI{
     }
     /** alias of point(int) */
     public IPoint getPoint(int i){ return point(i); }
-    
-    
+
+
     /** Returns i-th ICurve object contained in objects or null if not found.
 	ICurveR objects are not included.
     */
@@ -438,8 +439,8 @@ public class IServer implements IServerI{
     }
     /** alias of curve(int) */
     public ICurve getCurve(int i){ return curve(i); }
-    
-    
+
+
     /** Returns i-th IPolycurve object contained in objects or null if not found.
 	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
 	ICurve - IPolycurve relationship is still under work. This is temporary measure.
@@ -455,8 +456,8 @@ public class IServer implements IServerI{
     }
     /** alias of polycurve(int) */
     public IPolycurve getPolycurve(int i){ return polycurve(i); }
-    
-    
+
+
     /** Returns i-th ISurface object contained in objects or null if not found.
 	ISurfaceR objects are not included.
     */
@@ -471,8 +472,8 @@ public class IServer implements IServerI{
     }
     /** alias of surface(int) */
     public ISurface getSurface(int i){ return surface(i); }
-    
-    
+
+
     /** Returns i-th IMesh object contained in objects or null if not found.
 	IMeshR objects are not included.
     */
@@ -487,7 +488,7 @@ public class IServer implements IServerI{
     }
     /** alias of mesh(int) */
     public IMesh getMesh(int i){ return mesh(i); }
-    
+
     /** Returns i-th IBrep object contained in objects or null if not found.
     */
     public IBrep brep(int i){
@@ -501,7 +502,7 @@ public class IServer implements IServerI{
     }
     /** alias of brep(int) */
     public IBrep getBrep(int i){ return brep(i); }
-    
+
     /** Returns i-th IText object contained in objects or null if not found.
      */
     public IText text(int i){
@@ -515,8 +516,8 @@ public class IServer implements IServerI{
     }
     /** alias of text(int) */
     public IText getText(int i){ return text(i); }
-    
-    
+
+
     /** Returns i-th IGeometry object contained in objects or null if not found.
     */
     public IGeometry geometry(int i){
@@ -530,23 +531,23 @@ public class IServer implements IServerI{
     }
     /** alias of geometry(int) */
     public IGeometry getGeometry(int i){ return geometry(i); }
-    
+
     /** Returns i-th object contained in objects or null if not found.
     */
     public IObject object(Class cls, int i){
 	int curIdx=0;
 	synchronized(ig){
 	    for(int j=0; j<objects.size(); j++)
-		if(cls.isInstance(objects.get(j))) 
+		if(cls.isInstance(objects.get(j)))
 		    if(i==curIdx++) return objects.get(j);
 	}
 	return null;
     }
     /** alias of object(Class,int) */
     public IObject getObject(Class cls, int i){ return object(cls,i); }
-    
-    
-    
+
+
+
     /** number of IPoint in objects */
     public int pointNum(){
 	int num=0;
@@ -558,7 +559,7 @@ public class IServer implements IServerI{
     }
     /** alias of pointsNum() */
     public int getPointNum(){ return pointNum(); }
-    
+
     /** number of ICurve in objects */
     public int curveNum(){
 	int num=0;
@@ -570,8 +571,8 @@ public class IServer implements IServerI{
     }
     /** alias of curveNum() */
     public int getCurveNum(){ return curveNum(); }
-    
-    /** number of IPolycurve in objects 
+
+    /** number of IPolycurve in objects
 	Note that IPolycurve contains multiple ICurve and they show up in curves() as well.
 	ICurve - IPolycurve relationship is still under work. This is temporary measure.
     */
@@ -585,7 +586,7 @@ public class IServer implements IServerI{
     }
     /** alias of polycurveNum() */
     public int getPolycurveNum(){ return polycurveNum(); }
-    
+
     /** number of ISurface in objects */
     public int surfaceNum(){
 	int num=0;
@@ -597,8 +598,8 @@ public class IServer implements IServerI{
     }
     /** alias of surfaceNum() */
     public int getSurfaceNum(){ return surfaceNum(); }
-    
-    
+
+
     /** number of IMesh in objects */
     public int meshNum(){
 	int num=0;
@@ -610,8 +611,8 @@ public class IServer implements IServerI{
     }
     /** alias of meshNum() */
     public int getMeshNum(){ return meshNum(); }
-    
-    
+
+
     /** number of IBrep in objects */
     public int brepNum(){
 	int num=0;
@@ -623,7 +624,7 @@ public class IServer implements IServerI{
     }
     /** alias of brepNum() */
     public int getBrepNum(){ return brepNum(); }
-    
+
     /** number of IText in objects */
     public int textNum(){
 	int num=0;
@@ -635,7 +636,7 @@ public class IServer implements IServerI{
     }
     /** alias of textNum() */
     public int getTextNum(){ return textNum(); }
-    
+
     /** number of the IGeometry in objects */
     public int geometryNum(){
 	int num=0;
@@ -647,7 +648,7 @@ public class IServer implements IServerI{
     }
     /** alias of geometryNum() */
     public int getGeometryNum(){ return geometryNum(); }
-    
+
     /** number of the specified class in objects */
     public int objectNum(Class cls){
 	int num=0;
@@ -659,9 +660,9 @@ public class IServer implements IServerI{
     }
     /** alias of objectNum(Class) */
     public int getObjectNum(Class cls){ return objectNum(cls); }
-    
-    
-    
+
+
+
     public int layerNum(){ return layers.size(); }
 
     public ILayer layer(int i){ return layers.get(i); }
@@ -682,7 +683,7 @@ public class IServer implements IServerI{
 	return new ILayer(this, layerName);
 	//add(l); // layer is added in constractor of IObject
     }
-    
+
     public void deleteLayer(String layerName){
 	ILayer l=null;
 	for(int i=0; i<layers.size() && l==null; i++){
@@ -694,5 +695,5 @@ public class IServer implements IServerI{
     }
     public void deleteLayer(int i){ remove(layers.get(i)); }
     public void deleteLayer(ILayer l){ remove(l); }
-    
+
 }

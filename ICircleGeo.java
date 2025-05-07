@@ -254,6 +254,10 @@ public class ICircleGeo extends ICurveGeo{
 	    IVec4[] cpts = circleCP(center.get(), normal.get(), null, xradius.x(), yradius.x());
 	    super.init(cpts,circleDeg(),circleKnots());
 	}
+	this.center = center;
+	this.normal = normal;
+	this.xradius = xradius;
+	this.yradius = yradius;
     }
     
     public ICircleGeo(IVecI center, IVecI xradiusVec, IVecI yradiusVec, boolean approx){
@@ -265,6 +269,10 @@ public class ICircleGeo extends ICurveGeo{
 	    IVec4[] cpts = ovalCP(center.get(),xradiusVec.get(),yradiusVec.get());
 	    super.init(cpts,circleDeg(),circleKnots());
 	}
+	this.center = center;
+	this.normal = normal;
+	this.xradius = xradius;
+	this.yradius = yradius;
     }
     
     

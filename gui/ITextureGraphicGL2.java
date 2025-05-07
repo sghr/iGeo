@@ -34,14 +34,14 @@ import java.io.*;
 
 import igeo.*;
 
-/** 
+/**
     Texture graphic class
  */
 public class ITextureGraphicGL2 implements ITextureGraphicGL{
     public Texture texture;
     public int textureID;
     public GL gl;
-    
+
     /** constructor with image file name */
     public ITextureGraphicGL2(String filename){
 	init(filename,null);
@@ -56,7 +56,7 @@ public class ITextureGraphicGL2 implements ITextureGraphicGL{
     public ITextureGraphicGL2(BufferedImage image, GL gl){
 	init(image, gl);
     }
-    
+
     public void init(String filename, GL gl){
 	if(texture!=null && gl!=null){ texture.destroy(gl); }
 	texture = getTexture(filename);
@@ -65,7 +65,7 @@ public class ITextureGraphicGL2 implements ITextureGraphicGL{
 	}
 	this.gl = gl;
     }
-    
+
     public void init(BufferedImage image, GL gl){
 	if(texture!=null){ texture.destroy(gl); }
 	texture = getTexture(image, gl);
@@ -74,11 +74,11 @@ public class ITextureGraphicGL2 implements ITextureGraphicGL{
 	}
 	this.gl = gl;
     }
-    
+
     public int id(){
 	return textureID;
     }
-    
+
     public static Texture getTexture(BufferedImage image, GL gl){
 	try{
 	    return  AWTTextureIO.newTexture(gl.getGLProfile(), image, true);
@@ -88,7 +88,7 @@ public class ITextureGraphicGL2 implements ITextureGraphicGL{
 	}
 	return null;
     }
-    
+
     public static Texture getTexture(String imageFilename){
 	IG ig = IG.cur();
 	if(ig!=null){
@@ -119,7 +119,7 @@ public class ITextureGraphicGL2 implements ITextureGraphicGL{
 	}
 	return null;
     }
-    
+
     public int width(){ return texture.getWidth(); }
     public int height(){ return texture.getHeight(); }
 
@@ -127,11 +127,11 @@ public class ITextureGraphicGL2 implements ITextureGraphicGL{
 	if(texture!=null) texture.destroy(gl);
 	this.gl = gl;
     }
-    
+
     public void destroy(){
 	if(texture!=null && gl!=null) texture.destroy(gl);
     }
-    
+
     /*
     public static Texture getTexture(Image img, GL gl){
 	BufferedImage bimg=null;
@@ -150,5 +150,5 @@ public class ITextureGraphicGL2 implements ITextureGraphicGL{
 	return null;
     }
     */
-    
+
 }

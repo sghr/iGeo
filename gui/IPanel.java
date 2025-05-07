@@ -505,26 +505,51 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 		}
 	    }
 	}catch(Exception ex){ ex.printStackTrace(); }
+
+	String[][] fileFilterExtensions = 
+	    new String[][]{ new String[]{ "png", "PNG", "Png" },
+			    new String[]{ "ai", "Ai", "AI"  },
+			    new String[]{ "obj", "Obj", "OBJ" },
+			    new String[]{ "3dm", "3DM" },
+			    new String[]{ "3dm", "3DM" } };
+	String[] fileFilterDescriptions = 
+	    new String[]{ "Surface textures as PNG (if there's any texture) (.png)",
+			  "Adobe Illustrator file (.ai)",
+			  "Wavefront OBJ file (.obj)",
+			  "Rhinoceros 3D file version 4 (.3dm)",
+			  "Rhinoceros 3D file version 5 (.3dm)" };
 	
-	File file = chooseFile(new String[][]{ new String[]{ "3dm", "3DM" },
-					       new String[]{ "obj", "Obj", "OBJ" },
-					       new String[]{ "ai", "Ai", "AI" } },
-			       new String[]{ "Rhinoceros 3D file v4 (.3dm)",
-					     "Wavefront OBJ file (.obj)",
-					     //"Adobe Illustrator file (.ai) (line&polyline only)" },
-					     "Adobe Illustrator file (.ai)" },
-			       "Save",
-			       true,
-			       ig.basePath,
-			       null);
+	FileAndFilterIndex fileAndIdx = 
+	    chooseFile(fileFilterExtensions, fileFilterDescriptions,
+		       "Save",
+		       true,
+		       ig.basePath,
+		       null);
 	
 	//if(file!=null) ig.saveFile(file.getAbsolutePath());
-	if(file!=null){
-	    if(IIO.getFileType(file.getName()) == IIO.FileType.AI){
-		new AIScaleDialog(file);
+	if(fileAndIdx!=null && fileAndIdx.file!=null){
+	    if(IIO.getFileType(fileAndIdx.file.getName()) == IIO.FileType.AI){
+		new AIScaleDialog(fileAndIdx.file);
 		return;
 	    }
-	    IIO.save(file, ig);
+	    
+	    //IIO.save(file, ig);
+	    
+	    if(fileAndIdx.filterIndex == 4){ // Rhino5
+		IIO.saveRhino5(fileAndIdx.file, ig);
+	    }
+	    else if(fileAndIdx.filterIndex == 3){ // Rhino4
+		IIO.saveRhino4(fileAndIdx.file, ig);
+	    }
+	    else if(fileAndIdx.filterIndex == 2){ // OBJ
+		IIO.saveOBJ(fileAndIdx.file, ig);
+	    }
+	    else if(fileAndIdx.filterIndex == 1){ // AI
+		IIO.saveAI(fileAndIdx.file, ig);
+	    }
+	    else if(fileAndIdx.filterIndex == 0){ // PNG Texture
+		IIO.saveTextures(fileAndIdx.file, ig);
+	    }
 	}
 	
 	/*
@@ -601,44 +626,33 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	
 	public void actionPerformed(ActionEvent e) {
 	    if(e.getActionCommand().equals("OK")){
-
-
 		IAIExporter.fillClosedCurve = fillClosedCurveBox.isSelected();
-		
 		String scalestr = scalefield.getText();
-		
 		try{
-		    
 		    double scale = Double.parseDouble(scalestr);
 		    IIO.saveAI(file, ig, scale);
-		    
-		}catch(Exception ex){
-		    ex.printStackTrace();
-		}
+		}catch(Exception ex){ ex.printStackTrace(); }
 	    }
 	    setVisible(false); //hide();
 	}
-	
 	//public double scale(){ return scale; }
-	
     }
     
-    
     // file chooser dialog
-    public File chooseFile(String acceptableExtension,
-			   String extensionDescription,
-                           String approveButtonText,
-			   boolean writing,
-			   String defaultPath,
-			   File defaultFile){
+    public FileAndFilterIndex  chooseFile(String acceptableExtension,
+					  String extensionDescription,
+					  String approveButtonText,
+					  boolean writing,
+					  String defaultPath,
+					  File defaultFile){
         return chooseFile(IFileFilter.createCaseVariation(acceptableExtension),
                           extensionDescription, approveButtonText,writing,
 			  defaultPath, defaultFile);
     }
     
-    public File chooseFile(String[] acceptableExtensions, String extensionDescription,
-                           String approveButtonText, boolean writing,
-			   String defaultPath, File defaultFile){
+    public FileAndFilterIndex  chooseFile(String[] acceptableExtensions, String extensionDescription,
+					  String approveButtonText, boolean writing,
+					  String defaultPath, File defaultFile){
 	String[][] extensions = new String[1][];
 	extensions[0] = acceptableExtensions;
 	String[] description = new String[1];
@@ -647,13 +661,14 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	return chooseFile(extensions, description, approveButtonText, writing, defaultPath, defaultFile);
     }
     
-    public File chooseFile(String[][] acceptableExtensions,
-			   String[] extensionDescriptions,
-                           String approveButtonText, boolean writing,
-			   String defaultPath, File defaultFile){
+    public FileAndFilterIndex chooseFile(String[][] acceptableExtensions,
+					 String[] extensionDescriptions,
+					 String approveButtonText, boolean writing,
+					 String defaultPath, File defaultFile){
+
         File file=null;
         boolean canceled=false;
-	
+	int chosenFilterIndex = -1;
 	//if(defaultPath==null) defaultPath=null; //".";
 	
         file = defaultFile;
@@ -682,7 +697,9 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
 	    for(int i=filters.length-1; i>=0; i--){ // opposite order
 		chooser.addChoosableFileFilter(filters[i]);
 	    }
-	    chooser.setFileFilter(filters[0]); // default format (filter)
+	    
+	    //chooser.setFileFilter(filters[0]); // default format (filter)
+	    chooser.setFileFilter(filters[filters.length-1]); // default format (filter)
 	    
             if(file!=null){
                 chooser.setCurrentDirectory(new File(file.getParent()));
@@ -697,21 +714,22 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
                 boolean endWithExtension=false;
 		
 		javax.swing.filechooser.FileFilter currentFilter = chooser.getFileFilter();
-		int currentFilterIndex = -1;
-		for(int i=0; i<filters.length && currentFilterIndex<0; i++){
-		    if(currentFilter==filters[i]) currentFilterIndex=i;
+		
+		chosenFilterIndex = -1;
+		for(int i=0; i<filters.length && chosenFilterIndex<0; i++){
+		    if(currentFilter==filters[i]) chosenFilterIndex=i;
 		}
 		
-		for(int i=0; currentFilterIndex>=0 &&
-			(i<acceptableExtensions[currentFilterIndex].length) &&
+		for(int i=0; chosenFilterIndex>=0 &&
+			(i<acceptableExtensions[chosenFilterIndex].length) &&
 			!endWithExtension; i++){
-                    if(filename.endsWith(acceptableExtensions[currentFilterIndex][i])) endWithExtension=true;
+                    if(filename.endsWith(acceptableExtensions[chosenFilterIndex][i])) endWithExtension=true;
                 }
 		
-		if(currentFilterIndex>=0 && ! endWithExtension ){
+		if(chosenFilterIndex>=0 && ! endWithExtension ){
 		    // should it be changed?
                     //IOut.err("extension of file is invalid: "+filename);
-                    filename = filename.concat(acceptableExtensions[currentFilterIndex][0]);
+                    filename = filename.concat(acceptableExtensions[chosenFilterIndex][0]);
                     file = new File(filename);
                     //IOut.err("renamed to "+ file.toString());
                 }
@@ -741,6 +759,14 @@ public class IPanel extends IComponent implements IPanelI /*IServerI*/ /*, Mouse
             }
             else{ file=null; }
         }while(canceled);
-        return file;
+
+	return new FileAndFilterIndex(file, chosenFilterIndex);
+        //return file;
+    }
+
+    static class FileAndFilterIndex{
+	File file;
+	int filterIndex;
+	FileAndFilterIndex(File f, int idx){ file=f; filterIndex=idx; }
     }
 }

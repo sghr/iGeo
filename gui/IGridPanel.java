@@ -118,7 +118,6 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 	
 	int[] xpos = getPositionArrayFromRatio(widthRatio, width);
 	int[] ypos = getPositionArrayFromRatio(heightRatio, height);
-	
 	if(gridPanes==null || gridPanes.length!=xnum ||
            gridPanes[0].length!=ynum || panes!=null){
 	    
@@ -151,6 +150,24 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 			    orthogonal = true;
 			}
 		    }
+		    else if(xnum==2&&ynum==1){
+			if(i==0&&j==0){ // pers
+			    v = IView.getDefaultPerspectiveView(paneX,paneY,paneW,paneH);
+			}
+			else if(i==1&&j==0){ // top
+			    v = IView.getTopView(paneX,paneY,paneW,paneH);
+			    orthogonal = true;
+			}
+		    }
+		    else if(xnum==1&&ynum==2){
+			if(i==0&&j==0){ // pers
+			    v = IView.getDefaultPerspectiveView(paneX,paneY,paneW,paneH);
+			}
+			else if(i==0&&j==1){ // top
+			    v = IView.getTopView(paneX,paneY,paneW,paneH);
+			    orthogonal = true;
+			}
+		    }
 		    else{ // default; axon
 			v = IView.getDefaultAxonometricView(paneX,paneY,paneW,paneH);
 		    }
@@ -160,7 +177,7 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
 		    
 		    v.enableRotationAroundTarget(); // here?
 		    v.setTarget(0,0,0); //
-
+		    
 		    if(panes!=null && i<panes.length && j<panes[i].length && panes[i][j]!=null){
 			gridPanes[i][j] = panes[i][j];
 			gridPanes[i][j].setBounds(paneX,paneY,paneW,paneH);
@@ -183,7 +200,12 @@ public class IGridPanel extends IScreenTogglePanel{ //IPanel{
             for(int i=0; i<xnum; i++)
                 for(int j=0; j<ynum; j++)
 		    super.addPane(gridPanes[i][j]);
-	    
+
+	    // update graphic server
+	    if(getIG()!=null && server()!=null && server().graphicServer()!=null){
+		server().graphicServer().clearView();
+		for(int i=0; i<paneNum(); i++) server().graphicServer().addView(pane(i).getView());
+	    }
 	}
 	else{ // change size
             for(int i=0; i<xnum; i++){

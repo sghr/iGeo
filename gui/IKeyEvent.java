@@ -27,7 +27,7 @@ import java.awt.event.*;
 
 /**
    Abstracted key event in case no AWT provided
-      
+
    @author Satoru Sugihara
 */
 public class IKeyEvent{
@@ -37,7 +37,7 @@ public class IKeyEvent{
     public int keyLocation;
     public boolean actionKey;
     public boolean altDown, controlDown, metaDown, shiftDown;
-    
+
     public IKeyEvent(){}
     public IKeyEvent(int keycode){ keyCode = keycode; }
     public IKeyEvent(KeyEvent e){
@@ -50,6 +50,7 @@ public class IKeyEvent{
 	metaDown = e.isMetaDown();
 	shiftDown = e.isShiftDown();
     }
+
     // doesn't compile in processing 1.5
     public IKeyEvent(processing.event.KeyEvent e){
 	character = e.getKey();
@@ -62,7 +63,6 @@ public class IKeyEvent{
 	shiftDown = e.isShiftDown();
     }
     
-    
     public char getKeyChar(){ return character; }
     public int getKeyCode(){ return keyCode; }
     public int getKeyLocation(){ return keyLocation; }
@@ -70,6 +70,6 @@ public class IKeyEvent{
     public boolean isControlDown(){ return controlDown; }
     public boolean isMetaDown(){ return metaDown; }
     public boolean isShiftDown(){ return shiftDown; }
-    
-    
+
+
 }

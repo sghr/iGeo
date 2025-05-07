@@ -44,95 +44,95 @@ import igeo.*;
 
 /**
    Graphic subobject class to draw filled faces of a surface object by OpenGL.
-   
+
    @author Satoru Sugihara
 */
 public class ISurfaceGraphicFillGL extends IGraphicObject{
-    
+
     public static final boolean insertPointOnDegree1TwistedSurface=true;
-    
+
     public int isoparmRatioU=IConfig.tessellationResolution;
     public int isoparmRatioV=IConfig.tessellationResolution;
-    
+
     //public final static int fragmentResolution = 10;
-    
+
     public ISurfaceI surface=null; // parent
-    
+
     //public IGLQuadMatrix quadMatrix=null;
     //public IGLTriangles triangles=null;
-    
+
     public IVec[][] quads;
     public IVec[][] quadsNormal;
     public IVec2f[][] quadsUV;
     public IVec[][] triangles;
     public IVec[][] trianglesNormal;
     public IVec2f[][] trianglesUV;
-    
+
     public ITexture texture;
-    
-    
-    // cache to update surface 
+
+
+    // cache to update surface
     public double[] uvalCache, vvalCache;
     public IVec2[][] triangles2DCache;
-    
+
     public boolean initialized=false;
-    
+
     int origUEPNum, origVEPNum; // added 20121111
-    
+
     public ISurfaceGraphicFillGL(ISurface srf){
-	super(srf);
-	surface = srf.surface;
-	//initSurface();
+      super(srf);
+      surface = srf.surface;
+      //initSurface();
     }
-    
+
     public ISurfaceGraphicFillGL(ISurfaceR srf){
-	super(srf);
-	surface = srf.surface;
-	//initSurface();
+      super(srf);
+      surface = srf.surface;
+      //initSurface();
     }
-    
+
     public ISurfaceGraphicFillGL(IObject obj, ISurfaceI srf){
 	super(obj);
 	surface = srf;
 	//initSurface();
     }
-    
+
     public ISurfaceGraphicFillGL(ISurface srf, int isoparmRatioU, int isoparmRatioV ){
 	super(srf);
 	this.isoparmRatioU = isoparmRatioU;
 	this.isoparmRatioV = isoparmRatioV;
 	//initSurface();
     }
-    
+
     public ISurfaceGraphicFillGL(ISurfaceR srf, int isoparmRatioU, int isoparmRatioV ){
 	super(srf);
 	this.isoparmRatioU = isoparmRatioU;
 	this.isoparmRatioV = isoparmRatioV;
 	//initSurface();
     }
-    
+
     public void initSurface(){
 	//if(parent instanceof ISurface){ surface = ((ISurface)parent).surface; }
 	//else if(parent instanceof ISurfaceR){ surface = ((ISurfaceR)parent).surface; }
-	
+
 	origUEPNum = surface.uepNum();
 	origVEPNum = surface.vepNum();
-	
+
 	if(!surface.hasTrim()||!surface.hasInnerTrim()&&surface.hasDefaultTrim())
 	    initWithoutTrim(); // initialize IGLQuadMatrix
 	else initWithTrim(); // initialize IGLTriangles
-	
+
 	initialized=true;
     }
-    
+
     public void setAttribute(IAttribute attr){
 	super.setAttribute(attr);
 	texture = attr.texture;
     }
-    
+
     synchronized public void initWithoutTrim(){
 	synchronized(parent){
-	
+
 	    double[] uval;
 	    double[] vval;
 	    if(surface.udeg()==1){
@@ -149,7 +149,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 			if(i<epnum-1||j==0)
 			    uval[i*isoparmRatioU + j] = surface.u(i, (double)j/isoparmRatioU);
 	    }
-	    
+
 	    if(surface.vdeg()==1){
 		int num = surface.vnum();
 		vval = new double[num];
@@ -164,17 +164,17 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 			if(i<epnum-1||j==0)
 			    vval[i*isoparmRatioV + j] = surface.v(i, (double)j/isoparmRatioV);
 	    }
-	    
+
 	    // insert points for deg 1 twisted surface
 	    if(insertPointOnDegree1TwistedSurface&&
 	       surface.udeg()==1 && surface.vdeg()==1){
-		
+
 		boolean uinsert[] = new boolean[uval.length-1];
 		boolean vinsert[] = new boolean[vval.length-1];
 		boolean anyInsert=false;
 		for(int i=0; i<uval.length-1; i++) uinsert[i] = false;
 		for(int i=0; i<vval.length-1; i++) vinsert[i] = false;
-		
+
 		for(int i=0; i<uval.length-1; i++){
 		    for(int j=0; j<vval.length-1; j++){
 			if(!IVec.isFlat(surface.pt(uval[i],vval[j]),
@@ -187,7 +187,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 			}
 		    }
 		}
-		
+
 		if(anyInsert){
 		    ArrayList<Double> uval2 = new ArrayList<Double>();
 		    for(int i=0; i<uval.length-1; i++){
@@ -199,7 +199,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 			}
 		    }
 		    uval2.add(uval[uval.length-1]);
-		
+
 		    ArrayList<Double> vval2 = new ArrayList<Double>();
 		    for(int i=0; i<vval.length-1; i++){
 			vval2.add(vval[i]);
@@ -210,15 +210,15 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 			}
 		    }
 		    vval2.add(vval[vval.length-1]);
-		
+
 		    uval = new double[uval2.size()];
 		    for(int i=0; i<uval2.size(); i++) uval[i] = uval2.get(i);
-		
+
 		    vval = new double[vval2.size()];
 		    for(int i=0; i<vval2.size(); i++) vval[i] = vval2.get(i);
 		}
 	    }
-	    
+
 	    IVec[][] pts = new IVec[uval.length][vval.length];
 	    IVec[][] nrm = new IVec[uval.length][vval.length];
 	    for(int i=0; i<uval.length; i++){
@@ -227,7 +227,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    nrm[i][j] = surface.normal(uval[i], vval[j]).get().unit();
 		}
 	    }
-	    
+
 	    if(texture!=null){
 		IVec2f[][] uv = new IVec2f[uval.length][vval.length];
 		for(int i=0; i<uval.length; i++){
@@ -237,23 +237,23 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		}
 		quadsUV = uv;
 	    }
-	    
+
 	    //quadMatrix = new IGLQuadMatrix(pts,nrm);
 	    quads = pts;
 	    quadsNormal = nrm;
-	
+
 	    uvalCache=uval;
 	    vvalCache=vval;
-	    
+
 	}
     }
-    
+
     synchronized public void initWithTrim(){
 	synchronized(parent){
-	    
+
 	ITrimLoopGraphic[] outtrims = null;
         ITrimLoopGraphic[] intrims = null;
-        
+
         if(surface.hasOuterTrim()){
             outtrims = new ITrimLoopGraphic[surface.outerTrimLoopNum()];
             for(int i=0; i<surface.outerTrimLoopNum(); i++)
@@ -265,20 +265,20 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
             //outtrims = new ITrimLoopGraphic[1];
             //outtrims[0] = new ITrimLoopGraphic(surface);
         }
-        
+
         if(surface.hasInnerTrim()){
             intrims = new ITrimLoopGraphic[surface.innerTrimLoopNum()];
             for(int i=0; i<surface.innerTrimLoopNum(); i++)
                 intrims[i] = new ITrimLoopGraphic(surface.innerTrimLoop(i),
 						  false,IConfig.trimSegmentResolution);
         }
-	
+
         int unum = isoparmRatioU*(surface.uepNum()-1)+1;
         int vnum = isoparmRatioV*(surface.vepNum()-1)+1;
-	
+
 	double[] uval = null;
 	double[] vval = null;
-	
+
 	if(surface.udeg()==1){
 	    unum = surface.unum();
 	    uval = new double[unum];
@@ -291,7 +291,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    uval[i*isoparmRatioU+j] =
 			surface.u(i,(double)j/isoparmRatioU);
 	}
-	
+
 	if(surface.vdeg()==1){
 	    vnum = surface.vnum();
 	    vval = new double[vnum];
@@ -303,21 +303,21 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		for(int l=0; l<isoparmRatioV&&k<surface.vepNum()-1||l==0; l++){
 		    vval[k*isoparmRatioV+l] =
 			surface.v(k,(double)l/isoparmRatioV);
-		    
+
 		    //IOut.debug(20, "vval["+k+"*"+isoparmRatioV+"+"+l+"] = "+vval[k*isoparmRatioV+l]); //
 		}
 	}
-	
+
 	// insert points for deg 1 twisted surface
 	if(insertPointOnDegree1TwistedSurface&&
 	   surface.udeg()==1 && surface.vdeg()==1){
-	    
+
 	    boolean uinsert[] = new boolean[uval.length-1];
 	    boolean vinsert[] = new boolean[vval.length-1];
 	    boolean anyInsert=false;
 	    for(int i=0; i<uval.length-1; i++) uinsert[i] = false;
 	    for(int i=0; i<vval.length-1; i++) vinsert[i] = false;
-	    
+
 	    for(int i=0; i<uval.length-1; i++){
 		for(int j=0; j<vval.length-1; j++){
 		    if(!IVec.isFlat(surface.pt(uval[i],vval[j]),
@@ -330,7 +330,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    }
 		}
 	    }
-	    
+
 	    if(anyInsert){
 		ArrayList<Double> uval2 = new ArrayList<Double>();
 		for(int i=0; i<uval.length-1; i++){
@@ -342,7 +342,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    }
 		}
 		uval2.add(uval[uval.length-1]);
-		
+
 		ArrayList<Double> vval2 = new ArrayList<Double>();
 		for(int i=0; i<vval.length-1; i++){
 		    vval2.add(vval[i]);
@@ -353,27 +353,27 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    }
 		}
 		vval2.add(vval[vval.length-1]);
-		
+
 		uval = new double[uval2.size()];
 		for(int i=0; i<uval2.size(); i++) uval[i] = uval2.get(i);
 		unum = uval.length;
-		
+
 		vval = new double[vval2.size()];
 		for(int i=0; i<vval2.size(); i++) vval[i] = vval2.get(i);
 		vnum = vval.length;
 	    }
-	    
+
 	}
-	
-	
+
+
 	IVec2[][] surfPts = new IVec2[unum][vnum];
-	
+
 	for(int i=0; i<unum; i++){
 	    for(int j=0; j<vnum; j++){
 		surfPts[i][j] = new IVec2(uval[i],vval[j]);
 	    }
 	}
-	
+
 	/*
 	for(int i=0; i<surface.uepNum(); i++)
 	    for(int j=0; j<isoparmRatioU && i<surface.uepNum()-1 || j==0; j++)
@@ -383,14 +383,14 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 			    new IVec2(surface.u(i,(double)j/isoparmRatioU),
 				       surface.v(k,(double)l/isoparmRatioV));
 	*/
-	
+
 	IVec2[][] outerPts = null;
 	if(outtrims!=null){
 	    outerPts = new IVec2[outtrims.length][];
 	    for(int i=0; i<outtrims.length; i++)
 		outerPts[i] = outtrims[i].getPolyline2D().get();
 	}
-	
+
 	IVec2[][] innerPts = null;
 	if(intrims!=null){
 	    innerPts = new IVec2[intrims.length][];
@@ -398,9 +398,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		innerPts[i] = intrims[i].getPolyline2D().get();
 	    }
 	}
-	
+
 	IVec2[][] triangles2D = ISurfaceMesh.getTriangles(surfPts,outerPts,innerPts);
-	
+
 	IVec[][] triangles3D = new IVec[triangles2D.length][3];
 	IVec[][] trianglesNml = new IVec[triangles2D.length][3];
 	for(int i=0; i<triangles2D.length; i++){
@@ -409,7 +409,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		trianglesNml[i][j] = surface.normal(triangles2D[i][j]).get().unit();
 	    }
 	}
-	
+
 	if(texture!=null){
 	    trianglesUV = new IVec2f[triangles2D.length][3];
 	    for(int i=0; i<triangles2D.length; i++){
@@ -418,25 +418,25 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		}
 	    }
 	}
-	
+
 	//triangles = new IGLTriangles(triangles3D,trianglesNormal);
 	triangles = triangles3D;
 	trianglesNormal = trianglesNml;
-	
+
 	triangles2DCache = triangles2D;
 
 	}
     }
-    
+
     synchronized public void updateWithoutTrim(){
 	synchronized(parent){
-	
-	
+
+
 	if(uvalCache==null || vvalCache==null){
 	    IOut.err("cache is null. not updated.");
 	    return;
 	}
-	
+
 	if(quads==null || quads.length!=uvalCache.length || quads[0].length!=vvalCache.length){
 	    quads = new IVec[uvalCache.length][vvalCache.length];
 	    quadsNormal = new IVec[uvalCache.length][vvalCache.length];
@@ -474,15 +474,15 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 
 	}
     }
-    
+
     synchronized public void updateWithTrim(){
 	synchronized(parent){
-	    
+
 	if(triangles2DCache==null){
 	    IOut.err("cache is null. not updated.");
 	    return;
 	}
-	
+
 	if(triangles==null || triangles.length!=triangles2DCache.length){
 	    triangles = new IVec[triangles2DCache.length][3];
 	    trianglesNormal = new IVec[triangles2DCache.length][3];
@@ -493,7 +493,7 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		trianglesNormal[i][j] = surface.normal(triangles2DCache[i][j]).get().unit();
 	    }
 	}
-	
+
 	/*
 	if(triangles==null || triangles.length!=triangles2DCache.length){
 	    triangles = new IVec[triangles2DCache.length][3];
@@ -506,8 +506,8 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    }
 	}
 	*/
-	
-	
+
+
 	/*
 	if(triangles2DCache.length == triangles.triangleNum()){
 	    for(int i=0; i<triangles2DCache.length; i++){
@@ -533,35 +533,35 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 
 	}
     }
-    
+
     public void updateSurface(){
 
 	if(origUEPNum!=surface.uepNum() || origVEPNum!=surface.vepNum()){ initSurface(); return; }
-	
+
 	if(quads!=null) updateWithoutTrim();
 	if(triangles!=null) updateWithTrim();
 	//if(quadMatrix!=null) updateWithoutTrim();
 	//if(triangles!=null) updateWithTrim();
     }
-    
-    
+
+
     public boolean isDrawable(IGraphicMode m){
 	//return m.isGL()&&m.isFill();
 	return m.isGraphic3D()&&m.isFill();
     }
-    
-    
+
+
     synchronized public void draw(IGraphics g){
-	
+
 	//if(surface==null) initSurface(); // not initizlized at the constructor // shouldn't it?
 	if(!initialized) initSurface();
 	else if(update){ updateSurface(); update=false; }
-	
+
 	if(g.type() == IGraphicMode.GraphicType.GL||
 	   g.type() == IGraphicMode.GraphicType.P3D){
-	    
+
 	    IGraphics3D g3d = (IGraphics3D)g;
-	    
+
 	    //float red,green,blue,alpha;
 	    float[] rgba=null;
 	    if(color!=null){
@@ -578,11 +578,11 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		//blue = IConfig.objectColor.getBlue();
 		//alpha = IConfig.objectColor.getAlpha();
 	    }
-	    
+
 	    if(g3d.view().mode().isTransparent()){
 		rgba = new float[]{ rgba[0], rgba[1], rgba[2], IConfig.transparentModeAlpha/255f };
 	    }
-	    
+
 	    if(g3d.view().mode().isLight()){
 		g3d.ambient(rgba);
 		g3d.diffuse(rgba);
@@ -592,37 +592,37 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		g3d.clr(rgba[0],rgba[1],rgba[2],0f);
 	    }
 	    //else{ g3d.clr(red,green,blue,alpha); }
-	    
+
 	    g3d.clr(rgba);
 
 
 	    if(texture!=null){
 		g3d.beginTexture(texture);
 	    }
-	    
+
 	    /*
 	    // texture test
 	    GL2 gl2 = null;
 	    if(texture!=null){
 		Texture tex = texture.getTexture(g3d);
 		int textureID = tex.getTextureObject();
-		
+
 		gl2.glDisable(GL2.GL_BLEND); // important
 		gl2.glEnable(GL2.GL_TEXTURE_2D);
 		gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE); // GL_DECAL
-		
+
 		gl2.glBindTexture(GL2.GL_TEXTURE_2D, textureID);
 	    }
 	    */
 
-	    
+
 	    /*
 	    gl2.glDisable(GL2.GL_BLEND); // important
 	    gl2.glEnable(GL2.GL_TEXTURE_2D);
 	    gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE); // GL_DECAL
-	    
+
 	    gl2.glBindTexture(GL2.GL_TEXTURE_2D, textureID);
-	    
+
 	    gl2.glBegin(GL2.GL_QUADS);
 	    gl2.glTexCoord2f(0f,0f);
 	    gl2.glVertex3d(-1,-1,0);
@@ -632,10 +632,10 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 	    gl2.glVertex3d(1,1,0);
 	    gl2.glTexCoord2f(0f,1f);
 	    gl2.glVertex3d(-1,1,0);
-	    
+
             gl2.glEnd();
 	    */
-	    
+
 	    if(texture!=null){
 		if(quads!=null){
 		    if(quadsNormal==null){ g3d.drawQuadMatrix(quads,quadsUV); }
@@ -666,19 +666,19 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    }
 		}
 	    }
-	    
+
 	    // texture test
 	    if(texture!=null){
 		g3d.endTexture();
 	    }
-	    
+
 	    /*
 	    if(texture!=null){
 		gl2.glBindTexture(GL2.GL_TEXTURE_2D, 0); // bind no texture
 		gl2.glEnable(GL2.GL_BLEND);
 	    }
 	    */
-	    
+
 	    /*
 	    if(quadMatrix!=null){
 		IVec[][] p = new IVec[quadMatrix.width][quadMatrix.height];
@@ -687,9 +687,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 			p[j][i] = quadMatrix.pts[i*quadMatrix.width+j];
 		    }
 		}
-		
+
 		g3d.drawQuadMatrix(p);
-		
+
 		if(quadMatrix.normal==null){ g3d.drawQuadMatrix(p); }
 		else{
 		    IVec[][] n = new IVec[quadMatrix.width][quadMatrix.height];
@@ -706,16 +706,16 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		else{ g3d.drawTriangles(triangles.pts, triangles.normal); }
 	    }
 	    */
-	    
+
 	    /*
 	    GL gl = ((IGraphicsGL)g).getGL();
 	    //GL gl = g.getGL();
-	    
+
 	    if(gl!=null){
 		//gl.glLineWidth(0.01f);
 		//gl.glLineWidth(1f);
 		//gl.glLineStipple(0,(short)0xFFFF);
-		
+
 		float red,green,blue,alpha;
 		//float red = defaultRed;
 		//float green = defaultGreen;
@@ -733,9 +733,9 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    blue = (float)IConfig.objectColor.getBlue()/255;
 		    alpha = (float)IConfig.objectColor.getAlpha()/255;
 		}
-		
+
 		if(g.view().mode().isTransparent()){ alpha = (float)IConfig.transparentModeAlpha/255f; }
-		
+
 		if(g.view().mode().isLight()){
 		    float[] colorf = new float[]{ red, green, blue, alpha };
 		    gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, colorf, 0);
@@ -746,14 +746,14 @@ public class ISurfaceGraphicFillGL extends IGraphicObject{
 		    gl.glColor4f(red, green, blue, 0f); // ? without this, the color is tinted with the previous object's color
 		}
 		else{ gl.glColor4f(red, green, blue, alpha); }
-		
+
 		if(quadMatrix!=null) quadMatrix.draw(gl);
 		if(triangles!=null) triangles.draw(gl);
 	    }
 	    */
-	    
+
 	}
     }
-    
-    
+
+
 }

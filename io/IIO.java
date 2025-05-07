@@ -265,9 +265,11 @@ public class IIO{
     }
     
     
-    
     public static boolean save(String filename, IServerI server){
-	saveTextureAsPNG(filename, server); //
+	return save(filename,server,false);
+    }
+    public static boolean save(String filename, IServerI server, boolean saveAllTexture){
+	if(saveAllTexture){ saveTextures(filename, server); } 
 	FileType type = getFileType(filename);
 	if(type == FileType.OBJ) return saveOBJ(new File(filename),server);
 	if(type == FileType.RHINO) return saveRhino(new File(filename),server);
@@ -277,7 +279,10 @@ public class IIO{
     }
     
     public static boolean save(File file, IServerI server){
-	saveTextureAsPNG(file.getName(), server); //
+	return save(file,server,false);
+    }
+    public static boolean save(File file, IServerI server, boolean saveAllTexture){
+	if(saveAllTexture){ saveTextures(file, server); } 
 	FileType type = getFileType(file.getName());
 	if(type == FileType.OBJ) return saveOBJ(file,server);
 	if(type == FileType.RHINO) return saveRhino(file,server);
@@ -286,6 +291,9 @@ public class IIO{
 	return false;
     }
     
+    public static boolean saveOBJ(String filename, IServerI server){
+	return saveOBJ(new File(filename), server);
+    }
     
     public static boolean saveOBJ(File file, IServerI server){
 	IOut.debug(0,"saving obj file: "+file);
@@ -297,9 +305,19 @@ public class IIO{
 	return false;
     }
     
-    public static boolean saveRhino(File file, IServerI server){
-	IOut.debug(0,"saving 3dm file: "+file);
-	if(IRhino3dmExporter.write(file,server)){
+    public static boolean saveRhino(String filename, IServerI server){
+	return saveRhino(new File(filename), server);
+    }
+    
+    public static boolean saveRhino(File file, IServerI server){ return saveRhino5(file,server); } // v5 is default
+    
+    public static boolean saveRhino4(String filename, IServerI server){
+	return saveRhino4(new File(filename), server);
+    }
+    public static boolean saveRhino4(File file, IServerI server){
+	IOut.debug(0,"saving 3dm file(v4): "+file);
+	int version = 4;
+	if(IRhino3dmExporter.write(file,server,version)){
 	    IOut.debug(0,"saving complete"); 
 	    return true;
 	}
@@ -307,10 +325,30 @@ public class IIO{
 	return false;
     }
     
+    public static boolean saveRhino5(String filename, IServerI server){
+	return saveRhino5(new File(filename), server);
+    }
+    public static boolean saveRhino5(File file, IServerI server){
+	IOut.debug(0,"saving 3dm file(v5): "+file);
+	int version = 5;
+	if(IRhino3dmExporter.write(file,server,version)){
+	    IOut.debug(0,"saving complete"); 
+	    return true;
+	}
+	IOut.err("error occured in saving file "+file.toString());
+	return false;
+    }
+    
+    public static boolean saveAI(String filename, IServerI server){
+	return saveAI(new File(filename), server);
+    }
     public static boolean saveAI(File file, IServerI server){
 	return saveAI(file,server,IConfig.defaultAIExportScale);
     }
     
+    public static boolean saveAI(String filename, IServerI server, double scale){
+	return saveAI(new File(filename), server, scale);
+    }
     public static boolean saveAI(File file, IServerI server, double scale){
 	IOut.debug(0,"saving ai file: "+file);
 	if(IAIExporter.write(file,server,scale)){
@@ -321,11 +359,18 @@ public class IIO{
 	return false;
     }
     
-    public static void saveTextureAsPNG(String filename, IServerI server){
+    public static boolean saveTextures(File file, IServerI server){
+	return saveTexturesAsPNG(file.getName(), server);
+    }
+    public static boolean saveTextures(String filename, IServerI server){
+	return saveTexturesAsPNG(filename, server);
+    }
+    public static boolean saveTexturesAsPNG(String filename, IServerI server){
 	int objectNum = server.server().objectNum();
 	
 	String basename = getFilenameWithoutExtension(filename);
 	int objCount=0;
+	boolean success = true;
 	for(int i=0; i<objectNum; i++){
 	    IObject obj = server.server().getObject(i);
 	    IAttribute attr = obj.attr();
@@ -334,8 +379,9 @@ public class IIO{
 		filePath = IG.cur().formatOutputFilePath(filePath);
 		IOut.debug(0,"saving png file: "+filePath);
 		try{ ImageIO.write(attr.texture.image,"png",new File(filePath)); }
-		catch(IOException ioe){ ioe.printStackTrace(); }
+		catch(IOException ioe){ ioe.printStackTrace(); success=false; }
 	    }
 	}
+	return success;
     }
 }

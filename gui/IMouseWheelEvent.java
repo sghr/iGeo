@@ -27,7 +27,7 @@ import java.awt.event.*;
 
 /**
    Abstracted mouse wheel event
-      
+
    @author Satoru Sugihara
 */
 public class IMouseWheelEvent{
@@ -35,7 +35,7 @@ public class IMouseWheelEvent{
     public int rotation;
     public int scrollAmount;
     public int scrollType;
-    
+
     public IMouseWheelEvent(){}
     public IMouseWheelEvent(int rot){ rotation = rot; }
     public IMouseWheelEvent(MouseWheelEvent e){
@@ -51,7 +51,7 @@ public class IMouseWheelEvent{
 	scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL;
     }
     
-    
+
     public int getScrollAmount(){ return scrollAmount; }
     public int getScrollType(){ return scrollType; }
     public int getWheelRotation(){ return rotation; }

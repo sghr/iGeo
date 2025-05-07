@@ -27,7 +27,7 @@ import com.jogamp.opengl.GL; // Processing 3
 import java.awt.image.*;
 import igeo.*;
 
-/** 
+/**
     Texture graphic interface
  */
 public interface ITextureGraphicGL{

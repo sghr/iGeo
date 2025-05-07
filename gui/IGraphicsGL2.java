@@ -32,9 +32,9 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 import java.awt.*;
-import java.util.*;
 //import java.nio.*;
 import java.io.*;
+import java.util.*;
 
 //import com.sun.opengl.util.j2d.Overlay;
 import com.jogamp.opengl.util.awt.Overlay; // processing 2.0
@@ -50,46 +50,46 @@ import igeo.gui.*;
 /**
    A child class of Processing's PGraphic to draw on Processing version 2.0 using OpenGL.
    This class also manages the IServer to manage all the objects in iGeo.
-   
+
    @author Satoru Sugihara
 */
 public class IGraphicsGL2 implements IGraphicsGL{
-    
+
     // constants
     public static float[] defaultGLLightPosition = {0f, 0f, 1f, 0f};
     public static float[] defaultGLAmbientLight = {.4f,.4f,.4f,1f};
     public static float[] defaultGLDiffuseLight = {.7f,.7f,.7f,1f};
     public static float[] defaultGLSpecularLight = {.0f,.0f,.0f,1f};
-    
+
     public static boolean defaultGLTwoSidedLighting = false; //true; // when this is true, it seems to cause weird behavior looking like some of normals are flipped or messed up
-    
+
     public GL gl;
     public GL2 gl2;
     public Graphics2D g;
     public IView view;
     //public PGL pgl;
-    
+
     public double[][][] bgColor = new double[2][2][3];
-    
+
     public Texture bgTexture;
     public int bgTextureID;
-    
+
     public boolean firstDraw=true;
-    
-    
+
+
     public IGraphicsGL2(){}
-    
+
     public IView view(){ return view; }
-    
+
     //public void setPGL(PGL pgl){ this.pgl=pgl; setGL(pgl.gl); }
     public void setGL(GL gl){ this.gl=gl; gl2 = gl.getGL2(); }
     public void setGraphics(Graphics2D g){ this.g=g; }
-    
+
     //public GL getGL(){ return gl; }
     public GL getGL(){ return gl2; }
     //public GL2 getGL2(){ return gl2; }
     public Graphics2D getGraphics(){ return g; }
-    
+
     public IGraphicMode.GraphicType type(){ return IGraphicMode.GraphicType.GL; }
     /*
     public void setBGImage(Image img){
@@ -112,9 +112,9 @@ public class IGraphicsGL2 implements IGraphicsGL{
     }
     */
 
-    
+
     String imageFile; // debug
-    
+
     public void setBGImage(String imageFilename){
 	imageFile = imageFilename; // debug
 	bgTexture = ITextureGraphicGL2.getTexture(imageFile);
@@ -146,19 +146,19 @@ public class IGraphicsGL2 implements IGraphicsGL{
 		}
 	    }
 	    catch(IOException e){ e.printStackTrace(); }
-	    
+
 	}
 	else{
 	    IOut.err("no IG instance found");
 	}
 	*/
     }
-    
-    
+
+
     public void drawBG(GL gl, IView v){
-	
+
         GL2 gl2 = gl.getGL2(); // jogl 2.0
-	
+
 	//  jogl2?
 	gl2.glMatrixMode(GL2.GL_MODELVIEW); // not in processing 2.0
 	gl2.glPushMatrix(); // not in processing 2.0
@@ -166,10 +166,10 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	gl2.glMatrixMode(GL2.GL_PROJECTION); // not in processing 2.0
 	gl2.glPushMatrix(); // not in processing 2.0
 	gl2.glLoadIdentity(); // not in processing 2.0
-	
+
 	//if(IConfig.depthSort) gl2.glDisable(GL2.GL_DEPTH_TEST);
 	//if(mode.isLight()) gl2.glDisable(GL2.GL_LIGHTING);
-	
+
 	/*
 	if(view.bgImageBuf!=null){
 	    //gl2.glDisable(GL2.GL_DEPTH_TEST);
@@ -182,20 +182,20 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	    //gl2.glEnable(GL2.GL_DEPTH_TEST);
 	}
         */
-	
+
 	if(bgTexture!=null){
-	    //gl2.glClear(GL2.GL_COLOR_BUFFER_BIT); // 
-	    //gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT); // 
-	    //gl2.glClear(GL2.GL_ACCUM_BUFFER_BIT); // 
-	    //gl2.glClear(GL2.GL_STENCIL_BUFFER_BIT); // 
+	    //gl2.glClear(GL2.GL_COLOR_BUFFER_BIT); //
+	    //gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT); //
+	    //gl2.glClear(GL2.GL_ACCUM_BUFFER_BIT); //
+	    //gl2.glClear(GL2.GL_STENCIL_BUFFER_BIT); //
 	    //gl2.glDisable(GL2.GL_DEPTH_TEST);
-	    
+
 	    gl2.glDisable(GL2.GL_BLEND); // important
 	    gl2.glEnable(GL2.GL_TEXTURE_2D);
 	    gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE); // GL_DECAL
-	    
+
 	    gl2.glBindTexture(GL2.GL_TEXTURE_2D, bgTextureID);
-	    
+
 	    gl2.glBegin(GL2.GL_QUADS);
 	    gl2.glTexCoord2f(0f,0f);
 	    gl2.glVertex3d(-1,-1,0);
@@ -205,14 +205,14 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	    gl2.glVertex3d(1,1,0);
 	    gl2.glTexCoord2f(0f,1f);
 	    gl2.glVertex3d(-1,1,0);
-	    
+
             gl2.glEnd();
-	    
+
 	    //gl2.glFlush();
-	    
+
 	    gl2.glBindTexture(GL2.GL_TEXTURE_2D, 0); // bind no texture
 	    //gl2.glDisable(GL2.GL_TEXTURE_2D);
-	    
+
 	    gl2.glEnable(GL2.GL_BLEND);
 	    //gl2.glEnable(GL2.GL_DEPTH_TEST);
 	}
@@ -224,7 +224,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
                     bgColor[i][j][2] = (double)(view.bgColor[i][j].getBlue())/255.0;
                 }
 	    }
-	    
+
             gl2.glBegin(GL2.GL_QUADS);
             gl2.glColor3dv(bgColor[0][1],0);
             gl2.glVertex3d(-1.,-1.,0);
@@ -236,16 +236,16 @@ public class IGraphicsGL2 implements IGraphicsGL{
             gl2.glVertex3d(-1.,1.,0);
             gl2.glEnd();
         }
-	
+
 	//if(IConfig.depthSort) gl2.glEnable(GL2.GL_DEPTH_TEST);
 	gl2.glMatrixMode(GL2.GL_MODELVIEW);
 	gl2.glPopMatrix();
 	gl2.glMatrixMode(GL2.GL_PROJECTION);
 	gl2.glPopMatrix();
     }
-    
+
     public void drawView(IView view){
-	
+
         gl2.glViewport(view.screenX, view.screenY, view.screenWidth, view.screenHeight);
 
         //gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT); //
@@ -256,16 +256,16 @@ public class IGraphicsGL2 implements IGraphicsGL{
             gl2.glDisable(GL2.GL_DEPTH_TEST); // no depth for background
             drawBG(gl, view);
         }
-	
-	
+
+
 	if(view.mode.isTransparent() && !view.mode.isWireframe() || IConfig.disableDepthTest){ gl2.glDisable(GL2.GL_DEPTH_TEST); } // for transparency, ignore order to show objects in the back
         else if(IConfig.depthSort) gl2.glEnable(GL2.GL_DEPTH_TEST);
         // should DEPTH_TEST be changed to set to hint[ENABLE_DEPTH_TEST] later?
-	
-	
+
+
         // default light
 	if(view.mode.isLight()){
-            
+
             gl2.glMatrixMode(GL2.GL_MODELVIEW);
             gl2.glPushMatrix();
             gl2.glLoadIdentity();
@@ -274,21 +274,21 @@ public class IGraphicsGL2 implements IGraphicsGL{
             gl2.glLightfv(GL2.GL_LIGHT1, GL2.GL_AMBIENT, defaultGLAmbientLight, 0);
             gl2.glLightfv(GL2.GL_LIGHT1, GL2.GL_DIFFUSE, defaultGLDiffuseLight, 0);
             gl2.glLightfv(GL2.GL_LIGHT1, GL2.GL_SPECULAR,defaultGLSpecularLight, 0);
-	    
+
             //gl2.glLightModeli(GL2.GL_LIGHT_MODEL_LOCAL_VIEWER, 1); //
-	    
+
 	    if(defaultGLTwoSidedLighting)
                 gl2.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 1); // this seems to cause weird behavior looking like some of normals are flipped or messed up
-	    
+
             //gl2.glEnable(GL2.GL_NORMALIZE); //
             //gl2.glEnable(GL2.GL_AUTO_NORMAL); //
-	    
+
             gl2.glEnable(GL2.GL_LIGHT1);
             gl2.glEnable(GL2.GL_LIGHTING);
-	    
+
             gl2.glPopMatrix();
         }
-	
+
         gl2.glMatrixMode(GL2.GL_PROJECTION);
         gl2.glLoadIdentity();
         //gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT);
@@ -311,7 +311,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
         gl2.glLoadMatrixd(view.transformArray,0);
 
     }
-    
+
     public void draw(ArrayList<IGraphicI> objects, IView v){
 	/*
 	gl2.glClear(GL.GL_COLOR_BUFFER_BIT);
@@ -325,14 +325,14 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	gl2.glEnd();
 	if(true)return; // test
 	*/
-	
+
         view = v; // current view
-	
+
         //if(view==null || view.hide) return; // view==null is already checked in IPane
         if(view.hide) return;
-	
+
         drawView(view);
-	
+
         if(objects!=null){
             if(IConfig.drawOrderForward){
                 for(int i=0; i<objects.size(); i++)
@@ -343,14 +343,14 @@ public class IGraphicsGL2 implements IGraphicsGL{
                     if(objects.get(i).isVisible()) objects.get(i).draw(this);
             }
         }
-	
+
         if(view.mode().isLight()){
             gl2.glDisable(GL2.GL_LIGHTING);
             gl2.glDisable(GL2.GL_LIGHT1);
         }
-	
+
         if(g!=null){ // overlay
-	    
+
             // draw here?
             // border
             if(view.pane!=null &&
@@ -364,7 +364,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
             }
         }
     }
-    
+
     public boolean firstDraw(){ return firstDraw; }
     public void firstDraw(boolean f){ firstDraw=f; }
 
@@ -414,7 +414,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public void ambient(float r, float g , float b){ ambient(r,g,b,255); }
     public void ambient(IColor c){ ambient(c.rgba()); }
     public void ambient(IColor c, float alpha){ ambient(new float[]{ c.r(), c.g(), c.b(), alpha}); }
-    
+
     public void specular(float[] rgba){
         gl2.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, rgba, 0);
     }
@@ -424,7 +424,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public void specular(float r, float g , float b){ specular(r,g,b,255); }
     public void specular(IColor c){ specular(c.rgba()); }
     public void specular(IColor c, float alpha){ specular(new float[]{ c.r(), c.g(), c.b(), alpha}); }
-    
+
     public void emissive(float[] rgba){
         gl2.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, rgba, 0);
     }
@@ -434,12 +434,12 @@ public class IGraphicsGL2 implements IGraphicsGL{
     public void emissive(float r, float g , float b){ emissive(r,g,b,255); }
     public void emissive(IColor c){ emissive(c.rgba()); }
     public void emissive(IColor c, float alpha){ emissive(new float[]{ c.r(), c.g(), c.b(), alpha}); }
-    
+
     // conflicting with PGraphicsOpenGL.shininess()
     public void shininess(float s){
         gl2.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS,s);
     }
-    
+
 
     public void enableLight(){
         gl2.glEnable(GL2.GL_LIGHT1);
@@ -533,13 +533,13 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	}
 	gl2.glEnd();
     }
-    
+
     public void drawPolygon(IVec[] pts){
         gl2.glBegin(GL2.GL_POLYGON);
         for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
         gl2.glEnd();
     }
-    
+
     public void drawPolygon(IVec[] pts, IVec2f[] uv){
         gl2.glBegin(GL2.GL_POLYGON);
         for(int i=0; i<pts.length; i++){
@@ -548,7 +548,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	}
         gl2.glEnd();
     }
-    
+
     public void drawPolygon(IVec[] pts, IColor[] clr, float alpha, boolean light){
         gl2.glBegin(GL2.GL_POLYGON);
 	if(light){
@@ -583,7 +583,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	}
         gl2.glEnd();
     }
-    
+
     public void drawQuads(IVec[] pts){
 	gl2.glBegin(GL2.GL_QUADS);
         for(int i=0; i<pts.length; i++){ gl2.glVertex3d(pts[i].x,pts[i].y,pts[i].z); }
@@ -1266,7 +1266,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	}
         gl2.glEnd();
     }
-    
+
     public void beginTexture(ITexture tex){
 	gl2.glDisable(GL2.GL_BLEND); // important
 	gl2.glEnable(GL2.GL_TEXTURE_2D);
@@ -1277,7 +1277,7 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	gl2.glBindTexture(GL2.GL_TEXTURE_2D, 0); // bind no texture
 	gl2.glEnable(GL2.GL_BLEND);
     }
-    
+
     public ITextureGraphicGL getTextureGraphic(String filename){
 	return new ITextureGraphicGL2(filename, getGL());
     }
@@ -1285,4 +1285,3 @@ public class IGraphicsGL2 implements IGraphicsGL{
 	return new ITextureGraphicGL2(image, getGL());
     }
 }
-

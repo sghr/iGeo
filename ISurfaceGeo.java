@@ -28,46 +28,46 @@ import igeo.gui.*;
 
 /**
    Geometry of NURBS surface.
-   
+
    @author Satoru Sugihara
 */
 public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParameter{
-    
+
     /*protected*/ public IVecI[][] controlPoints;
-    
+
     // degree and knots should not be parameterized
-    // because number of control points, degree and knots are intertwined together: 
+    // because number of control points, degree and knots are intertwined together:
     // changing them independently doesn't make sense
     /*protected*/ public int udegree, vdegree;
-    
+
     /**
        normalized knot vector (start value in knot vector is 0, end value is 1)
     */
     /*protected*/ public double[] uknots, vknots;
     /*protected*/ public double ustart,uend,vstart,vend;
-    
+
     /**
        flag to determine to use default weight value (1.0)
     */
     /*protected*/ public boolean[][] defaultWeights;
-    
+
     /*protected*/ public IBSplineBasisFunction basisFunctionU, basisFunctionV;
     /*protected*/ public IBSplineBasisFunction derivativeFunctionU, derivativeFunctionV;
-    
-    
+
+
     // trim
     /*protected*/ public ArrayList<ArrayList<ITrimCurve>> innerTrimLoop;
     /*protected*/ public ArrayList<ArrayList<ITrimCurve>> outerTrimLoop;
     /*protected*/ public boolean innerTrimClosed=false;
     /*protected*/ public boolean outerTrimClosed=false;
-    
+
     /** point cache for proximity search */
     public ISurfaceCache uvSearchCache;
     public ITrimCache trimCache;
-    
-    
+
+
     public ISurfaceGeo(){}
-    
+
     public ISurfaceGeo(IVecI[][] cpts, int udegree, int vdegree,
 		       double[] uknots, double[] vknots,
 		       double ustart, double uend, double vstart, double vend){
@@ -83,63 +83,63 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	if(vstart!=0.0||vend!=1.0) normalizeKnots(vknots, vstart, vend);
 	init(cpts, udegree, vdegree, uknots, vknots);
     }
-    
+
     public ISurfaceGeo(IVecI[][] cpts, int udegree, int vdegree,
 		       double[] uknots, double[] vknots){
 	ustart=uknots[0]; uend=uknots[uknots.length-1];
 	vstart=vknots[0]; vend=vknots[vknots.length-1];
 	/*
 	if(IConfig.normalizeKnots){
-	    if(uknots[0]!=0.0 || uknots[uknots.length-1]!=1.0) 
+	    if(uknots[0]!=0.0 || uknots[uknots.length-1]!=1.0)
 		normalizeKnots(uknots, uknots[0], uknots[uknots.length-1]);
-	    if(vknots[0]!=0.0 || vknots[vknots.length-1]!=1.0) 
+	    if(vknots[0]!=0.0 || vknots[vknots.length-1]!=1.0)
 		normalizeKnots(vknots, vknots[0], vknots[vknots.length-1]);
 	}
 	*/
-	if(uknots[0]!=0.0 || uknots[uknots.length-1]!=1.0) 
+	if(uknots[0]!=0.0 || uknots[uknots.length-1]!=1.0)
 	    normalizeKnots(uknots, uknots[0], uknots[uknots.length-1]);
-	if(vknots[0]!=0.0 || vknots[vknots.length-1]!=1.0) 
+	if(vknots[0]!=0.0 || vknots[vknots.length-1]!=1.0)
 	    normalizeKnots(vknots, vknots[0], vknots[vknots.length-1]);
 	init(cpts, udegree, vdegree, uknots, vknots);
     }
-    
+
     public ISurfaceGeo(IVecI[][] cpts, int udegree, int vdegree){
 	ustart=0.; uend=1.;
 	vstart=0.; vend=1.;
 	init(cpts, udegree, vdegree,
 	     createKnots(udegree, cpts.length),createKnots(vdegree, cpts[0].length));
     }
-    
+
     public ISurfaceGeo(IVecI[][] cpts){
 	ustart=0.; uend=1.;
 	vstart=0.; vend=1.;
 	init(cpts, 1, 1, createKnots(1, cpts.length), createKnots(1, cpts[0].length));
     }
-    
+
     public ISurfaceGeo(IVecI[][] cpts, int udegree, int vdegree, boolean closeU, boolean closeV){
 	ustart=0.; uend=1.;
 	vstart=0.; vend=1.;
 	init(cpts, udegree, vdegree, closeU, closeV);
     }
-    
+
     public ISurfaceGeo(IVecI[][] cpts, int udegree, int vdegree, boolean closeU, double[] vk){
 	ustart=0.; uend=1.;
 	vstart=0.; vend=1.;
 	init(cpts, udegree, vdegree, closeU, vk);
     }
-    
+
     public ISurfaceGeo(IVecI[][] cpts, int udegree, int vdegree, double[] uk, boolean closeV){
 	ustart=0.; uend=1.;
 	vstart=0.; vend=1.;
 	init(cpts, udegree, vdegree, uk, closeV);
     }
-    
+
     public ISurfaceGeo(IVecI[][] cpts, boolean closeU, boolean closeV){
 	ustart=0.; uend=1.;
 	vstart=0.; vend=1.;
 	init(cpts, 1, 1, closeU, closeV);
     }
-    
+
     public ISurfaceGeo(IVecI pt1, IVecI pt2, IVecI pt3, IVecI pt4){
 	IVecI[][] cpts = new IVecI[2][2];
 	cpts[0][0] = pt1; cpts[1][0] = pt2;
@@ -159,25 +159,25 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		       double x3, double y3, double z3){
 	this(new IVec(x1,y1,z1),new IVec(x2,y2,z2),new IVec(x3,y3,z3));
     }
-    
+
     public ISurfaceGeo(double[][][] xyzValues){
 	this(getPointsFromArray(xyzValues));
     }
-    
+
     public ISurfaceGeo(double[][][] xyzValues, int udeg, int vdeg){
 	this(getPointsFromArray(xyzValues),udeg, vdeg);
     }
-    
+
     public ISurfaceGeo(double[][][] xyzValues, boolean closeU, boolean closeV){
 	this(getPointsFromArray(xyzValues),closeU,closeV);
     }
-    
+
     public ISurfaceGeo(double[][][] xyzValues, int udeg, int vdeg, boolean closeU, boolean closeV){
 	this(getPointsFromArray(xyzValues),udeg, vdeg,closeU,closeV);
     }
-    
+
     /** create surface with outer trim curve */
-    
+
     public ISurfaceGeo(ICurveI trimCurve){
 	IVecI[] cpts = new IVecI[trimCurve.num()];
 	for(int i=0; i<cpts.length; i++) cpts[i] = trimCurve.cp(i);
@@ -192,7 +192,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	int deg = trimCurve.deg();
 	double[] knots = new double[trimCurve.knotNum()];
 	for(int i=0; i<knots.length; i++) knots[i] = trimCurve.knot(i);
-	
+
 	int inum = innerTrimCurves.length;
 	IVecI[][] innerCpts = new IVecI[inum][];
 	int[] innerDeg = new int[inum];
@@ -223,44 +223,44 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    for(int j=0; j<knots[i].length; j++) knots[i][j] = outerTrimCurves[i].knot(j);
 	}
 	boolean outerClose = !cpts[0][0].eq(cpts[cpts.length-1][cpts[cpts.length-1].length-1]);
-	
+
 	int inum = innerTrimCurves.length;
 	IVecI[][][] innerCpts = new IVecI[inum][][];
 	int[][] innerDeg = new int[inum][];
 	double[][][] innerKnots = new double[inum][][];
 	boolean[] innerClose = new boolean[inum];
-	
+
 	for(int i=0; i<inum; i++){
 	    innerCpts[i] = new IVecI[innerTrimCurves[i].length][];
 	    innerDeg[i] = new int[innerTrimCurves[i].length];
 	    innerKnots[i] = new double[innerTrimCurves[i].length][];
-	    
+
 	    for(int j=0; j<innerTrimCurves[i].length; j++){
-		
+
 		innerCpts[i][j] = new IVecI[innerTrimCurves[i][j].num()];
 		for(int k=0; k<innerCpts[i][j].length; k++){
 		    innerCpts[i][j][k] = innerTrimCurves[i][j].cp(k);
 		}
 		innerDeg[i][j] = innerTrimCurves[i][j].deg();
-		
+
 		innerKnots[i][j] = new double[innerTrimCurves[i][j].knotNum()];
 		for(int k=0; k<innerKnots[i][j].length; k++){
 		    innerKnots[i][j][k] = innerTrimCurves[i][j].knot(k);
 		}
 	    }
-	    
+
 	    innerClose[i] = !innerCpts[i][0][0].eq(innerCpts[i][innerCpts[i].length-1][innerCpts[i][innerCpts[i].length-1].length-1]);
-	    
+
 	}
-	
+
 	initWithPlanarTrim(cpts, deg, knots, outerClose,
 			   innerCpts, innerDeg, innerKnots, innerClose);
     }
-    
+
     public ISurfaceGeo(ICurveI trimCurve, ICurveI innerTrimCurve){
 	this(trimCurve, new ICurveI[]{ innerTrimCurve });
     }
-    
+
     public ISurfaceGeo(ICurveI[] trimCurves){
 	if(trimCurves==null || trimCurves.length==0){ IOut.err("no trim curve is provided"); return; }
 	initWithPlanarTrims(trimCurves);
@@ -278,7 +278,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	ICurveGeo testCrv = new ICurveGeo(trimCrvPts,trimCrvDeg,trimCrvKnots);
 	initWithPlanarTrim(trimCrvPts, trimCrvDeg, trimCrvKnots, !testCrv.isClosed());
     }
-    
+
     public ISurfaceGeo(IVecI[] trimCrvPts, IVecI[] innerTrimCrvPts){
 	IVecI[] cpts2 = createClosedCP(trimCrvPts,1);
 	IVecI[] innerCpts = createClosedCP(innerTrimCrvPts,1);
@@ -303,7 +303,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 			   new IVecI[][]{ innerTrimCrvPts },new int[]{ innerTrimCrvDeg },
 			   new double[][]{ innerTrimCrvKnots }, new boolean[]{ !innerTestCrv.isClosed() });
     }
-    
+
     public ISurfaceGeo(IVecI[] trimCrvPts, IVecI[][] innerTrimCrvPts){
 	IVecI[] cpts2 = createClosedCP(trimCrvPts,1);
 	IVecI[][] innerCpts = new IVecI[innerTrimCrvPts.length][];
@@ -331,7 +331,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    innerKnots[i] = createClosedKnots(innerTrimCrvDeg[i],innerCpts[i].length);
 	    innerClose[i] = false;
 	}
-	
+
 	initWithPlanarTrim(cpts2, trimCrvDeg, knots, false,
 			   innerCpts, innerDegree, innerKnots, innerClose);
     }
@@ -346,15 +346,15 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	initWithPlanarTrim(trimCrvPts, trimCrvDeg, trimCrvKnots, !testCrv.isClosed(),
 			   innerTrimCrvPts, innerTrimCrvDeg, innerTrimCrvKnots, innerClose);
     }
-    
-    
+
+
     public ISurfaceGeo(ISurfaceGeo srf){
 	// duplicate points
 	controlPoints = new IVecI[srf.controlPoints.length][srf.controlPoints[0].length];
 	for(int i=0; i<controlPoints.length; i++)
 	    for(int j=0; j<controlPoints[0].length; j++)
 		controlPoints[i][j] = srf.controlPoints[i][j].dup();
-	
+
 	uknots = new double[srf.uknots.length];
 	System.arraycopy(srf.uknots, 0, uknots, 0, uknots.length);
 	vknots = new double[srf.vknots.length];
@@ -366,10 +366,10 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	vstart = srf.vstart;
 	vend = srf.vend;
 	init(controlPoints, udegree, vdegree, uknots, vknots);
-	
+
 	//if(srf.innerTrimLoop!=null) setInnerTrim(srf.innerTrimLoop);
 	//if(srf.outerTrimLoop!=null) setOuterTrim(srf.outerTrimLoop);
-	
+
 	if(srf.innerTrimLoop!=null){
 	    innerTrimLoop = new ArrayList<ArrayList<ITrimCurve>>();
 	    for(int i=0; i<srf.innerTrimLoop.size(); i++){
@@ -391,7 +391,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    }
 	}
     }
-    
+
     public void init(IVecI[][] cpts, int udeg, int vdeg, boolean closeU, boolean closeV){
 	if(closeU && closeV){
 	    cpts = createClosedCPInV(cpts, vdeg);
@@ -402,7 +402,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    IVecI[][] cpts2 = new IVecI[cpts.length][];
 	    for(int i=0; i<cpts.length; i++)
 		cpts2[i] = createClosedCP(cpts[i],vdeg);
-	    
+
 	    IVecI[][] ucpts = new IVecI[cpts2[0].length][cpts2.length];
 	    for(int i=0; i<cpts2[0].length; i++)
 		for(int j=0; j<cpts2.length; j++) ucpts[i][j] = cpts2[j][i];
@@ -412,7 +412,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    IVecI[][] cpts3 = new IVecI[ucpts2[0].length][cpts2[0].length];
 	    for(int i=0; i<cpts3.length; i++)
 		for(int j=0; j<cpts3[0].length; j++) cpts3[i][j] = ucpts2[j][i];
-	    
+
 	    init(cpts3, udeg, vdeg, createClosedKnots(udeg, cpts3.length),
 		 createClosedKnots(vdeg, cpts3[0].length));
 	    */
@@ -464,17 +464,17 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    init(cpts, udeg, vdeg, createKnots(udeg,cpts.length),vk);
 	}
     }
-    
+
     public void init(IVecI[][] cpts, int udeg, int vdeg, double[] uk, double[] vk){
-	
+
 	// check validity (costly?)
 	if(IConfig.checkValidControlPoint){ isValidCP(cpts, udeg, vdeg, uk, vk); }
-	
+
 	// duplicate of control points is avoided
         if(IConfig.checkDuplicatedControlPoint){ checkDuplicatedCP(cpts); }
         else if(IConfig.checkDuplicatedControlPointOnEdge){ checkDuplicatedCPOnEdge(cpts); }
-	
-	
+
+
 	controlPoints = cpts;
 	udegree = udeg;
 	vdegree = vdeg;
@@ -482,51 +482,51 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	vknots = vk;
 	basisFunctionU = new IBSplineBasisFunction(udeg, uk);
 	basisFunctionV = new IBSplineBasisFunction(vdeg, vk);
-	
+
 	defaultWeights = new boolean[cpts.length][cpts[0].length];
 	for(int i=0; i<cpts.length; i++)
 	    for(int j=0; j<cpts[0].length; j++)
 		defaultWeights[i][j] = !(cpts[i][j] instanceof IVec4I);
-	
+
     }
-    
-    
+
+
     public void initWithPlanarTrim(IVecI[] cpts, int trimDeg, double[] trimKnots,
 				   boolean close){
-	
+
 	IVec normal = IVec.averageNormal(cpts);
 	IVec[] uvvec = getPlanarUVVectors(cpts);
 	IVec uvec = uvvec[0], vvec = uvvec[1];
-	
+
 	uvec = normal.cross(uvec).cross(normal).unit();
 	vvec = normal.cross(uvec).unit();
-	
+
 	IVec origin = cpts[0].get();
 	IVec[] uvpts = getPlanarUVPoints(cpts, origin, uvec, vvec);
-	
+
 	double[][] uvrange = getPlanarUVRange(uvpts);
-	
+
 	IVec[][] cornerPts = new IVec[2][2];
 	cornerPts[0][0] = origin.dup().add(uvec, uvrange[0][0]).add(vvec, uvrange[1][0]);
 	cornerPts[1][0] = origin.dup().add(uvec, uvrange[0][1]).add(vvec, uvrange[1][0]);
 	cornerPts[0][1] = origin.dup().add(uvec, uvrange[0][0]).add(vvec, uvrange[1][1]);
 	cornerPts[1][1] = origin.dup().add(uvec, uvrange[0][1]).add(vvec, uvrange[1][1]);
-	
+
 	//ustart = uvrange[0][0];
 	//uend = uvrange[0][1];
 	//vstart = uvrange[1][0];
 	//vend = uvrange[1][1];
 	ustart = 0.0; uend = 1.0;
 	vstart = 0.0; vend = 1.0;
-	
+
 	for(int i=0; i<uvpts.length; i++){
 	    uvpts[i].x = (uvpts[i].x - uvrange[0][0])/(uvrange[0][1] - uvrange[0][0]);
 	    uvpts[i].y = (uvpts[i].y - uvrange[1][0])/(uvrange[1][1] - uvrange[1][0]);
 	}
-	
+
 	init(cornerPts,1,1,
 	     createKnots(1, cornerPts.length),createKnots(1, cornerPts[0].length));
-	
+
 	if(!close)
 	    addOuterTrimLoop(new ITrimCurve(uvpts, trimDeg, trimKnots, 0., 1.));
 	else{
@@ -536,8 +536,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    // adding a straight line to close
 	}
     }
-    
-    
+
+
     public IVecI[] serializeMatrix(IVecI[][] cpts){
 	ArrayList<IVecI> pts = new ArrayList<IVecI>();
 	pts.add(cpts[0][0]);
@@ -550,43 +550,43 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return pts.toArray(new IVecI[pts.size()]);
     }
-    
+
     public void initWithPlanarTrim(IVecI[][] cpts, int[] trimDeg, double[][] trimKnots,
 				   boolean close){
 	IVecI[] cpts2 = serializeMatrix(cpts);
-	
+
 	IVec normal = IVec.averageNormal(cpts2);
 	IVec[] uvvec = getPlanarUVVectors(cpts2);
 	IVec uvec = uvvec[0], vvec = uvvec[1];
-	
+
 	uvec = normal.cross(uvec).cross(normal).unit();
 	vvec = normal.cross(uvec).unit();
-	
+
 	IVec origin = cpts[0][0].get();
 	IVec[][] uvpts = getPlanarUVPoints(cpts, origin, uvec, vvec);
-	
+
 	double[][] uvrange = getPlanarUVRange(uvpts);
-	
+
 	IVec[][] cornerPts = new IVec[2][2];
 	cornerPts[0][0] = origin.dup().add(uvec, uvrange[0][0]).add(vvec, uvrange[1][0]);
 	cornerPts[1][0] = origin.dup().add(uvec, uvrange[0][1]).add(vvec, uvrange[1][0]);
 	cornerPts[0][1] = origin.dup().add(uvec, uvrange[0][0]).add(vvec, uvrange[1][1]);
 	cornerPts[1][1] = origin.dup().add(uvec, uvrange[0][1]).add(vvec, uvrange[1][1]);
-	
+
 	ustart = 0.0; uend = 1.0;
 	vstart = 0.0; vend = 1.0;
-	
+
 	for(int i=0; i<uvpts.length; i++){
 	    for(int j=0; j<uvpts[i].length; j++){
 		uvpts[i][j].x = (uvpts[i][j].x - uvrange[0][0])/(uvrange[0][1] - uvrange[0][0]);
 		uvpts[i][j].y = (uvpts[i][j].y - uvrange[1][0])/(uvrange[1][1] - uvrange[1][0]);
 	    }
 	}
-	
+
 	init(cornerPts,1,1,
 	     createKnots(1, cornerPts.length),createKnots(1, cornerPts[0].length));
 
-	
+
 	ITrimCurve[] trims = new ITrimCurve[uvpts.length + (close?1:0)];
 	for(int i=0; i<uvpts.length; i++){
 	    trims[i] = new ITrimCurve(uvpts[i], trimDeg[i], trimKnots[i], 0., 1.);
@@ -595,11 +595,11 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    trims[uvpts.length] = new ITrimCurve(uvpts[uvpts.length-1][uvpts[uvpts.length-1].length-1],
 						 uvpts[0][0]);
 	}
-	
+
 	addOuterTrimLoop(trims);
     }
-    
-    
+
+
     public void initWithPlanarTrim(IVecI[] cpts, int trimDeg, double[] trimKnots,
 				   boolean close,
 				   IVecI[][] innerCpts, int[] innerTrimDeg, double[][] innerTrimKnots,
@@ -610,21 +610,21 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    IOut.err("inner trim parameter is null"); //
 	    return;
 	}
-	
+
 	if(innerCpts.length!=innerTrimDeg.length ||
 	   innerCpts.length!=innerTrimKnots.length ||
 	   innerCpts.length!=innerClose.length ){
 	    IOut.err("inner trim parameter array length doesn't match");
 	    return;
 	}
-	
+
 	IVec orig = corner(0,0).get();
 	IVec uvec = corner(1,0).diff(orig);
 	IVec vvec = corner(0,1).diff(orig);
-	
+
 	for(int i=0; i<innerCpts.length; i++){
 	    IVec[] uvpts = getPlanarUVPoints(innerCpts[i], orig, uvec, vvec);
-	    
+
 	    if(!innerClose[i])
 		addInnerTrimLoop(new ITrimCurve(uvpts, innerTrimDeg[i], innerTrimKnots[i], 0., 1.));
 	    else{
@@ -634,38 +634,38 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		// adding a straight line to close
 	    }
 	}
-	
+
     }
-    
-    
+
+
     public void initWithPlanarTrim(IVecI[][] cpts, int[] trimDeg, double[][] trimKnots,
 				   boolean close,
 				   IVecI[][][] innerCpts, int[][] innerTrimDeg, double[][][] innerTrimKnots,
 				   boolean[] innerClose){
-	
+
 	initWithPlanarTrim(cpts,trimDeg,trimKnots,close);
-	
+
 	if(innerCpts==null || innerTrimDeg==null || innerTrimKnots==null || innerClose==null){
 	    IOut.err("inner trim parameter is null"); //
 	    return;
 	}
-	
+
 	if(innerCpts.length!=innerTrimDeg.length ||
 	   innerCpts.length!=innerTrimKnots.length ||
 	   innerCpts.length!=innerClose.length ){
 	    IOut.err("inner trim parameter array length doesn't match");
 	    return;
 	}
-	
+
 	IVec orig = corner(0,0).get();
 	IVec uvec = corner(1,0).diff(orig);
 	IVec vvec = corner(0,1).diff(orig);
-	
+
 	for(int i=0; i<innerCpts.length; i++){
-	    
+
 	    ITrimCurve[] trims = new ITrimCurve[innerCpts[i].length + (innerClose[i]?1:0)];
 	    IVec[][] uvpts = new IVec[innerCpts[i].length][];
-	    
+
 	    for(int j=0; j<innerCpts[i].length; j++){
 		uvpts[j] = getPlanarUVPoints(innerCpts[i][j], orig, uvec, vvec);
 		trims[j] = new ITrimCurve(uvpts[j], innerTrimDeg[i][j], innerTrimKnots[i][j], 0., 1.);
@@ -676,10 +676,10 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    }
 	    addInnerTrimLoop(trims);
 	}
-	
+
     }
-    
-    
+
+
 
     public void initWithPlanarTrims(ICurveI[] curves){
 	ArrayList<IVecI> pts = new ArrayList<IVecI>();
@@ -689,27 +689,27 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		    pts.add(curves[i].cp(j));
 	    }
 	}
-	
+
 	IVecI[] cpts = pts.toArray(new IVecI[pts.size()]);
-	
+
 	IVec normal = IVec.averageNormal(cpts);
 	IVec[] uvvec = getPlanarUVVectors(cpts);
 	IVec uvec = uvvec[0], vvec = uvvec[1];
-	
+
 	uvec = normal.cross(uvec).cross(normal).unit();
 	vvec = normal.cross(uvec).unit();
-	
+
 	IVec origin = cpts[0].get();
 	IVec[] uvpts = getPlanarUVPoints(cpts, origin, uvec, vvec);
-	
+
 	double[][] uvrange = getPlanarUVRange(uvpts);
-	
+
 	IVec[][] cornerPts = new IVec[2][2];
 	cornerPts[0][0] = origin.dup().add(uvec, uvrange[0][0]).add(vvec, uvrange[1][0]);
 	cornerPts[1][0] = origin.dup().add(uvec, uvrange[0][1]).add(vvec, uvrange[1][0]);
 	cornerPts[0][1] = origin.dup().add(uvec, uvrange[0][0]).add(vvec, uvrange[1][1]);
 	cornerPts[1][1] = origin.dup().add(uvec, uvrange[0][1]).add(vvec, uvrange[1][1]);
-	
+
 	IVecI[][] pts2 = new IVecI[curves.length][];
 	for(int i=0; i<curves.length; i++){
 	    pts2[i] = new IVecI[curves[i].num()];
@@ -719,24 +719,24 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(int i=0; i<curves.length; i++){
 	    uvpts2[i] = getPlanarUVPoints(pts2[i], origin, uvec, vvec);
 	}
-	
+
 	for(int i=0; i<uvpts2.length; i++){
 	    for(int j=0; j<uvpts2[i].length; j++){
 		uvpts2[i][j].x=(uvpts2[i][j].x-uvrange[0][0])/(uvrange[0][1]-uvrange[0][0]);
 		uvpts2[i][j].y=(uvpts2[i][j].y-uvrange[1][0])/(uvrange[1][1]-uvrange[1][0]);
 	    }
 	}
-	
+
 	init(cornerPts,1,1,
 	     createKnots(1, cornerPts.length),createKnots(1, cornerPts[0].length));
-	
+
 	ArrayList<ITrimCurve> trimCurves = new ArrayList<ITrimCurve>();
-	
+
 	for(int i=0; i<curves.length; i++){
 	    double[] knots = new double[curves[i].knotNum()];
 	    for(int j=0; j<knots.length; j++){ knots[j] = curves[i].knot(j); }
 	    ITrimCurve trim = new ITrimCurve(uvpts2[i],curves[i].deg(),knots,0.,1.);
-	    
+
 	    if(i>0 && !trimCurves.get(trimCurves.size()-1).end2d().eq(trim.start2d())){
 		// filling a gap with straight line
 		ITrimCurve fillLine =
@@ -746,7 +746,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    }
 	    trimCurves.add(trim);
 	}
-	
+
 	if(trimCurves.size()>1 &&
 	   !trimCurves.get(trimCurves.size()-1).end2d().eq(trimCurves.get(0).start2d())){
 	    // close the loop with straight line
@@ -755,45 +755,45 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 			       trimCurves.get(0).start2d().to3d());
 	    trimCurves.add(fillLine);
 	}
-	
+
 	addOuterTrimLoop(trimCurves.toArray(new ITrimCurve[trimCurves.size()]));
     }
-    
-    
+
+
     public boolean isValid(){
 	return isValidCP(controlPoints, udegree, vdegree, uknots, vknots);
     }
-    
+
     public static boolean isValidCP(IVecI[][] cpts, int udeg, int vdeg,
 				    double[] uknots, double[] vknots){
 	if(cpts==null){
 	    IOut.err("control points are null");
 	    return false;
 	}
-	
+
 	if(uknots==null){
 	    IOut.err("uknots are null");
 	    return false;
 	}
-	
+
 	if(vknots==null){
 	    IOut.err("vknots are null");
 	    return false;
 	}
-	
+
 	if(udeg <= 0){
 	    IOut.err("invalid udeg ("+udeg+")");
 	    return false;
 	}
-	
+
 	if(vdeg <= 0){
 	    IOut.err("invalid vdeg ("+vdeg+")");
 	    return false;
 	}
-	
+
 	int unum = cpts.length;
 	int vnum = cpts[0].length;
-	
+
 	for(int i=1; i<unum; i++){
 	    if(cpts[i].length!=vnum){
 		IOut.err("vnum("+vnum+") in control point array is inconsistent ("+
@@ -801,41 +801,41 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		return false;
 	    }
 	}
-	
+
 	if(unum <= udeg){
 	    IOut.err("too less control points in u direction ("+unum+") for u degree "+udeg+". it needs minimum "+(udeg+1));
 	    return false;
 	}
-	
+
 	if(vnum <= vdeg){
 	    IOut.err("too less control points in v direction ("+vnum+") for v degree "+vdeg+". it needs minimum "+(vdeg+1));
 	    return false;
 	}
-	
+
 	if(uknots.length != (udeg+unum+1)){
 	    IOut.err("uknot array length is invalid. it needs to be "+(udeg+unum+1));
 	    return false;
 	}
-	
+
 	if(vknots.length != (vdeg+vnum+1)){
 	    IOut.err("vknot array length is invalid. it needs to be "+(vdeg+vnum+1));
 	    return false;
 	}
 
 	if(!isValidCP(cpts)) return false;
-	
+
 	if(!isValidKnots(uknots)){
 	    IOut.err("uknot has invalid value");
 	    return false;
 	}
 	if(!isValidKnots(vknots)){
-	    IOut.err("uknot has invalid value");
+	    IOut.err("vknot has invalid value");
 	    return false;
 	}
-	
+
 	return true;
     }
-    
+
     public static boolean isValidCP(IVecI[][] cpts){
 	if(cpts==null){ IOut.err("controlPoint is null"); return false; }
 	for(int i=0; i<cpts.length; i++){
@@ -853,8 +853,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return true;
     }
-    
-    
+
+
     public static void checkDuplicatedCP(IVecI[][] cpts){
 	int un = cpts.length;
 	int vn = cpts[0].length;
@@ -864,7 +864,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		if(cpts[j/vn][j%vn]==cpts[i/vn][i%vn])
 		    cpts[j/vn][j%vn] = cpts[i/vn][i%vn].dup();
     }
-    
+
     public static void checkDuplicatedCP(IVecI[][] cpts, IVecI[] pts){
 	for(int i=0; i<cpts.length; i++){
 	    for(int j=0; j<cpts[i].length; j++){
@@ -874,7 +874,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    }
 	}
     }
-    
+
     public static void checkDuplicatedCPOnEdge(IVecI[][] cpts){
 	int un = cpts.length;
 	int vn = cpts[0].length;
@@ -885,7 +885,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(int i=0; i<vn; i++)
 	    if(cpts[0][i]==cpts[un-1][i]) cpts[un-1][i] = cpts[0][i].dup();
     }
-    
+
     public static IVec[][] getPointsFromArray(double[][][] xyzvalues){
 	IVec[][] cpts = new IVec[xyzvalues.length][xyzvalues[0].length];
         for(int i=0; i<cpts.length; i++){
@@ -904,13 +904,13 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         }
 	return cpts;
     }
-    
+
     /*
     public static IVec getAverageNormal(IVecI[] pts){
 	int n = pts.length;
 	if(n<3) return null;
 	if(n==3) return pts[1].get().diff(pts[0]).cross(pts[2].get().diff(pts[1])).unit();
-	
+
 	IVec nrm = new IVec();
 	for(int i=0; i<n; i++){
 	    IVec diff1 = pts[(i+1)%n].get().diff(pts[i]);
@@ -934,7 +934,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		if(vvec.isParallel(uvec)) vvec=null;
 	    }
         }
-	
+
 	if(pts.length < 3){
 	    IOut.err("too less trim points ("+pts.length+"). needs to be 3 or more");
 	    return null;
@@ -945,10 +945,10 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return new IVec[]{ uvec.unit(), uvec.cross(vvec).cross(uvec).unit() };
     }
-    
+
     public static IVec[] getPlanarUVPoints(IVecI[] pts, IVecI origin, IVec uvec, IVec vvec){
 	IVec[] uvpts = new IVec[pts.length];
-	
+
 	for(int i=0; i<pts.length; i++){
 	    IVec diff = pts[i].get().diff(origin);
 	    double[] uv = diff.projectTo2Vec(uvec,vvec);
@@ -959,14 +959,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return uvpts;
     }
-    
+
     public static IVec[][] getPlanarUVPoints(IVecI[][] pts, IVecI origin, IVec uvec, IVec vvec){
 	IVec[][] uvpts = new IVec[pts.length][];
-	
+
 	for(int i=0; i<pts.length; i++){
 	    uvpts[i] = new IVec[pts[i].length];
 	    for(int j=0; j<pts[i].length; j++){
-		
+
 		IVec diff = pts[i][j].get().diff(origin);
 		double[] uv = diff.projectTo2Vec(uvec,vvec);
 		if(pts[i][j] instanceof IVec4I){
@@ -977,7 +977,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return uvpts;
     }
-    
+
     public static double[][] getPlanarUVRange(IVec[] uvpts){
 
 	double minu = uvpts[0].x, maxu = uvpts[0].x, minv = uvpts[0].y, maxv = uvpts[0].y;
@@ -987,10 +987,10 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
             if(uvpts[i].y < minv) minv = uvpts[i].y;
             else if(uvpts[i].y > maxv) maxv = uvpts[i].y;
 	}
-	
+
 	return new double[][]{ new double[]{ minu, maxu }, new double[]{ minv, maxv }};
     }
-    
+
     public static double[][] getPlanarUVRange(IVec[][] uvpts){
 	double minu = uvpts[0][0].x, maxu = uvpts[0][0].x, minv = uvpts[0][0].y, maxv = uvpts[0][0].y;
 	for(int i=0; i<uvpts.length; i++){
@@ -1003,15 +1003,15 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		}
 	    }
 	}
-	
+
 	return new double[][]{ new double[]{ minu, maxu }, new double[]{ minv, maxv }};
     }
-    
-    
+
+
     public ISurfaceGeo get(){ return this; }
-    
+
     public ISurfaceGeo dup(){ return new ISurfaceGeo(this); }
-        
+
     public IVec pt(IVec2I v){ IVec2 vec=v.get(); return pt(vec.x,vec.y); }
     public IVec pt(IDoubleI u, IDoubleI v){ return pt(u.x(),v.x()); }
     public IVec pt(double u, double v){
@@ -1041,7 +1041,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         retval.y/=weight;
         retval.z/=weight;
     }
-    
+
     /**
        @param u u coordinates in uv parameter space
        @param v v coordinates in uv parameter space
@@ -1057,8 +1057,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     public IVec pt(IVec v){ return pt(v.x,v.y,v.z); }
     public IVec pt(IVecI v){ IVec vec=v.get(); return pt(vec.x,vec.y,vec.z); }
-    
-    
+
+
     public IVec utan(IVec2I v){ IVec2 vec=v.get(); return utan(vec.x,vec.y); }
     public IVec utan(IDoubleI u, IDoubleI v){ return utan(u.x(),v.x()); }
     public IVec utan(double u, double v){
@@ -1073,28 +1073,28 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         }
         int uindex = basisFunctionU.index(u);
         int vindex = basisFunctionV.index(v);
-        
+
         double[] nu = basisFunctionU.eval(uindex, u);
         double[] nv = basisFunctionV.eval(vindex, v);
-        
+
         double[] dnu = derivativeFunctionU.eval(uindex, u);
-        
+
         IVec4 val1 = new IVec4();
         IVec4 val2 = new IVec4();
-        
+
         int i,j;
         for(i=0; i<=udegree; i++){
             for(j=0; j<=vdegree; j++){
                 IVec cpt=controlPoints[uindex-udegree+i][vindex-vdegree+j].get();
-                
+
                 double w=1.;
                 if(!defaultWeights[uindex-udegree+i][vindex-vdegree+j]) w=((IVec4)cpt).w;
-                
+
                 val1.x += cpt.x*w*nu[i]*nv[j];
                 val1.y += cpt.y*w*nu[i]*nv[j];
                 val1.z += cpt.z*w*nu[i]*nv[j];
                 val1.w += w*nu[i]*nv[j];
-                
+
                 val2.x += cpt.x*w*dnu[i]*nv[j];
                 val2.y += cpt.y*w*dnu[i]*nv[j];
                 val2.z += cpt.z*w*dnu[i]*nv[j];
@@ -1104,18 +1104,18 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         val1.x*=val2.w;
         val1.y*=val2.w;
         val1.z*=val2.w;
-        
+
         val2.x*=val1.w;
         val2.y*=val1.w;
         val2.z*=val1.w;
-        
+
         val1.w*=val1.w;
-        
+
 	retval.x = (val2.x-val1.x)/val1.w;
         retval.y = (val2.y-val1.y)/val1.w;
-        retval.z = (val2.z-val1.z)/val1.w;    	
+        retval.z = (val2.z-val1.z)/val1.w;
     }
-        
+
     public IVec vtan(IVec2I v){ IVec2 vec=v.get(); return vtan(vec.x,vec.y); }
     public IVec vtan(IDoubleI u, IDoubleI v){ return vtan(u.x(),v.x()); }
     public IVec vtan(double u, double v){
@@ -1130,28 +1130,28 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         }
         int uindex = basisFunctionU.index(u);
         int vindex = basisFunctionV.index(v);
-        
+
         double[] nu = basisFunctionU.eval(uindex, u);
         double[] nv = basisFunctionV.eval(vindex, v);
-        
+
         double[] dnv = derivativeFunctionV.eval(vindex, v);
-        
+
         IVec4 val1 = new IVec4();
         IVec4 val2 = new IVec4();
-        
+
         int i,j;
         for(i=0; i<=udegree; i++){
             for(j=0; j<=vdegree; j++){
                 IVec cpt=controlPoints[uindex-udegree+i][vindex-vdegree+j].get();
-                
+
                 double w=1.;
                 if(!defaultWeights[uindex-udegree+i][vindex-vdegree+j]) w=((IVec4)cpt).w;
-                
+
                 val1.x += cpt.x*w*nu[i]*nv[j];
                 val1.y += cpt.y*w*nu[i]*nv[j];
                 val1.z += cpt.z*w*nu[i]*nv[j];
                 val1.w += w*nu[i]*nv[j];
-                
+
                 val2.x += cpt.x*w*nu[i]*dnv[j];
                 val2.y += cpt.y*w*nu[i]*dnv[j];
                 val2.z += cpt.z*w*nu[i]*dnv[j];
@@ -1161,19 +1161,19 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	val1.x*=val2.w;
         val1.y*=val2.w;
         val1.z*=val2.w;
-        
+
         val2.x*=val1.w;
         val2.y*=val1.w;
         val2.z*=val1.w;
-        
+
         val1.w*=val1.w;
-        
+
         retval.x = (val2.x-val1.x)/val1.w;
         retval.y = (val2.y-val1.y)/val1.w;
-        retval.z = (val2.z-val1.z)/val1.w;    	
+        retval.z = (val2.z-val1.z)/val1.w;
     }
-    
-    
+
+
     public IVec nml(IVec2I v){ IVec2 vec=v.get(); return nml(vec.x,vec.y); }
     public IVec nml(IDoubleI u, IDoubleI v){ return nml(u.x(),v.x()); }
     public IVec nml(double u, double v){
@@ -1196,7 +1196,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	else IOut.debug(10,"normal is zero"); //
     }
-    
+
     public IVec nrml(IVec2I v){ IVec2 vec=v.get(); return nml(vec.x,vec.y); }
     public IVec nrml(IDoubleI u, IDoubleI v){ return nml(u.x(),v.x()); }
     public IVec nrml(double u, double v){
@@ -1205,7 +1205,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	return retval;
     }
     public void nrml(double u, double v, IVec retval){ nml(u,v,retval); }
-    
+
     public IVec normal(IVec2I v){ IVec2 vec=v.get(); return nml(vec.x,vec.y); }
     public IVec normal(IDoubleI u, IDoubleI v){ return nml(u.x(),v.x()); }
     public IVec normal(double u, double v){
@@ -1214,42 +1214,42 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	return retval;
     }
     public void normal(double u, double v, IVec retval){ nml(u,v,retval); }
-    
+
     /** getting control point at i and j */
     public IVecI cp(int i, int j){ return controlPoints[i][j]/*.get()*/; }
     /** getting control point at i and j */
     public IVecI cp(IIntegerI i, IIntegerI j){ return controlPoints[i.x()][j.x()]; }
-    
+
     public IVecI[][] cps(){ return controlPoints; }
-    
-    
+
+
     public IVec corner(int u, int v){
 	if(u!=0) u=1;
 	if(v!=0) v=1;
 	return pt((double)u,(double)v);
     }
-    
+
     public IVec corner(IIntegerI u, IIntegerI v){
 	return corner(u.x(),v.x());
     }
-    
+
     public IVec cornerCP(int u, int v){
 	if(u!=0) u=ucpNum()-1;
 	if(v!=0) v=vcpNum()-1;
 	return controlPoints[u][v].get();
     }
-    
+
     public IVecI cornerCP(IIntegerI u, IIntegerI v){
 	int ui=0, vi=0;
 	if(u.x()!=0) ui=ucpNum()-1;
 	if(v.x()!=0) vi=vcpNum()-1;
 	return controlPoints[ui][vi];
     }
-    
-    
-    
+
+
+
     // adding CP after instantiated
-    
+
     /** add control point at the end and rebuild the surface
 	note that a knots is rebuilt with default equal intervals
 	and destroy original knot intervals if variable, like circle.
@@ -1259,14 +1259,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    IOut.err("vnum ("+vnum()+") and point array size ("+pts.length+") don't match.");
 	    return this;
 	}
-	
+
 	for(int i=0; i<pts.length; i++){
 	    if(pts[i]==null || !pts[i].isValid()){
 		IOut.err("input pts["+i+"] is invalid. not added");
 		return this;
 	    }
 	}
-	
+
 	// in case of first addition after the surface is instantiated with one row.
 	if(controlPoints.length==2){
 	    boolean allSame=true;
@@ -1288,7 +1288,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		return this;
 	    }
 	}
-	
+
 	if(IConfig.checkDuplicatedControlPoint){
 	    checkDuplicatedCP(controlPoints, pts);
 	}
@@ -1296,14 +1296,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	int vnum = controlPoints[0].length;
 	//check if it started with duplicated 2 points and if so, remove one of them.
 	//if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; } // isn't taken care of already above?
-	
+
 	IVecI[][] controlPoints2 = new IVecI[unum+1][vnum];
 	for(int i=0; i<unum; i++){
 	    for(int j=0; j<vnum; j++){ controlPoints2[i][j] = controlPoints[i][j]; }
 	}
-	
+
 	for(int j=0; j<vnum; j++){ controlPoints2[unum][j] = pts[j]; }
-	
+
 	// rebuild knots; because it's adding, ignoring the case of closed curve.
 	double[] uknots2  =createKnots(udegree, unum+1);
 	IBSplineBasisFunction basisFunctionU2 = new IBSplineBasisFunction(udegree, uknots2);
@@ -1311,17 +1311,17 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(int i=0; i<unum; i++){
 	    for(int j=0; j<vnum; j++){ defaultWeights2[i][j] = defaultWeights[i][j]; }
 	}
-	
+
 	for(int j=0; j<vnum; j++){ defaultWeights2[unum][j] = !(pts[j] instanceof IVec4I); }
-	
+
 	controlPoints = controlPoints2;
 	uknots = uknots2;
 	basisFunctionU = basisFunctionU2;
 	defaultWeights = defaultWeights2;
 	return this;
     }
-    
-    
+
+
     /** add control point at the end and rebuild the surface
 	note that a knots is rebuilt with default equal intervals
 	and destroy original knot intervals if variable, like circle.
@@ -1331,14 +1331,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    IOut.err("unum ("+unum()+") and point array size ("+pts.length+") don't match.");
 	    return this;
 	}
-	
+
 	for(int i=0; i<pts.length; i++){
 	    if(pts[i]==null || !pts[i].isValid()){
 		IOut.err("input pts["+i+"] is invalid. not added");
 		return this;
 	    }
 	}
-	
+
 	// in case of first addition after the surface is instantiated with one row.
 	if(controlPoints[0].length==2){
 	    boolean allSame=true;
@@ -1360,7 +1360,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		return this;
 	    }
 	}
-	
+
 	if(IConfig.checkDuplicatedControlPoint){
 	    checkDuplicatedCP(controlPoints, pts);
 	}
@@ -1368,14 +1368,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	int vnum = controlPoints[0].length;
 	//check if it started with duplicated 2 points and if so, remove one of them.
 	//if( num==2 && controlPoints[0].eq(controlPoints[1])){ num=1; } // isn't taken care of already above?
-	
+
 	IVecI[][] controlPoints2 = new IVecI[unum][vnum+1];
 	for(int i=0; i<unum; i++){
 	    for(int j=0; j<vnum; j++){ controlPoints2[i][j] = controlPoints[i][j]; }
 	}
-	
+
 	for(int i=0; i<unum; i++){ controlPoints2[i][vnum] = pts[i]; }
-	
+
 	// rebuild knots; because it's adding, ignoring the case of closed curve.
 	double[] vknots2  =createKnots(vdegree, vnum+1);
 	IBSplineBasisFunction basisFunctionV2 = new IBSplineBasisFunction(vdegree, vknots2);
@@ -1383,17 +1383,17 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(int i=0; i<unum; i++){
 	    for(int j=0; j<vnum; j++){ defaultWeights2[i][j] = defaultWeights[i][j]; }
 	}
-	
+
 	for(int i=0; i<unum; i++){ defaultWeights2[i][vnum] = !(pts[i] instanceof IVec4I); }
-	
+
 	controlPoints = controlPoints2;
 	vknots = vknots2;
 	basisFunctionV = basisFunctionV2;
 	defaultWeights = defaultWeights2;
 	return this;
     }
-    
-    
+
+
     // not tested yet.
     /** getting edit point at i and j */
     public IVec ep(int i, int j){
@@ -1403,11 +1403,11 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public IVec ep(IIntegerI i, IIntegerI j){
 	return pt(uknots[i.x()+udegree], vknots[j.x()+vdegree]);
     }
-    
-    
+
+
     /** mid in UV parameter (u=0.5, v=0.5) point on a surface */
     public IVec mid(){ return pt(0.5, 0.5); }
-    
+
     /** returns center of geometry object */
     public IVec center(){
 	int unum = ucpNum();
@@ -1430,7 +1430,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    }
 	    if(vclosed){ vcount = vnum-1; }
 	}
-	
+
 	// check if start and end of parameter match with knots[0] and knots[knots.length-1]
 	if(uknots[0] != 0.0 || uknots[uknots.length-1] != 1.0){
             // check by cp
@@ -1447,14 +1447,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    }
 	    if(uclosed){ ucount = unum-1; }
 	}
-	
+
 	IVec cnt = new IVec();
 	for(int i=0; i<ucount; i++){ for(int j=0; j<vcount; j++){ cnt.add(cp(i,j)); } }
 	cnt.div(ucount*vcount);
 	return cnt;
     }
-    
-    
+
+
     /** approximate invert projection from 3D location to interanl UV parameter (closest point on surface) */
     synchronized public IVec2 uv(IVecI pt){
 	if(uvSearchCache==null){ uvSearchCache = new ISurfaceCache(this); }
@@ -1465,28 +1465,28 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	if(uvSearchCache==null){ uvSearchCache = new ISurfaceCache(this); }
 	return uvSearchCache.uv(pt.get());
     }
-    
-    
-    
+
+
+
     /** find approximately closest point on a surface */
     public IVec closePt(IVecI pt){ return pt(uv(pt)); }
-    
+
     /** find approximately closest point on a surface on 2D */
     public IVec closePt(IVec2I pt){return pt(uv(pt)); }
-    
+
     /** distance to the closest point on a surface */
     public double dist(IVecI pt){ return closePt(pt).dist(pt); }
     /** distance to the closest point on a surface on 2D*/
     public double dist(IVec2I pt){ return closePt(pt).to2d().dist(pt); }
-    
-    
-    
-    
+
+
+
+
     public double uknot(int i){ return uknots[i]; }
     public IDouble uknot(IIntegerI i){ return new IDouble(uknots[i.x()]); }
     public double vknot(int i){ return vknots[i]; }
     public IDouble vknot(IIntegerI i){ return new IDouble(vknots[i.x()]); }
-    
+
     public double[] uknots(){ return uknots; }
     public double[] uknots(ISwitchE e){ return uknots(); }
     public IDouble[] uknots(ISwitchR r){
@@ -1501,7 +1501,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(int i=0; i<vknots.length; i++) vk[i] = new IDouble(vknots[i]);
 	return vk;
     }
-    
+
     public int uknotNum(){ return uknots.length; }
     public int vknotNum(){ return vknots.length; }
     //public IInteger uknotNumR(){ return new IInteger(uknots.length); }
@@ -1510,7 +1510,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public int vknotNum(ISwitchE e){ return vknotNum(); }
     public IInteger uknotNum(ISwitchR r){ return new IInteger(uknotNum()); }
     public IInteger vknotNum(ISwitchR r){ return new IInteger(vknotNum()); }
-    
+
     public boolean isRational(){
 	if(defaultWeights==null){
 	    IOut.err("defaultWeights is null"); return false;
@@ -1522,7 +1522,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     public boolean isRational(ISwitchE e){ return isRational(); }
     public IBool isRational(ISwitchR r){ return new IBool(isRational()); }
-        
+
     public int udeg(){ return udegree; }
     public int vdeg(){ return vdegree; }
     //public IInteger udegR(){ return new IInteger(udegree); }
@@ -1531,7 +1531,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public int vdeg(ISwitchE e){ return vdeg(); }
     public IInteger udeg(ISwitchR r){ return new IInteger(udeg()); }
     public IInteger vdeg(ISwitchR r){ return new IInteger(vdeg()); }
-    
+
     //public IInteger num(){ return new IInteger(controlPoints.length); }
     public int unum(){ return controlPoints.length; }
     public int vnum(){ return controlPoints[0].length; }
@@ -1541,9 +1541,9 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public int vnum(ISwitchE e){ return vnum(); }
     public IInteger unum(ISwitchR r){ return new IInteger(unum()); }
     public IInteger vnum(ISwitchR r){ return new IInteger(vnum()); }
-    
+
     //public IDouble len(){ return null; }
-    
+
     public int ucpNum(){ return unum(); } // equals to unum()
     public int vcpNum(){ return vnum(); } // equals to vnum()
     //public IInteger ucpNumR(){ return unumR(); } // equals to unum()
@@ -1552,7 +1552,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public int vcpNum(ISwitchE e){ return vcpNum(); }
     public IInteger ucpNum(ISwitchR r){ return new IInteger(ucpNum()); }
     public IInteger vcpNum(ISwitchR r){ return new IInteger(vcpNum()); }
-    
+
     public int uepNum(){ return uknots.length-2*udegree; }
     public int vepNum(){ return vknots.length-2*vdegree; }
     //public IInteger uepNumR(){ return new IInteger(uepNum()); }
@@ -1561,29 +1561,29 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public int vepNum(ISwitchE e){ return vepNum(); }
     public IInteger uepNum(ISwitchR r){ return new IInteger(uepNum()); }
     public IInteger vepNum(ISwitchR r){ return new IInteger(vepNum()); }
-    
+
     // epIdx: 0-epNum, epFraction: 0-1 or -1-0
     public double u(int epIdx, double epFraction){
         if(epFraction>=0) return uknots[epIdx+udegree] +
             (uknots[epIdx+udegree+1]-uknots[epIdx+udegree])*epFraction;
         return uknots[epIdx+udegree] +
-            (uknots[epIdx+udegree]-uknots[epIdx+udegree-1])*epFraction;     
+            (uknots[epIdx+udegree]-uknots[epIdx+udegree-1])*epFraction;
     }
     public IDouble u(IIntegerI epIdx, IDoubleI epFraction){
 	return new IDouble(u(epIdx.x(),epFraction.x()));
     }
-    
+
     // epIdx: 0-epNum, epFraction: 0-1 or -1-0
     public double v(int epIdx, double epFraction){
         if(epFraction>=0) return vknots[epIdx+vdegree] +
             (vknots[epIdx+vdegree+1]-vknots[epIdx+vdegree])*epFraction;
         return vknots[epIdx+vdegree] +
-            (vknots[epIdx+vdegree]-vknots[epIdx+vdegree-1])*epFraction;     
+            (vknots[epIdx+vdegree]-vknots[epIdx+vdegree-1])*epFraction;
     }
     public IDouble v(IIntegerI epIdx, IDoubleI epFraction){
 	return new IDouble(v(epIdx.x(),epFraction.x()));
     }
-    
+
     public double ustart(){ return ustart; }
     public double uend(){ return uend; }
     public double vstart(){ return vstart; }
@@ -1600,26 +1600,26 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public IDouble uend(ISwitchR r){ return new IDouble(uend()); }
     public IDouble vstart(ISwitchR r){ return new IDouble(vstart()); }
     public IDouble vend(ISwitchR r){ return new IDouble(vend()); }
-    
-    
+
+
     /** reverse U parameter. it changes internal parameter without creating a new instance.*/
     public ISurfaceGeo revU(){
         synchronized(IG.lock){
             IVecI[][] cpts2 = new IVecI[controlPoints.length][controlPoints[0].length];
-            
+
             for(int i=0; i<controlPoints.length; i++)
 		for(int j=0; j<controlPoints[i].length; j++)
 		    cpts2[i][j] = controlPoints[controlPoints.length-1-i][j];
-	    
+
             double[] uknots2 = new double[uknots.length];
             for(int i=0; i<uknots.length; i++)
                 uknots2[i] = 1.0 - uknots[uknots.length-1-i]; // [0-1] to [1-0]
-            
+
             boolean[][] defaultWeights2 = new boolean[defaultWeights.length][defaultWeights[0].length];
             for(int i=0; i<defaultWeights.length; i++)
 		for(int j=0; j<defaultWeights[i].length; j++)
 		    defaultWeights2[i][j] = defaultWeights[defaultWeights.length-1-i][j];
-	    
+
 	    controlPoints = cpts2;
             uknots = uknots2;
             defaultWeights = defaultWeights2;
@@ -1661,25 +1661,25 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return this;
     }
-    
+
     /** reverse V parameter. it changes internal parameter without creating a new instance.*/
     public ISurfaceGeo revV(){
         synchronized(IG.lock){
             IVecI[][] cpts2 = new IVecI[controlPoints.length][controlPoints[0].length];
-            
+
             for(int i=0; i<controlPoints.length; i++)
 		for(int j=0; j<controlPoints[i].length; j++)
 		    cpts2[i][j] = controlPoints[i][controlPoints[i].length-1-j];
-	    
+
             double[] vknots2 = new double[vknots.length];
             for(int i=0; i<vknots.length; i++)
                 vknots2[i] = 1.0 - vknots[vknots.length-1-i]; // [0-1] to [1-0]
-	    
+
             boolean[][] defaultWeights2 = new boolean[defaultWeights.length][defaultWeights[0].length];
             for(int i=0; i<defaultWeights.length; i++)
 		for(int j=0; j<defaultWeights[i].length; j++)
 		    defaultWeights2[i][j] = defaultWeights[i][defaultWeights[i].length-1-j];
-	    
+
             controlPoints = cpts2;
             vknots = vknots2;
             defaultWeights = defaultWeights2;
@@ -1697,31 +1697,31 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         }
         return this;
     }
-    
+
     /** reverse U and V parameter at the same time*/
     public ISurfaceGeo revUV(){
         synchronized(IG.lock){
             IVecI[][] cpts2 = new IVecI[controlPoints.length][controlPoints[0].length];
-            
+
             for(int i=0; i<controlPoints.length; i++)
 		for(int j=0; j<controlPoints[i].length; j++)
 		    cpts2[i][j] =
 			controlPoints[controlPoints.length-1-i][controlPoints[i].length-1-j];
-	    
+
             double[] uknots2 = new double[uknots.length];
             for(int i=0; i<uknots.length; i++)
                 uknots2[i] = 1.0 - uknots[uknots.length-1-i]; // [0-1] to [1-0]
-	    
+
             double[] vknots2 = new double[vknots.length];
             for(int i=0; i<vknots.length; i++)
                 vknots2[i] = 1.0 - vknots[vknots.length-1-i]; // [0-1] to [1-0]
-	    
+
             boolean[][] defaultWeights2 = new boolean[defaultWeights.length][defaultWeights[0].length];
             for(int i=0; i<defaultWeights.length; i++)
 		for(int j=0; j<defaultWeights[i].length; j++)
 		    defaultWeights2[i][j] =
 			defaultWeights[defaultWeights.length-1-i][defaultWeights[i].length-1-j];
-	    
+
             controlPoints = cpts2;
 	    uknots = uknots2;
             vknots = vknots2;
@@ -1745,12 +1745,12 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
         }
         return this;
     }
-    
+
     /** reverse normal direction. just reversing V direction. the normal direction is not
 	independent from U and V direction. */
     public ISurfaceGeo revN(){ return revV(); }
 
-    
+
     /** alias of revU() */
     public ISurfaceGeo flipU(){ return revU(); }
     /** alias of revV() */
@@ -1759,57 +1759,57 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public ISurfaceGeo flipUV(){ return revUV(); }
     /** alias of flipN() */
     public ISurfaceGeo flipN(){ return revN(); }
-    
-    
+
+
     /** swap U and V parameter */
     public ISurfaceGeo swapUV(){
         synchronized(IG.lock){
             IVecI[][] cpts2 = new IVecI[controlPoints[0].length][controlPoints.length];
-            
+
             for(int i=0; i<controlPoints.length; i++)
 		for(int j=0; j<controlPoints[i].length; j++)
 		    cpts2[j][i] = controlPoints[i][j];
-	    
+
             double[] uknots2 = vknots;
             double[] vknots2 = uknots;
-	    
+
             boolean[][] defaultWeights2 = new boolean[defaultWeights[0].length][defaultWeights.length];
             for(int i=0; i<defaultWeights.length; i++)
 		for(int j=0; j<defaultWeights[i].length; j++)
 		    defaultWeights2[j][i] = defaultWeights[i][j];
-	    
+
             controlPoints = cpts2;
 	    uknots = uknots2;
             vknots = vknots2;
             defaultWeights = defaultWeights2;
-	    
+
 	    double tmp;
 	    tmp = ustart;
 	    ustart = vstart;
 	    vstart = tmp;
-	    
+
 	    tmp = uend;
 	    uend = vend;
 	    vend = tmp;
-	    
+
 	    int tmpDeg = udegree;
 	    udegree = vdegree;
 	    vdegree = tmpDeg;
-	    
+
 	    IBSplineBasisFunction tmpFunc;
 	    tmpFunc = basisFunctionU;
 	    basisFunctionU = basisFunctionV;
 	    basisFunctionV = tmpFunc;
-	    
+
 	    tmpFunc = derivativeFunctionU;
 	    derivativeFunctionU = derivativeFunctionV;
 	    derivativeFunctionV = tmpFunc;
         }
         return this;
     }
-    
-    
-    
+
+
+
     public ISurfaceGeo clearInnerTrim(){
 	for(int i=0; innerTrimLoop!=null &&i<innerTrimLoop.size(); i++){
 	    ArrayList<ITrimCurve> loop=innerTrimLoop.get(i);
@@ -1838,14 +1838,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	clearInnerTrim();
 	for(int i=0;loops!=null&&i<loops.size();i++) addInnerTrim(loops.get(i));
     }
-    
+
     public void addInnerTrim(ArrayList<ITrimCurve> loops){
 	for(int i=0;loops!=null&&i<loops.size();i++) addInnerTrim(loops.get(i));
 	closeInnerTrim();
     }
     */
-    
-    
+
+
     static public boolean isTrimLoopInsideBoundary(ITrimCurveI[] crv,
 						   double u1, double v1,
 						   double u2, double v2){
@@ -1864,7 +1864,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return true;
     }
-    
+
     static public boolean isTrimCurveInsideBoundary(ITrimCurveI crv,
 						    double u1, double v1,
 						    double u2, double v2){
@@ -1880,7 +1880,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return true;
     }
-    
+
     static public boolean isTrimCurveCPInsideBoundary(ITrimCurveI crv, double u1, double v1,
 						      double u2, double v2){
 	for(int i=0; i<crv.num(); i++){
@@ -1892,13 +1892,13 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return true;
     }
-    
+
     static public boolean isTrimLoopClosed(ITrimCurveI[] crv){
 	//IOut.err("crv[0].start2d() = "+crv[0].start2d());
-	//IOut.err("crv[crv.length-1].end2d() = "+crv[crv.length-1].end2d()); 
+	//IOut.err("crv[crv.length-1].end2d() = "+crv[crv.length-1].end2d());
 	return crv[0].start2d().eq(crv[crv.length-1].end2d());
     }
-    
+
     public boolean checkTrimLoop(ITrimCurve[] loop){
 	// check closed, been inside boundary (0-1), loop direction? etc
 	if(loop==null){
@@ -1919,7 +1919,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return true;
     }
-    
+
     public boolean checkTrimLoop(ITrimCurve loop){
 	if(loop==null){
 	    IOut.err("trim loop is null");
@@ -1933,7 +1933,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    IOut.err("trim loop is not closed");
 	    return false;
 	}
-	return true; 
+	return true;
     }
     public boolean checkTrim(ITrimCurve curve){
 	if(curve==null){
@@ -1944,17 +1944,17 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    IOut.err("trim loop is outside boundary of surface");
 	    return false;
 	}
-	
-	return true; 
+
+	return true;
     }
-    
-    
+
+
     public ISurfaceGeo addDefaultOuterTrimLoop(){
 	if(hasOuterTrim()){
 	    IOut.err("the surface already has outer trim");
 	    return this;
 	}
-	
+
 	ITrimCurve[] loop = new ITrimCurve[4];
 	loop[0] = new ITrimCurve(new IVec(0.,0.,0.),new IVec(1.,0.,0.));
 	loop[1] = new ITrimCurve(new IVec(1.,0.,0.),new IVec(1.,1.,0.));
@@ -1963,8 +1963,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	addOuterTrimLoop(loop);
 	return this;
     }
-    
-    
+
+
     public ISurfaceGeo addInnerTrimLoop(ITrimCurveI[] loop){
 	ITrimCurve[] trimLoop = new ITrimCurve[loop.length];
 	for(int i=0; i<loop.length; i++) trimLoop[i] = loop[i].get();
@@ -1972,7 +1972,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     public ISurfaceGeo addInnerTrimLoop(ITrimCurve[] loop){
 	for(int i=0; loop!=null&&i<loop.length; i++) loop[i].surface(this);
-	
+
 	if(!checkTrimLoop(loop)) return this;
 	if(innerTrimLoop==null) innerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
@@ -1982,25 +1982,25 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	closeInnerTrim();
 	return this;
     }
-    
+
     public ISurfaceGeo addInnerTrimLoop(ITrimCurveI loop){ return addInnerTrimLoop(loop.get()); }
-    
+
     public ISurfaceGeo addInnerTrimLoop(ITrimCurve loop){
 	if(loop!=null) loop.surface(this);
-	
+
 	if(!checkTrimLoop(loop)) return this;
 	if(innerTrimLoop==null) innerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
-	if(!loop.isClosed()){ IOut.err("trim loop is not closed"); } 
+	if(!loop.isClosed()){ IOut.err("trim loop is not closed"); }
 	//l.add(loop.surface(this));
 	l.add(loop);
 	innerTrimLoop.add(l);
 	closeInnerTrim();
 	return this;
     }
-    
+
     public ISurfaceGeo addInnerTrimLoop(ICurveI[] trim){ return addInnerTrimLoop(trim,true); }
-    
+
     public ISurfaceGeo addInnerTrimLoop(ICurveI[] trim, boolean deleteInput){
 	if(trim==null || trim.length==0){ IOut.err("no trim input"); return this; }
 	ITrimCurve[] trimCrvs = new ITrimCurve[trim.length];
@@ -2010,21 +2010,21 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return addInnerTrimLoop(trimCrvs);
     }
-    
+
     public ISurfaceGeo addInnerTrimLoop(ICurveI trim){ return addInnerTrimLoop(trim,true); }
-    
+
     public ISurfaceGeo addInnerTrimLoop(ICurveI trim, boolean deleteInput){
 	if(trim==null){ IOut.err("no trim input"); return this; }
 	ITrimCurve trimCrv =new ITrimCurve(trim).surface(this);
 	if(deleteInput && trim instanceof IObject) ((IObject)trim).del();
 	return addInnerTrimLoop(trimCrv);
     }
-    
+
     public ISurfaceGeo addInnerTrim(ITrimCurve trimCrv){
 	if(trimCrv!=null) trimCrv.surface(this);
-	
+
 	if(!checkTrim(trimCrv)) return this;
-	
+
 	if(innerTrimLoop==null){
 	    innerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	    innerTrimLoop.add(new ArrayList<ITrimCurve>());
@@ -2037,23 +2037,23 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	innerTrimLoop.get(innerTrimLoop.size()-1).add(trimCrv);
 	return this;
     }
-    
-    
+
+
     public ISurfaceGeo closeInnerTrim(){ innerTrimClosed=true; return this; }
-    
-    
+
+
     /*
     public void setOuterTrim(ArrayList<ArrayList<ITrimCurve>> loops){
 	clearOuterTrim();
 	for(int i=0;loops!=null&&i<loops.size();i++) addOuterTrim(loops.get(i));
     }
-    
+
     public void addOuterTrim(ArrayList<ITrimCurve> loops){
 	for(int i=0;loops!=null&&i<loops.size();i++) addOuterTrim(loops.get(i));
 	closeOuterTrim();
     }
     */
-    
+
     public ISurfaceGeo addOuterTrimLoop(ITrimCurveI[] loop){
 	ITrimCurve[] trimLoop = new ITrimCurve[loop.length];
 	for(int i=0; i<loop.length; i++) trimLoop[i] = loop[i].get();
@@ -2061,7 +2061,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     public ISurfaceGeo addOuterTrimLoop(ITrimCurve[] loop){
 	for(int i=0; loop!=null&&i<loop.length; i++) loop[i].surface(this);
-	
+
 	if(!checkTrimLoop(loop)) return this;
 	if(outerTrimLoop==null) outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
@@ -2071,25 +2071,25 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	closeOuterTrim();
 	return this;
     }
-    
+
     public ISurfaceGeo addOuterTrimLoop(ITrimCurveI loop){ return addOuterTrimLoop(loop.get()); }
-    
+
     public ISurfaceGeo addOuterTrimLoop(ITrimCurve loop){
 	if(loop!=null) loop.surface(this);
-	
+
 	if(!checkTrimLoop(loop)) return this;
 	if(outerTrimLoop==null) outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
 	ArrayList<ITrimCurve> l = new ArrayList<ITrimCurve>();
-	if(!loop.isClosed()){ IOut.err("trim loop is not closed"); } 
+	if(!loop.isClosed()){ IOut.err("trim loop is not closed"); }
 	//l.add(loop.surface(this));
 	l.add(loop);
 	outerTrimLoop.add(l);
 	closeOuterTrim();
 	return this;
     }
-    
+
     public ISurfaceGeo addOuterTrimLoop(ICurveI[] trim){ return addOuterTrimLoop(trim,true); }
-    
+
     public ISurfaceGeo addOuterTrimLoop(ICurveI[] trim, boolean deleteInput){
 	if(trim==null || trim.length==0){ IOut.err("no trim input"); return this; }
 	ITrimCurve[] trimCrvs = new ITrimCurve[trim.length];
@@ -2099,19 +2099,19 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return addOuterTrimLoop(trimCrvs);
     }
-    
+
     public ISurfaceGeo addOuterTrimLoop(ICurveI trim){ return addOuterTrimLoop(trim,true); }
-    
+
     public ISurfaceGeo addOuterTrimLoop(ICurveI trim, boolean deleteInput){
 	if(trim==null){ IOut.err("no trim input"); return this; }
 	ITrimCurve trimCrv =new ITrimCurve(trim).surface(this);
 	if(deleteInput && trim instanceof IObject) ((IObject)trim).del();
 	return addOuterTrimLoop(trimCrv);
     }
-    
+
     public ISurfaceGeo addOuterTrim(ITrimCurve trimCrv){
 	if(trimCrv!=null) trimCrv.surface(this);
-	
+
 	if(!checkTrim(trimCrv)) return this;
 	if(outerTrimLoop==null){
 	    outerTrimLoop=new ArrayList<ArrayList<ITrimCurve>>();
@@ -2125,9 +2125,9 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	outerTrimLoop.get(outerTrimLoop.size()-1).add(trimCrv);
 	return this;
     }
-    
+
     public ISurfaceGeo closeOuterTrim(){ outerTrimClosed=true; return this; }
-    
+
     public boolean hasTrim(){ return hasInnerTrim()||hasOuterTrim(); }
     public boolean hasInnerTrim(){
 	return innerTrimLoop!=null && innerTrimLoop.size()>0;
@@ -2144,7 +2144,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public IBool hasTrim(ISwitchR r){ return new IBool(hasTrim()); }
     public IBool hasInnerTrim(ISwitchR r){ return new IBool(hasInnerTrim()); }
     public IBool hasOuterTrim(ISwitchR r){ return new IBool(hasOuterTrim()); }
-    
+
     public int innerTrimLoopNum(){
 	if(innerTrimLoop==null) return 0;
 	return innerTrimLoop.size();
@@ -2159,47 +2159,47 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public int outerTrimLoopNum(ISwitchE e){ return outerTrimLoopNum(); }
     public IInteger innerTrimLoopNum(ISwitchR r){ return new IInteger(innerTrimLoopNum()); }
     public IInteger outerTrimLoopNum(ISwitchR r){ return new IInteger(outerTrimLoopNum()); }
-    
-    
+
+
     public int innerTrimNum(int i){
 	if(innerTrimLoop==null) return 0;
 	return innerTrimLoop.get(i).size();
     }
     public IInteger innerTrimNum(IIntegerI i){ return new IInteger(innerTrimNum(i.x())); }
-    
+
     public int outerTrimNum(int i){
 	if(outerTrimLoop==null) return 0;
 	return outerTrimLoop.get(i).size();
     }
     public IInteger outerTrimNum(IIntegerI i){ return new IInteger(outerTrimNum(i.x())); }
-    
+
     public ITrimCurveI[] innerTrimLoop(int i){
 	return innerTrimLoop.get(i).toArray(new ITrimCurve[innerTrimLoop.get(i).size()]);
     }
     public ITrimCurveI[] innerTrimLoop(IIntegerI i){ return innerTrimLoop(i.x()); }
-    
+
     public ITrimCurveI[] outerTrimLoop(int i){
 	return outerTrimLoop.get(i).toArray(new ITrimCurve[outerTrimLoop.get(i).size()]);
     }
     public ITrimCurveI[] outerTrimLoop(IIntegerI i){ return outerTrimLoop(i.x()); }
-    
+
     public ITrimCurveI innerTrim(int i, int j){
 	return innerTrimLoop.get(i).get(j);
     }
     public ITrimCurveI innerTrim(IIntegerI i, IIntegerI j){ return innerTrim(i.x(),j.x()); }
-    
+
     public ITrimCurveI outerTrim(int i, int j){
 	return outerTrimLoop.get(i).get(j);
     }
     public ITrimCurveI outerTrim(IIntegerI i, IIntegerI j){ return outerTrim(i.x(),j.x()); }
-    
-    
+
+
     /**
        default trim is rectangular outer trim at the exact boundary of untrimmed surface
     */
     public boolean hasDefaultTrim(){
 	if(outerTrimLoopNum()!=1) return false;
-	
+
 	IVec[] cpts = new IVec[4];
 	// in case of 4 lines
 	if(outerTrimLoop.get(0).size()==4){
@@ -2219,9 +2219,9 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    for(int i=0; i<4; i++) cpts[i] = outerTrimLoop.get(0).get(0).cp(i).get();
 	}
 	else return false;
-	
+
 	final double resolution = 0.0; // !!!
-	
+
 	if(IVec.isArrayEqual(cpts, new IVec[]{ new IVec(0.,0.,0.),
 					       new IVec(1.,0.,0.),
 					       new IVec(1.,1.,0.),
@@ -2232,17 +2232,17 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     //public IBool hasDefaultTrimR(){ return new IBool(hasDefaultTrim()); }
     public boolean hasDefaultTrim(ISwitchE e){ return hasDefaultTrim(); }
     public IBool hasDefaultTrim(ISwitchR r){ return new IBool(hasDefaultTrim()); }
-    
+
     /** is the surface planar and flat */
     public boolean isFlat(){
 	IVecI planePt = corner(0,0);
 	IVecI planeDir = planePt.get().getNormal(corner(1,0),corner(0,1));
-	
+
 	if(!corner(1,1).get().isOnPlane(planeDir,planePt)){
 	    return false;
 	}
 	if(ucpNum()==2 && vcpNum()==2) return true;
-	
+
 	//for(int i=1; i<ucpNum()-1; i++)
 	//    for(int j=1; j<vcpNum()-1; j++)
 	for(int i=0; i<ucpNum(); i++){
@@ -2253,13 +2253,13 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 		}
 	    }
 	}
-	
+
 	return true;
     }
     //public IBool isFlatR(){ return new IBool(isFlat()); }
     public boolean isFlat(ISwitchE e){ return isFlat(); }
     public IBool isFlat(ISwitchR r){ return new IBool(isFlat()); }
-    
+
     /** is the surface closed in u direction */
     public boolean isUClosed(){
 	int vnum = vcpNum();
@@ -2278,10 +2278,10 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
         return true;
     }
-    
+
     public boolean isUClosed(ISwitchE e){ return isUClosed(); }
     public IBool isUClosed(ISwitchR r){ return new IBool(isUClosed()); }
-    
+
     /** is the surface closed in v direction */
     public boolean isVClosed(){
 	int unum = ucpNum();
@@ -2302,11 +2302,11 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     }
     public boolean isVClosed(ISwitchE e){ return isVClosed(); }
     public IBool isVClosed(ISwitchR r){ return new IBool(isVClosed()); }
-    
-    
+
+
     public boolean isInsideTrim(IVec2I v){ return isInsideTrim(v.get()); }
     public boolean isInsideTrim(double u, double v){ return isInsideTrim(new IVec2(u,v)); }
-    
+
     /** check if a u-v point is inside trim curves. the condition where out-trim loop is inside in-trim loop is ignored and it'd be false. */
     public boolean isInsideTrim(IVec2 v){
 	if(trimCache==null){
@@ -2318,14 +2318,14 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	}
 	return trimCache.isInside(v);
     }
-    
-    
+
+
     synchronized public ISurfaceGeo updateCache(){ uvSearchCache = new ISurfaceCache(this); return this; }
-    
+
     /**********************************************************************************
      * transformation methods; API of ITransformable interface
      *********************************************************************************/
-    
+
     public ISurfaceGeo add(double x, double y, double z){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.add(x,y,z);
 	return this;
@@ -2366,20 +2366,20 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.div(v);
 	return this;
     }
-    
+
     public ISurfaceGeo neg(){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.neg();
 	return this;
     }
     /** alias of neg */
     public ISurfaceGeo flip(){ return neg(); }
-    
-    
+
+
     /** scale add */
     public ISurfaceGeo add(IVecI v, double f){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.add(v,f);
 	return this;
-    }	
+    }
     public ISurfaceGeo add(IVecI v, IDoubleI f){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.add(v,f);
 	return this;
@@ -2387,8 +2387,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     /** scale add alias */
     public ISurfaceGeo add(double f, IVecI v){ return add(v,f); }
     public ISurfaceGeo add(IDoubleI f, IVecI v){ return add(v,f); }
-    
-    
+
+
     public ISurfaceGeo rot(IDoubleI angle){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(angle);
 	return this;
@@ -2397,7 +2397,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(angle);
 	return this;
     }
-    
+
     public ISurfaceGeo rot(IVecI axis, IDoubleI angle){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(axis,angle);
 	return this;
@@ -2406,7 +2406,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(axis,angle);
 	return this;
     }
-    
+
     public ISurfaceGeo rot(IVecI center, IVecI axis, IDoubleI angle){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(center,axis,angle);
 	return this;
@@ -2415,18 +2415,18 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(center,axis,angle);
 	return this;
     }
-    
+
     /** rotate to destination direction vector */
     public ISurfaceGeo rot(IVecI axis, IVecI destDir){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(axis,destDir);
 	return this;
     }
-    /** rotate to destination point location */    
+    /** rotate to destination point location */
     public ISurfaceGeo rot(IVecI center, IVecI axis, IVecI destPt){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot(center,axis,destPt);
 	return this;
     }
-    
+
     public ISurfaceGeo rot2(IDoubleI angle){ return rot(angle); }
     public ISurfaceGeo rot2(double angle){ return rot(angle); }
     public ISurfaceGeo rot2(IVecI center, IDoubleI angle){
@@ -2437,38 +2437,38 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot2(center,angle);
 	return this;
     }
-    
+
     /** rotation on xy-plane to destination direction vector */
     public ISurfaceGeo rot2(IVecI destDir){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot2(destDir);
 	return this;
     }
-    /** rotation on xy-plane to destination point location */    
+    /** rotation on xy-plane to destination point location */
     public ISurfaceGeo rot2(IVecI center, IVecI destPt){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.rot2(center,destPt);
 	return this;
     }
-    
-    
+
+
     /** alias of mul */
     public ISurfaceGeo scale(IDoubleI f){ return mul(f); }
     public ISurfaceGeo scale(double f){ return mul(f); }
-    
+
     public ISurfaceGeo scale(IVecI center, IDoubleI f){
-	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.scale(center,f); 
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.scale(center,f);
 	return this;
     }
     public ISurfaceGeo scale(IVecI center, double f){
-	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.scale(center,f); 
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.scale(center,f);
 	return this;
     }
-    
+
     /** scale only in 1 direction */
     public ISurfaceGeo scale1d(IVecI axis, double f){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.scale1d(axis,f);
 	return this;
     }
-    public ISurfaceGeo scale1d(IVecI axis, IDoubleI f){ 
+    public ISurfaceGeo scale1d(IVecI axis, IDoubleI f){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.scale1d(axis,f);
 	return this;
     }
@@ -2480,7 +2480,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.scale1d(center,axis,f);
 	return this;
     }
-    
+
     /** reflect(mirror) 3 dimensionally to the other side of the plane */
     public ISurfaceGeo ref(IVecI planeDir){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.ref(planeDir);
@@ -2493,8 +2493,8 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     /** mirror is alias of ref */
     public ISurfaceGeo mirror(IVecI planeDir){ return ref(planeDir); }
     public ISurfaceGeo mirror(IVecI center, IVecI planeDir){ return ref(planeDir); }
-    
-    
+
+
     /** shear operation */
     public ISurfaceGeo shear(double sxy, double syx, double syz,
 			     double szy, double szx, double sxz){
@@ -2520,7 +2520,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	    for(IVecI p : cpts) p.shear(center,sxy,syx,syz,szy,szx,sxz);
 	return this;
     }
-    
+
     public ISurfaceGeo shearXY(double sxy, double syx){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.shearXY(sxy,syx);
 	return this;
@@ -2553,7 +2553,7 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.shearYZ(center,syz,szy);
 	return this;
     }
-    
+
     public ISurfaceGeo shearZX(double szx, double sxz){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.shearZX(szx,sxz);
 	return this;
@@ -2565,52 +2565,52 @@ public class ISurfaceGeo extends INurbsGeo implements ISurfaceI, IEntityParamete
     public ISurfaceGeo shearZX(IVecI center, double szx, double sxz){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.shearZX(center,szx,sxz);
 	return this;
-    }	
+    }
     public ISurfaceGeo shearZX(IVecI center, IDoubleI szx, IDoubleI sxz){
 	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.shearZX(center,szx,sxz);
 	return this;
     }
-    
+
     /** mv() is alias of add() */
     public ISurfaceGeo mv(double x, double y, double z){ return add(x,y,z); }
     public ISurfaceGeo mv(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
     public ISurfaceGeo mv(IVecI v){ return add(v); }
-    
-    
+
+
     // method name cp() is used as getting control point method in curve and surface but here used also as copy because of the priority of variable fitting of diversed users' mind set over the clarity of the code organization
-    /** cp() is alias of dup() */ 
+    /** cp() is alias of dup() */
     public ISurfaceGeo cp(){ return dup(); }
-    
+
     /** cp() is alias of dup().add() */
     public ISurfaceGeo cp(double x, double y, double z){ return dup().add(x,y,z); }
     /** cp() is alias of dup().add() */
     public ISurfaceGeo cp(IDoubleI x, IDoubleI y, IDoubleI z){ return dup().add(x,y,z); }
     /** cp() is alias of dup().add() */
     public ISurfaceGeo cp(IVecI v){ return dup().add(v); }
-    
-    
+
+
     /** translate() is alias of add() */
     public ISurfaceGeo translate(double x, double y, double z){ return add(x,y,z); }
     public ISurfaceGeo translate(IDoubleI x, IDoubleI y, IDoubleI z){ return add(x,y,z); }
     public ISurfaceGeo translate(IVecI v){ return add(v); }
-    
-    
+
+
     public ISurfaceGeo transform(IMatrix3I mat){
-	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.transform(mat); 
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.transform(mat);
 	return this;
     }
     public ISurfaceGeo transform(IMatrix4I mat){
-	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.transform(mat); 
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.transform(mat);
 	return this;
     }
     public ISurfaceGeo transform(IVecI xvec, IVecI yvec, IVecI zvec){
-	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.transform(xvec,yvec,zvec); 
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.transform(xvec,yvec,zvec);
 	return this;
     }
     public ISurfaceGeo transform(IVecI xvec, IVecI yvec, IVecI zvec, IVecI translate){
-	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.transform(xvec,yvec,zvec,translate); 
+	for(IVecI[] cpts : controlPoints) for(IVecI p : cpts) p.transform(xvec,yvec,zvec,translate);
 	return this;
     }
-    
-    
+
+
 }

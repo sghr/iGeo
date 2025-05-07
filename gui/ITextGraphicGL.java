@@ -38,27 +38,27 @@ import com.jogamp.opengl.util.awt.TextRenderer; // processing 2.0 & 3
 
 /**
    Base class of OpenGL graphic vertex data collection
-   
+
    @author Satoru Sugihara
 */
 public class ITextGraphicGL extends IGraphicObject{
     public static final int defaultFontResolution = 80; //200;
     public static final Font defaultFont = new Font("SansSerif", Font.PLAIN, defaultFontResolution);
-    
+
     public static boolean shareRenderer=false;
 
     public static TextRenderer sharedRenderer;
-    
+
     public TextRenderer renderer;
     public IText text;
-    
+
     public String[] lines;
     public float textWidth;
     public float textHeight;
-    
+
     public Font font;
-    
-    
+
+
     public ITextGraphicGL(IText txt){
 	super(txt);
 	text = txt;
@@ -66,23 +66,23 @@ public class ITextGraphicGL extends IGraphicObject{
 	if(font==null){ font=defaultFont; }
 	//initText(); // initialized when first drawn
     }
-    
+
     public boolean isDrawable(IGraphicMode m){
         return m.isGL(); // currently GL only
         //return m.isGraphic3D();
     }
-    
+
     public void initText(){
 	lines = lines();
 	textWidth = (float)textWidth(lines);
 	textHeight = (float)textHeight(lines);
     }
-    
+
     public String[] lines(){
 	if(text==null || text.text()==null) return null;
 	return text.text().split("\n");
     }
-    
+
     public double textWidth(String[] lines){
 	if(renderer==null){
 	    if(shareRenderer){
@@ -113,16 +113,16 @@ public class ITextGraphicGL extends IGraphicObject{
 	}
 	return maxWidth/sz;
     }
-    
+
     public double textHeight(String[] lines){ if(lines==null){ return 0; } return lines.length; }
-    
+
     synchronized public void draw(IGraphics g){
 	if(text.text()==null) return;
-	
+
 	if(g.type()==IGraphicMode.GraphicType.GL){
 	    IGraphicsGL ggl = (IGraphicsGL)g;
 	    if(ggl.firstDraw() || renderer==null){ update(); } // when resized, it's firstDraw too.
-	    
+
 	    float halign=0, valign=0;
 	    if(text.isAlignLeft()){ halign=0; }
 	    else if(text.isAlignCenter()){ halign = textWidth/2; }
@@ -130,17 +130,17 @@ public class ITextGraphicGL extends IGraphicObject{
 	    if(text.isAlignBottom()){ valign = -textHeight+1; }
 	    else if(text.isAlignMiddle()){ valign = -textHeight/2+1; }
 	    else if(text.isAlignTop()){ valign = 1f; }
-	    
+
 	    IMatrix4 mat = IMatrix4.getTransform(text.uvec(),
 						 text.vvec(),
 						 text.uvec().cross(text.vvec()),
 						 text.pos());
-	    
-	    
-	    
+
+
+
 	    //GL gl = ggl.getGL(); // for processing 1.5
 	    GL2 gl = (GL2) ((IGraphicsGL2)ggl).getGL(); // for processing 2.0 & 3
-	    
+
 	    gl.glPushMatrix();
 	    gl.glMultMatrixd(mat.toArray(),0);
 	    renderer.begin3DRendering();
@@ -151,7 +151,7 @@ public class ITextGraphicGL extends IGraphicObject{
 	    }
 	    renderer.end3DRendering();
 	    gl.glPopMatrix();
-	    
+
 	    /*
 	    GL gl = ggl.getGL();
 	    try{
@@ -167,7 +167,7 @@ public class ITextGraphicGL extends IGraphicObject{
 	    }catch(Exception e){
 	    e.printStackTrace();
 	    }
-	    
+
 	    renderer.begin3DRendering();
 	    renderer.setColor((float)text.red(),(float)text.green(),(float)text.blue(),(float)text.alpha());
 	    for(int i=0; i<lines.length; i++){
@@ -184,16 +184,16 @@ public class ITextGraphicGL extends IGraphicObject{
 	    */
 	}
     }
-    
-    /** 
+
+    /**
 	@param i 0 is left corner, 1 is right corner
 	@param j 0 is bottom corner, 1 is top corner
     */
     public IVec corner(int i, int j){
 	if(renderer==null) initText(); // is this ok?
-	
+
 	if(text==null) return null;
-	
+
 	IVec corner = text.pos().cp();
 	if(i==0){
 	    if(text.isAlignCenter()){ corner.add(text.uvec(),-textWidth/2); }
@@ -203,25 +203,25 @@ public class ITextGraphicGL extends IGraphicObject{
 	    if(text.isAlignLeft()){ corner.add(text.uvec(),textWidth); }
 	    else if(text.isAlignCenter()){ corner.add(text.uvec(),textWidth/2); }
 	}
-	
+
 	if(j==0){
 	    if(text.isAlignTop()){ corner.add(text.vvec(),-textHeight); }
 	    else if(text.isAlignMiddle()){ corner.add(text.vvec(),-textHeight/2); }
-	    
+
 	    //if(text.isAlignMiddle()){ corner.add(text.vvec(),-textHeight/2); }
 	    //else if(text.isAlignBottom()){ corner.add(text.vvec(),-textHeight); }
 	}
 	else{
 	    if(text.isAlignMiddle()){ corner.add(text.vvec(),textHeight/2); }
 	    else if(text.isAlignBottom()){ corner.add(text.vvec(),textHeight); }
-	    
+
 	    //if(text.isAlignTop()){ corner.add(text.vvec(),textHeight); }
 	    //else if(text.isAlignMiddle()){ corner.add(text.vvec(),textHeight/2); }
 	}
-	
+
 	return corner;
     }
-    
+
     public void update(){
 	if(text.font==null && font!=defaultFont){ font = defaultFont; }
 	else if(text.font!=null && font!=text.font){ font = text.font; }
@@ -237,5 +237,5 @@ public class ITextGraphicGL extends IGraphicObject{
 	initText();
 	super.update();
     }
-    
+
 }

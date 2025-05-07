@@ -91,6 +91,8 @@ public class IGraphicServer{
     
     public void addView(IView v){ views.add(v); }
     
+    public void clearView(){ views.clear(); }
+    
     public IView view(int i){ return views.get(i); }
     
     public int viewNum(){ return views.size(); }

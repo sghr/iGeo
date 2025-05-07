@@ -64,6 +64,36 @@ public class IArcGeo extends ICurveGeo{
     }
     
     
+    public static IVec4[] arcCP(IVec center, IVec normal, IVec startPt, double angle, int segmentNum){
+	if(angle<0){
+	    normal = normal.dup().neg();
+	    angle = -angle;
+	}
+	IVec4[] cpts = new IVec4[segmentNum*2+1];
+	IVec radiusVec = startPt.diff(center);
+	IVec bisectorVec = radiusVec.dup();
+	double radius = radiusVec.len();
+        double segmentAngle = angle/segmentNum;
+        double bisectorAngle = segmentAngle/2;
+        double bisectorLen = radius/Math.cos(bisectorAngle);
+        bisectorVec.len(bisectorLen);
+        bisectorVec.rot(normal, bisectorAngle);
+        for(int i=0; i<cpts.length; i++){
+            cpts[i] = center.to4d();
+            if(i%2==0){
+                cpts[i].add(radiusVec);
+                radiusVec.rot(normal, segmentAngle);
+            }
+            else{
+                cpts[i].add(bisectorVec);
+                cpts[i].w = Math.cos(bisectorAngle);
+                bisectorVec.rot(normal, segmentAngle);
+            }
+        }
+        return cpts;	
+    }
+    
+    
     public static IVec4[] arcCP(IVec center, IVec startPt, IVec endPt, boolean flipArcSide){
 	IVec dir1 = startPt.diff(center);
         IVec dir2 = endPt.diff(center);
@@ -82,6 +112,24 @@ public class IArcGeo extends ICurveGeo{
 	return arcCP(center, normal, startPt, angle);
     }
     
+    public static IVec4[] arcCP(IVec center, IVec startPt, IVec endPt, boolean flipArcSide, int segmentNum){
+	IVec dir1 = startPt.diff(center);
+        IVec dir2 = endPt.diff(center);
+        IVec normal = null;
+        if(dir1.isParallel(dir2)) normal = dir2.cross(dir1.cross(IVec.zaxis));
+	else normal = dir2.cross(dir1); // not dir1.dup().cross(dir2); ?
+        double angle = dir1.angle(dir2);
+        if(angle == 0 || angle == Math.PI){
+            if(dir1.x !=0 || dir1.y !=0) normal = dir1.cross(IVec.zaxis);
+            else normal = dir1.cross(IVec.xaxis);
+        }
+	if(flipArcSide){
+            angle = Math.PI*2 - angle;
+            normal.neg();
+        }
+	return arcCP(center, normal, startPt, angle, segmentNum);
+    }
+    
     public static IVec4[] arcCP(IVec center, IVec startPt, IVec midPt, IVec endPt, IVec normal){
         IVec dir1 = startPt.diff(center);
         IVec dir2 = endPt.diff(center);
@@ -95,13 +143,48 @@ public class IArcGeo extends ICurveGeo{
         if(angle<0){ normal.neg(); angle = -angle; }
         normal.neg(); // why?
         return arcCP(center, normal, startPt, angle);
-    }    
+    }
+    
+    public static IVec4[] arcCP(IVec center, IVec startPt, IVec midPt, IVec endPt, IVec normal, int segmentNum){
+        IVec dir1 = startPt.diff(center);
+        IVec dir2 = endPt.diff(center);
+        IVec mdir = midPt.diff(center);
+        double angle = dir1.angle(dir2,normal); 
+        double mangle = dir1.angle(mdir,normal);
+        
+        if( angle>0 && mangle<0 ) angle = -(Math.PI*2 - angle);
+        else if( angle<0 && mangle>0) angle = Math.PI*2 + angle;
+	
+        if(angle<0){ normal.neg(); angle = -angle; }
+        normal.neg(); // why?
+        return arcCP(center, normal, startPt, angle, segmentNum);
+    }
     
     
     public static double[] arcKnots(double angle){
         if(angle < 0) angle = -angle;
         // angle cannot be negative
         int segmentNum= (int)(angle/(maxSegmentAngle)) + 1;
+        double segmentAngle = angle/segmentNum;
+        double[] knots = new double[(segmentNum+1)*2+2];
+        int k=0;
+        double a=0.;
+        knots[k]=a; k++;
+        knots[k]=a; k++;
+        knots[k]=a; k++;
+        for(; k<knots.length-1; k++){
+            a+=segmentAngle;
+            knots[k] = a; k++;
+            knots[k] = a; 
+        }
+        knots[k] = a;
+	for(k=0; k<knots.length; k++) knots[k] /= a; // normalize
+        return knots;
+    }
+
+    public static double[] arcKnots(double angle, int segmentNum){
+        if(angle < 0) angle = -angle;
+        // angle cannot be negative
         double segmentAngle = angle/segmentNum;
         double[] knots = new double[(segmentNum+1)*2+2];
         int k=0;

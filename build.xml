@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="Shift_JIS" ?>
 
-<project name="igeo" default="copy_jar2">
+<project name="igeo" default="copy_jar3">
 
 <!--<project name="igeo" default="all">-->
 
@@ -9,13 +9,13 @@
 <property name="jogl_path" value="C:\Program Files (x86)\Java\jogl-1.1.1-windows-i586" />
 -->
 
-<property name="processing1_path" value="C:\Program Files (x86)\processing-1.5.1" />
+<property name="processing1_path" value="C:\Program Files\processing-1.5.1" />
 <!--<property name="processing2_path" value="C:\Program Files\processing-2.0.3" /> -->
 <property name="processing2_path" value="C:\Program Files\processing-2.2.1" /> 
 <!--<property name="processing3_path" value="C:\Program Files\processing-3.0.1" />--> 
-<property name="processing3_path" value="C:\Program Files\processing-3.5.3" /> 
-<property name="processing_home" value="C:\Users\s\Documents\processing" />
-<property name="processing3_home" value="C:\Users\s\Documents\Processing3" />
+<property name="processing3_path" value="C:\Program Files\processing-3.5.4" /> 
+<property name="processing_home" value="C:\Users\s\Documents\Processing" />
+<property name="processing3_home" value="C:\Users\s\Documents\Processing" />
 <property name="processing_zip_path" value="processing_zip\igeo\" />
 <property name="javadoc_path" value="${processing_zip_path}\reference\" />
 <property name="javadoc_resource" value="C:\Users\s\Documents\www\igeo\doc\" />
@@ -323,7 +323,7 @@
   <target name="all1" depends="clean,compile1,jar1,copy_jar1,copy_src">
   </target>
 
-  <target name="all" depends="all2">
+  <target name="all" depends="all3">
   </target>
 
 </project>
@@ -332,4 +332,7 @@
      you need to change some code manually at IG.java (IG.GL = GL1 or GL2) and 
      gui/ITextGraphicsGL.java (import TextRenderer and ggl.getGL2() )
      in addition to using all1 or all2 target.
+     also
+     - comment out part of code in IKeyEvent, IMouseEvent, IMouseWheelEvent for Processing 1.5
+     - import com.jogamp.opengl.* in ITextGraphicsGL, ITextureGraphicsGL, ITextureGraphics2, IGraphicsGL2, IGraphicsGL, for Processing 3
    -->

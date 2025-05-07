@@ -2,7 +2,7 @@
 
     iGeo - http://igeo.jp
 
-    Copyright (c) 2002-2013 Satoru Sugihara
+    Copyright (c) 2002-2024 Satoru Sugihara
 
     This file is part of iGeo.
 
@@ -20,25 +20,13 @@
 
 ---*/
 
-package igeo.gui;
-
-
-import igeo.*;
-
-//import javax.media.opengl.*; // Processing 1 & 2
-import com.jogamp.opengl.*; // Processing 3
-
-import java.awt.image.*;
+package igeo;
 
 /**
-   Interface of Graphics to draw 3D geometry with OpenGL
+   Interface of NURBS volume operator.
+
    @author Satoru Sugihara
 */
-public interface IGraphicsGL extends IGraphics3D{
-    public GL getGL();
-    public void setGL(GL g);
-    public void setBGImage(String imageFilename);
-
-    public ITextureGraphicGL getTextureGraphic(String filename);
-    public ITextureGraphicGL getTextureGraphic(BufferedImage image);
+public interface IVolumeOp extends IParameter{
+    public IVolumeGeo get();
 }

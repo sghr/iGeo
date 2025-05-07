@@ -305,6 +305,14 @@ public class IView{
 	target.set(x,y,z);
     }
     public void setTarget(IVecI t){ target.set(t); }
+    public void updateTarget(double dist){
+	IVec dir = frontDirection();
+	dir.len(dist);
+	target.set(dir.add(pos));
+    }
+    public void updateTarget(){
+        updateTarget(viewDistance);
+    }
     
     public void enableRotationAroundTarget(){ rotateAroundTarget=true; }
     public void disableRotationAroundTarget(){ rotateAroundTarget=false; }
