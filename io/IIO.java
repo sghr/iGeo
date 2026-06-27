@@ -165,7 +165,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening file "+file.toString());
+	IOut.err("error occurred in opening file "+file.toString());
 	return null;
     }
     
@@ -175,7 +175,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening OBJ file");
+	IOut.err("error occurred in opening OBJ file");
 	return null;
     }
     
@@ -186,7 +186,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening file "+file.toString());
+	IOut.err("error occurred in opening file "+file.toString());
 	return objects;
     }
     
