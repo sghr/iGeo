@@ -165,7 +165,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening file "+file.toString());
+	IOut.err("error occurred in opening file "+file.toString());
 	return null;
     }
     
@@ -175,7 +175,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening OBJ file");
+	IOut.err("error occurred in opening OBJ file");
 	return null;
     }
     
@@ -186,7 +186,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening file "+file.toString());
+	IOut.err("error occurred in opening file "+file.toString());
 	return objects;
     }
     
@@ -196,7 +196,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening Rhino file"); 
+	IOut.err("error occurred in opening Rhino file"); 
         return objects;
     }
     
@@ -215,7 +215,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return true;
 	}
-	IOut.err("error occured in opening file "+file.toString());
+	IOut.err("error occurred in opening file "+file.toString());
 	return false;
 	*/
     }
@@ -250,7 +250,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening file "+file.toString());
+	IOut.err("error occurred in opening file "+file.toString());
 	return null;
     }
     
@@ -260,7 +260,7 @@ public class IIO{
 	    IOut.debug(0,"opening complete");
 	    return objects;
 	}
-	IOut.err("error occured in opening Shape file");
+	IOut.err("error occurred in opening Shape file");
 	return null;
     }
     
@@ -301,7 +301,7 @@ public class IIO{
 	    IOut.debug(0,"saving complete"); 
 	    return true;
 	}
-	IOut.err("error occured in saving file "+file.toString());
+	IOut.err("error occurred in saving file "+file.toString());
 	return false;
     }
     
@@ -321,7 +321,7 @@ public class IIO{
 	    IOut.debug(0,"saving complete"); 
 	    return true;
 	}
-	IOut.err("error occured in saving file "+file.toString());
+	IOut.err("error occurred in saving file "+file.toString());
 	return false;
     }
     
@@ -335,7 +335,7 @@ public class IIO{
 	    IOut.debug(0,"saving complete"); 
 	    return true;
 	}
-	IOut.err("error occured in saving file "+file.toString());
+	IOut.err("error occurred in saving file "+file.toString());
 	return false;
     }
     
@@ -355,7 +355,7 @@ public class IIO{
 	    IOut.debug(0,"saving complete"); 
 	    return true;
 	}
-	IOut.err("error occured in saving file "+file.toString());
+	IOut.err("error occurred in saving file "+file.toString());
 	return false;
     }
     
